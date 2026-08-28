@@ -25,7 +25,6 @@ export default async (request) => {
     return json({ error: "Method not allowed" }, 405);
   }
 
-  // Compare-and-swap loop prevents lost increments if visitors arrive together.
   for (let attempt = 0; attempt < 8; attempt += 1) {
     const entry = await store.getWithMetadata(KEY, {
       consistency: "strong",
@@ -40,11 +39,9 @@ export default async (request) => {
 
     const current = Number.parseInt(entry.data ?? "0", 10) || 0;
     const next = current + 1;
-
     const updated = await store.set(KEY, String(next), {
       onlyIfMatch: entry.etag,
     });
-
     if (updated.modified) return json({ count: next });
   }
 
