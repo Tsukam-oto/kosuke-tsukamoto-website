@@ -376,7 +376,14 @@
       .poem-line{font-size:13.5px;letter-spacing:0}
     }
 
-  </style>
+  
+/* v13 heading fix */
+.v13-line{display:block;width:max-content;max-width:100%;white-space:nowrap}
+.v13-one-line{display:block;width:max-content;max-width:none;white-space:nowrap!important}
+@media(max-width:900px){
+  .v13-line,.v13-one-line{width:auto;max-width:100%;white-space:normal!important}
+}
+</style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
 <body>
@@ -394,7 +401,7 @@
     <section class="hero">
       <div class="hero-copy">
         <p class="eyebrow">COMPOSER / LYRICIST / MUSIC EDUCATOR</p>
-        <h1>思いあふれて<span class="comma">、</span><br>音になるまで。</h1>
+        <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
         <p class="hero-sub">校歌、合唱、吹奏楽、室内楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
         <div class="hero-actions"><a class="btn primary" href="#works">作品を見る <span>→</span></a><a class="btn" href="#lyrics">詞を読む</a><a class="btn" href="#lyric-box">言葉を引く</a><a class="btn" href="#project">創作プロジェクト</a></div>
       </div>
@@ -409,7 +416,7 @@
 
     <section class="intro">
       <div class="wrap intro-grid">
-        <div><p class="section-kicker">ABOUT THE MUSIC</p><h2 class="section-title">人と人との間で、<br>待っている。</h2><p class="lyric-source">FROM “出会い”</p></div>
+        <div><p class="section-kicker">ABOUT THE MUSIC</p><h2 class="section-title"><span class="v13-line">人と人との間で、</span><span class="v13-line">待っている。</span></h2><p class="lyric-source">FROM “出会い”</p></div>
         <div class="intro-note">
           <p class="intro-copy">誰かの思いが言葉になり、言葉が人と人のあいだを行き来し、やがて音楽になる。その過程そのものを大切にしています。</p>
           <p>作曲すること、歌詞を書くこと、教えること、指揮すること。それぞれを切り離さず、一つの音楽活動として続けています。</p>
@@ -462,7 +469,7 @@
     <section class="lyrics-reading" id="lyrics">
       <div class="wrap">
         <div class="lyrics-reading-head">
-          <div class="lyrics-reading-title"><small>POETRY COLLECTION / LYRICS</small><h2>音楽の風景</h2></div>
+          <div class="lyrics-reading-title"><small>POETRY COLLECTION / LYRICS</small><h2><span class="v13-one-line">音楽の風景</span></h2></div>
           <div class="lyrics-reading-copy">歌うために書いた言葉を、音楽から少し離して読む場所です。意味のまとまりごとに短く行を置き、余白の中で一つずつ読めるようにしました。作品名を開くと全文を読むことができます。</div>
         </div>
         <div class="lyrics-list" aria-label="詩集 音楽の風景">
