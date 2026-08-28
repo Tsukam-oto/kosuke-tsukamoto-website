@@ -430,6 +430,47 @@
       .fact .v14-fact-line + .v14-fact-line::before{content:" "}
     }
 
+  
+    /* v15 — public page-view counter */
+    .footer-stats{
+      display:flex;
+      align-items:flex-end;
+      gap:28px;
+      margin-left:auto;
+      margin-right:8px;
+    }
+    .pv-counter{
+      min-width:150px;
+      border-left:1px solid rgba(255,255,255,.18);
+      padding-left:20px;
+    }
+    .pv-counter span{
+      display:block;
+      font:700 8px/1.3 var(--sans);
+      letter-spacing:.16em;
+      color:rgba(255,255,255,.48);
+      margin-bottom:8px;
+    }
+    .pv-counter strong{
+      display:block;
+      font:600 25px/1 var(--sans);
+      letter-spacing:.05em;
+      font-variant-numeric:tabular-nums;
+      color:#fff;
+    }
+    .pv-counter small{
+      display:block;
+      margin-top:7px;
+      font:8px/1.4 var(--sans);
+      letter-spacing:.08em;
+      color:rgba(255,255,255,.38);
+    }
+    @media(max-width:720px){
+      .footer-grid{align-items:flex-start}
+      .footer-stats{margin:4px 0 0;align-items:flex-start}
+      .pv-counter{min-width:0}
+    }
+
   </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -696,7 +737,7 @@
       <div class="wrap">
         <p class="section-kicker">NEWS / NOTES</p><h2 class="section-title">Updates</h2>
         <div class="news-list">
-          <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Website — 公開準備中。</p></div>
+          <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">IN PROGRESS</span><p>新作《海にまであなたは本を連れてきて》《All around you》を制作予定。</p></div>
         </div>
@@ -729,7 +770,7 @@
     </section>
   </main>
 
-  <footer><div class="footer-grid"><div class="footer-name"><strong>束元康介</strong><span>KOSUKE TSUKAMOTO OFFICIAL WEBSITE</span></div><div class="footer-copy">© 2026 Kosuke Tsukamoto<br>思いあふれて、音になるまで。</div></div></footer>
+  <footer><div class="footer-grid"><div class="footer-name"><strong>束元康介</strong><span>KOSUKE TSUKAMOTO OFFICIAL WEBSITE</span></div><div class="footer-stats"><div class="pv-counter" aria-live="polite"><span>PAGE VIEWS</span><strong id="page-view-count">—</strong><small>THIS SITE / TOTAL</small></div><div class="footer-copy">© 2026 Kosuke Tsukamoto<br>思いあふれて、音になるまで。</div></div></div></footer>
 
   <script>
     (() => {
@@ -816,5 +857,31 @@
       drawLyrics();
     })();
   </script>
+
+  <script>
+    (() => {
+      const el = document.getElementById("page-view-count");
+      if (!el) return;
+
+      fetch("/.netlify/functions/pageview", {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        cache: "no-store"
+      })
+        .then((r) => {
+          if (!r.ok) throw new Error("Counter unavailable");
+          return r.json();
+        })
+        .then(({ count }) => {
+          if (Number.isFinite(count)) {
+            el.textContent = new Intl.NumberFormat("ja-JP").format(count);
+          }
+        })
+        .catch(() => {
+          el.textContent = "—";
+        });
+    })();
+  </script>
+
 </body>
 </html>
