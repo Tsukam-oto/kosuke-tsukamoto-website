@@ -559,6 +559,146 @@
 @media(max-width:820px){
   .voices-preview> .wrap > div:first-of-type{grid-template-columns:1fr!important;gap:28px!important}
 }
+
+/* v20 — SHARE PHRASES / SOCIAL CARDS */
+.lyric-share-link{
+  display:inline-flex;align-items:center;justify-content:center;
+  margin:12px auto 0;padding:7px 0;border:0;border-bottom:1px solid currentColor;
+  background:transparent;color:inherit;cursor:pointer;
+  font:700 9px/1.4 var(--sans);letter-spacing:.14em;
+}
+.lyric-share-link:hover{opacity:.62}
+
+.poem-share-start{
+  grid-column:1/-1;
+  display:flex;justify-content:flex-end;
+  margin:0 0 2px;
+}
+.poem-share-start button{
+  border:0;border-bottom:1px solid var(--ink);background:transparent;color:var(--ink);
+  padding:7px 0;cursor:pointer;
+  font:700 9px/1.3 var(--sans);letter-spacing:.13em;
+}
+.poem-panel.share-mode .poem-line{
+  cursor:pointer;
+  transition:background .15s,color .15s,outline-color .15s;
+  border-radius:2px;
+}
+.poem-panel.share-mode .poem-line:hover{background:rgba(0,0,0,.055)}
+.poem-panel.share-mode .poem-line.is-selected{
+  background:#111;color:#fff;
+  outline:4px solid #111;
+}
+.poem-panel.share-mode .poem-line::after{
+  content:"";
+}
+.poem-panel.share-mode .poem-text::before{
+  content:"シェアしたい行をタップしてください。複数選べます。";
+  display:block;
+  margin:0 0 24px;
+  color:var(--muted);
+  font:700 9px/1.7 var(--sans);
+  letter-spacing:.08em;
+}
+
+.phrase-toolbar{
+  position:fixed;z-index:88;left:50%;bottom:18px;transform:translateX(-50%);
+  width:min(620px,calc(100vw - 28px));
+  display:none;align-items:center;gap:12px;
+  padding:11px 12px 11px 18px;
+  background:#111;color:#fff;
+  box-shadow:0 14px 50px rgba(0,0,0,.28);
+}
+.phrase-toolbar.show{display:flex}
+.phrase-toolbar-status{
+  min-width:0;flex:1;
+  font:700 9px/1.4 var(--sans);letter-spacing:.1em;
+}
+.phrase-toolbar button{
+  border:1px solid rgba(255,255,255,.45);
+  background:transparent;color:#fff;cursor:pointer;
+  padding:11px 13px;
+  font:700 9px/1 var(--sans);letter-spacing:.1em;
+}
+.phrase-toolbar .primary{background:#fff;color:#111;border-color:#fff}
+.phrase-toolbar button:disabled{opacity:.35;cursor:default}
+
+.share-modal[hidden]{display:none}
+.share-modal{
+  position:fixed;z-index:120;inset:0;
+  background:rgba(0,0,0,.72);
+  display:grid;place-items:center;
+  padding:18px;
+}
+.share-dialog{
+  width:min(760px,100%);
+  max-height:min(880px,calc(100vh - 36px));
+  overflow:auto;
+  background:var(--paper);
+  color:var(--ink);
+  box-shadow:0 28px 90px rgba(0,0,0,.38);
+}
+.share-dialog-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 20px;border-bottom:1px solid var(--line);
+}
+.share-dialog-head strong{
+  font:700 10px/1 var(--sans);letter-spacing:.15em;
+}
+.share-close{
+  border:0;background:transparent;cursor:pointer;
+  font:700 20px/1 var(--sans);padding:6px 8px;
+}
+.share-dialog-body{padding:28px}
+.share-preview{
+  min-height:310px;
+  display:flex;flex-direction:column;justify-content:space-between;
+  border:1px solid var(--line);
+  background:#f6f6f4;
+  padding:34px;
+}
+.share-preview-top{
+  font:700 8px/1.3 var(--sans);letter-spacing:.17em;color:var(--muted);
+}
+.share-preview-quote{
+  margin:46px 0;
+  font-size:clamp(23px,4.5vw,42px);
+  font-weight:600;line-height:1.65;letter-spacing:.01em;
+  white-space:pre-line;
+}
+.share-preview-source{
+  padding-top:14px;border-top:1px solid var(--line);
+  font:700 9px/1.6 var(--sans);letter-spacing:.08em;color:var(--muted);
+}
+.share-actions{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;margin-top:14px;
+}
+.share-action{
+  min-height:48px;border:1px solid var(--ink);background:transparent;color:var(--ink);
+  cursor:pointer;padding:10px 12px;
+  font:700 9px/1.3 var(--sans);letter-spacing:.11em;
+}
+.share-action.primary{background:#111;color:#fff}
+.share-help{
+  margin:15px 0 0;color:var(--muted);
+  font:10px/1.8 var(--sans);
+}
+.share-toast{
+  min-height:18px;margin-top:9px;
+  font:700 9px/1.5 var(--sans);letter-spacing:.06em;
+}
+@media(max-width:640px){
+  .poem-share-start{justify-content:flex-start}
+  .share-dialog-body{padding:18px}
+  .share-preview{padding:25px;min-height:290px}
+  .share-preview-quote{margin:36px 0;font-size:27px}
+  .share-actions{grid-template-columns:1fr}
+  .phrase-toolbar{bottom:10px}
+  .phrase-toolbar-status{font-size:8px}
+  .phrase-toolbar button{padding:10px 11px}
+}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -635,6 +775,9 @@
             <div class="lyric-controls lyric-controls-single">
               <button class="lyric-control primary" type="button" id="lyric-draw">もう一度引く</button>
             </div>
+            <div style="text-align:center">
+              <button class="lyric-share-link" type="button" id="lyric-share">SHARE THIS COMBINATION ↗</button>
+            </div>
           </div>
         </div>
       </div>
@@ -651,47 +794,69 @@
         <div class="lyrics-list" aria-label="詩集 音楽の風景">
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">01</span><div><h3>《願い》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">ただひとつだけ</span><span class="poem-line">願いが叶うなら</span><span class="poem-line">今この歌を聴いている</span><span class="poem-line">あなたが</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">今日のよかったことと</span><span class="poem-line">明日の楽しみなことを</span><span class="poem-line">同時に　同時に</span><span class="poem-line">思い出せたら良い</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">良いことばかりな</span><span class="poem-line">わけじゃない</span><span class="poem-line">嫌なことばかりって</span><span class="poem-line">わけじゃない</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">忘れたくないを</span><span class="poem-line">忘れないで</span><span class="poem-line">覚えていたいと</span><span class="poem-line">覚えていて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">目には見えないものばかり</span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">言葉にならないものばかり</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">でもそんな音楽に救われて</span><span class="poem-line">この歌がそんな</span><span class="poem-line">音楽になったら良い</span></div><div class="poem-meta"><strong>願い</strong>作詞・作曲：束元 康介<br>令和5年度 足立区連合音楽会にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">ただひとつだけ</span><span class="poem-line">願いが叶うなら</span><span class="poem-line">今この歌を聴いている</span><span class="poem-line">あなたが</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">今日のよかったことと</span><span class="poem-line">明日の楽しみなことを</span><span class="poem-line">同時に　同時に</span><span class="poem-line">思い出せたら良い</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">良いことばかりな</span><span class="poem-line">わけじゃない</span><span class="poem-line">嫌なことばかりって</span><span class="poem-line">わけじゃない</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">忘れたくないを</span><span class="poem-line">忘れないで</span><span class="poem-line">覚えていたいと</span><span class="poem-line">覚えていて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">目には見えないものばかり</span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">言葉にならないものばかり</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">でもそんな音楽に救われて</span><span class="poem-line">この歌がそんな</span><span class="poem-line">音楽になったら良い</span></div><div class="poem-meta"><strong>願い</strong>作詞・作曲：束元 康介<br>令和5年度 足立区連合音楽会にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">02</span><div><h3>《出会い》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">あなたのために書いた音符は</span><span class="poem-line">言葉をもって耳元まで</span><span class="poem-line">あなたのために書いた歌を</span><span class="poem-line">音楽を歌ってるんだよ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">出会いとは繋がりで</span><span class="poem-line">出会いとは偶然で</span><span class="poem-line">出会いとは一瞬で</span><span class="poem-line">どれも光って見える</span><span class="poem-line">どれも大切にしたい</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">楽譜の中に収まりきらない</span><span class="poem-line">音楽は色を</span><span class="poem-line">温もりを</span><span class="poem-line">別れをもっている</span><span class="poem-line">人と人との間で</span><span class="poem-line">待っている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span></div><div class="poem-meta"><strong>出会い</strong>作詞・作曲：束元 康介<br>令和6年度 海の日ジョイントコンサートにて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">あなたのために書いた音符は</span><span class="poem-line">言葉をもって耳元まで</span><span class="poem-line">あなたのために書いた歌を</span><span class="poem-line">音楽を歌ってるんだよ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">出会いとは繋がりで</span><span class="poem-line">出会いとは偶然で</span><span class="poem-line">出会いとは一瞬で</span><span class="poem-line">どれも光って見える</span><span class="poem-line">どれも大切にしたい</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">楽譜の中に収まりきらない</span><span class="poem-line">音楽は色を</span><span class="poem-line">温もりを</span><span class="poem-line">別れをもっている</span><span class="poem-line">人と人との間で</span><span class="poem-line">待っている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span></div><div class="poem-meta"><strong>出会い</strong>作詞・作曲：束元 康介<br>令和6年度 海の日ジョイントコンサートにて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">03</span><div><h3>《朝になったら》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">ため息の混じった帰り道</span><span class="poem-line">うまくいかないことを数えて</span><span class="poem-line">周りは平気でできることが</span><span class="poem-line">できないと気づいた帰り道</span><span class="poem-line">涙で滲んだ帰り道</span><span class="poem-line">今日もまた怒られちゃったな</span><span class="poem-line">周りのみんなも</span><span class="poem-line">敵じゃないかな</span><span class="poem-line">不安が積もってる帰り道</span><span class="poem-line">月明かりでさえ</span><span class="poem-line">落ち込む気持ち</span><span class="poem-line">もっと頑張る僕だったら</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">1人じゃないと気づいたのは</span><span class="poem-line">あなたと帰った帰り道</span><span class="poem-line">言葉に頼らぬ励ましを</span><span class="poem-line">受け取った夏の帰り道</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span></div><div class="poem-meta"><strong>朝になったら</strong>作詞・作曲：束元 康介<br>令和6年度 足立区連合音楽会にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">ため息の混じった帰り道</span><span class="poem-line">うまくいかないことを数えて</span><span class="poem-line">周りは平気でできることが</span><span class="poem-line">できないと気づいた帰り道</span><span class="poem-line">涙で滲んだ帰り道</span><span class="poem-line">今日もまた怒られちゃったな</span><span class="poem-line">周りのみんなも</span><span class="poem-line">敵じゃないかな</span><span class="poem-line">不安が積もってる帰り道</span><span class="poem-line">月明かりでさえ</span><span class="poem-line">落ち込む気持ち</span><span class="poem-line">もっと頑張る僕だったら</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">1人じゃないと気づいたのは</span><span class="poem-line">あなたと帰った帰り道</span><span class="poem-line">言葉に頼らぬ励ましを</span><span class="poem-line">受け取った夏の帰り道</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span></div><div class="poem-meta"><strong>朝になったら</strong>作詞・作曲：束元 康介<br>令和6年度 足立区連合音楽会にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">04</span><div><h3>《あなたと》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">幸せな日々が過ぎ去っていく</span><span class="poem-line">この切なさと出会えたこと</span><span class="poem-line">過ごした３年間</span><span class="poem-line">長いようで</span><span class="poem-line">あっという間だった</span><span class="poem-line">怒られたこともあったけど</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">このクラスで</span><span class="poem-line">この学年で</span><span class="poem-line">後輩とも出会えた</span><span class="poem-line">この部活で</span><span class="poem-line">この学校で良かった</span><span class="poem-line">日々の生活で、行事で</span><span class="poem-line">学んだすべてを</span><span class="poem-line">忘れないようにする</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「あなたと」出会えたから</span><span class="poem-line">悔しかったことさえ</span><span class="poem-line">出会えたから</span><span class="poem-line">思い出に変わる</span><span class="poem-line">出会えたんだ</span><span class="poem-line">友達と</span><span class="poem-line">大きくなった自分に</span><span class="poem-line">だから僕は</span><span class="poem-line">だから私は</span><span class="poem-line">ここで良かった</span><span class="poem-line">ありがとう</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">今まで支えてくれて</span><span class="poem-line">ありがとう</span><span class="poem-line">恥ずかしくて</span><span class="poem-line">言えなかったけど</span><span class="poem-line">家族や仲間や先生に</span><span class="poem-line">周りの人に救われていた</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">これからは</span><span class="poem-line">それぞれの道を</span><span class="poem-line">選んだから</span><span class="poem-line">夢を目指して</span><span class="poem-line">進んでいく</span><span class="poem-line">不安も大きいけれど</span><span class="poem-line">きっと僕は</span><span class="poem-line">きっと私は</span><span class="poem-line">大丈夫</span><span class="poem-line">ありがとう</span></div><div class="poem-meta"><strong>あなたと</strong>作詞：令和6年度3学年一同、束元康介　作曲：束元 康介<br>令和6年度 卒業式 予行練習にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">幸せな日々が過ぎ去っていく</span><span class="poem-line">この切なさと出会えたこと</span><span class="poem-line">過ごした３年間</span><span class="poem-line">長いようで</span><span class="poem-line">あっという間だった</span><span class="poem-line">怒られたこともあったけど</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">このクラスで</span><span class="poem-line">この学年で</span><span class="poem-line">後輩とも出会えた</span><span class="poem-line">この部活で</span><span class="poem-line">この学校で良かった</span><span class="poem-line">日々の生活で、行事で</span><span class="poem-line">学んだすべてを</span><span class="poem-line">忘れないようにする</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「あなたと」出会えたから</span><span class="poem-line">悔しかったことさえ</span><span class="poem-line">出会えたから</span><span class="poem-line">思い出に変わる</span><span class="poem-line">出会えたんだ</span><span class="poem-line">友達と</span><span class="poem-line">大きくなった自分に</span><span class="poem-line">だから僕は</span><span class="poem-line">だから私は</span><span class="poem-line">ここで良かった</span><span class="poem-line">ありがとう</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">今まで支えてくれて</span><span class="poem-line">ありがとう</span><span class="poem-line">恥ずかしくて</span><span class="poem-line">言えなかったけど</span><span class="poem-line">家族や仲間や先生に</span><span class="poem-line">周りの人に救われていた</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">これからは</span><span class="poem-line">それぞれの道を</span><span class="poem-line">選んだから</span><span class="poem-line">夢を目指して</span><span class="poem-line">進んでいく</span><span class="poem-line">不安も大きいけれど</span><span class="poem-line">きっと僕は</span><span class="poem-line">きっと私は</span><span class="poem-line">大丈夫</span><span class="poem-line">ありがとう</span></div><div class="poem-meta"><strong>あなたと</strong>作詞：令和6年度3学年一同、束元康介　作曲：束元 康介<br>令和6年度 卒業式 予行練習にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">05</span><div><h3>《晴れ渡る空》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">あなたが元気でいてくれたら</span><span class="poem-line">それだけでいいと思うこと</span><span class="poem-line">優しいあなたが</span><span class="poem-line">優しくいられる</span><span class="poem-line">世界であるならいいと思う</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">下を向いていたら</span><span class="poem-line">空の色に気づけない</span><span class="poem-line">きっとどんな絵の具でも</span><span class="poem-line">描ききれない</span><span class="poem-line">僕たちの世界は</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">自分で自分を大事にすること</span><span class="poem-line">簡単なようで</span><span class="poem-line">難しいこと</span><span class="poem-line">世界であなたは</span><span class="poem-line">あなただけだから</span><span class="poem-line">胸に手を当てて</span><span class="poem-line">忘れないように</span><span class="poem-line">忘れないように</span><span class="poem-line">歌に残すから</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span></div><div class="poem-meta"><strong>晴れ渡る空</strong>作詞・作曲：束元 康介<br>令和7年度 海の日ジョイントコンサートにて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">あなたが元気でいてくれたら</span><span class="poem-line">それだけでいいと思うこと</span><span class="poem-line">優しいあなたが</span><span class="poem-line">優しくいられる</span><span class="poem-line">世界であるならいいと思う</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">下を向いていたら</span><span class="poem-line">空の色に気づけない</span><span class="poem-line">きっとどんな絵の具でも</span><span class="poem-line">描ききれない</span><span class="poem-line">僕たちの世界は</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">自分で自分を大事にすること</span><span class="poem-line">簡単なようで</span><span class="poem-line">難しいこと</span><span class="poem-line">世界であなたは</span><span class="poem-line">あなただけだから</span><span class="poem-line">胸に手を当てて</span><span class="poem-line">忘れないように</span><span class="poem-line">忘れないように</span><span class="poem-line">歌に残すから</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span></div><div class="poem-meta"><strong>晴れ渡る空</strong>作詞・作曲：束元 康介<br>令和7年度 海の日ジョイントコンサートにて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">06</span><div><h3>《ただなか》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">どうでもいいことを</span><span class="poem-line">話しておきたい</span><span class="poem-line">小さなことから</span><span class="poem-line">始められるように</span><span class="poem-line">無くしたものばかり</span><span class="poem-line">見えてしまうけれど</span><span class="poem-line">うまくいかないのは</span><span class="poem-line">順調な証</span><span class="poem-line">悲しみを分け合うことができる</span><span class="poem-line">喜びを</span><span class="poem-line">胸にもっている</span><span class="poem-line">胸にもっている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">歌にするには</span><span class="poem-line">彩りに欠けるような</span><span class="poem-line">日々を抱きしめている</span><span class="poem-line">幸せの中で</span><span class="poem-line">ありのまま</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないようで</span><span class="poem-line">特別な毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span></div><div class="poem-meta"><strong>ただなか</strong>作詞・作曲：束元 康介<br>令和7年度 足立区連合音楽会にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">どうでもいいことを</span><span class="poem-line">話しておきたい</span><span class="poem-line">小さなことから</span><span class="poem-line">始められるように</span><span class="poem-line">無くしたものばかり</span><span class="poem-line">見えてしまうけれど</span><span class="poem-line">うまくいかないのは</span><span class="poem-line">順調な証</span><span class="poem-line">悲しみを分け合うことができる</span><span class="poem-line">喜びを</span><span class="poem-line">胸にもっている</span><span class="poem-line">胸にもっている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">歌にするには</span><span class="poem-line">彩りに欠けるような</span><span class="poem-line">日々を抱きしめている</span><span class="poem-line">幸せの中で</span><span class="poem-line">ありのまま</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないようで</span><span class="poem-line">特別な毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span></div><div class="poem-meta"><strong>ただなか</strong>作詞・作曲：束元 康介<br>令和7年度 足立区連合音楽会にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">07</span><div><h3>《これから》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">当たり前の景色も</span><span class="poem-line">これで最後だと</span><span class="poem-line">仲間と歩んできた</span><span class="poem-line">これまでの道のりを</span><span class="poem-line">今日が終わらないでほしい</span><span class="poem-line">当たり前の続きを</span><span class="poem-line">望んでしまうよ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">別れが惜しいと思える</span><span class="poem-line">幸せが心に</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">特別なあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になる前の気持ちを</span><span class="poem-line">抱きしめて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">辛く当たったり</span><span class="poem-line">会話が減ったり</span><span class="poem-line">ぶつかることだって</span><span class="poem-line">あったけど</span><span class="poem-line">どんな時もそばに</span><span class="poem-line">そばにいてくれた人</span><span class="poem-line">「先輩」と呼んでくれたから</span><span class="poem-line">背筋が伸びた</span><span class="poem-line">より良い学校を作るのは</span><span class="poem-line">あなたの番だよ</span><span class="poem-line">たくさんのあなたに</span><span class="poem-line">支えられて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">積み重ねたこと、</span><span class="poem-line">競い合ったこと、</span><span class="poem-line">支え合い</span><span class="poem-line">助け合い</span><span class="poem-line">乗り越えてきたことが</span><span class="poem-line">僕と私の今を</span><span class="poem-line">つくっている</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">かけがえないあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になる前の</span><span class="poem-line">今の気持ちを</span><span class="poem-line">抱きしめて</span><span class="poem-line">ありがとう</span><span class="poem-line">これから</span></div><div class="poem-meta"><strong>これから</strong>作詞：令和7年度3学年一同、束元康介　作曲：束元 康介<br>令和7年度 卒業式 予行練習にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">当たり前の景色も</span><span class="poem-line">これで最後だと</span><span class="poem-line">仲間と歩んできた</span><span class="poem-line">これまでの道のりを</span><span class="poem-line">今日が終わらないでほしい</span><span class="poem-line">当たり前の続きを</span><span class="poem-line">望んでしまうよ</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">別れが惜しいと思える</span><span class="poem-line">幸せが心に</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">特別なあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になる前の気持ちを</span><span class="poem-line">抱きしめて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">辛く当たったり</span><span class="poem-line">会話が減ったり</span><span class="poem-line">ぶつかることだって</span><span class="poem-line">あったけど</span><span class="poem-line">どんな時もそばに</span><span class="poem-line">そばにいてくれた人</span><span class="poem-line">「先輩」と呼んでくれたから</span><span class="poem-line">背筋が伸びた</span><span class="poem-line">より良い学校を作るのは</span><span class="poem-line">あなたの番だよ</span><span class="poem-line">たくさんのあなたに</span><span class="poem-line">支えられて</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">積み重ねたこと、</span><span class="poem-line">競い合ったこと、</span><span class="poem-line">支え合い</span><span class="poem-line">助け合い</span><span class="poem-line">乗り越えてきたことが</span><span class="poem-line">僕と私の今を</span><span class="poem-line">つくっている</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">かけがえないあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になる前の</span><span class="poem-line">今の気持ちを</span><span class="poem-line">抱きしめて</span><span class="poem-line">ありがとう</span><span class="poem-line">これから</span></div><div class="poem-meta"><strong>これから</strong>作詞：令和7年度3学年一同、束元康介　作曲：束元 康介<br>令和7年度 卒業式 予行練習にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">08</span><div><h3>《夏を吸い込んで》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">南風に包まれて</span><span class="poem-line">夏が来たことを知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">変わりたい自分がいる。</span><span class="poem-line">まだ明るい帰り道に</span><span class="poem-line">夏の中にいると知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">叶えたい夢がある。</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">弱音、言い訳が心を走り、</span><span class="poem-line">逃げ出したくなる。</span><span class="poem-line">うまくいかない理由を、</span><span class="poem-line">外側に探す。</span><span class="poem-line">それでも前を向けたのは、</span><span class="poem-line">あなたがいたから。</span><span class="poem-line">分かり合えたのは、</span><span class="poem-line">ぶつかったから。</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた。</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">本番も、</span><span class="poem-line">練習も、</span><span class="poem-line">退屈も、</span><span class="poem-line">失敗も</span><span class="poem-line">悩んで</span><span class="poem-line">迷って</span><span class="poem-line">立ち止まっても、</span><span class="poem-line">一度きりの</span><span class="poem-line">２度とない今日</span><span class="poem-line">だから、</span><span class="poem-line">明日の僕らが、</span><span class="poem-line">後悔に溺れないように</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">この音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span class="poem-line">この海を飛び越えて</span><span class="poem-line">この夏を吸い込んで</span></div><div class="poem-meta"><strong>夏を吸い込んで</strong>作詞・作曲：束元 康介<br>令和8年度 海の日ジョイントコンサート 中学校合同合唱にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">南風に包まれて</span><span class="poem-line">夏が来たことを知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">変わりたい自分がいる。</span><span class="poem-line">まだ明るい帰り道に</span><span class="poem-line">夏の中にいると知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">叶えたい夢がある。</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">弱音、言い訳が心を走り、</span><span class="poem-line">逃げ出したくなる。</span><span class="poem-line">うまくいかない理由を、</span><span class="poem-line">外側に探す。</span><span class="poem-line">それでも前を向けたのは、</span><span class="poem-line">あなたがいたから。</span><span class="poem-line">分かり合えたのは、</span><span class="poem-line">ぶつかったから。</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた。</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">本番も、</span><span class="poem-line">練習も、</span><span class="poem-line">退屈も、</span><span class="poem-line">失敗も</span><span class="poem-line">悩んで</span><span class="poem-line">迷って</span><span class="poem-line">立ち止まっても、</span><span class="poem-line">一度きりの</span><span class="poem-line">２度とない今日</span><span class="poem-line">だから、</span><span class="poem-line">明日の僕らが、</span><span class="poem-line">後悔に溺れないように</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">この音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span class="poem-line">この海を飛び越えて</span><span class="poem-line">この夏を吸い込んで</span></div><div class="poem-meta"><strong>夏を吸い込んで</strong>作詞・作曲：束元 康介<br>令和8年度 海の日ジョイントコンサート 中学校合同合唱にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">09</span><div><h3>《無題（2026年3月18日）》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">どんな言葉で伝えたら</span><span class="poem-line">言葉の奥まで</span><span class="poem-line">伝わるだろうか</span><span class="poem-line">一生に一度しかない日が</span><span class="poem-line">日々として続いてく</span><span class="poem-line">生きるのに必要な</span><span class="poem-line">幸せのことを</span><span class="poem-line">当たり前と呼んでいる</span><span class="poem-line">幸せで溢れている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたの失態を</span><span class="poem-line">叱ることはもうできない</span><span class="poem-line">あなたの成功を</span><span class="poem-line">共に喜ぶこともできない</span><span class="poem-line">素晴らしき門出を目の前に、</span><span class="poem-line">胸に残る気持ち</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「ありがとう」じゃ足りないから</span><span class="poem-line">「頑張れ」</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張れなかったり、</span><span class="poem-line">逃げ出してしまったり</span><span class="poem-line">そんな夜があっていいけど</span><span class="poem-line">あなたと</span><span class="poem-line">あなたの大切な人のために</span><span class="poem-line">頑張りたいなって思う</span><span class="poem-line">そんな朝が来るように</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「さよなら」じゃ寂しいから</span><span class="poem-line">「頑張れ」</span><span class="poem-line">「幸あれ」</span></div><div class="poem-meta"><strong>無題（2026年3月18日）</strong>作詞・作曲：束元 康介<br>令和7年度3月18日 学年集会にて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">どんな言葉で伝えたら</span><span class="poem-line">言葉の奥まで</span><span class="poem-line">伝わるだろうか</span><span class="poem-line">一生に一度しかない日が</span><span class="poem-line">日々として続いてく</span><span class="poem-line">生きるのに必要な</span><span class="poem-line">幸せのことを</span><span class="poem-line">当たり前と呼んでいる</span><span class="poem-line">幸せで溢れている</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたの失態を</span><span class="poem-line">叱ることはもうできない</span><span class="poem-line">あなたの成功を</span><span class="poem-line">共に喜ぶこともできない</span><span class="poem-line">素晴らしき門出を目の前に、</span><span class="poem-line">胸に残る気持ち</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「ありがとう」じゃ足りないから</span><span class="poem-line">「頑張れ」</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張れなかったり、</span><span class="poem-line">逃げ出してしまったり</span><span class="poem-line">そんな夜があっていいけど</span><span class="poem-line">あなたと</span><span class="poem-line">あなたの大切な人のために</span><span class="poem-line">頑張りたいなって思う</span><span class="poem-line">そんな朝が来るように</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「さよなら」じゃ寂しいから</span><span class="poem-line">「頑張れ」</span><span class="poem-line">「幸あれ」</span></div><div class="poem-meta"><strong>無題（2026年3月18日）</strong>作詞・作曲：束元 康介<br>令和7年度3月18日 学年集会にて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">10</span><div><h3>《春にあふれて》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text"><span class="poem-line">新しいことで溢れる春に</span><span class="poem-line">あなたらしい声</span><span class="poem-line">出せていますか？</span><span class="poem-line">新しいことで</span><span class="poem-line">溺れそうな春に</span><span class="poem-line">今</span><span class="poem-line">助けを求めても良いなら</span><span class="poem-line">そばで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「明日が来る」</span><span class="poem-line">そう聞いて</span><span class="poem-line">後ろを振り返る</span><span class="poem-line">「夜が明ける」</span><span class="poem-line">そう聞いて</span><span class="poem-line">耳を塞ぐ</span><span class="poem-line">「きっと大丈夫」</span><span class="poem-line">そう聞いても</span><span class="poem-line">嘘に聞こえる</span><span class="poem-line">春に怯える</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしと</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span class="poem-line">そばで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「過去を振り返る時間は</span><span class="poem-line">今を生きていない」</span><span class="poem-line">「前を向かなきゃ</span><span class="poem-line">意味がない」なら</span><span class="poem-line">思い出って何なの</span><span class="poem-line">新しい関係に</span><span class="poem-line">一歩踏み出さなきゃいけない</span><span class="poem-line">「怖がらなくてもいいよ」って</span><span class="poem-line">あなたは誰なの</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">桜が散って舞って</span><span class="poem-line">ねえ</span><span class="poem-line">ちょっとだけ待って</span><span class="poem-line">「もう会えない」なんて</span><span class="poem-line">嘘でも言わないで</span><span class="poem-line">また会いたいと思う人だって</span><span class="poem-line">最初は</span><span class="poem-line">最初は</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになって</span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになったら</span><span class="poem-line">世界はようやっと</span><span class="poem-line">息を吹き返して</span><span class="poem-line">不安をもったまま、</span><span class="poem-line">うまく笑えないまま</span><span class="poem-line">そばで</span><span class="poem-line">そばで</span></div><div class="poem-meta"><strong>春にあふれて</strong>作詞・作曲：束元 康介<br>令和8年度 海の日ジョイントコンサートにて</div></div>
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text"><span class="poem-line">新しいことで溢れる春に</span><span class="poem-line">あなたらしい声</span><span class="poem-line">出せていますか？</span><span class="poem-line">新しいことで</span><span class="poem-line">溺れそうな春に</span><span class="poem-line">今</span><span class="poem-line">助けを求めても良いなら</span><span class="poem-line">そばで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「明日が来る」</span><span class="poem-line">そう聞いて</span><span class="poem-line">後ろを振り返る</span><span class="poem-line">「夜が明ける」</span><span class="poem-line">そう聞いて</span><span class="poem-line">耳を塞ぐ</span><span class="poem-line">「きっと大丈夫」</span><span class="poem-line">そう聞いても</span><span class="poem-line">嘘に聞こえる</span><span class="poem-line">春に怯える</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしと</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span class="poem-line">そばで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">「過去を振り返る時間は</span><span class="poem-line">今を生きていない」</span><span class="poem-line">「前を向かなきゃ</span><span class="poem-line">意味がない」なら</span><span class="poem-line">思い出って何なの</span><span class="poem-line">新しい関係に</span><span class="poem-line">一歩踏み出さなきゃいけない</span><span class="poem-line">「怖がらなくてもいいよ」って</span><span class="poem-line">あなたは誰なの</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">桜が散って舞って</span><span class="poem-line">ねえ</span><span class="poem-line">ちょっとだけ待って</span><span class="poem-line">「もう会えない」なんて</span><span class="poem-line">嘘でも言わないで</span><span class="poem-line">また会いたいと思う人だって</span><span class="poem-line">最初は</span><span class="poem-line">最初は</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span class="poem-gap" aria-hidden="true"></span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになって</span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになったら</span><span class="poem-line">世界はようやっと</span><span class="poem-line">息を吹き返して</span><span class="poem-line">不安をもったまま、</span><span class="poem-line">うまく笑えないまま</span><span class="poem-line">そばで</span><span class="poem-line">そばで</span></div><div class="poem-meta"><strong>春にあふれて</strong>作詞・作曲：束元 康介<br>令和8年度 海の日ジョイントコンサートにて</div></div>
           </details>
           <details class="lyrics-item">
             <summary class="lyrics-summary"><span class="lyrics-index">11</span><div><h3>《All around you》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ</span></summary>
-            <div class="poem-panel"><div class="poem-text">
+            <div class="poem-panel">
+              <div class="poem-share-start"><button type="button" class="poem-share-begin">SELECT &amp; SHARE PHRASE ↗</button></div>
+              <div class="poem-text">
               <span class="poem-line">もう少し</span>
               <span class="poem-line">寝ていたいのに</span>
               <span class="poem-line">アラームに起こされて</span>
@@ -894,6 +1059,7 @@
         <div class="news-list">
           <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
+          <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>LYRICSとLYRIC BOXに、言葉をSNSへ共有できる機能を追加。</p></div>
           <div class="news-item"><time>2026.09</time><span class="smallcaps">CHORAL</span><p>《All around you》の歌詞を「音楽の風景」に追加。令和8年度 足立区連合音楽会にて演奏予定。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">IN PROGRESS</span><p>新作《海にまであなたは本を連れてきて》を制作予定。</p></div>
         </div>
@@ -1085,6 +1251,301 @@
     })();
   </script>
 
+
+  <script>
+    (() => {
+      const SITE_URL = document.querySelector('link[rel="canonical"]')?.href || location.origin + location.pathname;
+      const modal = document.getElementById("share-modal");
+      const quoteEl = document.getElementById("share-preview-quote");
+      const sourceEl = document.getElementById("share-preview-source");
+      const toastEl = document.getElementById("share-toast");
+      const toolbar = document.getElementById("phrase-toolbar");
+      const toolbarStatus = document.getElementById("phrase-toolbar-status");
+      const phraseShareBtn = document.getElementById("phrase-share");
+      const phraseCancelBtn = document.getElementById("phrase-cancel");
+
+      let sharePayload = { lines: [], source: "", anchor: "#lyrics" };
+      let activePanel = null;
+
+      const cleanTitle = (s) => String(s || "").replace(/[《》]/g, "").trim();
+
+      function setToast(message) {
+        if (!toastEl) return;
+        toastEl.textContent = message;
+        window.clearTimeout(setToast.timer);
+        setToast.timer = window.setTimeout(() => { toastEl.textContent = ""; }, 2600);
+      }
+
+      function getShareText() {
+        const body = sharePayload.lines.join("\n");
+        const source = sharePayload.source ? `\n— ${sharePayload.source}` : "";
+        return `${body}${source}\n${SITE_URL}${sharePayload.anchor || ""}`;
+      }
+
+      function openShare(payload) {
+        sharePayload = payload;
+        quoteEl.textContent = payload.lines.join("\n");
+        sourceEl.textContent = payload.source || "束元康介";
+        toastEl.textContent = "";
+        modal.hidden = false;
+        document.body.style.overflow = "hidden";
+      }
+
+      function closeShare() {
+        modal.hidden = true;
+        document.body.style.overflow = "";
+      }
+
+      document.getElementById("share-close")?.addEventListener("click", closeShare);
+      modal?.addEventListener("click", (e) => {
+        if (e.target === modal) closeShare();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && modal && !modal.hidden) closeShare();
+      });
+
+      async function copyText() {
+        const text = getShareText();
+        try {
+          await navigator.clipboard.writeText(text);
+          setToast("コピーしました。");
+        } catch {
+          const area = document.createElement("textarea");
+          area.value = text;
+          area.style.position = "fixed";
+          area.style.opacity = "0";
+          document.body.appendChild(area);
+          area.select();
+          document.execCommand("copy");
+          area.remove();
+          setToast("コピーしました。");
+        }
+      }
+
+      document.getElementById("share-copy")?.addEventListener("click", copyText);
+
+      document.getElementById("share-native")?.addEventListener("click", async () => {
+        if (navigator.share) {
+          try {
+            await navigator.share({
+              title: "束元康介 Official Website",
+              text: `${sharePayload.lines.join("\n")}${sharePayload.source ? `\n— ${sharePayload.source}` : ""}`,
+              url: SITE_URL + (sharePayload.anchor || "")
+            });
+          } catch (err) {
+            if (err?.name !== "AbortError") {
+              await copyText();
+              setToast("共有できなかったため、テキストをコピーしました。");
+            }
+          }
+        } else {
+          await copyText();
+          setToast("共有機能に未対応のため、テキストをコピーしました。");
+        }
+      });
+
+      function wrapByChars(ctx, text, maxWidth) {
+        const chars = Array.from(text);
+        const lines = [];
+        let line = "";
+        chars.forEach((ch) => {
+          const test = line + ch;
+          if (line && ctx.measureText(test).width > maxWidth) {
+            lines.push(line);
+            line = ch;
+          } else {
+            line = test;
+          }
+        });
+        if (line) lines.push(line);
+        return lines.length ? lines : [""];
+      }
+
+      function buildCanvas(width, height) {
+        const canvas = document.createElement("canvas");
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+
+        ctx.fillStyle = "#f6f6f4";
+        ctx.fillRect(0, 0, width, height);
+
+        const margin = Math.round(width * 0.085);
+        ctx.strokeStyle = "rgba(17,17,17,.22)";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(margin, margin, width - margin * 2, height - margin * 2);
+
+        ctx.fillStyle = "#666";
+        ctx.font = `700 ${Math.round(width * 0.018)}px Arial, sans-serif`;
+        ctx.textBaseline = "top";
+        ctx.fillText("KOSUKE TSUKAMOTO / WORDS", margin * 1.35, margin * 1.35);
+
+        const maxTextWidth = width - margin * 2.7;
+        let fontSize = Math.round(width * (sharePayload.lines.join("").length > 60 ? 0.047 : 0.056));
+        const minSize = Math.round(width * 0.035);
+        let rendered = [];
+
+        while (fontSize >= minSize) {
+          ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
+          rendered = [];
+          sharePayload.lines.forEach((line, idx) => {
+            const wrapped = wrapByChars(ctx, line, maxTextWidth);
+            rendered.push(...wrapped);
+            if (idx !== sharePayload.lines.length - 1) rendered.push("");
+          });
+          const lineHeight = fontSize * 1.62;
+          const total = rendered.length * lineHeight;
+          if (total < height * 0.48) break;
+          fontSize -= 4;
+        }
+
+        const lineHeight = fontSize * 1.62;
+        const blockHeight = rendered.length * lineHeight;
+        let y = Math.max(height * 0.29, (height - blockHeight) / 2 - height * 0.015);
+
+        ctx.fillStyle = "#111";
+        ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
+        rendered.forEach((line) => {
+          ctx.fillText(line, margin * 1.35, y);
+          y += lineHeight;
+        });
+
+        const footerY = height - margin * 1.65;
+        ctx.strokeStyle = "rgba(17,17,17,.2)";
+        ctx.beginPath();
+        ctx.moveTo(margin * 1.35, footerY - Math.round(width * 0.05));
+        ctx.lineTo(width - margin * 1.35, footerY - Math.round(width * 0.05));
+        ctx.stroke();
+
+        ctx.fillStyle = "#555";
+        ctx.font = `700 ${Math.round(width * 0.02)}px Arial, sans-serif`;
+        ctx.fillText(sharePayload.source || "束元康介", margin * 1.35, footerY);
+        ctx.textAlign = "right";
+        ctx.font = `700 ${Math.round(width * 0.015)}px Arial, sans-serif`;
+        ctx.fillText("kosuketsukamoto.netlify.app", width - margin * 1.35, footerY + Math.round(width * 0.006));
+        ctx.textAlign = "left";
+
+        return canvas;
+      }
+
+      function canvasToBlob(canvas) {
+        return new Promise((resolve) => canvas.toBlob(resolve, "image/png", 1));
+      }
+
+      async function createAndShareImage(kind) {
+        const isStory = kind === "story";
+        const canvas = buildCanvas(1080, isStory ? 1920 : 1350);
+        const blob = await canvasToBlob(canvas);
+        if (!blob) {
+          setToast("画像を生成できませんでした。");
+          return;
+        }
+
+        const filename = `kosuke-tsukamoto-${isStory ? "story" : "post"}.png`;
+        const file = new File([blob], filename, { type: "image/png" });
+        const caption = `${sharePayload.lines.join("\n")}${sharePayload.source ? `\n— ${sharePayload.source}` : ""}`;
+
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({ files: [file], text: caption, title: "束元康介 / WORDS" });
+            return;
+          } catch (err) {
+            if (err?.name === "AbortError") return;
+          }
+        }
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.setTimeout(() => URL.revokeObjectURL(url), 1500);
+        setToast("PNG画像を保存しました。");
+      }
+
+      document.getElementById("share-post")?.addEventListener("click", () => createAndShareImage("post"));
+      document.getElementById("share-story")?.addEventListener("click", () => createAndShareImage("story"));
+
+      // LYRIC BOX
+      document.getElementById("lyric-share")?.addEventListener("click", () => {
+        const fragments = Array.from(document.querySelectorAll("#lyric-stage .fragment-text"))
+          .map((el) => el.textContent.trim()).filter(Boolean);
+        const sources = Array.from(document.querySelectorAll("#lyric-sources > div"))
+          .map((el) => el.textContent.replace(/^\s*0[12]\s*《?/, "").replace(/》\s*$/, "").trim())
+          .filter(Boolean);
+
+        if (!fragments.length) return;
+        openShare({
+          lines: fragments,
+          source: sources.length ? sources.map(s => `《${cleanTitle(s)}》`).join(" × ") : "LYRIC BOX",
+          anchor: "#lyric-box"
+        });
+      });
+
+      // Full lyrics: enter selection mode.
+      function endSelectionMode() {
+        if (activePanel) {
+          activePanel.classList.remove("share-mode");
+          activePanel.querySelectorAll(".poem-line.is-selected").forEach((el) => el.classList.remove("is-selected"));
+        }
+        activePanel = null;
+        toolbar?.classList.remove("show");
+        if (phraseShareBtn) phraseShareBtn.disabled = true;
+        if (toolbarStatus) toolbarStatus.textContent = "0 LINES SELECTED";
+      }
+
+      function refreshToolbar() {
+        if (!activePanel) return;
+        const count = activePanel.querySelectorAll(".poem-line.is-selected").length;
+        toolbarStatus.textContent = `${count} LINE${count === 1 ? "" : "S"} SELECTED`;
+        phraseShareBtn.disabled = count === 0;
+      }
+
+      document.querySelectorAll(".poem-share-begin").forEach((button) => {
+        button.addEventListener("click", () => {
+          const panel = button.closest(".poem-panel");
+          if (!panel) return;
+          if (activePanel && activePanel !== panel) endSelectionMode();
+          activePanel = panel;
+          activePanel.classList.add("share-mode");
+          toolbar?.classList.add("show");
+          refreshToolbar();
+          panel.querySelector(".poem-text")?.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+      });
+
+      document.querySelectorAll(".poem-line").forEach((line) => {
+        line.addEventListener("click", () => {
+          const panel = line.closest(".poem-panel");
+          if (!activePanel || panel !== activePanel || !panel.classList.contains("share-mode")) return;
+          line.classList.toggle("is-selected");
+          refreshToolbar();
+        });
+      });
+
+      phraseCancelBtn?.addEventListener("click", endSelectionMode);
+
+      phraseShareBtn?.addEventListener("click", () => {
+        if (!activePanel) return;
+        const selected = Array.from(activePanel.querySelectorAll(".poem-line.is-selected"));
+        if (!selected.length) return;
+
+        const allLines = Array.from(activePanel.querySelectorAll(".poem-line"));
+        selected.sort((a, b) => allLines.indexOf(a) - allLines.indexOf(b));
+
+        const details = activePanel.closest(".lyrics-item");
+        const title = details?.querySelector(".lyrics-summary h3")?.textContent?.trim() || "";
+        openShare({
+          lines: selected.map((el) => el.textContent.trim()),
+          source: title || "束元康介",
+          anchor: "#lyrics"
+        });
+      });
+    })();
+  </script>
+
   <script>
     (() => {
       const el = document.getElementById("page-view-count");
@@ -1109,6 +1570,37 @@
         });
     })();
   </script>
+
+
+  <div class="phrase-toolbar" id="phrase-toolbar" aria-live="polite">
+    <div class="phrase-toolbar-status" id="phrase-toolbar-status">0 LINES SELECTED</div>
+    <button type="button" id="phrase-cancel">終了</button>
+    <button type="button" class="primary" id="phrase-share" disabled>シェア</button>
+  </div>
+
+  <div class="share-modal" id="share-modal" hidden>
+    <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-dialog-title">
+      <div class="share-dialog-head">
+        <strong id="share-dialog-title">SHARE WORDS</strong>
+        <button type="button" class="share-close" id="share-close" aria-label="閉じる">×</button>
+      </div>
+      <div class="share-dialog-body">
+        <div class="share-preview">
+          <div class="share-preview-top">KOSUKE TSUKAMOTO / WORDS</div>
+          <div class="share-preview-quote" id="share-preview-quote"></div>
+          <div class="share-preview-source" id="share-preview-source"></div>
+        </div>
+        <div class="share-actions">
+          <button type="button" class="share-action" id="share-copy">COPY TEXT</button>
+          <button type="button" class="share-action" id="share-native">SNS SHARE</button>
+          <button type="button" class="share-action primary" id="share-post">INSTAGRAM POST 4:5</button>
+          <button type="button" class="share-action primary" id="share-story">STORY 9:16</button>
+        </div>
+        <p class="share-help">Instagram用は、言葉・作品名・サイト名を入れたモノクロ画像を端末上で生成します。対応端末では共有画面を開き、未対応の場合はPNG画像として保存します。</p>
+        <div class="share-toast" id="share-toast"></div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
