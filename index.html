@@ -798,6 +798,44 @@
 }
 .lyrics-read{white-space:nowrap}
 
+
+/* v22 — working mobile share action bar */
+.phrase-toolbar{
+  z-index:200 !important;
+  bottom:calc(12px + env(safe-area-inset-bottom)) !important;
+  width:min(680px,calc(100vw - 24px)) !important;
+  min-height:62px;
+  border:1px solid rgba(255,255,255,.18);
+}
+.phrase-toolbar.show{
+  display:flex !important;
+}
+.phrase-toolbar-status{
+  font-size:9px !important;
+}
+#phrase-share{
+  min-width:92px;
+}
+.share-modal{
+  z-index:220 !important;
+  padding:
+    calc(12px + env(safe-area-inset-top))
+    12px
+    calc(12px + env(safe-area-inset-bottom)) !important;
+}
+@media(max-width:640px){
+  .phrase-toolbar{
+    gap:8px !important;
+    padding:10px 10px 10px 14px !important;
+  }
+  .phrase-toolbar-status{
+    line-height:1.35 !important;
+  }
+  .phrase-toolbar button{
+    min-height:42px;
+  }
+}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1158,7 +1196,7 @@
         <div class="news-list">
           <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
-          <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>「音楽の風景」を新しい作品順に変更。歌詞とLYRIC BOXのシェア機能を見やすく調整。</p></div>
+          <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>「音楽の風景」を新しい作品順に変更。歌詞とLYRIC BOXから言葉を選び、SNSや画像で共有できる機能を追加。</p></div>
           <div class="news-item"><time>2026.09</time><span class="smallcaps">CHORAL</span><p>《All around you》の歌詞を「音楽の風景」に追加。令和8年度 足立区連合音楽会にて演奏予定。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">IN PROGRESS</span><p>新作《海にまであなたは本を連れてきて》を制作予定。</p></div>
         </div>
@@ -1350,6 +1388,28 @@
     })();
   </script>
 
+
+
+
+
+  <div class="phrase-toolbar" id="phrase-toolbar" aria-live="polite">
+    <div class="phrase-toolbar-status" id="phrase-toolbar-status">0行 選択中</div>
+    <button type="button" id="phrase-cancel">終了</button>
+    <button type="button" class="primary" id="phrase-share" disabled>シェアへ</button>
+  </div>
+
+  <div class="share-modal" id="share-modal" hidden>
+    <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-dialog-title">
+      <div class="share-dialog-head">
+        <strong id="share-dialog-title">SHARE WORDS</strong>
+        <button type="button" class="share-close" id="share-close" aria-label="閉じる">×</button>
+      </div>
+      <div class="share-dialog-body">
+        <div class="share-preview">
+          <div class="share-preview-top">KOSUKE TSUKAMOTO / WORDS</div>
+          <div class="share-preview-quote" id="share-preview-quote"></div>
+          <div class="share-preview-source" id="share-preview-source"></div>
+        </div>
 
   <script>
     (() => {
@@ -1592,13 +1652,13 @@
         activePanel = null;
         toolbar?.classList.remove("show");
         if (phraseShareBtn) phraseShareBtn.disabled = true;
-        if (toolbarStatus) toolbarStatus.textContent = "0 LINES SELECTED";
+        if (toolbarStatus) toolbarStatus.textContent = "0行 選択中";
       }
 
       function refreshToolbar() {
         if (!activePanel) return;
         const count = activePanel.querySelectorAll(".poem-line.is-selected").length;
-        toolbarStatus.textContent = `${count} LINE${count === 1 ? "" : "S"} SELECTED`;
+        toolbarStatus.textContent = `${count}行 選択中`;
         phraseShareBtn.disabled = count === 0;
       }
 
@@ -1669,26 +1729,6 @@
         });
     })();
   </script>
-
-
-  <div class="phrase-toolbar" id="phrase-toolbar" aria-live="polite">
-    <div class="phrase-toolbar-status" id="phrase-toolbar-status">0 LINES SELECTED</div>
-    <button type="button" id="phrase-cancel">終了</button>
-    <button type="button" class="primary" id="phrase-share" disabled>シェア</button>
-  </div>
-
-  <div class="share-modal" id="share-modal" hidden>
-    <div class="share-dialog" role="dialog" aria-modal="true" aria-labelledby="share-dialog-title">
-      <div class="share-dialog-head">
-        <strong id="share-dialog-title">SHARE WORDS</strong>
-        <button type="button" class="share-close" id="share-close" aria-label="閉じる">×</button>
-      </div>
-      <div class="share-dialog-body">
-        <div class="share-preview">
-          <div class="share-preview-top">KOSUKE TSUKAMOTO / WORDS</div>
-          <div class="share-preview-quote" id="share-preview-quote"></div>
-          <div class="share-preview-source" id="share-preview-source"></div>
-        </div>
         <div class="share-actions">
           <button type="button" class="share-action" id="share-copy">COPY TEXT</button>
           <button type="button" class="share-action" id="share-native">SNS SHARE</button>
