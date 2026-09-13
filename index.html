@@ -936,6 +936,17 @@
   }
 }
 
+
+/* v26 — fix: hidden share modal must stay hidden on mobile */
+.share-modal[hidden]{
+  display:none !important;
+}
+@media(max-width:640px){
+  .share-modal:not([hidden]){
+    display:block !important;
+  }
+}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
