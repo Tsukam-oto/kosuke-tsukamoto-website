@@ -838,6 +838,17 @@
   .share-dialog-body{padding:18px !important}
 }
 
+/* v24: a visible share entry on the dark LYRIC BOX. */
+#lyric-share {
+  background:#fff !important;
+  color:#111 !important;
+  border-color:#fff !important;
+  position:relative;
+  z-index:2;
+}
+#lyric-share:hover { background:#eee !important; color:#111 !important; }
+#lyric-share:focus-visible { outline:3px solid #fff; outline-offset:4px; }
+.share-toast { min-height:1.8em; }
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1371,7 +1382,7 @@
         lyricStage.style.opacity = "0";
         lyricStage.style.transform = "translateY(6px)";
 
-        window.setTimeout(() => {
+        {
           lyricStage.innerHTML = pair.map((x, i) =>
             `<div class="fragment-card"><span class="fragment-no">0${i + 1}</span><div class="fragment-text">${escapeHtml(x.fragment)}</div></div>`
           ).join("");
@@ -1382,7 +1393,7 @@
 
           lyricStage.style.opacity = "1";
           lyricStage.style.transform = "translateY(0)";
-        }, 120);
+        }
       }
 
       if (lyricDraw) lyricDraw.addEventListener("click", drawLyrics);
@@ -1457,7 +1468,7 @@
           </div>
         </div>
 
-        <div class="share-toast" id="share-toast"></div>
+        <div class="share-toast" id="share-toast" role="status" aria-live="polite"></div>
       </div>
     </div>
   </div>
@@ -1484,6 +1495,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let activePanel = null;
   let currentImageFile = null;
   let currentImageURL = null;
+  let imageRequest = 0;
 
   function toast(message) {
     if (!toastEl) return;
@@ -1531,6 +1543,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openShare(payload) {
+    imageRequest++;
     sharePayload = payload;
     quoteEl.textContent = payload.lines.join("\n");
     sourceEl.textContent = payload.source || "束元康介";
@@ -1541,6 +1554,7 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function closeShare() {
+    imageRequest++;
     modal.hidden = true;
     document.body.style.overflow = "";
   }
@@ -1560,9 +1574,10 @@ document.addEventListener("DOMContentLoaded", () => {
       ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
-      document.execCommand("copy");
+      let copied = false;
+      try { copied = document.execCommand("copy"); } catch {}
       ta.remove();
-      toast("コピーしました。");
+      toast(copied ? "コピーしました。" : "コピーできませんでした。表示された言葉を選択してコピーしてください。");
     }
   });
 
@@ -1607,6 +1622,7 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("このブラウザでは画像を作れません。テキスト共有をお使いください。");
 
     ctx.fillStyle = "#f6f6f4";
     ctx.fillRect(0, 0, width, height);
@@ -1622,48 +1638,48 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillText("KOSUKE TSUKAMOTO / WORDS", 122, 122);
 
     const maxWidth = width - 244;
+    // Keep source and site name on separate rows, outside the quote area.
+    ctx.font = "700 21px Arial, sans-serif";
+    const sourceLines = wrapChars(ctx, sharePayload.source || "束元康介", maxWidth);
+    const siteY = height - 140;
+    const sourceY = siteY - 30 - sourceLines.length * 30;
+    const separatorY = sourceY - 30;
+    const quoteTop = 225;
+    const quoteBottom = separatorY - 45;
+    const availableHeight = quoteBottom - quoteTop;
     let fontSize = sharePayload.lines.join("").length > 70 ? 50 : 58;
-    const minSize = 36;
     let rendered = [];
-
-    while (fontSize >= minSize) {
+    let fits = false;
+    for (; fontSize >= 30; fontSize -= 2) {
       ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
       rendered = [];
       sharePayload.lines.forEach((line, idx) => {
         rendered.push(...wrapChars(ctx, line, maxWidth));
         if (idx !== sharePayload.lines.length - 1) rendered.push("");
       });
-      const total = rendered.length * fontSize * 1.62;
-      if (total <= height * 0.52) break;
-      fontSize -= 4;
+      if (rendered.length * fontSize * 1.62 <= availableHeight) {
+        fits = true;
+        break;
+      }
     }
-
+    if (!fits) throw new Error("選んだ言葉が画像に収まりません。選択する行を減らしてください。テキスト共有はそのまま使えます。");
     ctx.fillStyle = "#111";
-    ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
     const lineHeight = fontSize * 1.62;
-    const blockHeight = rendered.length * lineHeight;
-    let y = Math.max(height * 0.27, (height - blockHeight) / 2 - height * 0.02);
-
-    rendered.forEach((line) => {
+    let y = quoteTop + (availableHeight - rendered.length * lineHeight) / 2;
+    rendered.forEach(line => {
       ctx.fillText(line, 122, y);
       y += lineHeight;
     });
-
-    const footerY = height - 155;
     ctx.strokeStyle = "rgba(17,17,17,.2)";
     ctx.beginPath();
-    ctx.moveTo(122, footerY - 50);
-    ctx.lineTo(width - 122, footerY - 50);
+    ctx.moveTo(122, separatorY);
+    ctx.lineTo(width - 122, separatorY);
     ctx.stroke();
-
     ctx.fillStyle = "#555";
     ctx.font = "700 21px Arial, sans-serif";
-    ctx.fillText(sharePayload.source || "束元康介", 122, footerY);
-
-    ctx.textAlign = "right";
+    sourceLines.forEach((line, i) => ctx.fillText(line, 122, sourceY + i * 30));
     ctx.font = "700 16px Arial, sans-serif";
-    ctx.fillText("kosuketsukamoto.netlify.app", width - 122, footerY + 4);
-    ctx.textAlign = "left";
+    ctx.fillText("kosuketsukamoto.netlify.app", 122, siteY);
 
     return canvas;
   }
@@ -1673,25 +1689,29 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function generateImage(kind) {
-    const canvas = buildCanvas(kind);
-    const blob = await canvasBlob(canvas);
-    if (!blob) {
-      toast("画像を生成できませんでした。");
-      return;
-    }
-
+    const request = ++imageRequest;
     resetGeneratedImage();
-
-    const name = `kosuke-tsukamoto-${kind === "story" ? "story" : "post"}.png`;
-    currentImageFile = new File([blob], name, { type: "image/png" });
-    currentImageURL = URL.createObjectURL(blob);
-
-    generatedImage.src = currentImageURL;
-    downloadLink.href = currentImageURL;
-    downloadLink.download = name;
-    generatedBox.hidden = false;
-    generatedBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    toast("画像を作りました。");
+    toast("画像を作っています…");
+    try {
+      const canvas = buildCanvas(kind);
+      const blob = await canvasBlob(canvas);
+      if (request !== imageRequest) return;
+      if (!blob) throw new Error("画像を生成できませんでした。もう一度お試しください。");
+      const name = `kosuke-tsukamoto-${kind === "story" ? "story" : "post"}.png`;
+      // PNG download remains available even when File sharing is unsupported.
+      try { currentImageFile = new File([blob], name, { type: "image/png" }); }
+      catch { currentImageFile = null; }
+      currentImageURL = URL.createObjectURL(blob);
+      generatedImage.src = currentImageURL;
+      downloadLink.href = currentImageURL;
+      downloadLink.download = name;
+      generatedBox.hidden = false;
+      generatedBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      toast("画像を作りました。PNG保存か「画像を共有／保存」を選んでください。");
+    } catch (err) {
+      if (request !== imageRequest) return;
+      toast(err.message || "画像を生成できませんでした。もう一度お試しください。");
+    }
   }
 
   document.getElementById("share-post")?.addEventListener("click", () => generateImage("post"));
@@ -1699,21 +1719,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("share-image-system")?.addEventListener("click", async () => {
     if (!currentImageFile) {
-      toast("先に画像を作ってください。");
+      toast(currentImageURL ? "このブラウザでは画像共有に対応していません。PNG保存か画像の長押しをお使いください。" : "先に画像を作ってください。");
       return;
     }
 
-    if (navigator.share && navigator.canShare && navigator.canShare({ files: [currentImageFile] })) {
-      try {
+    try {
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [currentImageFile] })) {
         await navigator.share({
           files: [currentImageFile],
           title: "束元康介 / WORDS",
           text: sharePayload.source || ""
         });
         return;
-      } catch (err) {
-        if (err?.name === "AbortError") return;
       }
+    } catch (err) {
+      if (err?.name === "AbortError") return;
     }
 
     toast("共有メニューで画像を渡せないため、PNG保存か画像の長押しを使ってください。");
