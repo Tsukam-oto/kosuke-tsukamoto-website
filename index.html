@@ -838,17 +838,104 @@
   .share-dialog-body{padding:18px !important}
 }
 
-/* v24: a visible share entry on the dark LYRIC BOX. */
-#lyric-share {
-  background:#fff !important;
-  color:#111 !important;
-  border-color:#fff !important;
-  position:relative;
-  z-index:2;
+
+/* v24 — Instagram integrated into share destinations */
+#share-instagram{
+  background:#111;
+  color:#fff;
 }
-#lyric-share:hover { background:#eee !important; color:#111 !important; }
-#lyric-share:focus-visible { outline:3px solid #fff; outline-offset:4px; }
-.share-toast { min-height:1.8em; }
+#share-instagram[aria-expanded="true"]{
+  background:transparent;
+  color:#111;
+}
+#instagram-tools[hidden]{display:none !important}
+#instagram-tools{
+  margin-top:18px;
+  padding-top:20px;
+  border-top:1px solid var(--line);
+}
+
+
+/* v25 — mobile share sheet UX */
+.share-dialog-head{
+  position:sticky;
+  top:0;
+  z-index:4;
+  background:var(--paper);
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+}
+.share-dialog-head strong{
+  flex:1;
+}
+.share-close{
+  min-width:88px;
+  min-height:44px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  border:1px solid var(--ink) !important;
+  background:var(--paper) !important;
+  color:var(--ink) !important;
+  font:700 10px/1 var(--sans) !important;
+  letter-spacing:.08em;
+  padding:0 14px !important;
+}
+.share-close::before{
+  content:"←";
+  font-size:14px;
+}
+.share-close{
+  font-size:0 !important;
+}
+.share-close::after{
+  content:"戻る";
+  font-size:10px;
+}
+
+.share-bottom-close{
+  width:100%;
+  min-height:50px;
+  margin-top:20px;
+  border:1px solid var(--ink);
+  background:transparent;
+  color:var(--ink);
+  font:700 10px/1 var(--sans);
+  letter-spacing:.08em;
+}
+
+@media(max-width:640px){
+  .share-modal{
+    display:block !important;
+    padding:0 !important;
+    background:rgba(0,0,0,.72);
+  }
+  .share-dialog{
+    width:100% !important;
+    height:100dvh !important;
+    max-height:100dvh !important;
+    overflow-y:auto !important;
+    overscroll-behavior:contain;
+    -webkit-overflow-scrolling:touch;
+    box-shadow:none !important;
+  }
+  .share-dialog-head{
+    min-height:62px;
+    padding:
+      calc(8px + env(safe-area-inset-top))
+      14px
+      10px;
+  }
+  .share-dialog-body{
+    padding:18px 18px calc(28px + env(safe-area-inset-bottom)) !important;
+  }
+  .share-preview{
+    min-height:260px !important;
+    padding:24px !important;
+  }
+}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1382,7 +1469,7 @@
         lyricStage.style.opacity = "0";
         lyricStage.style.transform = "translateY(6px)";
 
-        {
+        window.setTimeout(() => {
           lyricStage.innerHTML = pair.map((x, i) =>
             `<div class="fragment-card"><span class="fragment-no">0${i + 1}</span><div class="fragment-text">${escapeHtml(x.fragment)}</div></div>`
           ).join("");
@@ -1393,7 +1480,7 @@
 
           lyricStage.style.opacity = "1";
           lyricStage.style.transform = "translateY(0)";
-        }
+        }, 120);
       }
 
       if (lyricDraw) lyricDraw.addEventListener("click", drawLyrics);
@@ -1448,14 +1535,15 @@
           <button type="button" class="share-action" id="share-copy">テキストをコピー</button>
           <a class="share-action" id="share-x" href="#" target="_blank" rel="noopener">Xで共有</a>
           <a class="share-action" id="share-line" href="#" target="_blank" rel="noopener">LINEで共有</a>
+          <button type="button" class="share-action" id="share-instagram">Instagramで使う</button>
           <button type="button" class="share-action" id="share-system">iPhoneの共有メニュー</button>
         </div>
 
-        <div class="share-image-tools">
-          <p class="share-help"><strong>Instagram</strong> はWebサイトから直接投稿画面へ内容を渡せないため、投稿用画像を作ってから共有します。</p>
+        <div class="share-image-tools" id="instagram-tools" hidden>
+          <p class="share-help"><strong>Instagram用画像を作ります。</strong><br>投稿なら4:5、ストーリーなら9:16を選んでください。画像を作ったあと、iPhoneの共有メニューからInstagramまたは「画像を保存」を選べます。</p>
           <div class="share-actions">
-            <button type="button" class="share-action primary" id="share-post">投稿用画像 4:5 を作る</button>
-            <button type="button" class="share-action primary" id="share-story">ストーリー用 9:16 を作る</button>
+            <button type="button" class="share-action primary" id="share-post">投稿 4:5</button>
+            <button type="button" class="share-action primary" id="share-story">ストーリー 9:16</button>
           </div>
 
           <div class="share-generated" id="share-generated" hidden>
@@ -1468,7 +1556,8 @@
           </div>
         </div>
 
-        <div class="share-toast" id="share-toast" role="status" aria-live="polite"></div>
+        <button type="button" class="share-bottom-close" id="share-bottom-close">共有画面を閉じる</button>
+        <div class="share-toast" id="share-toast"></div>
       </div>
     </div>
   </div>
@@ -1495,7 +1584,6 @@ document.addEventListener("DOMContentLoaded", () => {
   let activePanel = null;
   let currentImageFile = null;
   let currentImageURL = null;
-  let imageRequest = 0;
 
   function toast(message) {
     if (!toastEl) return;
@@ -1543,23 +1631,28 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function openShare(payload) {
-    imageRequest++;
     sharePayload = payload;
     quoteEl.textContent = payload.lines.join("\n");
     sourceEl.textContent = payload.source || "束元康介";
     resetGeneratedImage();
+
+    const instagramTools = document.getElementById("instagram-tools");
+    const instagramButton = document.getElementById("share-instagram");
+    if (instagramTools) instagramTools.hidden = true;
+    if (instagramButton) instagramButton.setAttribute("aria-expanded", "false");
+
     setDirectLinks();
     modal.hidden = false;
     document.body.style.overflow = "hidden";
   }
 
   function closeShare() {
-    imageRequest++;
     modal.hidden = true;
     document.body.style.overflow = "";
   }
 
   document.getElementById("share-close")?.addEventListener("click", closeShare);
+  document.getElementById("share-bottom-close")?.addEventListener("click", closeShare);
   modal?.addEventListener("click", (e) => { if (e.target === modal) closeShare(); });
   document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !modal.hidden) closeShare(); });
 
@@ -1574,10 +1667,23 @@ document.addEventListener("DOMContentLoaded", () => {
       ta.style.opacity = "0";
       document.body.appendChild(ta);
       ta.select();
-      let copied = false;
-      try { copied = document.execCommand("copy"); } catch {}
+      document.execCommand("copy");
       ta.remove();
-      toast(copied ? "コピーしました。" : "コピーできませんでした。表示された言葉を選択してコピーしてください。");
+      toast("コピーしました。");
+    }
+  });
+
+  document.getElementById("share-instagram")?.addEventListener("click", () => {
+    const tools = document.getElementById("instagram-tools");
+    const button = document.getElementById("share-instagram");
+    if (!tools || !button) return;
+
+    const willOpen = tools.hidden;
+    tools.hidden = !willOpen;
+    button.setAttribute("aria-expanded", String(willOpen));
+
+    if (willOpen) {
+      tools.scrollIntoView({ behavior: "smooth", block: "nearest" });
     }
   });
 
@@ -1622,7 +1728,6 @@ document.addEventListener("DOMContentLoaded", () => {
     canvas.width = width;
     canvas.height = height;
     const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("このブラウザでは画像を作れません。テキスト共有をお使いください。");
 
     ctx.fillStyle = "#f6f6f4";
     ctx.fillRect(0, 0, width, height);
@@ -1638,48 +1743,48 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.fillText("KOSUKE TSUKAMOTO / WORDS", 122, 122);
 
     const maxWidth = width - 244;
-    // Keep source and site name on separate rows, outside the quote area.
-    ctx.font = "700 21px Arial, sans-serif";
-    const sourceLines = wrapChars(ctx, sharePayload.source || "束元康介", maxWidth);
-    const siteY = height - 140;
-    const sourceY = siteY - 30 - sourceLines.length * 30;
-    const separatorY = sourceY - 30;
-    const quoteTop = 225;
-    const quoteBottom = separatorY - 45;
-    const availableHeight = quoteBottom - quoteTop;
     let fontSize = sharePayload.lines.join("").length > 70 ? 50 : 58;
+    const minSize = 36;
     let rendered = [];
-    let fits = false;
-    for (; fontSize >= 30; fontSize -= 2) {
+
+    while (fontSize >= minSize) {
       ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
       rendered = [];
       sharePayload.lines.forEach((line, idx) => {
         rendered.push(...wrapChars(ctx, line, maxWidth));
         if (idx !== sharePayload.lines.length - 1) rendered.push("");
       });
-      if (rendered.length * fontSize * 1.62 <= availableHeight) {
-        fits = true;
-        break;
-      }
+      const total = rendered.length * fontSize * 1.62;
+      if (total <= height * 0.52) break;
+      fontSize -= 4;
     }
-    if (!fits) throw new Error("選んだ言葉が画像に収まりません。選択する行を減らしてください。テキスト共有はそのまま使えます。");
+
     ctx.fillStyle = "#111";
+    ctx.font = `600 ${fontSize}px "Yu Mincho","Hiragino Mincho ProN","Noto Serif JP",serif`;
     const lineHeight = fontSize * 1.62;
-    let y = quoteTop + (availableHeight - rendered.length * lineHeight) / 2;
-    rendered.forEach(line => {
+    const blockHeight = rendered.length * lineHeight;
+    let y = Math.max(height * 0.27, (height - blockHeight) / 2 - height * 0.02);
+
+    rendered.forEach((line) => {
       ctx.fillText(line, 122, y);
       y += lineHeight;
     });
+
+    const footerY = height - 155;
     ctx.strokeStyle = "rgba(17,17,17,.2)";
     ctx.beginPath();
-    ctx.moveTo(122, separatorY);
-    ctx.lineTo(width - 122, separatorY);
+    ctx.moveTo(122, footerY - 50);
+    ctx.lineTo(width - 122, footerY - 50);
     ctx.stroke();
+
     ctx.fillStyle = "#555";
     ctx.font = "700 21px Arial, sans-serif";
-    sourceLines.forEach((line, i) => ctx.fillText(line, 122, sourceY + i * 30));
+    ctx.fillText(sharePayload.source || "束元康介", 122, footerY);
+
+    ctx.textAlign = "right";
     ctx.font = "700 16px Arial, sans-serif";
-    ctx.fillText("kosuketsukamoto.netlify.app", 122, siteY);
+    ctx.fillText("kosuketsukamoto.netlify.app", width - 122, footerY + 4);
+    ctx.textAlign = "left";
 
     return canvas;
   }
@@ -1689,29 +1794,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function generateImage(kind) {
-    const request = ++imageRequest;
-    resetGeneratedImage();
-    toast("画像を作っています…");
-    try {
-      const canvas = buildCanvas(kind);
-      const blob = await canvasBlob(canvas);
-      if (request !== imageRequest) return;
-      if (!blob) throw new Error("画像を生成できませんでした。もう一度お試しください。");
-      const name = `kosuke-tsukamoto-${kind === "story" ? "story" : "post"}.png`;
-      // PNG download remains available even when File sharing is unsupported.
-      try { currentImageFile = new File([blob], name, { type: "image/png" }); }
-      catch { currentImageFile = null; }
-      currentImageURL = URL.createObjectURL(blob);
-      generatedImage.src = currentImageURL;
-      downloadLink.href = currentImageURL;
-      downloadLink.download = name;
-      generatedBox.hidden = false;
-      generatedBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      toast("画像を作りました。PNG保存か「画像を共有／保存」を選んでください。");
-    } catch (err) {
-      if (request !== imageRequest) return;
-      toast(err.message || "画像を生成できませんでした。もう一度お試しください。");
+    const canvas = buildCanvas(kind);
+    const blob = await canvasBlob(canvas);
+    if (!blob) {
+      toast("画像を生成できませんでした。");
+      return;
     }
+
+    resetGeneratedImage();
+
+    const name = `kosuke-tsukamoto-${kind === "story" ? "story" : "post"}.png`;
+    currentImageFile = new File([blob], name, { type: "image/png" });
+    currentImageURL = URL.createObjectURL(blob);
+
+    generatedImage.src = currentImageURL;
+    downloadLink.href = currentImageURL;
+    downloadLink.download = name;
+    generatedBox.hidden = false;
+    generatedBox.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    toast("画像を作りました。");
   }
 
   document.getElementById("share-post")?.addEventListener("click", () => generateImage("post"));
@@ -1719,21 +1820,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.getElementById("share-image-system")?.addEventListener("click", async () => {
     if (!currentImageFile) {
-      toast(currentImageURL ? "このブラウザでは画像共有に対応していません。PNG保存か画像の長押しをお使いください。" : "先に画像を作ってください。");
+      toast("先に画像を作ってください。");
       return;
     }
 
-    try {
-      if (navigator.share && navigator.canShare && navigator.canShare({ files: [currentImageFile] })) {
+    if (navigator.share && navigator.canShare && navigator.canShare({ files: [currentImageFile] })) {
+      try {
         await navigator.share({
           files: [currentImageFile],
           title: "束元康介 / WORDS",
           text: sharePayload.source || ""
         });
         return;
+      } catch (err) {
+        if (err?.name === "AbortError") return;
       }
-    } catch (err) {
-      if (err?.name === "AbortError") return;
     }
 
     toast("共有メニューで画像を渡せないため、PNG保存か画像の長押しを使ってください。");
