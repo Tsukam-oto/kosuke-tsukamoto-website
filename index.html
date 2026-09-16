@@ -969,6 +969,48 @@
   color:#111 !important;
 }
 
+
+/* v28 — VOICES started */
+.voices-list{
+  margin-top:54px;
+  border-top:1px solid var(--line);
+}
+.voice-entry{
+  display:grid;
+  grid-template-columns:140px minmax(0,1fr);
+  gap:28px;
+  padding:30px 0 34px;
+  border-bottom:1px solid var(--line);
+}
+.voice-entry-meta{
+  font:700 9px/1.7 var(--sans);
+  letter-spacing:.14em;
+  color:var(--muted);
+}
+.voice-entry-text{
+  margin:0;
+  max-width:760px;
+  font:400 clamp(20px,2.3vw,31px)/1.8 var(--serif);
+  letter-spacing:.01em;
+}
+.voice-entry-note{
+  margin:12px 0 0;
+  font:700 9px/1.6 var(--sans);
+  letter-spacing:.12em;
+  color:var(--muted);
+}
+@media(max-width:640px){
+  .voice-entry{
+    grid-template-columns:1fr;
+    gap:12px;
+    padding:26px 0 30px;
+  }
+  .voice-entry-text{
+    font-size:22px;
+    line-height:1.75;
+  }
+}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1327,6 +1369,7 @@
       <div class="wrap">
         <p class="section-kicker">NEWS / NOTES</p><h2 class="section-title">Updates</h2>
         <div class="news-list">
+          <div class="news-item"><time>2026.09</time><span class="smallcaps">VOICE</span><p>VOICE BOXにコメントが届き、「VOICES / 届いた言葉」の掲載を開始しました。</p></div>
           <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
           <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
           <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>「音楽の風景」を新しい作品順に変更。歌詞とLYRIC BOXのシェア機能を見やすく調整。</p></div>
@@ -1345,7 +1388,7 @@
       <p>音楽について知っていること。演奏するときの小さなコツ。作品を読んだり聴いたりして感じたこと。このサイトを見て思ったこと。</p>
       <p>「もっとこうしたら面白そう」「こんなことをやってみたら？」というアイデアも歓迎します。</p>
       <p>ここは、束元康介から何かを発信するだけではなく、見てくださった方の声を受け取るための場所です。</p>
-      <p class="voice-small">掲載許可をいただいた言葉は、今後 <strong>VOICES — 届いた言葉</strong> としてこのサイトで紹介することがあります。掲載前に内容を確認し、個人情報や第三者を特定できる情報を含む投稿は掲載しません。</p>
+      <p class="voice-small">掲載許可をいただいた言葉は、<strong>VOICES — 届いた言葉</strong> としてこのサイトで紹介することがあります。掲載する場合も、お名前・ニックネームは公開せず、すべて匿名で紹介します。掲載前に内容を確認し、個人情報や第三者を特定できる情報を含む投稿は掲載しません。</p>
     </div>
 
     <form class="voice-form" action="https://formspree.io/f/xbgjraga" method="POST">
@@ -1374,21 +1417,20 @@
       </div>
 
       <div class="voice-field">
-        <label for="voice-name">NAME / お名前・ニックネーム（任意）</label>
+        <label for="voice-name">NAME / お名前・ニックネーム（任意・掲載時は匿名）</label>
         <input id="voice-name" name="name" type="text" placeholder="匿名でも送れます">
       </div>
 
       <fieldset class="voice-field" style="border-left:0;border-right:0;border-top:0;padding-left:0;padding-right:0;margin:0">
         <legend>PUBLICATION / VOICESへの掲載</legend>
         <div class="voice-publish">
-          <label class="voice-radio"><input type="radio" name="publication" value="名前・ニックネームを含め掲載してよい" required>名前・ニックネームを含め掲載してよい</label>
-          <label class="voice-radio"><input type="radio" name="publication" value="匿名なら掲載してよい">匿名なら掲載してよい</label>
+          <label class="voice-radio"><input type="radio" name="publication" value="匿名で掲載してよい" required>匿名で掲載してよい</label>
           <label class="voice-radio"><input type="radio" name="publication" value="掲載しない">掲載しない</label>
         </div>
       </fieldset>
 
       <button class="voice-submit" type="submit">SEND YOUR VOICE →</button>
-      <p class="voice-note">送信された内容が自動で公開されることはありません。内容と掲載希望を確認したうえで、掲載する場合のみサイトへ反映します。個人情報や第三者を特定できる情報は書かないようお願いいたします。</p>
+      <p class="voice-note">送信された内容が自動で公開されることはありません。内容と掲載希望を確認したうえで、掲載する場合のみ匿名でサイトへ反映します。個人情報や第三者を特定できる情報は書かないようお願いいたします。</p>
     </form>
   </div>
 </section>
@@ -1398,11 +1440,23 @@
     <p class="section-kicker">VOICES / 届いた言葉</p>
     <div style="display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:8vw;align-items:start">
       <h2 class="section-title">ここに、少しずつ<br>言葉が集まっていく。</h2>
-      <p class="section-lead">VOICE BOXに届いた声のうち、掲載許可をいただいたものを紹介していく場所です。作品への感想、音楽の知恵、サイトへの提案などを、束元が確認・選定したうえで掲載します。</p>
+      <p class="section-lead">VOICE BOXに届いた声のうち、掲載許可をいただいたものを匿名で紹介していく場所です。作品への感想、音楽の知恵、サイトへの提案などを、束元が確認・選定したうえで掲載します。</p>
     </div>
-    <div style="margin-top:54px;padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-      <p style="margin:0;font:700 9px/1.5 var(--sans);letter-spacing:.15em;color:var(--muted)">NO VOICES YET</p>
-      <p style="margin:12px 0 0;line-height:1.9">最初の声を待っています。</p>
+    <div class="voices-list">
+      <article class="voice-entry">
+        <div class="voice-entry-meta">VOICE 001<br>SITE / 2026.09</div>
+        <div>
+          <p class="voice-entry-text">歌詞読んでたら色々思い出してきました。<br>ありがとうございます。</p>
+          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
+        </div>
+      </article>
+      <article class="voice-entry">
+        <div class="voice-entry-meta">VOICE 002<br>SITE / 2026.09</div>
+        <div>
+          <p class="voice-entry-text">がんばってください<br>ミュージックアルバム待ってます</p>
+          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
+        </div>
+      </article>
     </div>
   </div>
 </section>
