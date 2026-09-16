@@ -1011,6 +1011,20 @@
   }
 }
 
+
+/* v29 — Updates and messages near the top */
+.hero-message-links{display:flex;flex-wrap:wrap;gap:12px 24px;margin-top:24px;font:500 12px/1.8 var(--sans)}
+.hero-message-links a,.update-link,.message-read-link{ text-decoration:underline;text-underline-offset:5px }
+.update-link{display:inline-block;margin-left:12px;font:600 12px/1.9 var(--sans)}
+.message-actions{display:flex;align-items:center;flex-wrap:wrap;gap:16px 24px;margin-top:28px}
+.message-actions p{margin:0;color:var(--muted);font:12px/1.9 var(--sans)}
+.message-read-link{display:inline-block;color:#f3f1eb;font:500 12px/1.9 var(--sans)}
+#voice{display:block}
+a:focus-visible,button:focus-visible{outline:2px solid currentColor;outline-offset:5px}
+#voice input:focus-visible,#voice select:focus-visible,#voice textarea:focus-visible{outline:2px solid #eee;outline-offset:5px}
+@media(min-width:1101px){.nav{gap:18px}}
+@media(max-width:640px){.update-link{display:block;margin:8px 0 0}.hero-message-links{gap:12px 18px}.message-actions .btn{width:100%;justify-content:space-between}}
+
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1021,7 +1035,7 @@
     </a>
     <button class="menu" aria-label="メニューを開く" aria-expanded="false"><i></i><i></i></button>
     <nav class="nav" aria-label="メインメニュー">
-      <a href="#works">WORKS</a><a href="#timeline">TIMELINE</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="#project">PROJECTS</a><a href="#profile">PROFILE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#voice">VOICE</a><a href="#contact">CONTACT</a>
+      <a href="#news">NEWS</a><a href="#voices">VOICES</a><a href="#voice">VOICE BOX</a><a href="#works">WORKS</a><a href="#timeline">TIMELINE</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="#project">PROJECTS</a><a href="#profile">PROFILE</a><a href="#activity">ACTIVITY</a><a href="#contact">CONTACT</a>
     </nav>
   </header>
 
@@ -1032,6 +1046,7 @@
         <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
         <p class="hero-sub">校歌、合唱、吹奏楽、室内楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
         <div class="hero-actions"><a class="btn primary" href="#works">作品を見る <span>→</span></a><a class="btn" href="#lyrics">詞を読む</a><a class="btn" href="#lyric-box">言葉を引く</a><a class="btn" href="#project">創作プロジェクト</a></div>
+        <div class="hero-message-links"><a href="#voices">届いた言葉を読む <span>→</span></a><a href="#voice">メッセージを送る <span>→</span></a><a href="#news">最新の更新を見る <span>↓</span></a></div>
       </div>
       <div class="hero-visual" aria-label="プロフィールイラスト">
         <figure class="portrait-frame">
@@ -1041,6 +1056,104 @@
       </div>
       <div class="scroll-mark">SCROLL</div>
     </section>
+
+<section class="news" id="news">
+      <div class="wrap">
+        <p class="section-kicker">NEWS / UPDATES</p><h2 class="section-title">Updates</h2>
+        <div class="news-list">
+          <div class="news-item"><time datetime="2026-09-16">2026.09.16</time><span class="smallcaps">VOICE</span><p>VOICE BOXにコメントが届いています。掲載許可をいただいた2件を匿名で紹介しています。<a class="update-link" href="#voices">届いた言葉を読む →</a></p></div>
+          <div class="news-item"><time datetime="2026-09-16">2026.09.16</time><span class="smallcaps">UPDATE</span><p>Updates・VOICES・VOICE BOXをページ上部へ移動しました。<a class="update-link" href="#voice">メッセージを送る →</a></p></div>
+          <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>「音楽の風景」を新しい作品順に変更。歌詞とLYRIC BOXのシェア機能を見やすく調整。</p></div>
+          <div class="news-item"><time>2026.09</time><span class="smallcaps">CHORAL</span><p>《All around you》の歌詞を「音楽の風景」に追加。令和8年度 足立区連合音楽会にて演奏予定。</p></div>
+          <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
+          <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
+          <div class="news-item"><time>2026</time><span class="smallcaps">IN PROGRESS</span><p>新作《海にまであなたは本を連れてきて》を制作予定。</p></div>
+        </div>
+      </div>
+    </section>
+
+<section class="voices-preview" id="voices">
+  <div class="wrap">
+    <p class="section-kicker">VOICES / 届いた言葉</p>
+    <div style="display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:8vw;align-items:start">
+      <h2 class="section-title">ここに、少しずつ<br>言葉が集まっていく。</h2>
+      <p class="section-lead">VOICE BOXに届いた声のうち、掲載許可をいただいたものを匿名で紹介していく場所です。作品への感想、音楽の知恵、サイトへの提案などを、束元が確認・選定したうえで掲載します。</p>
+    </div>
+    <div class="message-actions"><a class="btn primary" href="#voice">あなたもメッセージを送る <span>→</span></a><p>掲載は許可のある投稿のみ、すべて匿名で。</p></div>
+    <div class="voices-list">
+      <article class="voice-entry">
+        <div class="voice-entry-meta">VOICE 001<br>SITE / 2026.09</div>
+        <div>
+          <p class="voice-entry-text">歌詞読んでたら色々思い出してきました。<br>ありがとうございます。</p>
+          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
+        </div>
+      </article>
+      <article class="voice-entry">
+        <div class="voice-entry-meta">VOICE 002<br>SITE / 2026.09</div>
+        <div>
+          <p class="voice-entry-text">がんばってください<br>ミュージックアルバム待ってます</p>
+          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="voice" id="voice">
+  <div class="wrap voice-grid">
+    <div class="voice-copy">
+      <p class="section-kicker">VOICE BOX</p>
+      <h2>あなたの言葉を、<br>聞かせてください。</h2>
+      <p>音楽について知っていること。演奏するときの小さなコツ。作品を読んだり聴いたりして感じたこと。このサイトを見て思ったこと。</p>
+      <p>「もっとこうしたら面白そう」「こんなことをやってみたら？」というアイデアも歓迎します。</p>
+      <p>ここは、束元康介から何かを発信するだけではなく、見てくださった方の声を受け取るための場所です。</p>
+      <a class="message-read-link" href="#voices">届いた言葉を読む ↑</a>
+      <p class="voice-small">掲載許可をいただいた言葉は、<strong>VOICES — 届いた言葉</strong> としてこのサイトで紹介することがあります。掲載する場合も、お名前・ニックネームは公開せず、すべて匿名で紹介します。掲載前に内容を確認し、個人情報や第三者を特定できる情報を含む投稿は掲載しません。</p>
+    </div>
+
+    <form class="voice-form" action="https://formspree.io/f/xbgjraga" method="POST">
+      <input type="hidden" name="_subject" value="VOICE BOXから新しい投稿が届きました">
+
+      <div class="voice-field">
+        <label for="voice-theme">THEME / どんな声ですか？</label>
+        <select id="voice-theme" name="theme" required>
+          <option value="" selected disabled>選んでください</option>
+          <option>楽器・演奏のコツ</option>
+          <option>合唱について</option>
+          <option>吹奏楽について</option>
+          <option>指揮について</option>
+          <option>作曲・作詞について</option>
+          <option>音楽の授業について</option>
+          <option>作品の感想</option>
+          <option>サイトへの感想</option>
+          <option>こんなことをしてみたら？</option>
+          <option>その他</option>
+        </select>
+      </div>
+
+      <div class="voice-field">
+        <label for="voice-message">YOUR VOICE / あなたの言葉</label>
+        <textarea id="voice-message" name="voice" placeholder="感想、アドバイス、アイデア、小さな気づきなど、自由に書いてください。" required></textarea>
+      </div>
+
+      <div class="voice-field">
+        <label for="voice-name">NAME / お名前・ニックネーム（任意・掲載時は匿名）</label>
+        <input id="voice-name" name="name" type="text" placeholder="匿名でも送れます">
+      </div>
+
+      <fieldset class="voice-field" style="border-left:0;border-right:0;border-top:0;padding-left:0;padding-right:0;margin:0">
+        <legend>PUBLICATION / VOICESへの掲載</legend>
+        <div class="voice-publish">
+          <label class="voice-radio"><input type="radio" name="publication" value="匿名で掲載してよい" required>匿名で掲載してよい</label>
+          <label class="voice-radio"><input type="radio" name="publication" value="掲載しない">掲載しない</label>
+        </div>
+      </fieldset>
+
+      <button class="voice-submit" type="submit">SEND YOUR VOICE →</button>
+      <p class="voice-note">送信された内容が自動で公開されることはありません。内容と掲載希望を確認したうえで、掲載する場合のみ匿名でサイトへ反映します。個人情報や第三者を特定できる情報は書かないようお願いいたします。</p>
+    </form>
+  </div>
+</section>
 
     <section class="intro">
       <div class="wrap intro-grid">
@@ -1365,101 +1478,12 @@
       </div>
     </section>
 
-    <section class="news" id="news">
-      <div class="wrap">
-        <p class="section-kicker">NEWS / NOTES</p><h2 class="section-title">Updates</h2>
-        <div class="news-list">
-          <div class="news-item"><time>2026.09</time><span class="smallcaps">VOICE</span><p>VOICE BOXにコメントが届き、「VOICES / 届いた言葉」の掲載を開始しました。</p></div>
-          <div class="news-item"><time>2026.08</time><span class="smallcaps">WEBSITE</span><p>Official Websiteを公開しました。</p></div>
-          <div class="news-item"><time>2026</time><span class="smallcaps">CHORAL</span><p>《夏を吸い込んで》《春にあふれて》を作品アーカイブに追加。</p></div>
-          <div class="news-item"><time>2026.09</time><span class="smallcaps">UPDATE</span><p>「音楽の風景」を新しい作品順に変更。歌詞とLYRIC BOXのシェア機能を見やすく調整。</p></div>
-          <div class="news-item"><time>2026.09</time><span class="smallcaps">CHORAL</span><p>《All around you》の歌詞を「音楽の風景」に追加。令和8年度 足立区連合音楽会にて演奏予定。</p></div>
-          <div class="news-item"><time>2026</time><span class="smallcaps">IN PROGRESS</span><p>新作《海にまであなたは本を連れてきて》を制作予定。</p></div>
-        </div>
-      </div>
-    </section>
+    
 
     
-<section class="voice" id="voice">
-  <div class="wrap voice-grid">
-    <div class="voice-copy">
-      <p class="section-kicker">VOICE BOX</p>
-      <h2>あなたの言葉を、<br>聞かせてください。</h2>
-      <p>音楽について知っていること。演奏するときの小さなコツ。作品を読んだり聴いたりして感じたこと。このサイトを見て思ったこと。</p>
-      <p>「もっとこうしたら面白そう」「こんなことをやってみたら？」というアイデアも歓迎します。</p>
-      <p>ここは、束元康介から何かを発信するだけではなく、見てくださった方の声を受け取るための場所です。</p>
-      <p class="voice-small">掲載許可をいただいた言葉は、<strong>VOICES — 届いた言葉</strong> としてこのサイトで紹介することがあります。掲載する場合も、お名前・ニックネームは公開せず、すべて匿名で紹介します。掲載前に内容を確認し、個人情報や第三者を特定できる情報を含む投稿は掲載しません。</p>
-    </div>
 
-    <form class="voice-form" action="https://formspree.io/f/xbgjraga" method="POST">
-      <input type="hidden" name="_subject" value="VOICE BOXから新しい投稿が届きました">
 
-      <div class="voice-field">
-        <label for="voice-theme">THEME / どんな声ですか？</label>
-        <select id="voice-theme" name="theme" required>
-          <option value="" selected disabled>選んでください</option>
-          <option>楽器・演奏のコツ</option>
-          <option>合唱について</option>
-          <option>吹奏楽について</option>
-          <option>指揮について</option>
-          <option>作曲・作詞について</option>
-          <option>音楽の授業について</option>
-          <option>作品の感想</option>
-          <option>サイトへの感想</option>
-          <option>こんなことをしてみたら？</option>
-          <option>その他</option>
-        </select>
-      </div>
 
-      <div class="voice-field">
-        <label for="voice-message">YOUR VOICE / あなたの言葉</label>
-        <textarea id="voice-message" name="voice" placeholder="感想、アドバイス、アイデア、小さな気づきなど、自由に書いてください。" required></textarea>
-      </div>
-
-      <div class="voice-field">
-        <label for="voice-name">NAME / お名前・ニックネーム（任意・掲載時は匿名）</label>
-        <input id="voice-name" name="name" type="text" placeholder="匿名でも送れます">
-      </div>
-
-      <fieldset class="voice-field" style="border-left:0;border-right:0;border-top:0;padding-left:0;padding-right:0;margin:0">
-        <legend>PUBLICATION / VOICESへの掲載</legend>
-        <div class="voice-publish">
-          <label class="voice-radio"><input type="radio" name="publication" value="匿名で掲載してよい" required>匿名で掲載してよい</label>
-          <label class="voice-radio"><input type="radio" name="publication" value="掲載しない">掲載しない</label>
-        </div>
-      </fieldset>
-
-      <button class="voice-submit" type="submit">SEND YOUR VOICE →</button>
-      <p class="voice-note">送信された内容が自動で公開されることはありません。内容と掲載希望を確認したうえで、掲載する場合のみ匿名でサイトへ反映します。個人情報や第三者を特定できる情報は書かないようお願いいたします。</p>
-    </form>
-  </div>
-</section>
-
-<section class="voices-preview" id="voices">
-  <div class="wrap">
-    <p class="section-kicker">VOICES / 届いた言葉</p>
-    <div style="display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:8vw;align-items:start">
-      <h2 class="section-title">ここに、少しずつ<br>言葉が集まっていく。</h2>
-      <p class="section-lead">VOICE BOXに届いた声のうち、掲載許可をいただいたものを匿名で紹介していく場所です。作品への感想、音楽の知恵、サイトへの提案などを、束元が確認・選定したうえで掲載します。</p>
-    </div>
-    <div class="voices-list">
-      <article class="voice-entry">
-        <div class="voice-entry-meta">VOICE 001<br>SITE / 2026.09</div>
-        <div>
-          <p class="voice-entry-text">歌詞読んでたら色々思い出してきました。<br>ありがとうございます。</p>
-          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
-        </div>
-      </article>
-      <article class="voice-entry">
-        <div class="voice-entry-meta">VOICE 002<br>SITE / 2026.09</div>
-        <div>
-          <p class="voice-entry-text">がんばってください<br>ミュージックアルバム待ってます</p>
-          <p class="voice-entry-note">ANONYMOUS / 匿名</p>
-        </div>
-      </article>
-    </div>
-  </div>
-</section>
 
 <section class="contact" id="contact">
       <div class="wrap contact-grid">
