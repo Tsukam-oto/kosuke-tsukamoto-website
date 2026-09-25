@@ -263,6 +263,39 @@
     .footer-name span{display:block;font:700 8px/1.4 var(--sans);letter-spacing:.18em;opacity:.5;margin-top:8px}
     .footer-copy{text-align:right;font:9px/1.8 var(--sans);opacity:.48}
 
+
+/* v31 — VOICE BOX emphasis */
+.nav a[href="#voice"]{
+  border:1px solid currentColor;
+  padding:8px 11px;
+  margin-left:2px;
+}
+.voice-invite{
+  padding:48px 6vw;
+  background:#171717;
+  color:#f3f1eb;
+  border-top:1px solid #2f2f2f;
+  border-bottom:1px solid #2f2f2f;
+}
+.voice-invite-inner{
+  display:grid;
+  grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);
+  gap:8vw;
+  align-items:end;
+}
+.voice-invite .section-kicker{color:#aaa;margin-bottom:14px}
+.voice-invite h2{margin:0;font:500 clamp(30px,4.1vw,58px)/1.12 var(--serif);letter-spacing:-.02em}
+.voice-invite-copy{max-width:640px}
+.voice-invite-copy p{margin:0 0 20px;color:#c8c6c0;line-height:1.95}
+.voice-invite-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #eee;background:#eee;color:#111;padding:15px 20px;text-decoration:none;font:700 10px/1 var(--sans);letter-spacing:.14em}
+.voice-invite-link:hover{background:transparent;color:#eee}
+.voice-open-note{display:inline-block;margin:0 0 24px;padding:8px 11px;border:1px solid #555;font:700 9px/1.4 var(--sans);letter-spacing:.12em;color:#ddd}
+@media(max-width:820px){
+  .voice-invite{padding-top:40px;padding-bottom:40px}
+  .voice-invite-inner{grid-template-columns:1fr;gap:26px}
+  .nav a[href="#voice"]{margin-left:0}
+}
+
     @media(max-width:980px){
       .feature-grid,.activity-grid{grid-template-columns:1fr 1fr}.feature-grid .feature-card:last-child{grid-column:1/-1}
       .work-row{grid-template-columns:70px 1fr 1fr 95px}
@@ -1028,7 +1061,7 @@
 </a>
 <button aria-expanded="false" aria-label="メニューを開く" class="menu"><i></i><i></i></button>
 <nav aria-label="メインメニュー" class="nav">
-<a href="/works/">WORKS</a><a href="#timeline">TIMELINE</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/music-education/">PROJECTS</a><a href="/profile/">PROFILE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#voice">VOICE</a><a href="#contact">CONTACT</a>
+<a href="/works/">WORKS</a><a href="#timeline">TIMELINE</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/music-education/">PROJECTS</a><a href="/profile/">PROFILE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#voice">VOICE BOX</a><a href="#contact">CONTACT</a>
 </nav>
 </header>
 <main id="top">
@@ -1225,6 +1258,18 @@
 <p class="lyrics-note">詩集「音楽の風景」／束元康介</p>
 </div>
 </section>
+<section class="voice-invite" aria-label="VOICE BOXへのご案内">
+<div class="wrap voice-invite-inner">
+<div>
+<p class="section-kicker">YOUR VOICE / OPEN</p>
+<h2>読んで、聴いて、<br/>浮かんだことを。</h2>
+</div>
+<div class="voice-invite-copy">
+<p>作品の感想でも、音楽の小さな知恵でも、サイトへの提案でも。ひとことから送れます。ここで受け取った言葉が、このサイトや次の創作につながることがあります。</p>
+<a class="voice-invite-link" href="#voice">あなたの言葉を聞かせてください →</a>
+</div>
+</div>
+</section>
 <section class="works" id="works">
 <div class="wrap">
 <div class="works-head">
@@ -1366,6 +1411,7 @@
 <div class="voice-copy">
 <p class="section-kicker">VOICE BOX</p>
 <h2>あなたの言葉を、<br/>聞かせてください。</h2>
+<p class="voice-open-note">匿名で、ひとことから送れます。</p>
 <p>音楽について知っていること。演奏するときの小さなコツ。作品を読んだり聴いたりして感じたこと。このサイトを見て思ったこと。</p>
 <p>「もっとこうしたら面白そう」「こんなことをやってみたら？」というアイデアも歓迎します。</p>
 <p>ここは、束元康介から何かを発信するだけではなく、見てくださった方の声を受け取るための場所です。</p>
@@ -1404,7 +1450,7 @@
 <label class="voice-radio"><input name="publication" type="radio" value="掲載しない"/>掲載しない</label>
 </div>
 </fieldset>
-<button class="voice-submit" type="submit">SEND YOUR VOICE →</button>
+<button class="voice-submit" type="submit">あなたの言葉を送る →</button>
 <p class="voice-note">送信された内容が自動で公開されることはありません。内容と掲載希望を確認したうえで、掲載する場合のみ匿名でサイトへ反映します。個人情報や第三者を特定できる情報は書かないようお願いいたします。</p>
 </form>
 </div>
