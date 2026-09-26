@@ -121,22 +121,43 @@
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
     .btn.voice-cta{border-color:#111;background:transparent}
 
-    /* v33 — first-visit navigation */
+    /* v35 — compact editorial entrances */
     .explore{padding:0 6vw 104px;border-bottom:1px solid var(--line)}
     .explore-head{display:flex;justify-content:space-between;gap:30px;align-items:end;padding:34px 0 24px;border-top:1px solid var(--line)}
     .explore-title{margin:0;font-size:clamp(26px,3vw,40px);line-height:1.35;font-weight:600}
     .explore-note{max-width:470px;margin:0;color:#666;font-size:13px;line-height:1.9}
-    .explore-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
-    .explore-card{min-height:218px;padding:23px 22px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;position:relative;transition:transform .2s,background .2s,color .2s}
-    .explore-card:hover{transform:translateY(-3px);background:#fff}
-    .explore-card-num{font:700 9px/1 var(--sans);letter-spacing:.16em;color:#888;margin-bottom:34px}
-    .explore-card-en{font:700 9px/1.2 var(--sans);letter-spacing:.16em;color:#666;margin-bottom:10px}
-    .explore-card h2{margin:0 0 12px;font-size:22px;line-height:1.45;font-weight:600}
-    .explore-card p{margin:0;color:#666;font-size:12px;line-height:1.85;max-width:250px}
-    .explore-card-arrow{margin-top:auto;padding-top:26px;font:700 11px/1 var(--sans);letter-spacing:.08em}
-    .explore-card.voice{background:#111;color:#fff;border-color:#111}
-    .explore-card.voice:hover{background:#222}
-    .explore-card.voice .explore-card-num,.explore-card.voice .explore-card-en,.explore-card.voice p{color:#bbb}
+    .explore-layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(360px,.75fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .explore-list{display:grid;grid-template-rows:repeat(3,1fr)}
+    .explore-card{padding:24px 26px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:grid;grid-template-columns:48px minmax(0,1fr) auto;gap:20px;align-items:center;position:relative;transition:background .2s,color .2s}
+    .explore-card:hover{background:#fff}
+    .explore-card-num{font:700 9px/1 var(--sans);letter-spacing:.16em;color:#888}
+    .explore-card-body{min-width:0}
+    .explore-card-en{display:block;font:700 9px/1.2 var(--sans);letter-spacing:.16em;color:#666;margin-bottom:8px}
+    .explore-card h2{margin:0 0 7px;font-size:clamp(20px,2vw,27px);line-height:1.35;font-weight:600}
+    .explore-card p{margin:0;color:#666;font-size:12px;line-height:1.75;max-width:640px}
+    .explore-card-arrow{padding-left:20px;white-space:nowrap;font:700 10px/1 var(--sans);letter-spacing:.08em}
+    .explore-card.voice{display:flex;flex-direction:column;align-items:flex-start;justify-content:center;min-height:100%;padding:42px 44px;background:#111;color:#fff;border-color:#111}
+    .explore-card.voice:hover{background:#1b1b1b}
+    .explore-card.voice .explore-card-num{margin-bottom:48px;color:#aaa}
+    .explore-card.voice .explore-card-en{margin-bottom:16px;color:#bbb}
+    .explore-card.voice h2{margin-bottom:18px;font-size:clamp(28px,2.55vw,40px);line-height:1.34}
+    .explore-card.voice p{max-width:320px;color:#bbb;font-size:13px;line-height:1.85}
+    .explore-card.voice .explore-card-arrow{margin-top:34px;padding-left:0;color:#fff}
+    .voice-card-line{display:block;white-space:nowrap}
+    @media(max-width:980px){
+      .explore-layout{grid-template-columns:1fr}
+      .explore-card.voice{min-height:340px}
+      .explore-card.voice h2{font-size:34px}
+    }
+    @media(max-width:680px){
+      .explore-head{display:block}
+      .explore-note{margin-top:14px}
+      .explore-card{grid-template-columns:34px 1fr;padding:22px 18px;gap:12px}
+      .explore-card-arrow{grid-column:2;padding-left:0;margin-top:3px}
+      .explore-card p{font-size:11px}
+      .explore-card.voice{padding:34px 26px;min-height:320px}
+      .voice-card-line{white-space:normal}
+    }
 
     .hero-detail-note{margin:16px 0 0;font:700 9px/1.7 var(--sans);letter-spacing:.08em;color:var(--muted)}
     .btn.page-link{background:transparent}
@@ -1093,7 +1114,7 @@
 <div class="hero-copy">
 <p class="eyebrow">LYRICIST / COMPOSER / MUSIC EDUCATOR</p>
 <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
-<p class="hero-sub">校歌、合唱、吹奏楽、室内楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
+<p class="hero-sub">校歌、合唱、吹奏楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
 <div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn voice-cta" href="#voice">あなたの言葉を聞かせてください</a></div>
 </div>
 <div aria-label="プロフィールイラスト" class="hero-visual">
@@ -1110,18 +1131,28 @@
 <div><p class="section-kicker">START HERE / FOUR ENTRANCES</p><h2 class="explore-title">このサイトを、どこから見ますか。</h2></div>
 <p class="explore-note">作品、言葉、人物、そしてあなたの声。初めて訪れた方も、気になる入口からそのまま進めます。</p>
 </div>
-<div class="explore-grid">
+<div class="explore-layout">
+<div class="explore-list">
 <a class="explore-card" href="/works/">
-<span class="explore-card-num">01</span><span class="explore-card-en">WORKS</span><h2>作品を見る</h2><p>合唱、校歌、吹奏楽、室内楽。近年の作品と制作の記録へ。</p><span class="explore-card-arrow">OPEN →</span>
+<span class="explore-card-num">01</span>
+<div class="explore-card-body"><span class="explore-card-en">WORKS</span><h2>作品を見る</h2><p>合唱、校歌、吹奏楽。近年の作品と制作の記録へ。</p></div>
+<span class="explore-card-arrow">OPEN →</span>
 </a>
-<a class="explore-card" href="#lyrics">
-<span class="explore-card-num">02</span><span class="explore-card-en">LYRICS / WORDS</span><h2>言葉を読む</h2><p>詩集「音楽の風景」と、歌うために書いた言葉を読む場所へ。</p><span class="explore-card-arrow">READ →</span>
+<a class="explore-card" href="#lyric-box">
+<span class="explore-card-num">02</span>
+<div class="explore-card-body"><span class="explore-card-en">LYRIC BOX / RANDOM</span><h2>言葉を引く</h2><p>472の言葉から、偶然ふたつを。別々の作品の言葉が、ここで出会います。</p></div>
+<span class="explore-card-arrow">DRAW →</span>
 </a>
 <a class="explore-card" href="/profile/">
-<span class="explore-card-num">03</span><span class="explore-card-en">PROFILE</span><h2>人を知る</h2><p>作詞・作曲・音楽教育を行き来する活動とプロフィールへ。</p><span class="explore-card-arrow">ABOUT →</span>
+<span class="explore-card-num">03</span>
+<div class="explore-card-body"><span class="explore-card-en">PROFILE</span><h2>人を知る</h2><p>作詞・作曲・音楽教育を行き来する活動とプロフィールへ。</p></div>
+<span class="explore-card-arrow">ABOUT →</span>
 </a>
+</div>
 <a class="explore-card voice" href="#voice">
-<span class="explore-card-num">04</span><span class="explore-card-en">VOICE BOX / OPEN</span><h2>あなたの言葉を<br/>聞かせてください</h2><p>作品の感想、音楽の小さな知恵、サイトへの提案。匿名で、ひとことから。</p><span class="explore-card-arrow">SEND YOUR VOICE →</span>
+<span class="explore-card-num">04</span>
+<div class="explore-card-body"><span class="explore-card-en">VOICE BOX / OPEN</span><h2><span class="voice-card-line">あなたの言葉を、</span><span class="voice-card-line">聞かせてください。</span></h2><p>作品の感想、音楽の小さな知恵、サイトへの提案。匿名で、ひとことから。</p></div>
+<span class="explore-card-arrow">SEND YOUR VOICE →</span>
 </a>
 </div>
 </div>
@@ -1351,7 +1382,7 @@
 <div class="work-row" data-cat="fanfare"><div class="work-year">2022–2025</div><div class="work-name">運動会のためのファンファーレ I–IV</div><div class="work-note">毎年5月、運動会のために新作を制作。各曲タイトルは整理中。</div><span class="chip">4 WORKS</span></div>
 </div>
 <details class="older-works">
-<summary><span>EARLIER WORKS</span><strong>室内楽など、以前の作品を見る</strong><i>＋</i></summary>
+<summary><span>EARLIER WORKS</span><strong>以前の作品を見る</strong><i>＋</i></summary>
 <div class="older-list">
 <div class="work-row" data-cat="chamber"><div class="work-year">—</div><div class="work-name">音戯</div><div class="work-note">クラリネットとピアノのための小品</div><span class="chip">SCORE</span></div>
 <div class="work-row" data-cat="chamber"><div class="work-year">—</div><div class="work-name">彫刻刀の詩</div><div class="work-note">オーボエとピアノのための作品</div><span class="chip">SCORE</span></div>
@@ -1417,7 +1448,7 @@
 </aside>
 <div class="profile-copy">
 <p class="v14-profile-p">1998年生まれ。茨城県立取手松陽高等学校音楽科にて<br class="v14-break"/>ピアノを専攻。文教大学教育学部にて音楽教育を学ぶ。</p>
-<p class="v14-profile-p">大学卒業後、公立学校の音楽科教員として勤務。<br class="v14-break"/>教育活動に携わる傍ら、校歌、合唱作品、吹奏楽作品、<br class="v14-break"/>室内楽作品などの作詞・作曲を行う。</p>
+<p class="v14-profile-p">大学卒業後、公立学校の音楽科教員として勤務。<br class="v14-break"/>教育活動に携わる傍ら、校歌、合唱作品、吹奏楽作品などの<br class="v14-break"/>作詞・作曲を行う。</p>
 <p class="v14-profile-p">教育現場での創作にも取り組み、<br class="v14-break"/>生徒が自らの学校生活を振り返って<br class="v14-break"/>生み出した言葉をもとに、卒業記念の合唱作品を制作する<br class="v14-break"/>プロジェクトを継続している。</p>
 <p class="v14-profile-p">現在、混声合唱団<br class="v14-break"/><a href="https://choeurenchante.wixsite.com/choeurenchante" rel="noopener" style="border-bottom:1px solid currentColor" target="_blank">もとやわたクール・アンシャンテ</a> に所属。<br class="v14-break"/>指揮法を塚田真夫氏に学ぶ。</p>
 <div class="profile-facts">
@@ -1433,7 +1464,7 @@
 <div class="wrap">
 <p class="section-kicker">ACTIVITY</p><h2 class="section-title">音楽が僕にくれたものは、<br/>言葉にならないものばかり。</h2><p class="lyric-source">FROM “願い”</p>
 <div class="activity-grid">
-<article class="activity-card"><div><div class="smallcaps">COMPOSITION</div><h3>作詞・作曲</h3><p>合唱、吹奏楽、校歌、室内楽。演奏する人や場の背景にある言葉を受け取りながら制作します。</p></div></article>
+<article class="activity-card"><div><div class="smallcaps">COMPOSITION</div><h3>作詞・作曲</h3><p>合唱、吹奏楽、校歌。演奏する人や場の背景にある言葉を受け取りながら制作します。</p></div></article>
 <article class="activity-card"><div><div class="smallcaps">MUSIC EDUCATION</div><h3>音楽教育と創作</h3><p>授業の中で言葉を集め、対話し、創作へつなげる活動を実践。完成した作品を演奏する過程まで含めて設計します。</p></div></article>
 <article class="activity-card"><div><div class="smallcaps">CONDUCTING</div><h3>指揮</h3><p>合唱・学校行事等での指揮活動に取り組みながら、指揮法を継続して学んでいます。</p></div></article>
 </div>
