@@ -119,6 +119,24 @@
     .hero h1 .comma{letter-spacing:-.2em}
     .hero-sub{max-width:650px;font-size:15px;color:#555555;margin:30px 0 34px}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .btn.voice-cta{border-color:#111;background:transparent}
+
+    /* v33 — first-visit navigation */
+    .explore{padding:0 6vw 104px;border-bottom:1px solid var(--line)}
+    .explore-head{display:flex;justify-content:space-between;gap:30px;align-items:end;padding:34px 0 24px;border-top:1px solid var(--line)}
+    .explore-title{margin:0;font-size:clamp(26px,3vw,40px);line-height:1.35;font-weight:600}
+    .explore-note{max-width:470px;margin:0;color:#666;font-size:13px;line-height:1.9}
+    .explore-grid{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--line);border-left:1px solid var(--line)}
+    .explore-card{min-height:218px;padding:23px 22px 20px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;position:relative;transition:transform .2s,background .2s,color .2s}
+    .explore-card:hover{transform:translateY(-3px);background:#fff}
+    .explore-card-num{font:700 9px/1 var(--sans);letter-spacing:.16em;color:#888;margin-bottom:34px}
+    .explore-card-en{font:700 9px/1.2 var(--sans);letter-spacing:.16em;color:#666;margin-bottom:10px}
+    .explore-card h2{margin:0 0 12px;font-size:22px;line-height:1.45;font-weight:600}
+    .explore-card p{margin:0;color:#666;font-size:12px;line-height:1.85;max-width:250px}
+    .explore-card-arrow{margin-top:auto;padding-top:26px;font:700 11px/1 var(--sans);letter-spacing:.08em}
+    .explore-card.voice{background:#111;color:#fff;border-color:#111}
+    .explore-card.voice:hover{background:#222}
+    .explore-card.voice .explore-card-num,.explore-card.voice .explore-card-en,.explore-card.voice p{color:#bbb}
 
     .hero-detail-note{margin:16px 0 0;font:700 9px/1.7 var(--sans);letter-spacing:.08em;color:var(--muted)}
     .btn.page-link{background:transparent}
@@ -297,12 +315,15 @@
 }
 
     @media(max-width:980px){
+      .explore-grid{grid-template-columns:1fr 1fr}
+      .explore-head{align-items:start}
       .feature-grid,.activity-grid{grid-template-columns:1fr 1fr}.feature-grid .feature-card:last-child{grid-column:1/-1}
       .work-row{grid-template-columns:70px 1fr 1fr 95px}
       .voices{grid-template-columns:1fr}.voice-grid{grid-template-columns:1fr 1fr 1fr}
     }
     @media(max-width:820px){
       .site-header{height:68px}.nav{display:none;position:fixed;left:0;right:0;top:68px;padding:25px 6vw;background:var(--paper);border-bottom:1px solid var(--line);flex-direction:column;align-items:flex-start;gap:16px}.nav.open{display:flex}.menu{display:block}
+      .explore{padding-bottom:72px}.explore-head{display:block;padding-top:28px}.explore-note{margin-top:14px}.explore-card{min-height:190px}
       .hero{grid-template-columns:1fr;padding-top:116px;gap:50px}.hero-visual{min-height:auto}.portrait-frame{width:min(86vw,540px);margin:0 auto}.portrait-caption{left:-12px}
       .intro-grid,.project-top,.school-grid,.profile-grid,.contact-grid{grid-template-columns:1fr;gap:45px}.profile-side{position:static}
       .works-head{align-items:flex-start;flex-direction:column}
@@ -1049,6 +1070,9 @@
     font-size:22px;
     line-height:1.75;
   }
+  .explore-grid{grid-template-columns:1fr}
+  .explore-card{min-height:168px;padding:21px 20px 18px}
+  .explore-card-num{margin-bottom:24px}
 }
 
 </style>
@@ -1061,7 +1085,7 @@
 </a>
 <button aria-expanded="false" aria-label="メニューを開く" class="menu"><i></i><i></i></button>
 <nav aria-label="メインメニュー" class="nav">
-<a href="/works/">WORKS</a><a href="#timeline">TIMELINE</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/music-education/">PROJECTS</a><a href="/profile/">PROFILE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#voice">VOICE BOX</a><a href="#contact">CONTACT</a>
+<a href="/works/">WORKS</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/profile/">PROFILE</a><a href="/music-education/">PROJECTS</a><a href="#voice">VOICE BOX</a><a href="#timeline">TIMELINE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#contact">CONTACT</a>
 </nav>
 </header>
 <main id="top">
@@ -1070,7 +1094,7 @@
 <p class="eyebrow">LYRICIST / COMPOSER / MUSIC EDUCATOR</p>
 <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
 <p class="hero-sub">校歌、合唱、吹奏楽、室内楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
-<div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn" href="#lyrics">詞を読む</a><a class="btn" href="#lyric-box">言葉を引く</a><a class="btn" href="/music-education/">創作プロジェクト</a></div>
+<div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn voice-cta" href="#voice">あなたの言葉を聞かせてください</a></div>
 </div>
 <div aria-label="プロフィールイラスト" class="hero-visual">
 <figure class="portrait-frame">
@@ -1079,6 +1103,28 @@
 </figure>
 </div>
 <div class="scroll-mark">SCROLL</div>
+</section>
+<section class="explore" id="explore" aria-label="このサイトの入口">
+<div class="wrap">
+<div class="explore-head">
+<div><p class="section-kicker">START HERE / FOUR ENTRANCES</p><h2 class="explore-title">このサイトを、どこから見ますか。</h2></div>
+<p class="explore-note">作品、言葉、人物、そしてあなたの声。初めて訪れた方も、気になる入口からそのまま進めます。</p>
+</div>
+<div class="explore-grid">
+<a class="explore-card" href="/works/">
+<span class="explore-card-num">01</span><span class="explore-card-en">WORKS</span><h2>作品を見る</h2><p>合唱、校歌、吹奏楽、室内楽。近年の作品と制作の記録へ。</p><span class="explore-card-arrow">OPEN →</span>
+</a>
+<a class="explore-card" href="#lyrics">
+<span class="explore-card-num">02</span><span class="explore-card-en">LYRICS / WORDS</span><h2>言葉を読む</h2><p>詩集「音楽の風景」と、歌うために書いた言葉を読む場所へ。</p><span class="explore-card-arrow">READ →</span>
+</a>
+<a class="explore-card" href="/profile/">
+<span class="explore-card-num">03</span><span class="explore-card-en">PROFILE</span><h2>人を知る</h2><p>作詞・作曲・音楽教育を行き来する活動とプロフィールへ。</p><span class="explore-card-arrow">ABOUT →</span>
+</a>
+<a class="explore-card voice" href="#voice">
+<span class="explore-card-num">04</span><span class="explore-card-en">VOICE BOX / OPEN</span><h2>あなたの言葉を<br/>聞かせてください</h2><p>作品の感想、音楽の小さな知恵、サイトへの提案。匿名で、ひとことから。</p><span class="explore-card-arrow">SEND YOUR VOICE →</span>
+</a>
+</div>
+</div>
 </section>
 <section class="intro">
 <div class="wrap intro-grid">
