@@ -268,6 +268,28 @@
     .activity-card h3{font-size:22px;line-height:1.45;margin:24px 0 12px}
     .activity-card p{font-size:12px;color:#666666;margin:0}
 
+    .countdown-strip{padding:18px 6vw;background:var(--paper)}
+    .countdown-strip[hidden]{display:none}
+    .countdown-inner{display:grid;grid-template-columns:1fr auto auto auto;gap:clamp(18px,4vw,58px);align-items:center;min-height:90px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .countdown-kicker{font:700 9px/1.4 var(--sans);letter-spacing:.16em;color:var(--muted)}
+    .countdown-date{font-size:38px;line-height:1;letter-spacing:-.04em;white-space:nowrap}
+    .countdown-label{font-size:15px;white-space:nowrap}
+    .countdown-days{font-size:30px;line-height:1.2;white-space:nowrap}
+    .countdown-days small{font-size:15px;margin-right:4px}
+    .countdown-days .countdown-unit{font-size:15px;margin-left:3px}
+    .countdown-strip[data-state="day"] .countdown-inner{grid-template-columns:1fr auto auto}
+    .countdown-strip[data-state="day"] .countdown-label{font-size:24px}
+    .countdown-strip[data-state="day"] .countdown-days{display:none}
+    @media(max-width:700px){
+      .countdown-strip{padding:14px 6.5vw}
+      .countdown-inner{grid-template-columns:auto 1fr auto;gap:12px;min-height:76px}
+      .countdown-kicker{display:none}
+      .countdown-date{font-size:30px}
+      .countdown-label{font-size:13px;text-align:center}
+      .countdown-days{font-size:25px}
+      .countdown-days small,.countdown-days .countdown-unit{font-size:13px}
+      .countdown-strip[data-state="day"] .countdown-inner{grid-template-columns:1fr auto}
+    }
     .news{padding:110px 6vw;background:var(--white);border-top:1px solid var(--line)}
     .news-list{margin-top:40px;border-top:1px solid var(--line)}
     .news-item{display:grid;grid-template-columns:110px 100px 1fr;gap:20px;padding:19px 0;border-bottom:1px solid var(--line);align-items:center}
@@ -1507,6 +1529,48 @@
 </div>
 </div>
 </section>
+<section class="countdown-strip" id="countdown" aria-label="11月22日までのカウントダウン">
+<div class="wrap countdown-inner">
+<span class="countdown-kicker">COMING / 2026</span>
+<time class="countdown-date" datetime="2026-11-22">11.22</time>
+<span class="countdown-label">発表まで</span>
+<span class="countdown-days" id="countdown-days"><small>あと</small><span id="countdown-number">—</span><span class="countdown-unit">日</span></span>
+</div>
+</section>
+<script>
+  (() => {
+    const section = document.getElementById("countdown");
+    const label = section.querySelector(".countdown-label");
+    const number = document.getElementById("countdown-number");
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      timeZone: "Asia/Tokyo", year: "numeric", month: "numeric", day: "numeric"
+    });
+    const targetDay = Date.UTC(2026, 10, 22);
+
+    function updateCountdown() {
+      const parts = Object.fromEntries(formatter.formatToParts(new Date())
+        .filter(part => part.type !== "literal")
+        .map(part => [part.type, Number(part.value)]));
+      const today = Date.UTC(parts.year, parts.month - 1, parts.day);
+      const days = Math.round((targetDay - today) / 86400000);
+      section.hidden = days < 0;
+      if (days === 0) {
+        section.dataset.state = "day";
+        label.textContent = "本日";
+      } else if (days > 0) {
+        section.dataset.state = "before";
+        label.textContent = "発表まで";
+        number.textContent = String(days);
+      }
+    }
+
+    updateCountdown();
+    window.setInterval(updateCountdown, 60000);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) updateCountdown();
+    });
+  })();
+</script>
 <section class="news" id="news">
 <div class="wrap">
 <p class="section-kicker">NEWS / NOTES</p><h2 class="section-title">Updates</h2>
