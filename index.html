@@ -268,19 +268,19 @@
     .activity-card h3{font-size:22px;line-height:1.45;margin:24px 0 12px}
     .activity-card p{font-size:12px;color:#666666;margin:0}
 
-    .countdown-strip{padding:10px 6vw;background:var(--paper)}
+    .countdown-strip{margin-top:34px;max-width:570px;background:transparent}
     .countdown-strip[hidden]{display:none}
-    .countdown-inner{display:flex;justify-content:center;gap:clamp(20px,4vw,56px);align-items:center;min-height:76px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+    .countdown-inner{display:flex;justify-content:space-between;gap:16px;align-items:center;min-height:66px;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
     .countdown-kicker{display:none}
-    .countdown-date{font-size:34px;line-height:1;letter-spacing:-.04em;white-space:nowrap}
-    .countdown-label{font-size:14px;white-space:nowrap}
-    .countdown-days{font-size:28px;line-height:1.2;white-space:nowrap}
+    .countdown-date{font-size:30px;line-height:1;letter-spacing:-.04em;white-space:nowrap}
+    .countdown-label{font-size:13px;white-space:nowrap}
+    .countdown-days{font-size:26px;line-height:1.2;white-space:nowrap}
     .countdown-days small{font-size:15px;margin-right:4px}
     .countdown-days .countdown-unit{font-size:15px;margin-left:3px}
     .countdown-strip[data-state="day"] .countdown-label{font-size:24px}
     .countdown-strip[data-state="day"] .countdown-days{display:none}
     @media(max-width:700px){
-      .countdown-strip{padding:8px 6.5vw}
+      .countdown-strip{margin-top:27px}
       .countdown-inner{gap:clamp(8px,3vw,14px);min-height:68px}
       .countdown-kicker{display:none}
       .countdown-date{font-size:27px}
@@ -1160,15 +1160,6 @@
 <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
 <p class="hero-sub">校歌、合唱、吹奏楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
 <div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn voice-cta" href="#voice">あなたの言葉を聞かせてください</a></div>
-</div>
-<div aria-label="プロフィールイラスト" class="hero-visual">
-<figure class="portrait-frame">
-<img alt="グランドピアノのある指揮シーンのモノクロイラスト" src="assets/conducting-scene.webp"/>
-<figcaption class="portrait-caption"><span>KOSUKE TSUKAMOTO</span><strong>作詞・作曲・音楽教育</strong></figcaption>
-</figure>
-</div>
-<div class="scroll-mark">SCROLL</div>
-</section>
 <section class="countdown-strip" id="countdown" aria-label="11月22日までのカウントダウン">
 <div class="wrap countdown-inner">
 <span class="countdown-kicker">COMING / 2026</span>
@@ -1211,6 +1202,15 @@
     });
   })();
 </script>
+</div>
+<div aria-label="プロフィールイラスト" class="hero-visual">
+<figure class="portrait-frame">
+<img alt="グランドピアノのある指揮シーンのモノクロイラスト" src="assets/conducting-scene.webp"/>
+<figcaption class="portrait-caption"><span>KOSUKE TSUKAMOTO</span><strong>作詞・作曲・音楽教育</strong></figcaption>
+</figure>
+</div>
+<div class="scroll-mark">SCROLL</div>
+</section>
 <section class="explore" id="explore" aria-label="このサイトの入口">
 <div class="wrap">
 <div class="explore-head">
