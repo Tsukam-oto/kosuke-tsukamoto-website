@@ -1113,6 +1113,10 @@
 .reader-letter blockquote{margin:0;max-width:800px;font:400 clamp(17px,1.65vw,21px)/2 var(--serif);overflow-wrap:anywhere}
 .reader-letter blockquote p+p{margin-top:1.5em}
 .reader-letter-note{max-width:800px;font:400 12px/1.9 var(--sans);color:var(--muted);margin-top:28px}
+/* Keep VOICE BOX heading phrases intact at every column width. */
+.voice-copy{container-type:inline-size}
+.voice-copy h2{font-size:min(64px,9.5cqi);line-height:1.3}
+.voice-heading-line{display:block;white-space:nowrap}
 </style>
 <noscript><style>.lyric-preview-note{display:block!important}</style></noscript>
 </head>
@@ -1518,7 +1522,7 @@
 <div class="wrap voice-grid">
 <div class="voice-copy">
 <p class="section-kicker">VOICE BOX</p>
-<h2>あなたの言葉を、<br/>聞かせてください。</h2>
+<h2><span class="voice-heading-line">あなたの言葉を、</span><span class="voice-heading-line">聞かせてください。</span></h2>
 <p class="voice-open-note">匿名で、ひとことから送れます。</p>
 <p>音楽について知っていること。演奏するときの小さなコツ。作品を読んだり聴いたりして感じたこと。このサイトを見て思ったこと。</p>
 <p>「もっとこうしたら面白そう」「こんなことをやってみたら？」というアイデアも歓迎します。</p>
