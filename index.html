@@ -119,9 +119,12 @@
     .hero h1 .comma{letter-spacing:-.2em}
     .hero-sub{max-width:650px;font-size:15px;color:#555555;margin:30px 0 34px}
     .hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+    .homepage-update{display:flex;gap:8px 19px;flex-wrap:wrap;margin-top:17px;font:600 10px/1.9 var(--sans);color:var(--muted)}.homepage-update a{border-bottom:1px solid var(--line);text-decoration:none}.homepage-update a:hover{color:var(--ink)}
     .btn.voice-cta{border-color:#111;background:transparent}
 
-    /* v35 — compact editorial entrances */
+    .explore-side-note{padding:23px 0 0;font:12px/1.9 var(--sans);color:var(--muted)}
+.explore-side-note a{color:var(--ink);text-decoration:underline;text-underline-offset:5px}
+/* v35 — compact editorial entrances */
     .explore{padding:0 6vw 104px;border-bottom:1px solid var(--line)}
     .explore-head{display:flex;justify-content:space-between;gap:30px;align-items:end;padding:34px 0 24px;border-top:1px solid var(--line)}
     .explore-title{margin:0;font-size:clamp(26px,3vw,40px);line-height:1.35;font-weight:600}
@@ -293,7 +296,7 @@
     .news{padding:110px 6vw;background:var(--white);border-top:1px solid var(--line)}
     .news-list{margin-top:40px;border-top:1px solid var(--line)}
     .news-item{display:grid;grid-template-columns:110px 100px 1fr;gap:20px;padding:19px 0;border-bottom:1px solid var(--line);align-items:center}
-    .news-item time,.news-item .smallcaps{font:700 9px/1 var(--sans);letter-spacing:.10em}
+    .news-item time,.news-item .news-pending,.news-item .smallcaps{font:700 9px/1 var(--sans);letter-spacing:.10em}
     .news-item .smallcaps{color:var(--muted)}
     .news-item p{font-size:13px;margin:0}
 
@@ -1160,7 +1163,7 @@
 </a>
 <button aria-expanded="false" aria-label="メニューを開く" class="menu"><i></i><i></i></button>
 <nav aria-label="メインメニュー" class="nav">
-<a href="/works/">WORKS</a><a href="#lyrics">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/profile/">PROFILE</a><a href="/music-education/">PROJECTS</a><a href="#voice">VOICE BOX</a><a href="#timeline">TIMELINE</a><a href="#activity">ACTIVITY</a><a href="#news">NEWS</a><a href="#contact">CONTACT</a>
+<a href="/works/">WORKS</a><a href="/lyrics/">LYRICS</a><a href="#lyric-box">LYRIC BOX</a><a href="/profile/">PROFILE</a><a href="/music-education/">PROJECTS</a><a href="#voice">VOICE BOX</a><a href="#timeline">TIMELINE</a><a href="#activity">ACTIVITY</a><a href="/special-thanks/">SPECIAL THANKS</a><a href="#news">NEWS</a><a href="#contact">CONTACT</a>
 </nav>
 </header>
 <main id="top">
@@ -1170,7 +1173,8 @@
 <p class="eyebrow">LYRICIST / COMPOSER / MUSIC EDUCATOR</p>
 <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
 <p class="hero-sub">校歌、合唱、吹奏楽。人と言葉に向き合いながら、教育の現場と創作のあいだで音楽をつくっています。</p>
-<div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn voice-cta" href="#voice">あなたの言葉を聞かせてください</a></div>
+<div class="hero-actions"><a class="btn primary" href="/works/">作品を見る <span>→</span></a><a class="btn" href="/lyrics/">詩を読む <span>→</span></a><a class="btn voice-cta" href="#voice">あなたの言葉を聞かせてください</a></div>
+<div class="homepage-update" aria-label="新しい公開案内"><a href="/special-thanks/">SPECIAL THANKSを見る →</a><a href="/works/ongaku-no-fuukei/">《音楽の風景》制作デモを聴く →</a></div>
 <section class="countdown-strip" id="countdown" aria-label="11月22日までのカウントダウン">
 <div class="wrap countdown-inner">
 <span class="countdown-kicker">COMING / 2026</span>
@@ -1235,10 +1239,10 @@
 <div class="explore-card-body"><span class="explore-card-en">WORKS</span><h2>作品を見る</h2><p>合唱、校歌、吹奏楽。近年の作品と制作の記録へ。</p></div>
 <span class="explore-card-arrow">OPEN →</span>
 </a>
-<a class="explore-card" href="#lyric-box">
+<a class="explore-card" href="/lyrics/">
 <span class="explore-card-num">02</span>
-<div class="explore-card-body"><span class="explore-card-en">LYRIC BOX / RANDOM</span><h2>言葉を引く</h2><p>472の言葉から、偶然ふたつを。別々の作品の言葉が、ここで出会います。</p></div>
-<span class="explore-card-arrow">DRAW →</span>
+<div class="explore-card-body"><span class="explore-card-en">POETRY COLLECTION</span><h2>詩を読む</h2><p>詩集《音楽の風景》に収録した11篇を掲載しています。</p></div>
+<span class="explore-card-arrow">READ →</span>
 </a>
 <a class="explore-card" href="/profile/">
 <span class="explore-card-num">03</span>
@@ -1252,6 +1256,7 @@
 <span class="explore-card-arrow">SEND YOUR VOICE →</span>
 </a>
 </div>
+<div class="explore-side-note">歌詞の一部をランダムに表示する機能：<a href="#lyric-box">LYRIC BOXで言葉を引く →</a></div>
 </div>
 </section>
 <section class="reader-letter" id="voice-korekara" aria-labelledby="reader-letter-title">
@@ -1315,144 +1320,12 @@
 </div>
 </div>
 </section>
-<section class="lyrics-reading" id="lyrics">
-<div class="wrap">
-<div class="lyrics-reading-head">
-<div class="lyrics-reading-title"><small>POETRY COLLECTION / LYRICS</small><h2><span class="v13-one-line">音楽の風景</span></h2></div>
-<div class="lyrics-reading-copy">歌うために書いた言葉を、音楽から少し離して読む場所です。意味のまとまりごとに短く行を置き、余白の中で一つずつ読めるようにしました。作品名を開くと全文を読むことができます。</div>
-</div>
-<p class="collection-entry"><a class="btn" href="/works/ongaku-no-fuukei/">合唱9作品を聴く <span>— 制作デモ・譜面の抜粋 →</span></a></p>
-<div aria-label="詩集 音楽の風景" class="lyrics-list">
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">11</span><div><h3>《All around you》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text">
-<span class="poem-line">もう少し</span>
-<span class="poem-line">寝ていたいのに</span>
-<span class="poem-line">アラームに起こされて</span>
-<span class="poem-line">終わって欲しく無いことばかりが</span>
-<span class="poem-line">終わることばかり</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">あれもこれも</span>
-<span class="poem-line">するつもりだったし</span>
-<span class="poem-line">宿題だって</span>
-<span class="poem-line">7月のうちに</span>
-<span class="poem-line">駆け抜けるはずだった夏は</span>
-<span class="poem-line">立ち止まったまま</span>
-<span class="poem-line">終わっていた</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">ねえ、秋は</span>
-<span class="poem-line">どこにあるの？</span>
-<span class="poem-line">風景はいつも</span>
-<span class="poem-line">勝手に変わってしまうから</span>
-<span class="poem-line">ねえ、秋は</span>
-<span class="poem-line">どこにあるの？</span>
-<span class="poem-line">せっかくひとりぼっちに</span>
-<span class="poem-line">なれたはずなのに、</span>
-<span class="poem-line">どうしてあたたかい</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">時間割通りの平日に</span>
-<span class="poem-line">苦しいような</span>
-<span class="poem-line">救われるような</span>
-<span class="poem-line">先生も少し眠そうで</span>
-<span class="poem-line">生きているんだと思った</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">早く帰りたかったのに</span>
-<span class="poem-line">遠回り</span>
-<span class="poem-line">何か無くした</span>
-<span class="poem-line">きもちになるのは</span>
-<span class="poem-line">夕焼けのせいと</span>
-<span class="poem-line">決めつけて</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">ねえ、秋は</span>
-<span class="poem-line">どこにあるの？</span>
-<span class="poem-line">風景はいつも</span>
-<span class="poem-line">勝手に変わってしまうから</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">ねえ　秋は</span>
-<span class="poem-line">どこにあるの</span>
-<span class="poem-line">どうか見つかるように</span>
-<span class="poem-line">どうか見つからないように</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">秋は　何も　答えず</span>
-<span class="poem-line">ただ</span>
-<span aria-hidden="true" class="poem-gap"></span>
-<span class="poem-line">All around you</span>
-</div><div class="poem-meta"><strong>All around you</strong>作詞・作曲：束元 康介<br/>令和8年度 足立区連合音楽会にて演奏予定</div></div>
-<a class="btn" href="/works/all-around-you/" style="margin:0 0 32px 88px">《All around you》作品ページ →</a></details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">10</span><div><h3>《春にあふれて》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/haru-ni-afurete/">《春にあふれて》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">新しいことで溢れる春に</span><span class="poem-line">あなたらしい声</span><span class="poem-line">出せていますか？</span><span class="poem-line">新しいことで</span><span class="poem-line">溺れそうな春に</span><span class="poem-line">今</span><span class="poem-line">助けを求めても良いなら</span><span class="poem-line">そばで</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">「明日が来る」</span><span class="poem-line">そう聞いて</span><span class="poem-line">後ろを振り返る</span><span class="poem-line">「夜が明ける」</span><span class="poem-line">そう聞いて</span><span class="poem-line">耳を塞ぐ</span><span class="poem-line">「きっと大丈夫」</span><span class="poem-line">そう聞いても</span><span class="poem-line">嘘に聞こえる</span><span class="poem-line">春に怯える</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしと</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span class="poem-line">そばで</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">「過去を振り返る時間は</span><span class="poem-line">今を生きていない」</span><span class="poem-line">「前を向かなきゃ</span><span class="poem-line">意味がない」なら</span><span class="poem-line">思い出って何なの</span><span class="poem-line">新しい関係に</span><span class="poem-line">一歩踏み出さなきゃいけない</span><span class="poem-line">「怖がらなくてもいいよ」って</span><span class="poem-line">あなたは誰なの</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">桜が散って舞って</span><span class="poem-line">ねえ</span><span class="poem-line">ちょっとだけ待って</span><span class="poem-line">「もう会えない」なんて</span><span class="poem-line">嘘でも言わないで</span><span class="poem-line">また会いたいと思う人だって</span><span class="poem-line">最初は</span><span class="poem-line">最初は</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになるまで</span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになるまでは</span><span class="poem-line">世界の喧騒も、</span><span class="poem-line">誰かの悪口も</span><span class="poem-line">届かないところで</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">わたしがわたしで</span><span class="poem-line">いられるようになって</span><span class="poem-line">あなたがあなたで</span><span class="poem-line">いられるようになったら</span><span class="poem-line">世界はようやっと</span><span class="poem-line">息を吹き返して</span><span class="poem-line">不安をもったまま、</span><span class="poem-line">うまく笑えないまま</span><span class="poem-line">そばで</span><span class="poem-line">そばで</span></div><div class="poem-meta"><strong>春にあふれて</strong>作詞・作曲：束元 康介<br/>令和8年度 海の日ジョイントコンサートにて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">09</span><div><h3>《無題（2026年3月18日）》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">どんな言葉で伝えたら</span><span class="poem-line">言葉の奥まで</span><span class="poem-line">伝わるだろうか</span><span class="poem-line">一生に一度しかない日が</span><span class="poem-line">日々として続いてく</span><span class="poem-line">生きるのに必要な</span><span class="poem-line">幸せのことを</span><span class="poem-line">当たり前と呼んでいる</span><span class="poem-line">幸せで溢れている</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">あなたの失態を</span><span class="poem-line">叱ることはもうできない</span><span class="poem-line">あなたの成功を</span><span class="poem-line">共に喜ぶこともできない</span><span class="poem-line">素晴らしき門出を目の前に、</span><span class="poem-line">胸に残る気持ち</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「ありがとう」じゃ足りないから</span><span class="poem-line">「頑張れ」</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">頑張れなかったり、</span><span class="poem-line">逃げ出してしまったり</span><span class="poem-line">そんな夜があっていいけど</span><span class="poem-line">あなたと</span><span class="poem-line">あなたの大切な人のために</span><span class="poem-line">頑張りたいなって思う</span><span class="poem-line">そんな朝が来るように</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">頑張らなくていい</span><span class="poem-line">逃げ出してもいい</span><span class="poem-line">耳触りがいい言葉は</span><span class="poem-line">無責任で</span><span class="poem-line">だから僕は</span><span class="poem-line">愛をもって言う</span><span class="poem-line">「さよなら」じゃ寂しいから</span><span class="poem-line">「頑張れ」</span><span class="poem-line">「幸あれ」</span></div><div class="poem-meta"><strong>無題（2026年3月18日）</strong>作詞・作曲：束元 康介<br/>令和7年度3月18日 学年集会にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">08</span><div><h3>《夏を吸い込んで》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/natsu-wo-suikonde/">《夏を吸い込んで》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">南風に包まれて</span><span class="poem-line">夏が来たことを知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">変わりたい自分がいる。</span><span class="poem-line">まだ明るい帰り道に</span><span class="poem-line">夏の中にいると知った。</span><span class="poem-line">この夏が終わるまでに、</span><span class="poem-line">叶えたい夢がある。</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">弱音、言い訳が心を走り、</span><span class="poem-line">逃げ出したくなる。</span><span class="poem-line">うまくいかない理由を、</span><span class="poem-line">外側に探す。</span><span class="poem-line">それでも前を向けたのは、</span><span class="poem-line">あなたがいたから。</span><span class="poem-line">分かり合えたのは、</span><span class="poem-line">ぶつかったから。</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた。</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">本番も、</span><span class="poem-line">練習も、</span><span class="poem-line">退屈も、</span><span class="poem-line">失敗も</span><span class="poem-line">悩んで</span><span class="poem-line">迷って</span><span class="poem-line">立ち止まっても、</span><span class="poem-line">一度きりの</span><span class="poem-line">２度とない今日</span><span class="poem-line">だから、</span><span class="poem-line">明日の僕らが、</span><span class="poem-line">後悔に溺れないように</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">この音に乗って</span><span class="poem-line">どこまでもいけるような</span><span class="poem-line">気がしてる。</span><span class="poem-line">一人きりじゃ見られなかった、</span><span class="poem-line">諦めていた</span><span class="poem-line">目を覚まして</span><span class="poem-line">見る夢の中で、</span><span class="poem-line">この夏を吸い込んで</span><span class="poem-line">この海を飛び越えて</span><span class="poem-line">この夏を吸い込んで</span></div><div class="poem-meta"><strong>夏を吸い込んで</strong>作詞・作曲：束元 康介<br/>令和8年度 海の日ジョイントコンサート 中学校合同合唱にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">07</span><div><h3>《これから》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/korekara/">《これから》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">当たり前の景色も</span><span class="poem-line">これで最後だと</span><span class="poem-line">仲間と歩んできた</span><span class="poem-line">これまでの道のり</span><span class="poem-line">今日が終わらないでほしい</span><span class="poem-line">当たり前の続きを</span><span class="poem-line">望んでしまうよ</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">別れが惜しいと思える</span><span class="poem-line">幸せが心に</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">特別なあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になるまでの気持ちを</span><span class="poem-line">抱きしめて</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">辛く当たったり</span><span class="poem-line">会話が減ったり</span><span class="poem-line">ぶつかることだって</span><span class="poem-line">あったけど</span><span class="poem-line">どんな時もそばに</span><span class="poem-line">そばにいてくれた人</span><span class="poem-line">「先輩」と呼んでくれたから</span><span class="poem-line">背筋が伸びた</span><span class="poem-line">より良い学校を作るのは</span><span class="poem-line">あなたの番だよ</span><span class="poem-line">たくさんのあなたに</span><span class="poem-line">支えられて</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">月日が経って</span><span class="poem-line">バラバラになっても</span><span class="poem-line">積み重ねたこと、</span><span class="poem-line">競い合ったこと、</span><span class="poem-line">支え合い</span><span class="poem-line">助け合い</span><span class="poem-line">乗り越えてきたことが</span><span class="poem-line">僕と私の今を</span><span class="poem-line">つくっている</span><span class="poem-line">伝えたいのは</span><span class="poem-line">ありふれた言葉</span><span class="poem-line">私にとって</span><span class="poem-line">かけがえないあなたへ</span><span class="poem-line">一生の別れに</span><span class="poem-line">ならないように</span><span class="poem-line">言葉になる前の</span><span class="poem-line">今の気持ちを</span><span class="poem-line">抱きしめて</span><span class="poem-line">ありがとう</span><span class="poem-line">これから</span></div><div class="poem-meta"><strong>これから</strong>作詞：令和7年度3学年一同、束元康介　作曲：束元 康介<br/>令和7年度 卒業式 予行練習にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">06</span><div><h3>《ただなか》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/tadanaka/">《ただなか》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">どうでもいいことを</span><span class="poem-line">話しておきたい</span><span class="poem-line">小さなことから</span><span class="poem-line">始められるように</span><span class="poem-line">無くしたものばかり</span><span class="poem-line">見えてしまうけれど</span><span class="poem-line">うまくいかないのは</span><span class="poem-line">順調な証</span><span class="poem-line">悲しみを分け合うことができる</span><span class="poem-line">喜びを</span><span class="poem-line">胸にもっている</span><span class="poem-line">胸にもっている</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">歌にするには</span><span class="poem-line">彩りに欠けるような</span><span class="poem-line">日々を抱きしめている</span><span class="poem-line">幸せの中で</span><span class="poem-line">ありのまま</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">なんでもないような</span><span class="poem-line">ありふれた毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">あなたと生きていける</span><span class="poem-line">なんでもないようで</span><span class="poem-line">特別な毎日</span><span class="poem-line">あなたと生きている</span><span class="poem-line">今はただ</span><span class="poem-line">今はただ</span><span class="poem-line">幸せのただなかで</span></div><div class="poem-meta"><strong>ただなか</strong>作詞・作曲：束元 康介<br/>令和7年度 足立区連合音楽会にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">05</span><div><h3>《晴れ渡る空》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/harewataru-sora/">《晴れ渡る空》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">あなたが元気でいてくれたら</span><span class="poem-line">それだけでいいと思うこと</span><span class="poem-line">優しいあなたが</span><span class="poem-line">優しくいられる</span><span class="poem-line">世界であるならいいと思う</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">下を向いていたら</span><span class="poem-line">空の色に気づけない</span><span class="poem-line">きっとどんな絵の具でも</span><span class="poem-line">描ききれない</span><span class="poem-line">僕たちの世界は</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">自分で自分を大事にすること</span><span class="poem-line">簡単なようで</span><span class="poem-line">難しいこと</span><span class="poem-line">世界であなたは</span><span class="poem-line">あなただけだから</span><span class="poem-line">胸に手を当てて</span><span class="poem-line">忘れないように</span><span class="poem-line">忘れないように</span><span class="poem-line">歌に残すから</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">たくさんのことを</span><span class="poem-line">求めたりしない</span><span class="poem-line">大切なものは</span><span class="poem-line">きっともう持っている</span><span class="poem-line">たくさんのものを</span><span class="poem-line">求めたりしない</span><span class="poem-line">晴れ渡る空と音楽が</span><span class="poem-line">あったらいい</span></div><div class="poem-meta"><strong>晴れ渡る空</strong>作詞・作曲：束元 康介<br/>令和7年度 海の日ジョイントコンサートにて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">04</span><div><h3>《あなたと》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/anata-to/">《あなたと》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">幸せな日々が過ぎ去っていく</span><span class="poem-line">この切なさと出会えたこと</span><span class="poem-line">過ごした３年間</span><span class="poem-line">長いようで</span><span class="poem-line">あっという間だった</span><span class="poem-line">怒られたこともあったけど</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">このクラスで</span><span class="poem-line">この学年で</span><span class="poem-line">後輩とも出会えた</span><span class="poem-line">この部活で</span><span class="poem-line">この学校で良かった</span><span class="poem-line">日々の生活で、行事で</span><span class="poem-line">学んだすべてを</span><span class="poem-line">忘れないようにする</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">「あなたと」出会えたから</span><span class="poem-line">悔しかったことさえ</span><span class="poem-line">出会えたから</span><span class="poem-line">思い出に変わる</span><span class="poem-line">出会えたんだ</span><span class="poem-line">友達と</span><span class="poem-line">大きくなった自分に</span><span class="poem-line">だから僕は</span><span class="poem-line">だから私は</span><span class="poem-line">ここで良かった</span><span class="poem-line">ありがとう</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">今まで支えてくれて</span><span class="poem-line">ありがとう</span><span class="poem-line">恥ずかしくて</span><span class="poem-line">言えなかったけど</span><span class="poem-line">家族や仲間や先生に</span><span class="poem-line">周りの人に救われていた</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">これからは</span><span class="poem-line">それぞれの道を</span><span class="poem-line">選んだから</span><span class="poem-line">夢を目指して</span><span class="poem-line">進んでいく</span><span class="poem-line">不安も大きいけれど</span><span class="poem-line">きっと僕は</span><span class="poem-line">きっと私は</span><span class="poem-line">大丈夫</span><span class="poem-line">ありがとう</span></div><div class="poem-meta"><strong>あなたと</strong>作詞：令和6年度3学年一同、束元康介　作曲：束元 康介<br/>令和6年度 卒業式 予行練習にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">03</span><div><h3>《朝になったら》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/asa-ni-nattara/">《朝になったら》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">ため息の混じった帰り道</span><span class="poem-line">うまくいかないことを数えて</span><span class="poem-line">周りは平気でできることが</span><span class="poem-line">できないと気づいた帰り道</span><span class="poem-line">涙で滲んだ帰り道</span><span class="poem-line">今日もまた怒られちゃったな</span><span class="poem-line">周りのみんなも</span><span class="poem-line">敵じゃないかな</span><span class="poem-line">不安が積もってる帰り道</span><span class="poem-line">月明かりでさえ</span><span class="poem-line">落ち込む気持ち</span><span class="poem-line">もっと頑張る僕だったら</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">1人じゃないと気づいたのは</span><span class="poem-line">あなたと帰った帰り道</span><span class="poem-line">言葉に頼らぬ励ましを</span><span class="poem-line">受け取った夏の帰り道</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">朝になったら</span><span class="poem-line">きっとうまくいくから</span><span class="poem-line">朝になったら</span><span class="poem-line">僕ら笑えているから</span><span class="poem-line">朝になったら</span><span class="poem-line">この夜が終わったら</span><span class="poem-line">窓に射した光が</span><span class="poem-line">僕を待っているから</span><span class="poem-line">僕らを待っているから</span></div><div class="poem-meta"><strong>朝になったら</strong>作詞・作曲：束元 康介<br/>令和6年度 足立区連合音楽会にて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">02</span><div><h3>《出会い》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/deai/">《出会い》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">あなたのために書いた音符は</span><span class="poem-line">言葉をもって耳元まで</span><span class="poem-line">あなたのために書いた歌を</span><span class="poem-line">音楽を歌ってるんだよ</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">出会いとは繋がりで</span><span class="poem-line">出会いとは偶然で</span><span class="poem-line">出会いとは一瞬で</span><span class="poem-line">どれも光って見える</span><span class="poem-line">どれも大切にしたい</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">楽譜の中に収まりきらない</span><span class="poem-line">音楽は色を</span><span class="poem-line">温もりを</span><span class="poem-line">別れをもっている</span><span class="poem-line">人と人との間で</span><span class="poem-line">待っている</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">あなたと出会えたから</span><span class="poem-line">変わっていく風景を</span><span class="poem-line">忘れてしまわぬように</span><span class="poem-line">あなたがそばにいるから</span><span class="poem-line">彩っていく風景を</span><span class="poem-line">この瞬間を幸せと呼ぶ</span></div><div class="poem-meta"><strong>出会い</strong>作詞・作曲：束元 康介<br/>令和6年度 海の日ジョイントコンサートにて</div></div>
-</details>
-<details class="lyrics-item">
-<summary class="lyrics-summary"><span class="lyrics-index">01</span><div><h3>《願い》</h3><p>LYRIC / CHORAL WORK</p></div><span class="lyrics-read">READ / SHARE</span></summary>
-<div class="poem-panel">
-<p><a class="btn" href="/works/ongaku-no-fuukei/negai/">《願い》の制作デモ・譜面を見る →</a></p>
-<div class="poem-share-start"><p class="share-guide">気に入った言葉を選んで、X・LINE・共有メニュー・投稿用画像で共有できます。</p><button class="poem-share-begin" type="button">好きな言葉を選んでシェアする ↗</button></div>
-<div class="poem-text"><span class="poem-line">ただひとつだけ</span><span class="poem-line">願いが叶うなら</span><span class="poem-line">今この歌を聴いている</span><span class="poem-line">あなたが</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">今日のよかったことと</span><span class="poem-line">明日の楽しみなことを</span><span class="poem-line">同時に　同時に</span><span class="poem-line">思い出せたら良い</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">良いことばかりな</span><span class="poem-line">わけじゃない</span><span class="poem-line">嫌なことばかりって</span><span class="poem-line">わけじゃない</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">忘れたくないを</span><span class="poem-line">忘れないで</span><span class="poem-line">覚えていたいと</span><span class="poem-line">覚えていて</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">目には見えないものばかり</span><span class="poem-line">音楽が僕にくれたものは</span><span class="poem-line">言葉にならないものばかり</span><span aria-hidden="true" class="poem-gap"></span><span class="poem-line">でもそんな音楽に救われて</span><span class="poem-line">この歌がそんな</span><span class="poem-line">音楽になったら良い</span></div><div class="poem-meta"><strong>願い</strong>作詞・作曲：束元 康介<br/>令和5年度 足立区連合音楽会にて</div></div>
-</details>
-</div>
-<p class="lyrics-note">詩集「音楽の風景」／束元康介</p>
-</div>
+<section class="lyrics-reading poetry-teaser" id="lyrics" aria-label="詩集 音楽の風景への入口">
+<div class="wrap"><div class="lyrics-reading-head">
+<div class="lyrics-reading-title"><small>POETRY COLLECTION / READ</small><h2><span class="v13-one-line">音楽の風景</span></h2></div>
+<div class="lyrics-reading-copy">詩集《音楽の風景》の11篇を掲載しています。詩の本文を読んだり、好きな行を選んで共有したりできます。</div>
+</div><div class="hero-actions"><a class="btn primary" href="/lyrics/">詩集を読む — 11篇 →</a><a class="btn" href="/works/ongaku-no-fuukei/">合唱9作品を聴く →</a></div>
+<p class="lyrics-note" style="margin-top:30px">詩本文は独立した詩集ページに掲載しています。</p></div>
 </section>
 <section class="voice-invite" aria-label="VOICE BOXへのご案内">
 <div class="wrap voice-invite-inner">
@@ -1490,16 +1363,16 @@
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/tadanaka/"><div class="work-year">2025</div><div class="work-name">ただなか</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">足立区連合音楽発表会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/harewataru-sora/"><div class="work-year">2025</div><div class="work-name">晴れ渡る空</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">海の日ジョイントコンサート</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/korekara/"><div class="work-year">2025</div><div class="work-name">これから</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">卒業記念創作合唱｜第3学年生徒の言葉をもとに制作</span></div><span class="chip">詳細を見る →</span></a>
-<a class="work-row" data-cat="wind" href="/works/futashika/"><div class="work-year">2025</div><div class="work-name">ふたしか</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表</span></div><span class="chip">詳細を見る →</span></a>
+<a class="work-row" data-cat="wind" href="/works/futashika/"><div class="work-year">2025</div><div class="work-name">ふたしか</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="wind" href="/works/kono-fuukei-ni-yosete/"><div class="work-year">2025</div><div class="work-name">この風景に寄せて</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">第3回定期演奏会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/deai/"><div class="work-year">2024</div><div class="work-name">出会い</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">海の日ジョイントコンサート／北千住イーストゲート合唱団に作品提供</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/asa-ni-nattara/"><div class="work-year">2024</div><div class="work-name">朝になったら</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">足立区連合音楽会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/anata-to/"><div class="work-year">2024</div><div class="work-name">あなたと</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">卒業記念創作合唱｜生徒の言葉をもとに制作</span></div><span class="chip">詳細を見る →</span></a>
-<a class="work-row" data-cat="wind" href="/works/moshi-kotoba-ga/"><div class="work-year">2024</div><div class="work-name">もし言葉が</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表</span></div><span class="chip">詳細を見る →</span></a>
+<a class="work-row" data-cat="wind" href="/works/moshi-kotoba-ga/"><div class="work-year">2024</div><div class="work-name">もし言葉が</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="choral" href="/works/ongaku-no-fuukei/negai/"><div class="work-year">2023</div><div class="work-name">願い</div><div class="work-note"><span class="work-genre">合唱</span><span class="work-description">足立区連合音楽会</span></div><span class="chip">詳細を見る →</span></a>
-<a class="work-row" data-cat="wind" href="/works/hibi/"><div class="work-year">2023</div><div class="work-name">日日</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表</span></div><span class="chip">詳細を見る →</span></a>
+<a class="work-row" data-cat="wind" href="/works/hibi/"><div class="work-year">2023</div><div class="work-name">日日</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表会</span></div><span class="chip">詳細を見る →</span></a>
 <a class="work-row" data-cat="school" href="/school-song/"><div class="work-year">2023</div><div class="work-name">江戸川区立下小岩小学校 校歌</div><div class="work-note"><span class="work-genre">校歌</span><span class="work-description">作詞：下小岩小学校 校歌制作委員会／作曲：束元康介</span></div><span class="chip">詳細を見る →</span></a>
-<a class="work-row" data-cat="wind" href="/works/hana-to-konetsu/"><div class="work-year">2022</div><div class="work-name">花と高熱</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表</span></div><span class="chip">詳細を見る →</span></a>
+<a class="work-row" data-cat="wind" href="/works/hana-to-konetsu/"><div class="work-year">2022</div><div class="work-name">花と高熱</div><div class="work-note"><span class="work-genre">吹奏楽</span><span class="work-description">学習発表会</span></div><span class="chip">詳細を見る →</span></a>
 <div class="work-row" data-cat="fanfare"><div class="work-year">2022–2025</div><div class="work-name">運動会のためのファンファーレ I–IV</div><div class="work-note"><span class="work-genre">ファンファーレ</span><span class="work-description">毎年5月、運動会のために新作を制作。各曲タイトルは整理中。</span></div><span class="chip">詳細準備中</span></div>
 </div>
 <details class="older-works">
@@ -1594,6 +1467,8 @@
 <div class="wrap">
 <p class="section-kicker">NEWS / NOTES</p><h2 class="section-title">Updates</h2>
 <div class="news-list">
+<div class="news-item"><span class="news-pending">新着</span><span class="smallcaps">SPECIAL THANKS</span><p><a href="/special-thanks/">北千住イーストゲート合唱団の紹介と《出会い》の正式ライブ音源を掲載しました。 →</a></p></div>
+<div class="news-item"><span class="news-pending">新着</span><span class="smallcaps">POETRY</span><p><a href="/lyrics/">詩集《音楽の風景》の独立ページで11篇の詩を読めます。 →</a></p></div>
 <div class="news-item"><time datetime="2026-10-12">2026.10.12</time><span class="smallcaps">WORKS</span><p><a href="/works/kotoba-wo-tebanashite/">作品集《言葉を手放して》を12作品版へ更新。デモ音源・譜例をご覧いただけます。 →</a></p></div>
 <div class="news-item"><time datetime="2026-10-12">2026.10.12</time><span class="smallcaps">NEW WORK</span><p><a href="/works/umi-ni-made-anata-wa-hon-wo-tsurete-kite/">吹奏楽作品《海にまで あなたは本を連れてきて》の紹介ページを公開。全曲音源と総譜の一部をご覧いただけます。 →</a></p></div>
 <div class="news-item"><time>2026.09</time><span class="smallcaps">VOICE</span><p>VOICE BOXにコメントが届き、「VOICES / 届いた言葉」の掲載を開始しました。</p></div>
