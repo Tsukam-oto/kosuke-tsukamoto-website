@@ -1374,7 +1374,7 @@
 </style>
 <style>
  .hero{min-height:0}.countdown-strip{margin:0}.featured-recording,.short-about{padding:40px 6vw;border-top:1px solid var(--line)}.featured-recording h2,.short-about h2{font-size:clamp(28px,4vw,40px);line-height:1.5;margin:12px 0}.featured-recording audio{width:100%;max-width:660px;display:block;margin:18px 0}.featured-recording p{font-size:14px;line-height:1.8}.recording-note{color:#666;font-size:12px!important}.recording-links,.footer-routes{display:flex;gap:8px 24px;flex-wrap:wrap}.recording-links a,.short-about a,.footer-routes a{display:inline-flex;align-items:center;min-height:44px;font-size:13px;text-decoration:underline;text-underline-offset:4px}.short-about p{max-width:660px;font-size:15px;line-height:1.9}.short-about a{margin-right:24px}.footer-routes{max-width:var(--max);margin:24px auto 0}.lyric-box-section #lyric-stage .fragment-card{min-height:0}.lyric-box-section #lyric-stage .fragment-text{min-height:0;padding:14px 0;font-size:clamp(20px,2.6vw,34px)}.lyric-box-section #lyric-stage .fragment-source{min-height:44px}.lyric-box-section #lyric-stage{align-items:stretch}.lyric-box-section .lyric-machine{min-width:0}.lyric-box-section .lyric-box-grid>div{min-width:0}.lyric-box-section .lyric-box-intro .section-title br{display:none}.lyric-box-section .lyric-stat{margin-top:12px}.news{padding-top:40px;padding-bottom:40px}.news .section-title{font-size:clamp(28px,4vw,42px)}@media(max-width:640px){.lyric-box-section #lyric-stage .fragment-card{min-height:0}.lyric-box-section #lyric-stage .fragment-text{min-height:0;font-size:clamp(18px,5.2vw,24px)}.lyric-box-section #lyric-stage .fragment-source{font-size:11px;min-height:44px}.featured-recording,.short-about{padding:30px 6vw}.news{padding-top:30px;padding-bottom:30px}}
-</style><link rel="stylesheet" href="/assets/site-navigation.css"><script src="/assets/site-navigation.js" defer></script><style>.hero{padding-top:34px}@media(max-width:640px){.hero{padding-top:24px}}</style></head>
+</style><link rel="stylesheet" href="/assets/site-navigation.css"><script src="/assets/site-navigation.js" defer></script><style>.hero{padding-top:34px}@media(max-width:640px){.hero{padding-top:24px}}</style><style>.countdown-strip{max-width:none;padding:0 6vw}.countdown-inner{max-width:var(--max);margin:auto}.lyric-box-section .lyric-box-intro .section-title{font-size:clamp(29px,3.1vw,42px)}.lyric-box-section .lyric-controls-single #lyric-draw{width:100%}</style></head>
 <body>
 <header class="site-header"><a class="site-brand" href="/">束元康介<span>KOSUKE TSUKAMOTO</span></a><details class="site-menu"><summary>MENU <span aria-hidden="true">＋</span></summary><nav aria-label="メインメニュー"><a href="/works/">WORKS</a><a href="/lyrics/">LYRICS</a><a href="/#lyric-box">LYRIC BOX</a><a href="/music-education/">EDUCATION</a><a href="/voice-box/">VOICE BOX</a><a href="/special-thanks/">SPECIAL THANKS</a><a href="/profile/">PROFILE</a><a href="/contact/">CONTACT</a></nav></details></header>
 <main id="top"><section class="hero">
@@ -1534,10 +1534,8 @@
       });
       /* LYRIC-BOX-LINKED-SOURCES-V1: end */
 
-      let lyricDrawTimer = null;
       function drawLyrics() {
         if (!lyricStage || !lyricSources || !lyricFragments.length) return;
-        if (lyricDrawTimer !== null) window.clearTimeout(lyricDrawTimer);
         const pair = choosePair();
         const updateResults = () => {
           lyricStage.innerHTML = pair.map((x, i) => {
@@ -1558,13 +1556,7 @@
           lyricStage.style.opacity = "1";
           lyricStage.style.transform = "translateY(0)";
         };
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          updateResults();
-        } else {
-          lyricStage.style.opacity = "0";
-          lyricStage.style.transform = "translateY(6px)";
-          lyricDrawTimer = window.setTimeout(() => { lyricDrawTimer = null; updateResults(); }, 120);
-        }
+        updateResults();
       }
 
       if (lyricDraw) lyricDraw.addEventListener("click", drawLyrics);
