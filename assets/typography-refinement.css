@@ -72,3 +72,6 @@ main :is(input,textarea,select){max-width:100%;min-width:0}
 .poem-text .poem-line{white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;max-width:100%}
 .poem-share-start,.poem-share-start .share-guide,.poem-share-start button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
 @media(max-width:820px){.poem-panel{grid-template-columns:minmax(0,1fr)}}
+
+.site05-entrances strong{text-wrap:balance;overflow-wrap:break-word;word-break:normal}
+@media(max-width:360px){.site05-entrances a:not(.entrance-thanks){padding-inline:10px;column-gap:3px}}
