@@ -57,3 +57,7 @@ main :is(input,textarea,select){max-width:100%;min-width:0}
  .lyric-box-section #lyric-stage .fragment-text{font-size:1.0625rem}
 }
 @media(prefers-reduced-motion:reduce){.lyric-box-section #lyric-stage *{transition:none!important}}
+
+/* Keep numerals with their Japanese counter; balanced fallback for enlarged text. */
+.type-unit{display:inline-block;max-width:100%;vertical-align:baseline;word-break:normal;overflow-wrap:break-word;text-wrap:balance}
+.lyric-unit{text-wrap:balance}
