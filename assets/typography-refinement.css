@@ -61,3 +61,14 @@ main :is(input,textarea,select){max-width:100%;min-width:0}
 /* Keep numerals with their Japanese counter; balanced fallback for enlarged text. */
 .type-unit{display:inline-block;max-width:100%;vertical-align:baseline;word-break:normal;overflow-wrap:break-word;text-wrap:balance}
 .lyric-unit{text-wrap:balance}
+/* Text enlargement must reflow rather than hide oversized content. */
+.countdown-inner{flex-wrap:wrap;row-gap:10px;padding-block:12px}
+.countdown-label{white-space:normal}
+.countdown-days{margin-left:auto;max-width:100%}
+.affiliation-line .affiliation-name{white-space:normal;overflow-wrap:break-word;word-break:normal}
+.player-title .work-title-line{white-space:normal;overflow-wrap:break-word;word-break:normal;text-wrap:balance}
+.poem-panel,.poem-panel>*{min-width:0;max-width:100%}
+/* Preserve authored line elements and blank lines; allow only visual soft wrapping at narrow/enlarged sizes. */
+.poem-text .poem-line{white-space:pre-wrap;overflow-wrap:break-word;word-break:normal;max-width:100%}
+.poem-share-start,.poem-share-start .share-guide,.poem-share-start button{min-width:0;max-width:100%;white-space:normal;overflow-wrap:break-word}
+@media(max-width:820px){.poem-panel{grid-template-columns:minmax(0,1fr)}}
