@@ -1,0 +1,16 @@
+/* Related works: isolated styles. Do not affect global cards, LYRIC BOX or player. */
+.related-works-block{border-top:1px solid var(--line,#d7d7d3);padding:44px 0 54px;min-width:0}
+.related-works-header{margin-bottom:20px}
+.related-works-kicker{margin:0 0 8px;color:#686868;font:700 11px/1.5 Arial,sans-serif;letter-spacing:.12em}
+.related-works-header h2{font-size:clamp(25px,3vw,34px);line-height:1.5;font-weight:500;margin:0 0 6px}
+.related-works-description{font-size:13px;line-height:1.8;color:#555;margin:0}
+.related-works-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.related-work-link{box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;gap:12px;min-height:142px;min-width:0;padding:22px 24px;text-decoration:none;color:inherit;background:#fff;border:1px solid #cfcfcb;transition:border-color .18s ease,background .18s ease}
+.related-work-link:hover{background:#f0f0ed;border-color:#333;text-decoration:none}
+.related-work-link:focus-visible{outline:2px solid #111;outline-offset:3px}
+.related-work-info{font:700 11px/1.5 Arial,sans-serif;letter-spacing:.08em;color:#666}
+.related-work-name{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:clamp(20px,2.6vw,27px);line-height:1.5;min-width:0;overflow-wrap:normal;word-break:auto-phrase}
+.related-work-name>span{font:20px/1 Arial,sans-serif;flex:0 0 auto;color:#555}
+.related-work-detail{font:12px/1.7 Arial,sans-serif;color:#555}
+@media(max-width:600px){.related-works-block{padding:33px 0 40px}.related-works-list{grid-template-columns:1fr;gap:10px}.related-work-link{min-height:118px;padding:17px 18px;gap:8px}.related-work-name{font-size:22px}}
+@media(prefers-reduced-motion:reduce){.related-work-link{transition:none}}
