@@ -1,3 +1,30 @@
 
 .site-header{box-sizing:border-box;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:72px;height:auto;padding:14px 5vw;background:#f6f6f4;border-bottom:1px solid #ccc;color:#111;font-family:Arial,"Yu Gothic",sans-serif}
 .site-brand{display:flex;flex-direction:column;color:#111;text-decoration:none;font-size:17px;font-weight:700;letter-spacing:.08em;line-height:1.5}.site-brand span{font-size:8px;letter-spacing:.13em}.site-menu{position:relative}.site-menu summary{display:flex;gap:16px;align-items:center;justify-content:center;min-height:44px;padding:0 12px;border:1px solid #888;cursor:pointer;list-style:none;font:700 11px/1.5 Arial,sans-serif}.site-menu summary::-webkit-details-marker{display:none}.site-menu nav{position:absolute;right:0;top:100%;width:min(310px,88vw);padding:12px;background:#f6f6f4;border:1px solid #bbb;box-shadow:0 8px 20px #0002;display:grid;gap:0}.site-menu nav a{display:flex;align-items:center;min-height:44px;padding:8px 12px;text-decoration:none;color:#111;font:700 12px/1.6 Arial,sans-serif;letter-spacing:.08em}.site-menu nav a:hover{background:#e4e4e1}.site-footer{padding:32px 6vw;background:#111;color:#eee;font:12px/1.8 Arial,sans-serif}.site-footer nav{display:flex;flex-wrap:wrap;gap:4px 22px;margin:12px 0}.site-footer a{display:inline-flex;align-items:center;min-height:44px;color:inherit;text-decoration:underline;text-underline-offset:4px}.site-footer strong,.site-footer small{display:block}a:focus-visible,button:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid currentColor;outline-offset:4px}section[id],details[id],audio[id]{scroll-margin-top:100px}[hidden]{display:none!important}img,audio{max-width:100%}button,input,select,textarea{font:inherit}button,a,input,select,textarea{touch-action:manipulation}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*{animation:none!important;transition:none!important}}
+/* VOICE_AMBIENT_V1: global subtle link and poem ending */
+.site-header .site-voice-quicklink{
+  display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
+  min-height:44px;padding:5px 3px;margin-left:auto;white-space:nowrap;
+  color:#555;text-decoration:none;text-underline-offset:5px;
+  font:500 12px/1.5 Arial,'Yu Gothic',sans-serif;letter-spacing:.02em
+}
+.site-header .site-voice-quicklink:hover{text-decoration:underline;color:#111}
+.site-header .site-voice-quicklink:focus-visible{outline:2px solid #111;outline-offset:3px}
+.site-header .site-voice-compact{display:none}
+.voice-poem-feedback{margin:12px 0 26px 88px;padding:0}
+.voice-poem-feedback a{display:inline-flex;align-items:center;min-height:44px;
+  color:#555;font:500 13px/1.7 Arial,'Yu Gothic',sans-serif;
+  text-decoration:none;border-bottom:1px solid #aaa}
+.voice-poem-feedback a:hover{text-decoration:underline;color:#111}
+.voice-poem-feedback a:focus-visible{outline:2px solid #111;outline-offset:4px}
+@media(max-width:580px){
+  .site-header{gap:6px}
+  .site-header .site-brand{min-width:0;font-size:15px;letter-spacing:.04em}
+  .site-header .site-voice-full{display:none}
+  .site-header .site-voice-compact{display:inline}
+  .site-header .site-voice-quicklink{font-size:11px;flex-shrink:0}
+  .site-header .site-menu{flex-shrink:0}
+  .site-header .site-menu summary{padding:0 8px}
+  .voice-poem-feedback{margin-left:16px;margin-right:16px}
+}
+@media(prefers-reduced-motion:reduce){.site-header .site-voice-quicklink{transition:none}}
