@@ -1,0 +1,44 @@
+/* Compact homepage VOICES spotlight. The full archive stays in VOICE BOX. */
+.home-voices {
+  padding: 42px 6vw 44px;
+  color: #f6f6f4;
+  background: #151515;
+  border-top: 1px solid #303030;
+}
+
+.home-voices-inner {
+  display: grid;
+  grid-template-columns: minmax(250px, .85fr) minmax(0, 1.15fr);
+  gap: clamp(30px, 5vw, 80px);
+  align-items: center;
+}
+.home-voices .section-kicker { margin: 0 0 10px; color: #c6c6c2; }
+.home-voices h2 {
+  margin: 0;
+  font: 500 clamp(28px, 3.25vw, 43px)/1.48 var(--serif);
+  letter-spacing: -.025em;
+  text-wrap: balance;
+}
+.home-voice-highlight { min-width: 0; padding-left: clamp(20px, 2.8vw, 42px); border-left: 1px solid #777; }
+.home-voice-highlight-label { margin: 0 0 9px; font: 700 10px/1.6 var(--sans); letter-spacing: .08em; color: #c6c6c2; }
+.home-voice-highlight blockquote {
+  margin: 0;
+  font: 500 clamp(19px, 2.25vw, 28px)/1.6 var(--serif);
+  letter-spacing: -.01em;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.home-voices-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px 18px; margin-top: 16px; }
+.home-voices-note { margin: 0; font: 10px/1.7 var(--sans); color: #bcbcb7; }
+.home-voices-link { display: inline-flex; align-items: center; min-height: 44px; font: 700 11px/1.6 var(--sans); color: #fff; text-decoration: underline; text-underline-offset: 5px; white-space: nowrap; }
+.home-voices-link:hover { text-decoration-thickness: 2px; }
+.home-voices-link:focus-visible { outline: 3px solid #fff; outline-offset: 3px; }
+
+@media (max-width: 760px) {
+  .home-voices { padding: 36px 6vw 38px; }
+  .home-voices-inner { grid-template-columns: 1fr; gap: 21px; }
+  .home-voices h2 { font-size: clamp(27px, 7vw, 35px); line-height: 1.4; }
+  .home-voice-highlight { padding: 17px 0 0; border-left: 0; border-top: 1px solid #777; }
+  .home-voice-highlight blockquote { font-size: clamp(19px, 5vw, 24px); }
+  .home-voices-bottom { margin-top: 12px; }
+}
