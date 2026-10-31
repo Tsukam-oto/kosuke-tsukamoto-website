@@ -64,7 +64,7 @@ async function connect(cfg){if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co\/?$/i.test
  client=window.supabase.createClient(cfg.url.replace(/\/$/,''),cfg.publishableKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
  $('setupForm').classList.add('hide');$('loginForm').classList.remove('hide');msg('認証状態を確認しています…');
  client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;notes=[];selected=null;dirty.clear();blocked.clear();revision={};$('gate').classList.remove('hide');msg('ログアウトしました。');setStatus('未ログイン');}else if(session?.user&&(!user||user.id!==session.user.id)){setTimeout(()=>start(session.user),0)}});
- const {data,error}=await client.auth.getSession();if(error)msg('認証状態を確認できませんでした: '+error.message,true);else if(data.session?.user)await start(data.session.user);else msg('メールアドレスに届くログイン用リンクで認証します。');}
+ const {data,error}=await client.auth.getSession();if(error)msg('認証状態を確認できませんでした: '+error.message,true);else if(data.session?.user)await start(data.session.user);else msg('登録済みの場合は、メールアドレスとパスワードでログインしてください。');}
 async function start(u){if(loading)return;loading=true;user=u;msg('本人のノートを同期しています…');setStatus('同期中…',true);
  try{await reload(true);$('gate').classList.add('hide');msg('');setStatus(dirty.size?'未同期の編集あり':'同期済み',!!dirty.size);if(dirty.size)schedule();}
  catch(e){msg('クラウドから読み込めません: '+e.message+'\nテーブル設定とネット接続をご確認ください。',true);setStatus('同期できません',true)}finally{loading=false}}
@@ -157,7 +157,7 @@ function handlers(){if(started)return;started=true;
  window.addEventListener('beforeunload',rememberPending);
  $('setupForm').onsubmit=async e=>{e.preventDefault();const cfg={url:$('projectUrl').value.trim(),publishableKey:$('publicKey').value.trim()};if(cfg.publishableKey.startsWith('sb_secret_')||cfg.publishableKey.split('.').length===3){msg('秘密鍵やservice_roleキーは使用しないでください。公開可能なキーを指定してください。',true);return}localStorage.setItem(configKey,JSON.stringify(cfg));await connect(cfg)};
  $('loginForm').onsubmit=async e=>{e.preventDefault();if(!client)return;msg('ログイン中…');const {error}=await client.auth.signInWithPassword({email:$('loginEmail').value.trim(),password:$('loginPassword').value});msg(error?'ログインできません: '+error.message:'ログインしました。',!!error)};
- $('signUpButton').onclick=async()=>{if(!client)return;const email=$('loginEmail').value.trim(),password=$('loginPassword').value;if(!email||password.length<6){msg('メールアドレスと6文字以上のパスワードを入力してください。',true);return}msg('登録中…');const {error}=await client.auth.signUp({email,password});msg(error?'登録できません: '+error.message:'登録を受け付けました。確認メールが届いた場合はメール内の認証リンクを開き、こちらの画面からログインしてください。',!!error)};
+ $('signUpButton').onclick=async()=>{if(!client)return;const email=$('loginEmail').value.trim(),password=$('loginPassword').value;if(!email||password.length<6){msg('メールアドレスと6文字以上のパスワードを入力してください。',true);return}msg('登録中…');const {error}=await client.auth.signUp({email,password,options:{emailRedirectTo:location.origin+location.pathname}});msg(error?'登録できません: '+error.message:'登録を受け付けました。確認メールが届いた場合はメール内の認証リンクを開き、こちらの画面からログインしてください。',!!error)};
  $('changeServer').onclick=()=>{if(!confirm('同期先の設定を変更しますか？'))return;client?.auth.signOut();localStorage.removeItem(configKey);location.reload()};
 }
 async function init(){handlers();const cfg=setupValue();if(!cfg){$('setupForm').classList.remove('hide');$('loginForm').classList.add('hide');msg('最初に専用クラウドを設定してください。');return}await connect(cfg);
