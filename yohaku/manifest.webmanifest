@@ -1,0 +1,20 @@
+{
+  "name": "余白 — LYRIC NOTE",
+  "short_name": "余白",
+  "description": "本人の言葉だけを、どこからでも残すプライベートリリックノート",
+  "id": "/yohaku/",
+  "start_url": "/yohaku/",
+  "scope": "/yohaku/",
+  "display": "standalone",
+  "background_color": "#f6f5f1",
+  "theme_color": "#f6f5f1",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/yohaku/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
