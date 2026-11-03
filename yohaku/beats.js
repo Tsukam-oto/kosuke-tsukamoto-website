@@ -3,37 +3,49 @@ const $=id=>document.getElementById(id);
 const ctx=()=>window.YOHAKU_BEAT_CONTEXT;
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const bucket='yohaku-beats';
-let beats=[], signed=new Map(), current=null, listFilter='', inFlight=false;
+let beats=[], signed=new Map(), current=null, listFilter='', inFlight=false,loaded=false,pendingLoad=null,lastFetch=0;
 const getClient=()=>ctx()?.getClient?.();
 const getUser=()=>ctx()?.getUser?.();
 const notify=t=>ctx()?.toast?.(t);
 function relevant(){const id=ctx()?.getSelected?.();return beats.filter(x=>x.lyric_note_id===id)}
-function updateLinked(){const wrap=$('linkedBeatBox');if(!wrap)return;const items=relevant();wrap.classList.toggle('hide',!getUser());$('linkedBeatText').textContent=items.length?items.map(x=>x.title).join('、'):'この歌詞に合うビートを登録できます';}
-async function fetchBeats(){
+function updateLinked(){const wrap=$('linkedBeatBox');if(!wrap)return;const items=relevant();wrap.classList.toggle('hide',!getUser());$('linkedBeatText').textContent=items.length?items.map(x=>x.title).join('、'):loaded?'この歌詞に合うビートを登録できます':'ビート棚を開くと関連ビートも読み込みます';}
+async function fetchBeats(force=false){
  const c=getClient(),u=getUser();if(!c||!u)return;
- const {data,error}=await c.from('yohaku_beats').select('*').eq('user_id',u.id).order('updated_at',{ascending:false});
- if(error)throw error;beats=data||[];
- signed.clear();
- const tracks=beats.filter(x=>x.audio_path);
- await Promise.all(tracks.map(async beat=>{
-  const {data,error}=await c.storage.from(bucket).createSignedUrl(beat.audio_path,1800);
-  if(!error&&data?.signedUrl)signed.set(beat.id,{url:data.signedUrl,expires:Date.now()+1500000});
- }));
- const el=$('beatShelf');if(el)el.textContent='♫ BEATS '+beats.length;
- updateLinked();
+ if(loaded&&!force&&Date.now()-lastFetch<90000)return;
+ if(pendingLoad)return pendingLoad;
+ const request=(async()=>{
+  const {data,error}=await c.from('yohaku_beats')
+   .select('id,user_id,title,creator,source_url,bpm,musical_key,note_text,lyric_note_id,audio_path,favorite,created_at,updated_at')
+   .eq('user_id',u.id).order('updated_at',{ascending:false});
+  if(error)throw error;
+  if(getUser()?.id!==u.id)return;
+  beats=data||[];loaded=true;lastFetch=Date.now();
+  for(const [id,link] of signed){
+   if(!beats.some(x=>x.id===id&&x.audio_path===link.path))signed.delete(id);
+  }
+  if($('beatShelf'))$('beatShelf').textContent='♫ BEATS '+beats.length;
+  updateLinked();
+ })();
+ pendingLoad=request;
+ try{return await request}finally{if(pendingLoad===request)pendingLoad=null}
 }
-function onLogout(){beats=[];signed.clear();current=null;const a=$('beatAudio');if(a){a.pause();a.removeAttribute('src');a.load()}$('beatPlayer')?.classList.add('hide');if($('beatShelf'))$('beatShelf').textContent='♫ BEATS';updateLinked();}
-async function onLogin(){try{await fetchBeats()}catch(e){notify('ビート一覧を読み込めません: '+e.message)}}
+function onLogout(){
+ beats=[];signed.clear();current=null;loaded=false;pendingLoad=null;lastFetch=0;
+ const a=$('beatAudio');if(a){a.pause();a.removeAttribute('src');a.load()}
+ $('beatPlayer')?.classList.add('hide');if($('beatShelf'))$('beatShelf').textContent='♫ BEATS';updateLinked();
+}
+function onLogin(){beats=[];signed.clear();loaded=false;lastFetch=0;updateLinked();}
+
 async function playBeat(id){
  const beat=beats.find(x=>x.id===id);if(!beat)return;
  if(!beat.audio_path){if(beat.source_url){window.open(beat.source_url,'_blank','noopener,noreferrer');return}notify('このビートにはMP3もリンクもありません');return}
  const audio=$('beatAudio');
  if(current===id&&!audio.paused){audio.pause();return}
  let signedLink=signed.get(id);
- if(!signedLink||signedLink.expires<Date.now()){
+ if(!signedLink||signedLink.expires<Date.now()||signedLink.path!==beat.audio_path){
    const {data,error}=await getClient().storage.from(bucket).createSignedUrl(beat.audio_path,1800);
    if(error)throw error;
-   signedLink={url:data.signedUrl,expires:Date.now()+1500000};signed.set(id,signedLink);
+   signedLink={url:data.signedUrl,expires:Date.now()+1500000,path:beat.audio_path};signed.set(id,signedLink);
  }
  if(current!==id||audio.src!==signedLink.url){
    audio.pause();audio.src=signedLink.url;current=id;
@@ -58,14 +70,15 @@ function openShelf(onlyLinked=false){
    a.href=url;a.download='yohaku-beats-'+new Date().toISOString().slice(0,10)+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
    notify('ビート一覧を保存しました（MP3本体は含まれません）');
  };
- renderRows(onlyLinked);
+ if(!loaded){const list=panel.querySelector('#beatRows');list.innerHTML='<div class="beat-empty">ビートを読み込んでいます…</div>'}else renderRows(onlyLinked);
+ fetchBeats().then(()=>{if(panel.isConnected)renderRows(onlyLinked)}).catch(e=>{if(panel.isConnected){const list=panel.querySelector('#beatRows');list.textContent='読み込みに失敗しました。閉じてから再度お試しください。'}notify('ビートを読み込めません: '+e.message)});
 }
-function renderRows(onlyLinked){
+function renderRows(onlyLinked,limit=80){
  const root=$('beatRows');if(!root)return;root.innerHTML='';
  const q=listFilter.trim().toLowerCase(),noteId=ctx().getSelected();
  const rows=beats.filter(b=>(!onlyLinked||b.lyric_note_id===noteId)&&(!q||[b.title,b.creator,b.note_text,b.musical_key].join(' ').toLowerCase().includes(q))).sort((a,b)=>Number(b.favorite)-Number(a.favorite)||new Date(b.updated_at)-new Date(a.updated_at));
  if(!rows.length){root.innerHTML='<div class="beat-empty">該当するビートはありません。上の「＋ ビート追加」から登録できます。</div>';return}
- rows.forEach(beat=>{
+ rows.slice(0,limit).forEach(beat=>{
   const el=document.createElement('div');el.className='beat-row';
   const info=document.createElement('div');info.className='beat-row-info';
   const title=document.createElement('strong');title.textContent=(beat.favorite?'★ ':'')+beat.title;info.append(title);
@@ -78,6 +91,7 @@ function renderRows(onlyLinked){
   action(beat.favorite?'★':'☆',async()=>{const next=!beat.favorite;const {error}=await getClient().from('yohaku_beats').update({favorite:next,updated_at:new Date().toISOString()}).eq('id',beat.id).eq('user_id',getUser().id);if(error)throw error;beat.favorite=next;renderRows(onlyLinked)});
   el.append(btns);root.append(el);
  });
+ if(rows.length>limit){const more=document.createElement('button');more.type='button';more.className='secondary';more.textContent=`さらに${Math.min(80,rows.length-limit)}件表示（全${rows.length}件）`;more.onclick=()=>renderRows(onlyLinked,limit+80);root.append(more)}
 }
 function showForm(beat){
  const isEdit=!!beat;
@@ -106,7 +120,7 @@ function showForm(beat){
   const bpm=v('beatBpm').value?Number(v('beatBpm').value):null;
   if(bpm!==null&&(!Number.isInteger(bpm)||bpm<30||bpm>300)){v('beatFormStatus').textContent='BPMは30〜300で指定してください';return}
   inFlight=true;v('beatSave').disabled=true;v('beatFormStatus').textContent='保存中…';
-  const c=getClient(),u=getUser();let uploaded=null;
+  const c=getClient(),u=getUser();let uploaded=null,dbSaved=false;
   try{
    if(raw){
     uploaded=u.id+'/'+crypto.randomUUID()+'.mp3';
@@ -118,13 +132,20 @@ function showForm(beat){
    if(isEdit)result=await c.from('yohaku_beats').update(row).eq('id',beat.id).eq('user_id',u.id).select().single();
    else result=await c.from('yohaku_beats').insert(row).select().single();
    if(result.error)throw result.error;
+   dbSaved=true;
    if(uploaded&&beat?.audio_path&&uploaded!==beat.audio_path){
-     await c.storage.from(bucket).remove([beat.audio_path]);
+     const removed=await c.storage.from(bucket).remove([beat.audio_path]);
+     if(removed.error)notify('旧MP3の削除に失敗しました。新しい音源の保存は成功しています');
      if(current===beat.id){$('beatAudio').pause();current=null;$('beatPlayer').classList.add('hide')}
    }
-   await fetchBeats();notify('ビートを保存しました');openShelf();
+   try{await fetchBeats(true)}catch(syncErr){
+     const pos=beats.findIndex(x=>x.id===result.data.id);
+     if(pos>=0)beats[pos]=result.data;else beats.unshift(result.data);
+     loaded=true;lastFetch=0;notify('保存成功。ただし一覧の同期に失敗しました。再度開いて更新してください');
+   }
+   notify('ビートを保存しました');openShelf();
   }catch(e){
-   if(uploaded)await c.storage.from(bucket).remove([uploaded]);
+   if(uploaded&&!dbSaved){try{await c.storage.from(bucket).remove([uploaded])}catch{}}
    v('beatFormStatus').textContent='保存できません: '+e.message;
   }finally{inFlight=false;v('beatSave').disabled=false;}
  };
@@ -133,17 +154,19 @@ async function deleteBeat(beat){
  if(!confirm('「'+beat.title+'」を削除しますか？\n保存したMP3も削除します。'))return;
  const c=getClient(),u=getUser(),{error}=await c.from('yohaku_beats').delete().eq('id',beat.id).eq('user_id',u.id);
  if(error){notify('削除できません: '+error.message);return}
+ beats=beats.filter(x=>x.id!==beat.id);signed.delete(beat.id);
  if(beat.audio_path){const x=await c.storage.from(bucket).remove([beat.audio_path]);if(x.error)notify('MP3の削除に失敗しました: '+x.error.message)}
  if(current===beat.id){$('beatAudio').pause();current=null;$('beatPlayer').classList.add('hide')}
- await fetchBeats();notify('ビートを削除しました');openShelf();
+ try{await fetchBeats(true)}catch(e){lastFetch=0;notify('削除は完了しました。一覧の再取得は失敗しました')}
+ notify('ビートを削除しました');openShelf();
 }
 function init(){
  $('beatShelf').onclick=()=>openShelf();
  $('beatForNote').onclick=()=>openShelf(true);
  $('beatLoop').onchange=()=>{$('beatAudio').loop=$('beatLoop').checked};
  $('beatAudio').onerror=()=>notify('MP3を再生できません。ネットワークや音声ファイルを確認してください');
- window.addEventListener('focus',()=>{if(getUser())fetchBeats().catch(()=>{})});
- document.addEventListener('visibilitychange',()=>{if(!document.hidden&&getUser())fetchBeats().catch(()=>{})});
+ window.addEventListener('focus',()=>{if(loaded&&getUser())fetchBeats().catch(()=>{})});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&loaded&&getUser())fetchBeats().catch(()=>{})});
 }
 window.YOHAKU_BEATS={onLogin,onLogout,onNotesChanged:updateLinked,openShelf,refresh:fetchBeats};
 document.addEventListener('DOMContentLoaded',init);
