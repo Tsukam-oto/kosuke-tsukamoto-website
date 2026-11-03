@@ -1,4 +1,4 @@
-/* 知の図書館 v1.3.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.3.1 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -381,12 +381,29 @@ async function diagnoseSync(){
 
 async function save(kind,id,payload,opts={}){
  if(!needAuth())return false;
- const key=recordId(kind,id);const old=records[kind][key] ? deep(records[kind][key]) : null; const row={id:key,kind,user_id:currentUser.id,payload:deep(payload),created_at:old?.created_at||new Date().toISOString(),updated_at:new Date().toISOString()};
+ const key=recordId(kind,id);const old=records[kind][key] ? deep(records[kind][key]) : null;
+ const stamp=new Date(Math.max(Date.now(),old?.updated_at?Date.parse(old.updated_at)+1:0)).toISOString();
+ const owner=currentUser.id;
+ const row={id:key,kind,user_id:owner,payload:deep(payload),created_at:old?.created_at||new Date().toISOString(),updated_at:stamp};
  records[kind][key]=row;if(!opts.silent)render();
- try{await queueWrite(key,async()=>{const {error}=await client.from('knowledge_records').upsert(row,{onConflict:'user_id,id'});if(error)throw error;});if(!opts.quiet)notice(globalThis.__KNOWLEDGE_DEMO?'デモ画面に保存しました（クラウドには送信しません）。':'クラウドに保存しました。');return true}
- catch(e){if(records[kind][key]===row){if(old)records[kind][key]=old;else delete records[kind][key];}if(!opts.silent)render();notice('保存に失敗しました: '+(e.message||e),true);return false}
+ try{await queueWrite(key,async()=>{
+  // visit is a read-position signal; treat it as eventually consistent. All authored records require CAS.
+  if(kind==='visit'){const {error}=await client.from('knowledge_records').upsert(row,{onConflict:'user_id,id'});if(error)throw error;return}
+  if(!old){const {error}=await client.from('knowledge_records').insert(row);if(error){if(error.code==='23505')throw new Error('CONFLICT: 同じ記録が別端末で作成されています。');throw error}return}
+  const {data,error}=await client.from('knowledge_records')
+   .update({payload:row.payload,updated_at:row.updated_at})
+   .eq('user_id',owner).eq('id',key).eq('updated_at',old.updated_at).select('id');
+  if(error)throw error;
+  if(!Array.isArray(data)||!data.some(r=>r.id===key))throw new Error('CONFLICT: 別の端末でこの記録が先に変更されました。');
+ });if(!opts.quiet)notice(globalThis.__KNOWLEDGE_DEMO?'デモ画面に保存しました（クラウドには送信しません）。':'クラウドに保存しました。');return true}
+ catch(e){const isConflict=String(e.message||e).startsWith('CONFLICT:');
+  if(records[kind][key]===row){if(old)records[kind][key]=old;else delete records[kind][key];}
+  if(!opts.silent)render();
+  if(isConflict){dialog={type:'plain-prompt',conflict:true,prompt:'保存競合を検知しました。別端末の変更を上書きしないよう、クラウドへの保存を中止しました。\n\nこの下に保存できなかった文章があります。必要な部分をコピーしてから閉じてください。\n\n'+JSON.stringify({kind,id,payload:row.payload},null,2)};renderDialog();notice('別端末の更新と競合しました。文章をコピーしてから同期を再確認してください。',true)}
+  else notice('保存に失敗しました: '+(e.message||e),true);
+  return false}
 }
-async function remove(kind,key){if(!needAuth())return false;const old=deep(records[kind][key]||null);if(!old)return false;delete records[kind][key];render();try{await queueWrite(key,async()=>{const {error}=await client.from('knowledge_records').delete().eq('user_id',currentUser.id).eq('id',key);if(error)throw error});notice('削除しました');return true}catch(e){records[kind][key]=old;render();notice('削除できませんでした: '+e.message,true);return false}}
+async function remove(kind,key){if(!needAuth())return false;const old=deep(records[kind][key]||null);if(!old)return false;delete records[kind][key];render();try{await queueWrite(key,async()=>{const {data,error}=await client.from('knowledge_records').delete().eq('user_id',old.user_id).eq('id',key).eq('updated_at',old.updated_at).select('id');if(error)throw error;if(!data?.some(x=>x.id===key))throw new Error('別端末で変更されたため、削除を中止しました。')});notice('削除しました');return true}catch(e){records[kind][key]=old;render();notice('削除できませんでした: '+e.message,true);return false}}
 async function openArticle(id){if(!BY_ID[id])return;sessionSeen.add(id);const old=visit(id)||{};if(currentUser&&cloudStatus==='ready'){await save('visit',id,{topicId:id,lastVisited:new Date().toISOString(),readIndex:Number(old.readIndex||0)},{silent:true,quiet:true})}navigate('article',id)}
 function showAuth(){dialog={type:'auth',message:''};renderDialog()}
 function showQuestion(topicId='',text='',recId=''){dialog={type:'question',topicId,text,recId};renderDialog()}
@@ -399,7 +416,7 @@ function renderDialog(){if(!dialog){modalLayer.innerHTML='';return}
  } else if(dialog.type==='thread'){renderThreadModal();
  } else if(dialog.type==='handoff'){renderHandoffModal();
  } else if(dialog.type==='export-chooser'){renderExportChooser();
- } else if(dialog.type==='plain-prompt'){modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><h2>コピーする文章</h2><textarea class="textarea" readonly style="min-height:280px">${esc(dialog.prompt||'')}</textarea></section></div>`;
+ } else if(dialog.type==='plain-prompt'){modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><h2>${dialog.conflict?'保存競合 — 未保存の文章':'コピーする文章'}</h2><textarea class="textarea" readonly style="min-height:280px">${esc(dialog.prompt||'')}</textarea></section></div>`;
  } else if(dialog.type==='question'){
  const record=dialog.recId?records.question[dialog.recId]:null;const p=record?.payload||{};
  modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog" role="dialog" aria-modal="true" aria-label="疑問を記録する"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><div class="kicker">SAVE A QUESTION</div><h2>${record?'疑問を編集する':'問いを残す'}</h2><div class="form-grid"><div class="form-group"><label for="questionText">疑問</label><textarea class="textarea" id="questionText" placeholder="知りたいことを書いてください">${esc(dialog.text||p.text||'')}</textarea></div><div class="form-group"><label for="questionTopic">関連するテーマ</label><select class="select" id="questionTopic" style="width:100%"><option value="">関連テーマなし</option>${TOPICS.map(t=>`<option value="${esc(t.id)}" ${t.id===(dialog.topicId||p.topicId)?'selected':''}>${esc(t.title)}</option>`).join('')}</select></div><div class="form-group"><label for="questionAnswer">自分で見つけた答え・手がかり（空欄可）</label><textarea class="textarea" id="questionAnswer">${esc(p.answer||'')}</textarea></div><div class="form-group"><label for="questionStatus">状態</label><select class="select" id="questionStatus"><option value="open" ${p.status!=='resolved'?'selected':''}>まだ解決していない</option><option value="resolved" ${p.status==='resolved'?'selected':''}>理解した・解決した</option></select></div><div class="actions"><button class="btn" data-action="submit-question">${record?'変更を保存':'疑問を保存'}</button>${record?'<button class="btn btn-danger" data-action="delete-question">削除する</button>':''}</div></div></section></div>`;
