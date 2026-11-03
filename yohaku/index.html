@@ -187,7 +187,7 @@ function updateLinked(){const wrap=$('linkedBeatBox');if(!wrap)return;const item
 async function fetchBeats(force=false){
  const c=getClient(),u=getUser();if(!c||!u)return;
  if(loaded&&!force&&Date.now()-lastFetch<90000)return;
- if(pendingLoad)return pendingLoad;
+ if(pendingLoad){if(!force)return pendingLoad;await pendingLoad;}
  const request=(async()=>{
   const {data,error}=await c.from('yohaku_beats')
    .select('id,user_id,title,creator,source_url,bpm,musical_key,note_text,lyric_note_id,audio_path,favorite,created_at,updated_at')
