@@ -1,0 +1,39 @@
+
+/* 余白 BEAT SHELF v1.1 */
+.beat-launch{display:inline-flex;align-items:center;gap:7px;border:1px solid #c9cebe;border-radius:9px;background:#ebeee5;color:#354133;font-size:12px;font-weight:700;padding:7px 12px;white-space:nowrap}
+.beat-launch:hover{background:#dce3d3}
+.beat-player{position:sticky;top:70px;z-index:2;background:#fafaf6;border-bottom:1px solid #dde1d8;display:flex;align-items:center;gap:12px;padding:9px 4%;min-width:0}
+.beat-playing{flex:0 1 180px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.beat-playing strong{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.beat-playing span{font-size:10px;color:#828779;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.beat-player audio{flex:1;min-width:90px;max-width:640px;height:37px}
+.beat-player .beat-loop{display:flex;align-items:center;gap:5px;white-space:nowrap;font-size:11px;color:#6c7464}
+.beat-player .beat-loop input{accent-color:#44533e}
+.beat-panel{display:grid;gap:12px}
+.beat-panel .beat-hint{padding:12px 13px;background:#f1f3eb;border:1px solid #dbe2d5;border-radius:9px;color:#646c5e;font-size:12px;line-height:1.7}
+.beat-panel .beat-controls{display:flex;gap:8px;align-items:center}
+.beat-panel .beat-controls input{flex:1;min-width:0;padding:9px 11px;border-radius:8px;border:1px solid #dce0d6;font-size:13px}
+.beat-panel button{white-space:nowrap}
+.beat-rows{display:grid;gap:7px}
+.beat-row{border:1px solid #e0e2db;border-radius:10px;padding:11px 12px;background:#fff;display:flex;align-items:center;gap:11px;min-width:0}
+.beat-row-info{min-width:0;flex:1}
+.beat-row-info strong{display:block;font-size:13px;overflow-wrap:anywhere;line-height:1.4}
+.beat-row-info small{display:block;color:#858a7f;font-size:11px;margin-top:3px;overflow-wrap:anywhere}
+.beat-row-btns{display:flex;gap:5px}
+.beat-row-btns button{font-size:11px;border-radius:8px;padding:5px 9px;border:1px solid #dfe3da;background:#f9faf6}
+.beat-row-btns button:hover{background:#eaf0e4}
+.beat-row-btns .beat-play-btn{background:#354234;color:#fff;border-color:#354234}
+.beat-empty{text-align:center;color:#9a9f93;padding:24px 10px;border:1px dashed #dfe2d9;border-radius:9px;font-size:12px}
+.beat-form{display:grid;gap:11px}
+.beat-form label{display:grid;gap:4px;font-size:11px;color:#727a6e}
+.beat-form input:not([type=checkbox]),.beat-form select,.beat-form textarea{width:100%;border-radius:8px;border:1px solid #dce1d6;background:white;padding:10px;font-size:14px;min-width:0}
+.beat-form textarea{min-height:75px;resize:vertical}
+.beat-form .beat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.beat-form .beat-file-hint{color:#777f71;font-size:11px;line-height:1.7}
+.beat-form .beat-form-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:3px}
+.beat-form .beat-form-actions button{padding:10px 13px;border-radius:8px}
+.beat-link-panel{border:1px solid #dce1d6;background:#f9faf5;border-radius:10px;padding:12px 14px;margin:12px 0}
+.beat-link-panel strong{display:block;font-size:11px;color:#65705f;margin-bottom:6px}
+.beat-link-panel button{border:0;background:transparent;text-align:left;color:#424e3f;padding:3px 0;font-size:12px;text-decoration:underline}
+@media(max-width:900px){.beat-player{top:70px}}
+@media(max-width:650px){.beat-player{top:53px;padding:7px 12px;gap:6px;flex-wrap:wrap}.beat-playing{flex:1 1 45%}.beat-player audio{flex:1 1 100%;order:3;height:32px}.beat-player .beat-loop{margin-left:auto}.beat-launch{padding:5px 8px;font-size:11px}.top-actions{gap:4px}.beat-row{align-items:flex-start;flex-wrap:wrap}.beat-row-info{flex-basis:100%}.beat-row-btns{width:100%;justify-content:flex-end}}
