@@ -114,11 +114,44 @@ function load(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY));if(d&&
 function save(){try{db.updatedAt=new Date().toISOString();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));$('#save-status').textContent='保存済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});return true}catch(e){toast('保存できませんでした。バックアップを書き出してください。');return false}}
 function works(){return [...PUBLIC,...db.userWorks].filter(w=>resolveSky(w)===sky)}
 function getWork(id){return works().find(w=>w.id===id)}
-function words(){return [...new Set([...DEFAULT_WORDS,...db.customWords])].filter(Boolean)}
+
+/* Exact fragments, observed locally. Never infer or generate lyrics. */
+let rapPhraseMemo={key:null,rows:[]};
+function rapRepeatedPhrases(){
+ if(sky!=='rap')return [];
+ const corpus=works().slice(0,200);
+ const key=corpus.map(w=>w.id+':'+(w.updatedAt||'')+':'+w.lyrics.length+':'+w.lyrics.slice(0,16)).join('|');
+ if(rapPhraseMemo.key===key)return rapPhraseMemo.rows;
+ const inverted=new Map();
+ for(const w of corpus){
+  const seen=new Set();let budget=4200;
+  for(const line of w.lyrics.split(/\r?\n/).slice(0,150)){
+   if(budget<=0)break;
+   const t=norm(line).slice(0,125);
+   for(let len=4;len<=8&&budget>0;len++){
+    for(let i=0;i+len<=t.length&&budget>0;i++){
+     budget--;
+     const part=t.slice(i,i+len);
+     if(!/^[\p{L}]+$/u.test(part))continue;
+     seen.add(part);
+    }
+   }
+  }
+  for(const part of seen){if(!inverted.has(part))inverted.set(part,new Set());inverted.get(part).add(w.id);}
+ }
+ const raw=[...inverted].filter(([t,ids])=>ids.size>=2).map(([text,ids])=>({text,ids:[...ids],count:ids.size,quality:ids.size*Math.log2(text.length+1)}));
+ raw.sort((a,b)=>b.text.length-a.text.length||b.count-a.count||a.text.localeCompare(b.text,'ja'));
+ const kept=[];
+ for(const p of raw){if(kept.some(l=>l.text.includes(p.text)&&p.ids.every(id=>l.ids.includes(id))))continue;kept.push(p);if(kept.length>=32)break;}
+ kept.sort((a,b)=>b.quality-a.quality||b.text.length-a.text.length||a.text.localeCompare(b.text,'ja'));
+ rapPhraseMemo={key,rows:kept.slice(0,24)};
+ return rapPhraseMemo.rows;
+}
+function words(){return [...new Set([...DEFAULT_WORDS,...db.customWords,...(sky==='rap'?rapRepeatedPhrases().map(x=>x.text):[])])].filter(Boolean)}
 function tokens(w){const t=norm(w.lyrics);return words().filter(x=>t.includes(norm(x))).sort((a,b)=>b.length-a.length)}
 function occurrences(text,needle){if(!needle)return 0;const a=norm(text),b=norm(needle);let count=0,at=0;while((at=a.indexOf(b,at))!==-1){count++;at+=b.length}return count;}
 function wordDF(){const arr=works(),map=new Map();for(const word of words()){let df=0,ct=0;for(const w of arr){const n=occurrences(w.lyrics,word);if(n){df++;ct+=n}}if(df)map.set(word,{df,count:ct})}return map}
-function connections(){const all=works(),df=wordDF(),n=all.length,arr=[];for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const a=tokens(all[i]),b=new Set(tokens(all[j]));const shared=a.filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
+function connections(){const all=works(),df=wordDF(),n=all.length,arr=[],sets=all.map(w=>new Set(tokens(w)));for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const b=sets[j],shared=[...sets[i]].filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
 function formatTags(w){const arr=tokens(w).filter(x=>x.length>=2).slice(0,3);return arr.length?arr.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>未分類</span>'}
 function summary(){const all=works(),conn=connections(),df=wordDF();return {all,conn,df,nwords:df.size,lines:all.reduce((s,w)=>s+w.lyrics.split('\n').filter(Boolean).length,0),private:db.userWorks.length};}
 function toast(message){const x=$('#toast');x.textContent=message;x.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>x.classList.remove('show'),3000)}
