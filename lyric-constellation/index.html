@@ -11,6 +11,41 @@
 @media(max-width:1250px){.layout{grid-template-columns:205px minmax(0,1fr)}.sidebar{padding:22px 11px}.main{padding:25px 22px}.grid-2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:760px){.grid-2{grid-template-columns:minmax(0,1fr)}.pillbar,.constellation-scroll{max-width:100%}.dark-card{max-width:100%}.layout{display:block;padding-bottom:73px}.sidebar{position:fixed;bottom:0;top:auto;height:72px;width:100%;padding:0 6px;border-right:0;border-top:1px solid #e2e2df;flex-direction:row;background:#f7f6f2;align-items:center;z-index:12}.brand,.nav-label,.sidebar-bottom{display:none}.nav{display:flex;justify-content:space-around;width:100%}.nav button{display:flex;flex-direction:column;gap:0;flex:1;padding:9px 3px 6px;line-height:1.4;text-align:center;justify-content:center;font-size:10px;margin:0}.nav button span.icon{font-size:19px;width:auto}.nav button small{display:none}.main{padding:18px 14px 45px}.topline{margin-bottom:17px}.heading{font-size:29px}.lede{font-size:12px}.stats{grid-template-columns:repeat(2,1fr);gap:9px}.stat{padding:14px}.stat b{font-size:29px}.works-list,.term-results,.compare-grid{grid-template-columns:1fr}.panel{padding:17px}.dark-head{padding:18px 18px 6px}.dark-bottom{padding:0 15px 16px}.stars-svg{min-height:260px}.top-actions .btn{font-size:11px;padding:8px}.star-label{font-size:22px}.constellation-scroll{overflow-x:auto;scrollbar-width:thin}.stars-svg{width:760px;max-width:none;min-height:0}.timeline{grid-template-columns:60px 1fr;gap:0 13px}.timeline-year{font-size:22px;padding-right:9px}.timeline-item{flex-wrap:wrap}.drawer{padding:17px 20px 80px}.reading .poem-text{font-size:14px}.section-top h2{font-size:17px}}
 @media(prefers-reduced-motion:reduce){.drawer,.work-card{transition:none}}
+
+/* LYRIC CONSTELLATION v1.2: deliberate line wrapping and separate skies */
+.headline-segment{display:inline-block;white-space:nowrap}
+.heading{text-wrap:balance;overflow-wrap:normal}
+.sky-switch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 10px;max-width:740px}
+.sky-switch button{border:1px solid #d9dde3;border-radius:16px;padding:13px 17px;background:#fffdf9;color:#455267;display:flex;flex-direction:column;align-items:start;gap:2px;font-weight:850;text-align:left;min-width:0}
+.sky-switch button strong{font-size:15px}.sky-switch button small{font-size:10px;opacity:.8}
+.sky-switch button.active{border-color:#4c648d;background:#e8edf3;box-shadow:inset 0 0 0 1px #4c648d;color:#1d3251}
+.sky-switch button.rap-selected{background:#33273f;color:#f5e6f6;border-color:#9876ad;box-shadow:inset 0 0 0 1px #9876ad}
+.sky-help{color:#7b8793;font-size:11px;margin:0 0 24px;line-height:1.8}
+.rap-welcome{background:#f7f3fa;border:1px solid #e5d8ed;padding:23px;border-radius:18px;margin:0 0 18px}
+.rap-welcome strong{display:block;font-size:18px;margin-bottom:6px}.rap-welcome p{font-size:13px;margin:6px 0 16px}
+body.sky-rap{--bg:#171521;--surface:#231f2d;--ink:#f4eef5;--muted:#b5a9bf;--border:#3e374a;--shadow:0 15px 45px rgba(0,0,0,.15)}
+body.sky-rap .sidebar{background:#211c29;border-color:#44394f}
+body.sky-rap .brand strong,body.sky-rap .sidebar-bottom strong,body.sky-rap .heading{color:#f5eaf2}
+body.sky-rap .nav button{color:#c2b5cb}body.sky-rap .nav button.active{background:#3e304c;color:#f9e4ef;box-shadow:none}body.sky-rap .nav button:hover{background:#352b42}
+body.sky-rap .breadcrumb,body.sky-rap .eyebrow,body.sky-rap .lede,body.sky-rap .small-muted,body.sky-rap .panel-sub,body.sky-rap .desc,body.sky-rap .notice,body.sky-rap .footer-note,body.sky-rap .sky-help{color:#c0b3cc}
+body.sky-rap .stat{background:#272231;border-color:#484052}body.sky-rap .stat b,body.sky-rap .counts{color:#ebd5ef}body.sky-rap .stat span{color:#c4b5ce}
+body.sky-rap .btn{background:#30283c;color:#f1e6f4;border-color:#584c68}body.sky-rap .btn.primary{background:#aa83c0;color:#1a1523;border-color:#aa83c0}
+body.sky-rap .sky-switch button{background:#252130;color:#cebfda;border-color:#51475e}body.sky-rap .sky-switch button.active{background:#443053;color:#ffefff;border-color:#c49bd3;box-shadow:inset 0 0 0 1px #c49bd3}
+body.sky-rap .dark-card{background:radial-gradient(ellipse at 25% 12%,#53325f 0%,#281a37 45%,#100e19 100%);border-color:#73527d}
+body.sky-rap .star-link{stroke:#c89dc9}body.sky-rap .star-link.hot{stroke:#f8c8e9}body.sky-rap .star-node .core{fill:#ecc1ef;stroke:#fff0ff}body.sky-rap .star-node.selected .halo{fill:#efade6}body.sky-rap .star-year{fill:#bc9dc9}body.sky-rap .star-label{fill:#fff1fa}
+body.sky-rap .word,body.sky-rap .pill,body.sky-rap .work-card,body.sky-rap .term-result,body.sky-rap .compare-col{background:#2e2838;color:#f0e8f5;border-color:#584968}
+body.sky-rap .word small,body.sky-rap .work-card small,body.sky-rap .term-result small,body.sky-rap .timeline-item small{color:#bdb0ca}
+body.sky-rap .word:hover,body.sky-rap .word.active,body.sky-rap .pill:hover,body.sky-rap .pill.active{background:#60416d;color:#fff5fc}
+body.sky-rap .tag,body.sky-rap .work-card .tags span{background:#3e334b;color:#dfc7e7;border-color:#5b4969}
+body.sky-rap .insight,body.sky-rap .note-box,body.sky-rap .status,body.sky-rap .rap-welcome{background:#302638;color:#e2d7e6;border-color:#624c6f}
+body.sky-rap .drawer,body.sky-rap dialog{background:#251f2c;color:#f3eaf4}body.sky-rap .drawer h2,body.sky-rap .panel h2,body.sky-rap .section-top h2{color:#fff0f9}
+body.sky-rap .field input,body.sky-rap .field select,body.sky-rap .field textarea,body.sky-rap .note-box textarea,body.sky-rap .search,body.sky-rap .control-row input{background:#31283c;color:#f7ecf7;border-color:#624c70}
+body.sky-rap .field label{color:#efdcf2}body.sky-rap .reading-meta,body.sky-rap .reading-stat,body.sky-rap .timeline-year{color:#bdaec9}body.sky-rap .close{background:#43354e;color:#ead4ef}
+body.sky-rap .timeline-item,body.sky-rap .settings-row{border-color:#494052}body.sky-rap .timeline-item button{color:#e7c9ef}
+body.sky-rap .cloud-card{background:#2b2535;border-color:#584b64}body.sky-rap .cloud-card p,body.sky-rap .cloud-note{color:#c6b7d0}
+body.sky-rap .work-card .eyebrow{color:#cbb4d8}body.sky-rap .term-result blockquote{color:#e3d5e9}body.sky-rap .rap-welcome strong{color:#f9e7f6}
+@media(max-width:760px){.sky-switch{gap:8px}.sky-switch button{padding:11px 12px;border-radius:13px}.sky-switch button strong{font-size:13px}.sky-switch button small{font-size:10px}.heading{font-size:clamp(25px,6.7vw,31px);line-height:1.42;letter-spacing:.01em}body.sky-rap .sidebar{background:#241e2b;border-color:#4b3b57}body.sky-rap .nav button.active{background:#45324f}.rap-welcome{padding:17px}}
+
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <style>
