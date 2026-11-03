@@ -313,6 +313,8 @@ function init(){
  $('beatForNote').onclick=()=>openShelf(true);
  $('beatLoop').onchange=()=>{$('beatAudio').loop=$('beatLoop').checked};
  $('beatAudio').onerror=()=>notify('MP3を再生できません。ネットワークや音声ファイルを確認してください');
+ window.addEventListener('focus',()=>{if(getUser())fetchBeats().catch(()=>{})});
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&getUser())fetchBeats().catch(()=>{})});
 }
 window.YOHAKU_BEATS={onLogin,onLogout,onNotesChanged:updateLinked,openShelf,refresh:fetchBeats};
 document.addEventListener('DOMContentLoaded',init);
