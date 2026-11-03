@@ -1,0 +1,32 @@
+{
+  "id": "/lyric-constellation/",
+  "name": "歌詞の星座 — 自分の言葉を、もう一度発見する",
+  "short_name": "歌詞の星座",
+  "description": "自分の作品から言葉のつながりを発見する、本人専用の歌詞アーカイブ",
+  "start_url": "/lyric-constellation/",
+  "scope": "/lyric-constellation/",
+  "display": "standalone",
+  "background_color": "#f6f4f0",
+  "theme_color": "#121c30",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "./icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
