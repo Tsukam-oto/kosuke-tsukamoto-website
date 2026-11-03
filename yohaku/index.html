@@ -125,7 +125,7 @@ const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID()
 const date=s=>s?new Date(s).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}):'—';
 const full=s=>s?new Date(s).toLocaleString('ja-JP',{dateStyle:'medium',timeStyle:'short'}):'—';
 const keys=['id','title','body','original','originalSource','kind','createdAt','updatedAt','pinned','tags','history'];
-let client=null,user=null,notes=[],selected=null,query='',filter='all',dirty=new Set(),blocked=new Set(),timer=null,flushing=false,started=false,revision={},modalClose=null,loading=false,listTimer=null,pendingTimer=null,visibleLimit=80,lastFocusReload=0,homeActive=true;
+let client=null,user=null,notes=[],selected=null,query='',filter='all',dirty=new Set(),blocked=new Set(),timer=null,flushing=false,started=false,revision={},modalClose=null,loading=false,listTimer=null,pendingTimer=null,visibleLimit=80,lastFocusReload=0,homeActive=true,pendingBlankId=null;
 function setStatus(s,busy=false){$('saveState').textContent=s;$('saveState').classList.toggle('busy',busy)}
 function toast(s){let el=$('toast');el.textContent=s;el.classList.remove('hide');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add('hide'),3300)}
 function msg(s,error=false){const el=$('gateMessage');el.textContent=s;el.classList.toggle('error',error)}
@@ -140,7 +140,7 @@ async function connect(cfg){if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co\/?$/i.test
  $('setupForm').classList.add('hide');$('loginForm').classList.remove('hide');msg('認証状態を確認しています…');
  client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;notes=[];selected=null;dirty.clear();blocked.clear();revision={};window.YOHAKU_BEATS?.onLogout?.();$('gate').classList.remove('hide');msg('ログアウトしました。');setStatus('未ログイン');}else if(session?.user&&(!user||user.id!==session.user.id)){setTimeout(()=>start(session.user),0)}});
  const {data,error}=await client.auth.getSession();if(error)msg('認証状態を確認できませんでした: '+error.message,true);else if(data.session?.user)await start(data.session.user);else msg('登録済みの場合は、メールアドレスとパスワードでログインしてください。');}
-async function start(u){if(loading)return;loading=true;user=u;homeActive=true;msg('本人のノートを同期しています…');setStatus('同期中…',true);
+async function start(u){if(loading)return;loading=true;user=u;homeActive=true;pendingBlankId=null;msg('本人のノートを同期しています…');setStatus('同期中…',true);
  try{await reload(true);$('gate').classList.add('hide');msg('');window.YOHAKU_BEATS?.onLogin?.();setStatus(dirty.size?'未同期の編集あり':'同期済み',!!dirty.size);if(dirty.size)schedule();}
  catch(e){msg('クラウドから読み込めません: '+e.message+'\nテーブル設定とネット接続をご確認ください。',true);setStatus('同期できません',true)}finally{loading=false}}
 function pendingKey(){return `yohaku-pending-v2-${user?.id||'guest'}`}
@@ -168,7 +168,12 @@ async function flush(){if(flushing||!client||!user)return;if(!navigator.onLine){
   rememberPending();
  }}catch(e){failed=true;toast('通信に失敗しました: '+e.message)}finally{flushing=false;setStatus(blocked.size?'競合あり・要確認':dirty.size?'未同期の編集あり':'同期済み',dirty.size>0);if(dirty.size&&!blocked.size&&navigator.onLine&&!failed)schedule()}}
 function pushHistory(n){const last=n.history.at(-1);if(n.body&&(!last||Date.now()-new Date(last.savedAt).getTime()>60000)){n.history.push({title:n.title,body:n.body,savedAt:now()});if(n.history.length>25)n.history.shift()}}
-function change(field,value){let n=get();if(!n)return;if(field==='body'&&n.body!==value)pushHistory(n);if(field==='body'&&n.original===null&&value.trim().length)n.original=value;n[field]=value;n.updatedAt=now();mark(n);if(field==='title'||field==='body')scheduleSide();if(field==='body')count();}
+function change(field,value){let n=get();if(!n)return;if(field==='body'&&n.body!==value)pushHistory(n);if(field==='body'&&n.original===null&&value.trim().length)n.original=value;n[field]=value;n.updatedAt=now();
+ if(n.id===pendingBlankId){
+   if((field==='body'||field==='title')&&!value.trim()){if(field==='title'||field==='body')scheduleSide();if(field==='body')count();return}
+   pendingBlankId=null;
+ }
+ mark(n);if(field==='title'||field==='body')scheduleSide();if(field==='body')count();}
 function count(){let n=get();$('wordcount').textContent=n?`${[...n.body].length}文字 · ${n.body.split('\n').length}行`:''}
 function scheduleSide(){clearTimeout(listTimer);listTimer=setTimeout(side,180)}
 function mostRecentNote(){let latest=null,latestMs=-Infinity;for(const n of notes){const t=Date.parse(n.updatedAt||n.createdAt)||0;if(t>latestMs){latestMs=t;latest=n}}return latest}
@@ -183,7 +188,17 @@ function updateHome(){
  $('homeCount').textContent='保存されているストック：'+notes.length+'件';
  if(homeActive)$('crumbTitle').textContent='ホーム';
 }
-function showHome(){if(!user)return;homeActive=true;rememberPending();draw();if(innerWidth<650)window.scrollTo({top:0,behavior:'auto'})}
+function discardEmptyDraft(){
+ if(!pendingBlankId)return;
+ const id=pendingBlankId;
+ pendingBlankId=null;
+ const n=notes.find(x=>x.id===id);
+ if(n&&!dirty.has(id)&&!n.body.trim()&&(!n.title.trim()||n.title==='無題のメモ')){
+   notes=notes.filter(x=>x.id!==id);
+   if(selected===id)selected=notes[0]?.id||null;
+ }
+}
+function showHome(){if(!user)return;discardEmptyDraft();homeActive=true;rememberPending();draw();if(innerWidth<650)window.scrollTo({top:0,behavior:'auto'})}
 function draw(){clearTimeout(listTimer);side();editor();updateHome()}
 function side(){const q=query.trim().toLowerCase();const arr=notes.filter(n=>(filter==='all'||filter==='pinned'&&n.pinned||filter==='free'&&n.kind==='フリースタイル'||filter==='fragment'&&n.kind!=='フリースタイル')&&(!q||[n.title,n.body,n.kind,...n.tags].join(' ').toLowerCase().includes(q))).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||new Date(b.updatedAt)-new Date(a.updatedAt));
  $('visibleCount').textContent=`${arr.length} / ${notes.length} 件`;
@@ -196,8 +211,8 @@ function editor(){const n=get();$('editorView').classList.toggle('hide',homeActi
  $('pinButton').textContent=n.pinned?'✦ ピン留め中':'✧ ピン留めする';$('metaCreated').textContent='作成 '+full(n.createdAt);$('metaUpdated').textContent='更新 '+full(n.updatedAt);
  $('originalButton').disabled=n.original===null;$('originalButton').textContent=n.original===null?'原文なし':'初回の原文を表示';
  $('tagsList').innerHTML=n.tags.map((tag,i)=>`<span class="tag">${esc(tag)} <button type="button" data-remove-tag="${i}" aria-label="${esc(tag)}を削除">×</button></span>`).join('');count();window.YOHAKU_BEATS?.onNotesChanged?.();}
-function select(id){if(!notes.some(n=>n.id===id))return;selected=id;homeActive=false;draw();if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})}
-function create(t='',kind='断片',title=''){let n=norm({id:uid(),title:title||t.split('\n')[0].slice(0,24)||'無題のメモ',body:t,original:t||null,originalSource:'本人入力',kind,createdAt:now(),updatedAt:now()});notes.push(n);selected=n.id;homeActive=false;filter='all';query='';$('search').value='';mark(n);draw();toast('クラウドへ保存します');if(!t)$('bodyInput').focus()}
+function select(id){if(!notes.some(n=>n.id===id))return;if(id!==pendingBlankId)discardEmptyDraft();selected=id;homeActive=false;draw();if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})}
+function create(t='',kind='断片',title='',deferBlank=false){discardEmptyDraft();let n=norm({id:uid(),title:title||t.split('\n')[0].slice(0,24)||'無題のメモ',body:t,original:t||null,originalSource:'本人入力',kind,createdAt:now(),updatedAt:now()});notes.push(n);selected=n.id;homeActive=false;filter='all';query='';$('search').value='';if(deferBlank&&!t.trim()){pendingBlankId=n.id;setStatus('入力待ち')}else{mark(n);toast('クラウドへ保存します')}draw();if(!t)$('bodyInput').focus()}
 function openModal(title,body,buttons=[]){$('modalTitle').textContent=title;const c=$('modalContent');c.innerHTML='';if(typeof body==='string')c.textContent=body;else c.appendChild(body);const f=$('modalFoot');f.innerHTML='';for(let item of buttons.length?buttons:[{text:'閉じる',click:closeModal}]){const b=document.createElement('button');b.type='button';b.className=item.class||'secondary';b.textContent=item.text;b.onclick=item.click;f.appendChild(b)}$('modalShade').classList.remove('hide');$('modalShade').setAttribute('aria-hidden','false');modalClose=closeModal}
 function closeModal(){$('modalShade').classList.add('hide');$('modalShade').setAttribute('aria-hidden','true');modalClose=null}
 function dl(name,body,mime){const u=URL.createObjectURL(new Blob([body],{type:mime}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2500)}
@@ -229,7 +244,7 @@ function privacy(){openModal('保存とプライバシー','ログイン中の�
 function handlers(){if(started)return;started=true;
  $('newButton').onclick=quick;$('newEmpty').onclick=quick;
  $('homeButton').onclick=showHome;
- $('homeWrite').onclick=()=>{create();if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})};
+ $('homeWrite').onclick=()=>{create('','断片','',true);if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})};
  $('homeContinue').onclick=()=>{const n=mostRecentNote();if(!n)return;select(n.id);$('bodyInput').focus({preventScroll:true})};
  $('homeBeats').onclick=()=>window.YOHAKU_BEATS?.openShelf?.();
  $('search').oninput=e=>{query=e.target.value;visibleLimit=80;scheduleSide()};document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;visibleLimit=80;side()});
