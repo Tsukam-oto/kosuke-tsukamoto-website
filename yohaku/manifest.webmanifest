@@ -1,7 +1,7 @@
 {
   "name": "余白 — LYRIC NOTE",
   "short_name": "余白",
-  "description": "本人の言葉だけを、どこからでも残すプライベートリリックノート",
+  "description": "本人の言葉を残し、推敲し、どこからでも育てるプライベートリリックノート",
   "id": "/yohaku/",
   "start_url": "/yohaku/",
   "scope": "/yohaku/",
