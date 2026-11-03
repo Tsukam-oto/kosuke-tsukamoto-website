@@ -89,7 +89,7 @@ function showForm(beat){
  if(beat?.audio_path)v('beatFileHint').textContent='登録済みMP3あり。新しいMP3を選ぶと差し替えます（20MBまで）。';
  const sel=v('beatLyric'),empty=document.createElement('option');empty.value='';empty.textContent='関連なし';sel.append(empty);
  ctx().getNotes().forEach(n=>{const opt=document.createElement('option');opt.value=n.id;opt.textContent=n.title||'無題のメモ';sel.append(opt)});
- sel.value=beat?.lyric_note_id||ctx().getSelected()||'';
+ sel.value=beat?(beat.lyric_note_id||''):(ctx().getSelected()||'');
  v('beatCancel').onclick=()=>openShelf();
  const actions=[{text:'閉じる',click:ctx().closeModal}];
  if(isEdit)actions.unshift({text:'削除',click:()=>deleteBeat(beat),class:'secondary'});
