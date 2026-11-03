@@ -15,6 +15,56 @@
 .gate-form input{font-size:15px;padding:12px;border-radius:9px;border:1px solid #d9ded3;min-width:0}.gate-form .primary{padding:12px;font-size:14px;cursor:pointer}
 .gate-message{font-size:12px;line-height:1.8;color:#65745c;margin-top:18px;white-space:pre-line}.gate-message.error{color:#aa4c42}.text-link{background:none;border:0;text-decoration:underline;font-size:12px;color:#717a65;cursor:pointer;align-self:flex-start}
 .list-more{width:100%;justify-content:center;margin-top:10px}.notes-scroll .list-more{min-height:36px}@media(max-width:650px){.notes-scroll .list-more{width:auto;flex:0 0 175px;align-self:stretch}}
+
+/* 余白 v1.3 - 軽量スタート画面。音源・追加ライブラリは読み込まない */
+.home-nav{background:transparent;border:0;padding:5px 3px;font:inherit;font-weight:700;white-space:nowrap;color:var(--ink);cursor:pointer}
+.home-nav:hover,.home-nav:focus-visible{text-decoration:underline;text-underline-offset:3px}
+.home-view{width:min(100%,940px);margin:0 auto;padding:clamp(30px,5.5vw,65px) clamp(20px,5vw,65px) 60px;min-width:0}
+.home-kicker{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.18em;color:#7e8b71}
+.home-heading h2{font-size:clamp(25px,3vw,34px);line-height:1.4;letter-spacing:.01em;margin:14px 0 11px;font-weight:700}
+.home-heading p{color:#777d70;font-size:13px;line-height:1.9;margin:0 0 28px}
+.home-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.home-action{min-width:0;min-height:168px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:14px;border:1px solid #dadfd4;background:#fffefb;border-radius:13px;padding:21px 18px;position:relative;transition:border-color .14s,background .14s}
+.home-action:hover{border-color:#aab5a0;background:#f9faf5}
+.home-action:disabled{opacity:.4;cursor:not-allowed}
+.home-action:disabled:hover{background:#fffefb}
+.home-action-write{background:#343b31;border-color:#343b31;color:white}
+.home-action-write:hover{background:#455040;border-color:#455040}
+.home-action-symbol{width:34px;height:34px;display:grid;place-items:center;border-radius:9px;background:#edf0e9;color:#445440;font-family:Arial,sans-serif;font-size:24px;line-height:1}
+.home-action-write .home-action-symbol{background:#ffffff22;color:#fff}
+.home-action-copy{display:flex;flex-direction:column;gap:5px;max-width:100%}
+.home-action-copy strong{font-size:16px;line-height:1.5}
+.home-action-copy small{color:#8e9588;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.home-action-write .home-action-copy small{color:#d7dfd3}
+.home-action-arrow{font-size:19px;position:absolute;right:17px;top:19px;color:#9ba596}
+.home-action-write .home-action-arrow{color:#d8dfd2}
+.home-latest{margin-top:35px;padding:22px 24px;border-top:1px solid #d7ded3;border-bottom:1px solid #d7ded3}
+.home-latest-eyebrow{font-family:Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:.12em;color:#858e80;margin-bottom:12px}
+.home-latest strong{display:block;font-size:16px;line-height:1.55;overflow-wrap:anywhere}
+.home-latest p{font-size:12px;color:#777e74;line-height:1.8;margin:9px 0 13px;overflow-wrap:anywhere;white-space:pre-wrap}
+.home-count{font-size:11px;color:#7a8577}
+.home-foot{font-size:11px;color:#9aa096;margin:26px 0 0}
+#editorView{scroll-margin-top:90px}
+@media(max-width:900px){.home-actions{grid-template-columns:1fr;gap:9px}.home-action{min-height:94px;display:flex;flex-direction:row;align-items:center;gap:16px;padding:18px}.home-action-arrow{top:50%;transform:translateY(-50%)}.home-action-copy{padding-right:18px}}
+@media(max-width:650px){
+ body.yohaku-home .sidebar{padding-bottom:2px}
+ body.yohaku-home .sidebar .side-action,
+ body.yohaku-home .sidebar .searchbox,
+ body.yohaku-home .sidebar .filter-row,
+ body.yohaku-home .sidebar .countline,
+ body.yohaku-home .sidebar .notes-scroll{display:none}
+ body.yohaku-home #copyTop{display:none}
+ body.yohaku-home .breadcrumbs .crumb-current{display:none}
+ .home-view{padding:29px 21px 55px}
+ .home-heading h2{font-size:25px}
+ .home-heading p{font-size:12px;margin-bottom:22px}
+ .home-action{min-height:88px;padding:15px 14px}
+ .home-action-symbol{width:37px;height:37px;flex:none}
+ .home-action-copy strong{font-size:15px}
+ .home-action-copy small{font-size:10px}
+ .home-latest{margin-top:25px;padding:19px 5px}
+ .home-foot{margin-top:24px}
+}
 </style></head>
 <body><div class="app">
 <aside class="sidebar" aria-label="リリックノート一覧"><div class="brand"><div><div class="kicker">LYRIC NOTE / PERSONAL</div><h1>余白<span style="font-weight:400;font-size:14px;color:#8a8e81;padding-left:8px">ことばの記録</span></h1></div><div class="symbol" aria-hidden="true">余</div></div>
@@ -23,8 +73,27 @@
 <div class="filter-row"><button class="filter active" data-filter="all">すべて</button><button class="filter" data-filter="fragment">断片</button><button class="filter" data-filter="free">即興</button><button class="filter" data-filter="pinned">固定</button></div>
 <div class="countline"><span>STOCKS</span><span id="visibleCount">—</span></div><nav class="notes-scroll" id="notesList" aria-label="ストック一覧"></nav>
 <div class="side-bottom"><button class="bottom-btn" id="backupButton" type="button">↓ JSON保存</button><button class="bottom-btn" id="importButton" type="button">↑ 読み込む</button><button class="bottom-btn" id="txtAllButton" type="button">↓ 全件TXT</button><button class="bottom-btn" id="aboutButton" type="button">ⓘ 保存について</button></div><div class="storage-hint">ログインするとMac・iPhoneで同期します</div></aside>
-<main class="main"><div class="topbar"><div class="breadcrumbs">LYRIC NOTE <span style="margin:0 7px;color:#b4b7ae">/</span> <span id="crumbTitle" class="crumb-current">—</span></div><div class="top-actions"><button id="beatShelf" type="button" class="beat-launch" data-yohaku-release="1.2.1-lightweight" title="ビート棚を開く">♫ BEATS</button><div id="saveState" class="saved">接続中…</div><button id="syncRefresh" class="iconbutton" type="button" title="他端末から再読み込み" aria-label="同期する">↻</button><button id="signOut" class="iconbutton" type="button" title="ログアウト" aria-label="ログアウト">⏻</button><button id="copyTop" class="iconbutton" type="button" aria-label="本文をコピー" title="本文をコピー"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button></div></div>
+<main class="main"><div class="topbar"><div class="breadcrumbs"><button type="button" class="home-nav" id="homeButton" title="余白のホームへ戻る" aria-label="余白のホームへ戻る">⌂ 余白</button> <span style="margin:0 7px;color:#b4b7ae">/</span> <span id="crumbTitle" class="crumb-current">—</span></div><div class="top-actions"><button id="beatShelf" type="button" class="beat-launch" data-yohaku-release="1.2.1-lightweight" title="ビート棚を開く">♫ BEATS</button><div id="saveState" class="saved">接続中…</div><button id="syncRefresh" class="iconbutton" type="button" title="他端末から再読み込み" aria-label="同期する">↻</button><button id="signOut" class="iconbutton" type="button" title="ログアウト" aria-label="ログアウト">⏻</button><button id="copyTop" class="iconbutton" type="button" aria-label="本文をコピー" title="本文をコピー"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></svg></button></div></div>
 <div id="beatPlayer" class="beat-player hide"><div class="beat-playing"><strong id="beatPlayingTitle">—</strong><span id="beatPlayingSubtitle">MP3 PLAYER</span></div><audio id="beatAudio" controls preload="none"></audio><label class="beat-loop"><input id="beatLoop" type="checkbox">ループ</label></div>
+<section id="homeView" class="home-view hide" aria-label="余白のホーム">
+  <div class="home-heading">
+    <div class="home-kicker">YOUR SPACE FOR WORDS</div>
+    <h2>言葉が浮かんだら、ここへ。</h2>
+    <p>思いついたときに、書く。前の続きに戻る。好きなビートを聴く。</p>
+  </div>
+  <div class="home-actions" role="group" aria-label="余白で始めること">
+    <button id="homeWrite" type="button" class="home-action home-action-write"><span class="home-action-symbol" aria-hidden="true">＋</span><span class="home-action-copy"><strong>言葉を書く</strong><small>新しいストックを開く・自動保存</small></span><span class="home-action-arrow" aria-hidden="true">›</span></button>
+    <button id="homeContinue" type="button" class="home-action"><span class="home-action-symbol" aria-hidden="true">↺</span><span class="home-action-copy"><strong>続きを書く</strong><small id="homeContinueLabel">最近のストックに戻る</small></span><span class="home-action-arrow" aria-hidden="true">›</span></button>
+    <button id="homeBeats" type="button" class="home-action"><span class="home-action-symbol" aria-hidden="true">♫</span><span class="home-action-copy"><strong>ビートを聴く</strong><small>ビート棚とMP3プレーヤー</small></span><span class="home-action-arrow" aria-hidden="true">›</span></button>
+  </div>
+  <div class="home-latest">
+    <div class="home-latest-eyebrow">LAST STOCK</div>
+    <strong id="homeRecentTitle">最近のストックはまだありません</strong>
+    <p id="homeRecentPreview">言葉を思いついたら、「言葉を書く」から始められます。</p>
+    <div id="homeCount" class="home-count">ストックを読み込み中</div>
+  </div>
+  <p class="home-foot">ここに残るのは、あなた自身の言葉です。</p>
+</section>
 <div id="emptyView" class="empty hide"><div style="font-family:serif;font-size:55px;color:#adb19e">余</div><h2>忘れる前に、書き残す。</h2><p>自分の言葉だけを、ここに。</p><button class="primary" id="newEmpty" type="button">新しいストックを作る</button></div>
 <div id="editorView" class="content hide"><section class="editor-wrap" aria-label="歌詞の編集"><div class="eyebrow"><span class="line"></span><span id="noteNumber">STOCK —</span><span style="flex:1"></span><span>WORDS IN PROGRESS</span></div>
 <input id="titleInput" class="heading-input" aria-label="ストックのタイトル" placeholder="無題のメモ" spellcheck="false" maxlength="130"><div class="meta-inline"><span class="chip" id="metaCreated">作成 —</span><span class="chip outline" id="metaUpdated">更新 —</span></div>
@@ -52,7 +121,7 @@ const uid=()=>typeof crypto!=='undefined'&&crypto.randomUUID?crypto.randomUUID()
 const date=s=>s?new Date(s).toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'}):'—';
 const full=s=>s?new Date(s).toLocaleString('ja-JP',{dateStyle:'medium',timeStyle:'short'}):'—';
 const keys=['id','title','body','original','originalSource','kind','createdAt','updatedAt','pinned','tags','history'];
-let client=null,user=null,notes=[],selected=null,query='',filter='all',dirty=new Set(),blocked=new Set(),timer=null,flushing=false,started=false,revision={},modalClose=null,loading=false,listTimer=null,pendingTimer=null,visibleLimit=80,lastFocusReload=0;
+let client=null,user=null,notes=[],selected=null,query='',filter='all',dirty=new Set(),blocked=new Set(),timer=null,flushing=false,started=false,revision={},modalClose=null,loading=false,listTimer=null,pendingTimer=null,visibleLimit=80,lastFocusReload=0,homeActive=true;
 function setStatus(s,busy=false){$('saveState').textContent=s;$('saveState').classList.toggle('busy',busy)}
 function toast(s){let el=$('toast');el.textContent=s;el.classList.remove('hide');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.add('hide'),3300)}
 function msg(s,error=false){const el=$('gateMessage');el.textContent=s;el.classList.toggle('error',error)}
@@ -67,7 +136,7 @@ async function connect(cfg){if(!/^https:\/\/[a-z0-9.-]+\.supabase\.co\/?$/i.test
  $('setupForm').classList.add('hide');$('loginForm').classList.remove('hide');msg('認証状態を確認しています…');
  client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){user=null;notes=[];selected=null;dirty.clear();blocked.clear();revision={};window.YOHAKU_BEATS?.onLogout?.();$('gate').classList.remove('hide');msg('ログアウトしました。');setStatus('未ログイン');}else if(session?.user&&(!user||user.id!==session.user.id)){setTimeout(()=>start(session.user),0)}});
  const {data,error}=await client.auth.getSession();if(error)msg('認証状態を確認できませんでした: '+error.message,true);else if(data.session?.user)await start(data.session.user);else msg('登録済みの場合は、メールアドレスとパスワードでログインしてください。');}
-async function start(u){if(loading)return;loading=true;user=u;msg('本人のノートを同期しています…');setStatus('同期中…',true);
+async function start(u){if(loading)return;loading=true;user=u;homeActive=true;msg('本人のノートを同期しています…');setStatus('同期中…',true);
  try{await reload(true);$('gate').classList.add('hide');msg('');window.YOHAKU_BEATS?.onLogin?.();setStatus(dirty.size?'未同期の編集あり':'同期済み',!!dirty.size);if(dirty.size)schedule();}
  catch(e){msg('クラウドから読み込めません: '+e.message+'\nテーブル設定とネット接続をご確認ください。',true);setStatus('同期できません',true)}finally{loading=false}}
 function pendingKey(){return `yohaku-pending-v2-${user?.id||'guest'}`}
@@ -98,20 +167,33 @@ function pushHistory(n){const last=n.history.at(-1);if(n.body&&(!last||Date.now(
 function change(field,value){let n=get();if(!n)return;if(field==='body'&&n.body!==value)pushHistory(n);if(field==='body'&&n.original===null&&value.trim().length)n.original=value;n[field]=value;n.updatedAt=now();mark(n);if(field==='title'||field==='body')scheduleSide();if(field==='body')count();}
 function count(){let n=get();$('wordcount').textContent=n?`${[...n.body].length}文字 · ${n.body.split('\n').length}行`:''}
 function scheduleSide(){clearTimeout(listTimer);listTimer=setTimeout(side,180)}
-function draw(){clearTimeout(listTimer);side();editor()}
+function mostRecentNote(){let latest=null,latestMs=-Infinity;for(const n of notes){const t=Date.parse(n.updatedAt||n.createdAt)||0;if(t>latestMs){latestMs=t;latest=n}}return latest}
+function updateHome(){
+ const latest=mostRecentNote();
+ $('homeView').classList.toggle('hide',!homeActive);
+ document.body.classList.toggle('yohaku-home',homeActive);
+ $('homeContinue').disabled=!latest;
+ $('homeContinueLabel').textContent=latest?(latest.title||'無題のメモ'):'まだストックがありません';
+ $('homeRecentTitle').textContent=latest?(latest.title||'無題のメモ'):'最近のストックはまだありません';
+ $('homeRecentPreview').textContent=latest?(latest.body.trim().slice(0,130)||'本文はまだありません'):'言葉を思いついたら、「言葉を書く」から始められます。';
+ $('homeCount').textContent='保存されているストック：'+notes.length+'件';
+ if(homeActive)$('crumbTitle').textContent='ホーム';
+}
+function showHome(){if(!user)return;homeActive=true;rememberPending();draw();if(innerWidth<650)window.scrollTo({top:0,behavior:'auto'})}
+function draw(){clearTimeout(listTimer);side();editor();updateHome()}
 function side(){const q=query.trim().toLowerCase();const arr=notes.filter(n=>(filter==='all'||filter==='pinned'&&n.pinned||filter==='free'&&n.kind==='フリースタイル'||filter==='fragment'&&n.kind!=='フリースタイル')&&(!q||[n.title,n.body,n.kind,...n.tags].join(' ').toLowerCase().includes(q))).sort((a,b)=>Number(b.pinned)-Number(a.pinned)||new Date(b.updatedAt)-new Date(a.updatedAt));
  $('visibleCount').textContent=`${arr.length} / ${notes.length} 件`;
  $('notesList').innerHTML=arr.length?arr.slice(0,visibleLimit).map(n=>`<button type="button" class="note-item ${n.id===selected?'selected':''}" data-note-id="${esc(n.id)}"><span class="note-top"><span class="note-title">${n.pinned?'✦ ':''}${esc(n.title||'無題のメモ')}</span><span class="note-date">${date(n.updatedAt)}</span></span><span class="note-preview">${esc(n.body.replace(/[\n\u2029]+/g,' ').slice(0,110)||'本文なし')}</span></button>`).join(''):'<div class="empty" style="padding:24px 5px;font-size:12px">メモはありません</div>';
  if(arr.length>visibleLimit)$('notesList').insertAdjacentHTML('beforeend',`<button type="button" class="bottom-btn list-more" data-show-more="1">さらに${Math.min(80,arr.length-visibleLimit)}件表示（全${arr.length}件）</button>`);
  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('active',x.dataset.filter===filter))}
-function editor(){const n=get();$('editorView').classList.toggle('hide',!n);$('emptyView').classList.toggle('hide',!!n);if(!n)return;
+function editor(){const n=get();$('editorView').classList.toggle('hide',homeActive||!n);$('emptyView').classList.toggle('hide',homeActive||!!n);if(!n||homeActive)return;
  $('crumbTitle').textContent=n.title||'無題のメモ';$('titleInput').value=n.title;$('bodyInput').value=n.body;
  $('noteNumber').textContent=/stock-(\d+)/.test(n.id)?'STOCK '+n.id.replace('stock-',''):'NEW NOTE';$('kindSelect').value=n.kind;
  $('pinButton').textContent=n.pinned?'✦ ピン留め中':'✧ ピン留めする';$('metaCreated').textContent='作成 '+full(n.createdAt);$('metaUpdated').textContent='更新 '+full(n.updatedAt);
  $('originalButton').disabled=n.original===null;$('originalButton').textContent=n.original===null?'原文なし':'初回の原文を表示';
  $('tagsList').innerHTML=n.tags.map((tag,i)=>`<span class="tag">${esc(tag)} <button type="button" data-remove-tag="${i}" aria-label="${esc(tag)}を削除">×</button></span>`).join('');count();window.YOHAKU_BEATS?.onNotesChanged?.();}
-function select(id){if(!notes.some(n=>n.id===id))return;selected=id;draw();if(innerWidth<650)scrollTo({top:0,behavior:'smooth'})}
-function create(t='',kind='断片',title=''){let n=norm({id:uid(),title:title||t.split('\n')[0].slice(0,24)||'無題のメモ',body:t,original:t||null,originalSource:'本人入力',kind,createdAt:now(),updatedAt:now()});notes.push(n);selected=n.id;filter='all';query='';$('search').value='';mark(n);draw();toast('クラウドへ保存します');if(!t)$('bodyInput').focus()}
+function select(id){if(!notes.some(n=>n.id===id))return;selected=id;homeActive=false;draw();if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})}
+function create(t='',kind='断片',title=''){let n=norm({id:uid(),title:title||t.split('\n')[0].slice(0,24)||'無題のメモ',body:t,original:t||null,originalSource:'本人入力',kind,createdAt:now(),updatedAt:now()});notes.push(n);selected=n.id;homeActive=false;filter='all';query='';$('search').value='';mark(n);draw();toast('クラウドへ保存します');if(!t)$('bodyInput').focus()}
 function openModal(title,body,buttons=[]){$('modalTitle').textContent=title;const c=$('modalContent');c.innerHTML='';if(typeof body==='string')c.textContent=body;else c.appendChild(body);const f=$('modalFoot');f.innerHTML='';for(let item of buttons.length?buttons:[{text:'閉じる',click:closeModal}]){const b=document.createElement('button');b.type='button';b.className=item.class||'secondary';b.textContent=item.text;b.onclick=item.click;f.appendChild(b)}$('modalShade').classList.remove('hide');$('modalShade').setAttribute('aria-hidden','false');modalClose=closeModal}
 function closeModal(){$('modalShade').classList.add('hide');$('modalShade').setAttribute('aria-hidden','true');modalClose=null}
 function dl(name,body,mime){const u=URL.createObjectURL(new Blob([body],{type:mime}));const a=document.createElement('a');a.href=u;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2500)}
@@ -142,6 +224,10 @@ function resolveConflicts(){
 function privacy(){openModal('保存とプライバシー','ログイン中の本人だけがリリックを表示できます。ノートはSupabaseのデータベースに保存され、所有者別のアクセス制御（RLS）で保護されます。公開サイトのファイルやGitHubには歌詞を保存しません。通信障害時の未同期の編集のみ、復旧用として端末のブラウザー内に残す場合があります。共用端末ではログアウトしてください。定期的にJSONバックアップも保管してください。AIによる作詞・補作・韻分析はありません。')}
 function handlers(){if(started)return;started=true;
  $('newButton').onclick=quick;$('newEmpty').onclick=quick;
+ $('homeButton').onclick=showHome;
+ $('homeWrite').onclick=()=>{create();if(innerWidth<650)$('editorView').scrollIntoView({block:'start',behavior:'auto'})};
+ $('homeContinue').onclick=()=>{const n=mostRecentNote();if(!n)return;select(n.id);$('bodyInput').focus({preventScroll:true})};
+ $('homeBeats').onclick=()=>window.YOHAKU_BEATS?.openShelf?.();
  $('search').oninput=e=>{query=e.target.value;visibleLimit=80;scheduleSide()};document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;visibleLimit=80;side()});
  $('notesList').onclick=e=>{if(e.target.closest('[data-show-more]')){visibleLimit+=80;side();return}const b=e.target.closest('[data-note-id]');if(b)select(b.dataset.noteId)};
  $('titleInput').oninput=e=>{change('title',e.target.value);$('crumbTitle').textContent=e.target.value||'無題のメモ'};
