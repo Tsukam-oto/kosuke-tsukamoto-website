@@ -339,7 +339,7 @@ function openDeepReading(id){
  const a=window.LyricCloseReading.analyze(w,works());
  const intro='<div class="deep-intro"><div class="eyebrow">CLOSE READING / 読みの仮説</div><h2>《'+esc(w.title)+'》を読み解く</h2>'+
  '<p>言葉の出現を数えるだけでなく、<strong>どの位置に置かれ、前後で何が変わるか</strong>を読みます。観察・仮説・別の読みを区別します。</p>'+
- '<div class="deep-actions"><button class="btn sm" data-open="'+esc(w.id)+'">原文を読む</button><button class="btn sm" id="closeDrawer">閉じる</button></div></div>';
+ '<div class="deep-actions"><button class="btn sm" data-open="'+esc(w.id)+'">原文を読む</button></div></div>';
  const structure='<section class="deep-section"><div class="eyebrow">01 / STRUCTURE</div><h3>冒頭と結末の距離</h3>'+
  '<div class="deep-two-col">'+deepColumn('冒頭',a.opening,'冒頭なし',false)+deepColumn('結末',a.ending,'結末なし',false)+'</div>'+
  '<p class="deep-question">読みの問い：冒頭の状況は、結末で解決されているでしょうか。それとも意味が変わり、あるいは答えないまま残されていますか。</p></section>';
@@ -355,19 +355,28 @@ function openDeepReading(id){
  '<span class="deep-pill">異なる解釈</span><p>'+esc(r.alternative)+'</p></article>').join(''):
  '<div class="deep-reading-card"><h4>この作品の仮説は、まだ登録されていません。</h4>'+
  '<p>人称や反復の観察から、ご自身の読みを記録できます。AIが作者の意図を確定することはありません。</p></div>')+'</section>';
- const relations='<section class="deep-section"><div class="eyebrow">04 / CROSS-WORK READING</div><h3>ほかの作品と読み比べる</h3>'+
+
+ const dialogue='<section class="deep-section"><div class="eyebrow">04 / LITERARY DIALOGUE</div><h3>異なる作品が対話するところ</h3>'+
+ '<p class="desc">共通語だけでは見つけにくい対照・緊張関係を、双方の原文に根拠がある場合だけ表示します。これは読み手が検討する仮説であり、制作意図や直接の影響関係ではありません。</p>'+
+ (a.dialogues.length?a.dialogues.map(d=>'<article class="deep-reading-card"><h4>'+esc(d.title)+'</h4>'+
+ '<div class="deep-two-col">'+deepColumn('《'+esc(w.title)+'》',d.here,'—',false)+deepColumn('《'+esc(d.otherTitle)+'》',d.there,'—',false)+'</div>'+
+ '<span class="deep-pill">関係を読む仮説</span><p>'+esc(d.reading)+'</p>'+
+ '<span class="deep-pill">別の読み</span><p>'+esc(d.alternative)+'</p>'+
+ '<button class="btn sm" data-deep-work="'+esc(d.otherId)+'">比較作品を精読する</button></article>').join(''):
+ '<p class="desc">この作品について、原文で確認できた対話候補はまだありません。無関係という意味ではありません。</p>')+'</section>';
+ const relations='<section class="deep-section"><div class="eyebrow">05 / CROSS-WORK READING</div><h3>ほかの作品と読み比べる</h3>'+
  (a.cross.length?a.cross.map(x=>'<article class="deep-cross"><h4>《'+esc(x.title)+'》</h4>'+
  x.topics.slice(0,2).map(t=>'<div class="deep-cross-block"><b>'+esc(t.label)+'：'+esc(t.words.join('・'))+'</b>'+
  '<div class="deep-two-col">'+deepColumn('この作品',t.here?[t.here]:[],'—',false)+deepColumn('比較作品',t.there?[t.there]:[],'—',false)+'</div></div>').join('')+
  '<button class="btn sm" data-deep-work="'+esc(x.id)+'">この作品も深く読む</button></article>').join(''):
  '<p class="desc">現在の空にある作品間で、今回の比較条件を満たす候補はありません。</p>')+
  '<p class="desc">ここは語句や場面の共通性を示します。「同じテーマ」「影響関係がある」と断定していません。名義の異なる空の作品は混ぜません。</p></section>';
- const note='<section class="deep-section deep-personal-note"><div class="eyebrow">05 / YOUR INTENT</div><h3>制作した本人の意図は、別の記録として</h3>'+
+ const note='<section class="deep-section deep-personal-note"><div class="eyebrow">06 / YOUR INTENT</div><h3>制作した本人の意図は、別の記録として</h3>'+
  '<p class="desc">上の観察や仮説と、ご自身の制作意図を混同しないためのメモ欄です。ここに書いた内容をAIの結論として扱いません。</p>'+
  '<div class="note-box"><textarea id="noteText" placeholder="当時考えていたこと／読みとして違うと思った点／別の読みなど。">'+esc(db.notes[w.id]||'')+'</textarea>'+
  '<div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="'+esc(w.id)+'">本人メモを保存</button></div></div></section>';
  $('#drawer').innerHTML='<div class="drawer-top"><span class="eyebrow">EVIDENCE FIRST</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div>'+
- '<div class="deep-read">'+intro+structure+language+readings+relations+note+
+ '<div class="deep-read">'+intro+structure+language+readings+dialogue+relations+note+
  '<p class="deep-disclaimer">'+esc(a.caution)+' 分析対象は現在この画面で読み込んでいる作品で、原文は一切変更していません。</p></div>';
  $('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');
  $('#drawer').scrollTop=0;
