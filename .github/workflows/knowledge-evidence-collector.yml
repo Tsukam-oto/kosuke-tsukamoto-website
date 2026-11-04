@@ -57,7 +57,7 @@ jobs:
               -f sha="$SHA" \
               -f content="$CONTENT" \
               -f branch="main" \
-              -f message="Refresh unverified source candidates [skip ci]" >/dev/null; then
+              -f message="Refresh unverified source candidates" >/dev/null; then
               echo "Candidate ledger published"
               exit 0
             fi
