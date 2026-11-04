@@ -45,6 +45,9 @@ jobs:
       - name: Block unverifiable or unauthorized output before publishing
         run: python chi-no-toshokan/research/validate_public.py
 
+      - name: Check research screen rendering and safe links
+        run: node chi-no-toshokan/research/test_dossiers_ui.cjs
+
       - name: Publish only the candidate ledger and unverified research sheets
         env:
           GH_TOKEN: ${{ github.token }}
