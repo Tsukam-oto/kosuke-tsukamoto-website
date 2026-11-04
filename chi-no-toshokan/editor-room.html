@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#193e32">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="description" content="知の図書館：教員・作曲家のAI活用実践を本人専用で記録し、発信候補へ育てる編集室。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self';script-src 'self' https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src 'self' https://fonts.gstatic.com;connect-src 'self' https://nroyxwozdxwnrqyierjx.supabase.co wss://nroyxwozdxwnrqyierjx.supabase.co;img-src 'self' data:;object-src 'none';base-uri 'none';upgrade-insecure-requests">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./editor-room.css">
+<title>知の図書館｜AI実践と発信の編集室</title>
+<script defer src="./editor-room.js"></script>
+</head><body>
+<header class="header"><a href="./" class="brand">◈ 知の図書館</a><span>編集室｜本人専用</span><a href="./research-dossiers.html">研究の調査票</a></header>
+<main class="wrap">
+<section class="intro"><div class="kicker">PRIVATE EDITORIAL STUDIO · AI WORK LOG</div>
+<h1>仕事で試したことを、<wbr>伝えられる知識に。</h1>
+<p>教員・作曲家としての日々の仕事や創作で、AIをどう使い、何が変わったか。失敗も含めて記録し、noteの記事や教材・ツールの発信候補へ育てる非公開の編集室です。</p></section>
+<section class="privacy" aria-label="公開と取り扱いの注意"><strong>学校の内部資料や生徒・保護者の個人情報は入力しないでください。</strong>
+学年・クラス・氏名・メールアドレス・非公開の録音・評価・名簿などは、ここへ貼り付けず、一般化した仕事内容と手順だけを記録します。記録はnoteへ自動投稿されません。最終的な公開判断は別に必要です。</section>
+<section class="auth" id="auth-status" role="status" aria-live="polite">ログイン状態を確認しています。</section>
+<section id="private-app" hidden>
+ <div class="stats" aria-label="編集候補の記録状況"><div><strong id="total-count">0</strong><span>非公開の記録</span></div><div><strong id="candidate-count">0</strong><span>記事候補</span></div><div><strong id="published-count">0</strong><span>公開後の記録</span></div></div>
+ <div class="columns">
+  <section class="writing-panel" aria-labelledby="editor-title">
+   <div class="panel-head"><h2 id="editor-title">実践を残す</h2><button class="text-button" type="button" id="new-entry">新しく記録</button></div>
+   <form id="editor-form">
+    <input type="hidden" id="record-id">
+    <label for="kind">どの活動から生まれた記録ですか</label>
+    <select id="kind"><option value="education">音楽教育・授業研究</option><option value="workflow">AI活用・ICT・校務改善</option><option value="composition">作曲・編曲・録音</option><option value="research">知の図書館・知識探究</option></select>
+    <label for="title">テーマ</label><input id="title" required maxlength="150" placeholder="例：鑑賞授業の準備をAIとどう改善したか">
+    <label for="problem">出発点：何に困った／何を実現したかったか</label><textarea id="problem" rows="3" maxlength="5000" placeholder="個人情報や学校の内部文書は貼り付けず、課題を一般化して記録"></textarea>
+    <label for="ai-method">AIをどう使ったか：指示、役割分担、試行</label><textarea id="ai-method" rows="4" maxlength="7000" placeholder="どんな依頼・確認・修正を行ったか。成功した指示だけでなく試行錯誤も"></textarea>
+    <label for="result">実際の結果：成功、失敗、未確認</label><textarea id="result" rows="3" maxlength="6000" placeholder="何が改善したか。未検証なら未検証と明記"></textarea>
+    <label for="lesson">他の人が再現するときの要点</label><textarea id="lesson" rows="3" maxlength="5000" placeholder="手順、注意点、次回改善したい点"></textarea>
+    <label for="sources">参考資料・実装リンク（任意）</label><textarea id="sources" rows="2" maxlength="5000" placeholder="公開できるURL・資料名のみ"></textarea>
+    <label for="stage">編集上の段階</label>
+    <select id="stage"><option value="seed">記録・素材</option><option value="candidate">記事化候補</option><option value="draft">原稿確認中</option><option value="published">公開後の記録</option></select>
+    <label for="public-url">公開済み記事URL（任意）</label><input id="public-url" type="url" maxlength="500" placeholder="公開したときだけ記入">
+    <div class="form-actions"><button type="submit" class="primary" id="save-entry">非公開で保存する</button><button type="button" id="copy-brief" class="secondary">AI記事化ブリーフをコピー</button></div>
+    <div class="form-actions secondary-actions"><button type="button" id="delete-entry" class="danger" hidden>この記録を削除</button><button type="button" id="reload">クラウドから再読込</button></div>
+   </form>
+  </section>
+  <section class="library-panel" aria-labelledby="list-title">
+   <div class="panel-head"><h2 id="list-title">非公開の素材箱</h2></div>
+   <input type="search" id="filter" aria-label="実践記録を検索" placeholder="テーマや工夫を検索">
+   <div class="chips" aria-label="記録の表示条件" role="group"><button type="button" data-filter="all" aria-pressed="true">すべて</button><button type="button" data-filter="seed" aria-pressed="false">素材</button><button type="button" data-filter="candidate" aria-pressed="false">記事候補</button><button type="button" data-filter="draft" aria-pressed="false">原稿確認中</button><button type="button" data-filter="published" aria-pressed="false">公開済み</button></div>
+   <div id="entry-list" class="entry-list"></div>
+   <section class="workflow-tip"><h3>noteをAI中心で運営するための流れ</h3><p>①実践を残す → ②AIに記事化ブリーフを渡す → ③事実・出典・学校情報を確認 → ④原稿を確認して投稿 → ⑤反応と改善を記録。</p><p>現段階では、<strong>ChatGPTの会話を自動で読み取ったり、noteに自動投稿したりはしません。</strong>選んだ記録から、本人の操作で記事化ブリーフを作ります。</p></section>
+  </section>
+ </div>
+</section>
+<footer><a href="./">知の図書館に戻る</a><span>データは既存の認証付きクラウド記録に保存し、公開リポジトリには保存しません。保存・読み戻しの実機確認は別途必要です。</span></footer>
+</main></body></html>
