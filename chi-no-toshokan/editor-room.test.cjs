@@ -13,6 +13,9 @@ check('mobile viewport',html.includes('viewport-fit=cover'));
 check('mobile layout breakpoint',css.includes('@media(max-width:770px)'));
 check('quick memo mobile entry',html.includes('id="quick-text"')&&html.includes('id="quick-save"')&&css.includes('.quick-controls'));
 check('quick memo saved as private note',src.includes("async function saveQuick()")&&src.includes("kind:'note'")&&src.includes("stage:'seed'"));
+check('article body remains in private app',html.includes('id="article-body"')&&html.includes('id="article-count"')&&html.indexOf('id="article-body"')>html.indexOf('id="private-app" hidden'));
+check('copying a draft is manual',html.includes('id="copy-article"')&&src.includes("clipboard.writeText(text)"));
+check('length guidelines are explicitly non-binding',magSrc.includes('字数より内容を優先')&&magSrc.includes('公式が保証した最適文字数ではありません'));
 check('magazine config is included',html.includes('src="./editor-magazines.js"'));
 check('magazine control and planner are mobile-ready',html.includes('id="magazine"')&&html.includes('id="cadence-output"')&&css.includes('.magazine-list')&&css.includes('scroll-snap-type:x'));
 check('noindex for private management',html.includes('noindex,nofollow,noarchive'));
@@ -38,6 +41,8 @@ const win={confirm(){consented=true;return true},prompt(){prompted=true},matchMe
 const navigator={clipboard:{async writeText(value){copied=value}}};
 vm.runInNewContext(magSrc,{window:win,Object},{timeout:5000});
 check('five distinct magazines',win.EDITOR_MAGAZINES.magazines.length===5);
+check('three article formats',win.EDITOR_MAGAZINES.formats.length===3);
+check('short/standard/feature targets',win.EDITOR_MAGAZINES.formats.map(x=>x.min).join(',')==='800,1500,3000');
 check('7-day rotation totals 7',win.EDITOR_MAGAZINES.weeklyPlan.length===7&&win.EDITOR_MAGAZINES.magazines.reduce((a,b)=>a+b.weeklyGoal,0)===7);
 create('drafts-per-week').value='10';
 create('ready-percent').value='50';
@@ -46,6 +51,12 @@ const source=src.replace(/\ninit\(\);\nwindow\.EDITOR_DEBUG=/,'\nwindow.EDITOR_D
 check('test runner removes only automatic auth initialization',source!==src);
 vm.runInNewContext(source,{window:win,document:doc,navigator,URL,Date,Math,setTimeout,clearTimeout,console},{timeout:5000});
 check('editorial prompt exists',typeof win.EDITOR_DEBUG.makePrompt==='function');
+check('new manuscript controls initialized',!!create('format').innerHTML&&!!create('article-range').textContent);
+create('article-body').value='業務改善でAIを使いました。これはまだ実証していません。';
+create('article-body').handlers.input();
+check('live article length working',create('article-count').textContent.includes('字')&&create('article-count').textContent!=='0字');
+check('length heuristic does not approve source accuracy',create('editor-lint').innerHTML.includes('事実の正確性'));
+
 check('all five magazine cards rendered',(create('magazine-list').innerHTML.match(/magazine-card/g)||[]).length===5);
 check('real weekly forecast is labelled hypothetical',create('cadence-output').innerHTML.includes('5本／週')&&create('cadence-output').innerHTML.includes('試算'));
 const script=win.EDITOR_DEBUG.makePrompt({
@@ -54,6 +65,7 @@ const script=win.EDITOR_DEBUG.makePrompt({
 });
 check('source context preserved',script.includes('鑑賞サイトの改善')&&script.includes('テストは未完了'));
 check('magazine-aware prompt',script.includes('対象マガジン：音楽の授業をつくる')&&script.includes('指導要領'));
+check('brief prioritizes natural readable prose over fixed template',script.includes('均一な箇条書き')&&script.includes('適切な段落'));
 check('no fabricated experience policy',script.includes('創作しない'));
 check('citations requested in editorial prompt',script.includes('要出典・要確認'));
 check('school privacy gate on prompt',script.includes('学校の内部資料')&&script.includes('個人情報'));
@@ -67,11 +79,14 @@ create('lesson').value='確認手順を残す';
 create('stage').value='seed';
 create('sources').value='';
 create('public-url').value='';
+create('format').value='standard';
+create('article-body').value='授業で試したことを記録する。';
 (async()=>{
  await create('copy-brief').handlers.click();
  check('copy is only triggered after confirmation',consented);
  check('copy gives ChatGPT editorial-ready prompt',copied.includes('note記事の下書き'));
  check('copy retains unverified result',copied.includes('検証中'));
+ check('magazine style uses flexible word counts',copied.includes('1500〜2500字')&&!copied.includes('2,000〜3,000字'));
  check('no accidental external upload during copy',!prompted);
  console.log('Editorial room smoke PASS:',checks,'checks');
 })().catch(e=>{console.error(e);process.exitCode=1});
