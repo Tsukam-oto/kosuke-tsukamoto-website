@@ -45,7 +45,7 @@ function searchWorks(works,query,themeId,limit=40){
  if(q)found=found.filter(w=>(String(w.title)+' '+String(w.lyrics)+' '+String(w.collection||'')).normalize('NFKC').toLowerCase().includes(q));
  const rows=found.map(w=>({work:w,observed:target?observe(w,target):null})).filter(x=>!target||x.observed.score);
  rows.sort((a,b)=>target?b.observed.score-a.observed.score||b.observed.matchedLines-a.observed.matchedLines||String(a.work.title).localeCompare(String(b.work.title),'ja'):
-  (Number(a.work.trackNo)||0)-(Number(b.work.trackNo)||0)||String(a.work.title).localeCompare(String(b.work.title),'ja'));
+  (Number(a.work.originalBookIndex)??99999)-(Number(b.work.originalBookIndex)??99999)||String(a.work.title).localeCompare(String(b.work.title),'ja'));
  const count=rows.length;
  return {count,rows:rows.slice(0,limit),theme:target,query:q};
 }
@@ -67,5 +67,32 @@ function verify(source,passages,connections,works){
  }
  return {passages:acceptedPassages,connections:acceptedConnections,discarded};
 }
-root.MummyResearch={THEMES,lines,observe,analyze,searchWorks,verify};
+
+/* Source-version validated, fully independent lyrics readings. No essay required. */
+function verifySongs(readings,dialogues,works){
+ const songs=new Map((works||[]).filter(w=>w.sky==='rap'&&w.sourceSystem==='lyric_master')
+   .map(w=>[String(w.id).replace(/^master-/,''),w]));
+ const accepted=[],pairs=[];let discarded=0;
+ for(const r of readings||[]){
+  const w=songs.get(r.work_id);
+  if(!w||Number(w.sourceVersionNo)!==Number(r.source_version_no)||
+     !w.lyrics.includes(r.evidence_a)||!w.lyrics.includes(r.evidence_b)){discarded++;continue;}
+  const hitA=lines(w.lyrics).find(x=>x.text.includes(r.evidence_a));
+  const hitB=lines(w.lyrics).find(x=>x.text.includes(r.evidence_b));
+  if(!hitA||!hitB){discarded++;continue;}
+  accepted.push({...r,work:w,verifiedLineA:hitA.number,verifiedLineB:hitB.number});
+ }
+ for(const c of dialogues||[]){
+  const a=songs.get(c.work_a_id),b=songs.get(c.work_b_id);
+  if(!a||!b||Number(a.sourceVersionNo)!==Number(c.version_a)||
+    Number(b.sourceVersionNo)!==Number(c.version_b)||
+    !a.lyrics.includes(c.evidence_a)||!b.lyrics.includes(c.evidence_b)){discarded++;continue;}
+  const la=lines(a.lyrics).find(x=>x.text.includes(c.evidence_a));
+  const lb=lines(b.lyrics).find(x=>x.text.includes(c.evidence_b));
+  if(!la||!lb){discarded++;continue;}
+  pairs.push({...c,workA:a,workB:b,lineA:la.number,lineB:lb.number});
+ }
+ return {readings:accepted,dialogues:pairs,discarded,studiedCount:new Set(accepted.map(x=>x.work_id)).size};
+}
+root.MummyResearch={THEMES,lines,observe,analyze,searchWorks,verify,verifySongs};
 })(typeof window!=='undefined'?window:globalThis);
