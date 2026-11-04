@@ -88,7 +88,7 @@ function repeats(lines){
  .map(a=>({text:a[0].text,count:a.length,lines:a.map(x=>x.number)}));
 }
 function questionLines(lines){
- const re=/[？?]|どうして|なぜ|なんで|どこに|どんな|誰なの|だろうか|でしょうか|ますか[？?]?|のかな/;
+ const re=/[？?]|どうして|なぜ|なんで(?!も)|どこに|誰なの|だろうか|でしょうか|のかな/;
  return lines.filter(x=>re.test(x.text)).slice(0,8);
 }
 function motifs(lines){
