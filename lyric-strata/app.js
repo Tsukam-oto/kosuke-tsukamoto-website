@@ -10,6 +10,7 @@ let draftReadings=[],draftReadingLoadError='';
 let crossReadings=[],crossLoadError='',crossTopic='all',crossTerm='',crossLimit=15;
 let crossOpenSerial=0;
 let readingPaths=[],readingPathsLoadError='',selectedReadingPath='morning-promise';
+let readingChallenges=[],readingChallengesLoadError='';
 let compareLeft='',compareRight='',compareSerial=0,songReadingRecords=[];
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -374,7 +375,7 @@ async function loadReadingPaths(){
  if(!user){readingPaths=[];readingPathsLoadError='';return;}
  try{
   const {data:rows,error}=await client().from('lyric_close_reading_paths')
-   .select('thread_key,title,guiding_question,core_hypothesis,formal_mechanism,central_tension,counterreading,inference_limit,next_inquiry,anchors,assessment_status')
+   .select('thread_key,title,guiding_question,core_hypothesis,formal_mechanism,central_tension,counterreading,inference_limit,next_inquiry,anchors,assessment_status,refined_hypothesis,refinement_note')
    .eq('user_id',user.id).limit(100);
   if(error)throw error;
   readingPaths=Array.isArray(rows)?rows:[];readingPathsLoadError='';
@@ -387,6 +388,54 @@ function readingPathSource(a){
  if(!source)return null;
  return {...source,technique:a.technique||'',observation:a.observation||'',sourceVersion:a.source_version??null};
 }
+
+const CHALLENGE_KIND_NAMES={
+ contradicts:'従来の読みへの反論',
+ narrows:'適用範囲を狭める',
+ reframes:'問いの立て方を変える',
+ unresolved:'まだ判断できない'
+};
+async function loadReadingChallenges(){
+ if(!user){readingChallenges=[];readingChallengesLoadError='';return;}
+ try{
+  const {data:rows,error}=await client().from('lyric_reading_challenges')
+   .select('challenge_key,thread_key,challenge_kind,work_id,entry_id,evidence,challenged_assumption,observation,revised_reading,alternative,limit_note,quoted_source_version,assessment_status')
+   .eq('user_id',user.id).limit(300);
+  if(error)throw error;
+  readingChallenges=Array.isArray(rows)?rows:[];readingChallengesLoadError='';
+ }catch(e){readingChallenges=[];readingChallengesLoadError=e.message||'取得エラー';}
+}
+function challengeSource(c){
+ if(!c||!c.evidence||!!c.work_id===!!c.entry_id)return null;
+ return crossDoc({left_work_id:c.work_id||null,left_entry_id:c.entry_id||null,evidence_left:c.evidence},'left');
+}
+function challengeCard(c){
+ const source=challengeSource(c);
+ if(!source)return '<article class="reading-challenge reading-challenge-unavailable"><p>資料の原文または引用に不一致があります。再照合が必要です。</p></article>';
+ return '<article class="reading-challenge">'+
+ '<header><div><span class="reading-challenge-source">'+esc(source.kind)+'</span><h5>《'+esc(source.title)+'》</h5></div>'+
+ '<small>'+esc(CHALLENGE_KIND_NAMES[c.challenge_kind]||'再検討')+'</small></header>'+
+ '<blockquote>'+esc(source.quote)+'</blockquote>'+
+ '<dl><dt>問い直す従来の前提</dt><dd>'+esc(c.challenged_assumption)+'</dd>'+'<dt>原文に見えること</dt><dd>'+esc(c.observation)+'</dd>'+
+ '<dt>この反例で修正すること</dt><dd>'+esc(c.revised_reading)+'</dd>'+
+ '<dt>反論・留保</dt><dd>'+esc(c.alternative)+'</dd>'+
+ '<dt>決めつけないこと</dt><dd>'+esc(c.limit_note)+'</dd></dl>'+
+ '<div class="reading-challenge-footer">'+crossAction(source)+'</div></article>';
+}
+function challengePanel(path){
+ if(readingChallengesLoadError)return '<p class="muted">反例を取得できませんでした：'+esc(readingChallengesLoadError)+'</p>';
+ const tests=readingChallenges.filter(c=>c.thread_key===path.thread_key);
+ const shown=tests.filter(c=>challengeSource(c));
+ return '<section class="reading-refutation">'+
+ '<div class="reading-refutation-intro"><h4>反例を通して、読み直す。</h4><p>反例は既存の読みを否定するためだけではありません。どの部分を守り、どの前提を変えるかを原文とともに確かめます。</p></div>'+
+ (path.refined_hypothesis?'<div class="reading-refined"><strong>反例後の仮説</strong><p>'+esc(path.refined_hypothesis)+'</p>'+
+ (path.refinement_note?'<small>'+esc(path.refinement_note)+'</small>':'')+'</div>':'')+
+ '<details class="reading-initial"><summary>初回の仮説と照らし合わせる</summary><p>'+esc(path.core_hypothesis)+'</p></details>'+
+ '<p class="reading-challenge-count">この問いの反例 '+shown.length+'件'+(tests.length!==shown.length?'（うち'+(tests.length-shown.length)+'件は出典の再照合が必要）':'')+'</p>'+
+ '<div class="reading-challenge-grid">'+(tests.map(challengeCard).join('')||'<p class="muted">まだ反例の精読がありません。</p>')+'</div>'+
+ '</section>';
+}
+
 function readPathEvidence(a){
  const d=readingPathSource(a);
  if(!d)return '<article class="reading-path-evidence unavailable"><p>出典の原文または引用を確認できません。この箇所は表示対象外です。</p></article>';
@@ -405,8 +454,8 @@ function readingPathsPanel(){
  const evidence=Array.isArray(active.anchors)?active.anchors:[];
  const valid=evidence.filter(a=>readingPathSource(a));
  const sections=[
-  ['読みの中心',active.core_hypothesis],['歌詞の書き方・構造',active.formal_mechanism],
-  ['同時に残る矛盾',active.central_tension],['この読みへの反例',active.counterreading],
+  ['歌詞の書き方・構造',active.formal_mechanism],
+  ['初回から残る矛盾',active.central_tension],['初回に挙げた別解',active.counterreading],
   ['決めつけてはいけないこと',active.inference_limit]
  ];
  return '<section class="reading-paths">'+
@@ -415,13 +464,13 @@ function readingPathsPanel(){
  '<button type="button" class="'+(p.thread_key===selectedReadingPath?'active':'')+'" data-read-path="'+esc(p.thread_key)+'" aria-pressed="'+(p.thread_key===selectedReadingPath)+'">'+
  '<span>0'+(i+1)+'</span>'+esc(p.title)+'</button>').join('')+'</nav>'+
  '<div class="reading-path-active"><p class="reading-path-brow">問いの精読 ／ '+valid.length+'件の根拠</p>'+
- '<h3>'+esc(active.title)+'</h3><p class="reading-path-question">'+esc(active.guiding_question)+'</p>'+
+ '<h3>'+esc(active.title)+'</h3><p class="reading-path-question">'+esc(active.guiding_question)+'</p>'+challengePanel(active)+
  '<div class="reading-path-body">'+sections.map(([label,text],i)=>
  '<section class="'+(i===3?'reading-path-counter':'')+'"><h4>'+esc(label)+'</h4><p>'+esc(text)+'</p></section>').join('')+'</div>'+
  '<h4 class="reading-path-evidence-title">根拠となる作品・原文</h4>'+
  '<div class="reading-path-sources">'+(valid.map(readPathEvidence).join('')||'<p>出典の照合が必要です。</p>')+'</div>'+
  '<div class="reading-path-next"><strong>次に考える問い</strong><p>'+esc(active.next_inquiry)+'</p></div>'+
- '<p class="reading-path-note">全引用は非公開データベースの現在の保存原文と照合済みです。ただし、木乃伊のPDF抽出本文は原本との校正前です。歌詞の語り手と実在の作者は同一視しません。</p>'+
+ '<p class="reading-path-note">原文引用は保存時点で照合済みです。後から歌詞本文を変更した場合は、原文を開いて再確認が必要です。木乃伊のPDF抽出本文は原本との校正前です。歌詞の語り手と実在の作者は同一視しません。</p>'+
  '</div></section>';
 }
 function renderReadingPaths(){
@@ -553,7 +602,7 @@ async function openCrossWork(id){
   if(error)throw error;
   if(serial!==crossOpenSerial||modal.classList.contains('hidden')||!user)return;
   if(!record){meta.textContent='原文がありません。';return;}
-  const relevant=[...crossReadings.flatMap(r=>r.left_work_id===id?[r.evidence_left]:r.right_work_id===id?[r.evidence_right]:[]),...readingPaths.flatMap(p=>(p.anchors||[]).filter(a=>a&&a.kind==='work'&&a.source_id===id).map(a=>a.quote))];
+  const relevant=[...crossReadings.flatMap(r=>r.left_work_id===id?[r.evidence_left]:r.right_work_id===id?[r.evidence_right]:[]),...readingPaths.flatMap(p=>(p.anchors||[]).filter(a=>a&&a.kind==='work'&&a.source_id===id).map(a=>a.quote)),...readingChallenges.filter(c=>c.work_id===id).map(c=>c.evidence)];
   const n=relevant.filter(q=>record.literal_text.includes(q)).length;
   meta.textContent=(w.sky==='rap'?'木乃伊・PDF抽出原文（未校正）':w.sky==='choir'?'合唱・詩':'個人作品')+
    ' ／ 保存本文 v'+record.version_no+' ／ 関連する引用 '+n+'/'+relevant.length+'件を現在の本文で再照合';
@@ -600,7 +649,7 @@ async function cloudLoad(){
    else if(!old.dirty){Object.assign(old,row,{synced:true,dirty:false});}
   }
   if(extra||remote?.length){readingReportCache=null;save();}
-  await Promise.all([loadMasterCandidates(),loadDraftReadings(),loadCrossReadings(),loadSongReadingRecords(),loadReadingPaths()]);
+  await Promise.all([loadMasterCandidates(),loadDraftReadings(),loadCrossReadings(),loadSongReadingRecords(),loadReadingPaths(),loadReadingChallenges()]);
   toast('クラウドから '+(remote?.length||0)+'件を確認、新規 '+extra+'件を追加しました。');
  }catch(e){toast('クラウド読み込み失敗：'+(e.message||e));}finally{syncing=false;render();}
 }
@@ -639,7 +688,7 @@ async function authSubmit(e){
 async function authClick(){
  if(!user){authModal(true);return;}
  if(!confirm('ログアウトしますか？ この端末に残した原文は削除されません。'))return;
- try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';crossReadings=[];crossLoadError='';readingPaths=[];readingPathsLoadError='';songReadingRecords=[];compareLeft='';compareRight='';++compareSerial;closeCrossSource();if($('compareOutput'))$('compareOutput').replaceChildren();if($('crossOutput'))$('crossOutput').replaceChildren();render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
+ try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';crossReadings=[];crossLoadError='';readingPaths=[];readingPathsLoadError='';readingChallenges=[];readingChallengesLoadError='';songReadingRecords=[];compareLeft='';compareRight='';++compareSerial;closeCrossSource();if($('compareOutput'))$('compareOutput').replaceChildren();if($('crossOutput'))$('crossOutput').replaceChildren();render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
 }
 async function initSession(){
  try{const {data:r,error}=await client().auth.getSession();if(error)throw error;if(r.session?.user){user=r.session.user;await cloudLoad();}else render();}catch(e){render();console.warn('Auth unavailable',e);}

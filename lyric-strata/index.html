@@ -168,6 +168,40 @@
 .reading-path-note{color:#98909c;font-size:10px;line-height:1.8;margin:20px 0 0}
 @media(max-width:700px){.reading-paths-heading{padding:16px}.reading-path-tabs{padding:10px;grid-template-columns:1fr;gap:6px}.reading-path-active{padding:18px 13px}.reading-path-active>h3{font-size:20px}.reading-path-body,.reading-path-sources{grid-template-columns:1fr}.reading-path-body section:first-child{grid-column:span 1}}
 
+
+.reading-refutation{margin:20px 0 25px;border:1px solid #ddd5e2;border-radius:14px;overflow:hidden;background:#fbfafc}
+.reading-refutation-intro{padding:18px 18px 13px;border-bottom:1px solid #e7e0ea}
+.reading-refutation-intro h4{font-size:16px;line-height:1.5;margin:0 0 6px;font-weight:800;color:#39313c}
+.reading-refutation-intro p{font-size:12px;line-height:1.9;margin:0;color:#6e6474}
+.reading-refined{padding:18px 20px;background:#fff;border-bottom:1px solid #e6e0e8}
+.reading-refined strong{display:block;font-size:12px;font-weight:800;color:#665170;margin-bottom:8px}
+.reading-refined p{font-size:14px;line-height:2.05;color:#35303c;margin:0}
+.reading-refined small{display:block;margin-top:12px;font-size:11px;line-height:1.9;color:#756b79}
+.reading-initial{padding:12px 20px;border-bottom:1px solid #e6e0e8;font-size:12px}
+.reading-initial summary{cursor:pointer;color:#665c70;font-weight:650;line-height:1.8;outline-offset:3px}
+.reading-initial p{font-size:12px;line-height:2;color:#625a69;margin:10px 0}
+.reading-challenge-count{margin:17px 18px 10px;font-size:12px;font-weight:700;color:#5d4e66}
+.reading-challenge-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 17px 19px}
+.reading-challenge{min-width:0;border:1px solid #e5deea;border-radius:12px;background:#fff;padding:15px;display:flex;flex-direction:column}
+.reading-challenge header{display:flex;justify-content:space-between;align-items:start;gap:10px}
+.reading-challenge h5{font-size:13px;font-weight:760;line-height:1.65;margin:3px 0 0;overflow-wrap:anywhere;color:#40374a}
+.reading-challenge-source{font-size:10px;color:#918497}
+.reading-challenge header small{font-size:10px;line-height:1.75;text-align:right;color:#7a657e;flex:0 0 95px}
+.reading-challenge blockquote{border-left:3px solid #ab96b5;padding:10px 10px 10px 13px;margin:12px 0;background:#fbf9fc;white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:1.85;color:#463d4d}
+.reading-challenge dl{margin:0;flex:1}
+.reading-challenge dt{font-size:10px;font-weight:800;margin-top:12px;color:#766780}
+.reading-challenge dd{font-size:12px;line-height:1.9;margin:4px 0 0;color:#4f4656;overflow-wrap:anywhere}
+.reading-challenge-footer{margin-top:17px}
+.reading-challenge-footer .btn{font-size:11px}
+.reading-challenge-unavailable{color:#665d69;font-size:12px}
+@media(max-width:700px){
+ .reading-challenge-grid{grid-template-columns:1fr;padding:0 10px 12px}
+ .reading-refutation-intro,.reading-refined{padding:15px}
+ .reading-initial{padding:11px 15px}
+ .reading-challenge-count{margin:14px 11px 10px}
+ .reading-challenge{padding:13px}
+ .reading-challenge header small{flex-basis:90px}
+}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -185,7 +219,7 @@
 <button type="button" data-view="discovery">作品とのつながり</button>
 <button type="button" data-view="cross">作品を横断して読む</button>
 </div>
-<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.3</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
+<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.4</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><div class="stat"><b id="countReadings">—</b><small>原文に沿った初回精読</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
 <div class="toolbar"><input id="search" class="search" type="search" placeholder="言葉・作品名を探す" aria-label="検索"><select id="skyFilter" class="filter" aria-label="創作名義"><option value="all">すべての名義</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option><option value="unassigned">未分類</option></select><button class="btn dark" data-view="import">＋ 回収する</button></div>
