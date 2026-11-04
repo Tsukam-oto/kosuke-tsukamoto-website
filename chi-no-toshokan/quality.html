@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#17392f">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'none'; img-src 'self' data:; object-src 'none'; base-uri 'none'">
+<title>根拠の見える図書館 | 知の図書館</title>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f7f2;--card:#fffefa;--ink:#19352d;--sub:#5d7068;--border:#d9e0d6;--a:#23584c;--gold:#9a7242;--soft:#e5eee7}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.85 "Zen Kaku Gothic New",system-ui,sans-serif}a{color:var(--a)}button,input{font:inherit}button{cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #d5a65e;outline-offset:3px}.wrap{max-width:1080px;padding:26px 21px 72px;margin:auto}.eyebrow{font-size:12px;letter-spacing:.13em;color:var(--gold);font-weight:800}header{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--border);padding-bottom:18px}header a{font-weight:700;text-decoration:none}.hero{padding:40px 0 22px}h1{font-size:clamp(25px,4vw,42px);line-height:1.38;letter-spacing:-.025em;margin:9px 0 12px}h2{font-size:21px;margin:0 0 10px}h3{font-size:17px;line-height:1.5;margin:6px 0}.lead{font-size:16px;max-width:760px;color:#41564d}.metrics{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:28px 0}.metric{border:1px solid var(--border);border-radius:16px;background:var(--card);padding:18px}.metric strong{display:block;font-size:33px;font-variant-numeric:tabular-nums;line-height:1.2}.metric span{font-size:12px;color:var(--sub)}.note{padding:15px 19px;background:#e8eee7;border-left:4px solid var(--a);border-radius:3px 12px 12px 3px;margin:20px 0 34px}.flow{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:20px 0}.flow span{flex:1;min-width:130px;text-align:center;border-radius:12px;background:var(--soft);padding:15px 9px;font-size:14px;font-weight:700}.flow b{color:var(--sub)}.control{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:18px 0}.control button{border:1px solid var(--border);border-radius:20px;padding:7px 16px;background:var(--card);color:var(--ink)}.control button[aria-pressed=true]{background:var(--ink);color:white}.control input{border:1px solid var(--border);border-radius:12px;padding:9px 12px;min-width:170px;flex:1}.cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}.card{border:1px solid var(--border);border-radius:15px;background:var(--card);padding:19px;display:flex;flex-direction:column;gap:7px}.tag{font-size:12px;font-weight:700;color:#396453}.tag.pending{color:#8c6a36}.small{font-size:13px;color:var(--sub)}.card a{font-weight:700;margin-top:auto;text-decoration-thickness:1px;text-underline-offset:4px}.chip{font-size:11px;padding:3px 9px;border-radius:15px;background:var(--soft);display:inline-block;margin-right:5px}.empty{padding:35px;text-align:center;color:var(--sub)}footer{border-top:1px solid var(--border);margin-top:50px;padding-top:24px;color:var(--sub);font-size:13px}@media(max-width:640px){.wrap{padding:17px 14px 66px}.hero{padding-top:24px}.metrics{gap:8px}.metric{padding:12px}.metric strong{font-size:26px}.cards{grid-template-columns:1fr}.control button{padding:7px 10px}.flow b{display:none}}
+</style>
+<script defer src="./data.js"></script>
+<script defer src="./evidence.js"></script>
+<script defer src="./quality.js"></script>
+</head>
+<body>
+<div class="wrap">
+<header><a href="./">知の図書館</a><span class="eyebrow">EVIDENCE TRANSPARENCY</span></header>
+<main>
+<section class="hero"><div class="eyebrow">ARTICLE & SOURCE AUDIT</div><h1>その知識は、どこから来たのか。</h1><p class="lead">読み物の面白さと、根拠の確かさは別です。資料に結びつく主張と、まだ個別照合していない記事を、同じ基準で見えるようにしました。</p></section>
+<section class="metrics" aria-label="根拠照合の進捗">
+<div class="metric"><strong id="metric-all">—</strong><span>公開テーマ数</span></div>
+<div class="metric"><strong id="metric-reviewed">—</strong><span>個別の論点を照合したテーマ</span></div>
+<div class="metric"><strong id="metric-claims">—</strong><span>出典と紐づく論点</span></div>
+</section>
+<div class="note"><strong>ここに表示する数は「内容の正確さ」の点数ではありません。</strong>照合済みとは、指定した論点に資料の参照先を付けているという編集上の状態です。記事全文の検証や、資料の研究上の質を保証する意味ではありません。リンク先の内容が更新される場合もあります。</div>
+<section aria-labelledby="flow-title"><h2 id="flow-title">資料から知識までの3段階</h2>
+<div class="flow" aria-label="資料、論点、記事の関係"><span>原典・研究・公的資料</span><b>→</b><span>個別の論点と留保</span><b>→</b><span>記事・図解・次の問い</span></div>
+<p class="small">資料の種類と、何を裏付ける資料なのかを区別します。図解は原資料そのものと教育用の模式図を混同しません。</p></section>
+<section style="margin-top:42px" aria-labelledby="catalog-title"><h2 id="catalog-title">記事ごとの根拠の確認状況</h2><p class="small">現在は一部の記事に、論点単位の照合と図解を導入しています。未照合の記事に根拠の強さを推定して付けることはしません。</p>
+<div class="control" role="group" aria-label="記事の表示条件"><button type="button" data-status="all" aria-pressed="true">すべて</button><button type="button" data-status="reviewed" aria-pressed="false">論点を照合</button><button type="button" data-status="pending" aria-pressed="false">個別照合前</button><input id="filter" type="search" aria-label="記事を検索" placeholder="テーマ・分野で探す"></div>
+<p id="result-count" aria-live="polite" class="small"></p><div id="cards" class="cards"></div>
+</section>
+</main><footer>知の図書館｜資料と主張を結びつけるための編集進捗です。個人の蔵書・学習記録はこのページでは取得しません。 <a href="./">図書館に戻る</a></footer>
+</div>
+</body></html>
