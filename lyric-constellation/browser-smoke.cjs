@@ -47,7 +47,7 @@ async function runScenario(browser,base,{mobile}){
   assert.match(html,/この解釈をもう一度考える箇所/,'reread evidence visible');
   assert.match(html,/L\d+/,'source citations visible');
   assert.match(html,/本人の確認/,'review controls visible');
-  assert.match(html,/本人の視点/,'author's viewpoint separate from reader interpretation');
+  assert.match(html,/本人の視点/,"author\'s viewpoint separate from reader interpretation");
   const card=page.locator('#drawer .deep-reading-card').filter({hasText:'「僕」と「僕ら」の間に何があるか'}).first();
   const review=card.locator('.author-review');
   await review.locator('summary').click();
