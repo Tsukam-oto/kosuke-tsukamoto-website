@@ -62,6 +62,17 @@
     <label for="result">実際の結果：成功、失敗、未確認</label><textarea id="result" rows="3" maxlength="6000" placeholder="何が改善したか。未検証なら未検証と明記"></textarea>
     <label for="lesson">他の人が再現するときの要点</label><textarea id="lesson" rows="3" maxlength="5000" placeholder="手順、注意点、次回改善したい点"></textarea>
     <label for="sources">参考資料・実装リンク（任意）</label><textarea id="sources" rows="2" maxlength="5000" placeholder="公開できるURL・資料名のみ"></textarea>
+    <section class="draft-section" aria-labelledby="draft-title">
+     <div class="panel-head"><h3 id="draft-title">note記事の原稿</h3><span class="small-note">構成・分量は記事に合わせて柔軟に</span></div>
+     <label for="format">記事の長さ・形式</label><select id="format"></select>
+     <div id="format-advice" class="magazine-advice" aria-live="polite"></div>
+     <label for="article-body">原稿本文（AIが書いた文章をここに貼り付けて保管）</label>
+     <textarea id="article-body" rows="12" maxlength="40000" placeholder="AIが作成した下書きを貼り付けます。ここに書いた内容は本人専用クラウドに保存され、noteへ自動公開されません。"></textarea>
+     <div class="draft-counters" aria-live="polite"><strong id="article-count">0字</strong><span id="reading-time">推定読書時間：未計測</span><span id="article-range">字数の目安を表示</span></div>
+     <div id="editor-lint" class="editor-lint" aria-live="polite"></div>
+     <div class="form-actions"><button type="button" id="copy-article" class="secondary">本文をコピーしてnoteへ</button></div>
+     <p class="small-note">機械的な読みやすさチェックは文章を評価・公開承認するものではありません。出典・権利・学校の内部情報と本人の言葉は、人が確認してください。</p>
+    </section>
     <label for="stage">編集上の段階</label>
     <select id="stage"><option value="seed">記録・素材</option><option value="candidate">記事化候補</option><option value="draft">原稿確認中</option><option value="published">公開後の記録</option></select>
     <label for="public-url">公開済み記事URL（任意）</label><input id="public-url" type="url" maxlength="500" placeholder="公開したときだけ記入">
