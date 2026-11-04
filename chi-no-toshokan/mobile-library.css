@@ -1,0 +1,76 @@
+/* v1.7.1 | smartphone-first navigation: phones from 320px to 650px. No effect on cloud records. */
+.mobile-shortcuts{display:none}
+@media(max-width:650px){
+ html{scroll-padding-top:12px}
+ body{overscroll-behavior-y:auto}
+ .page-wrap{min-width:0;overflow-x:clip}
+ .mobile-shortcuts{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  padding:10px 12px 3px;
+  background:#fffefa;
+ }
+ .mobile-shortcuts a{
+  min-width:0;min-height:48px;
+  display:flex;justify-content:center;align-items:center;
+  padding:8px 5px;border:1px solid #dbe5d9;border-radius:10px;
+  color:#2d5947;background:#f5f7ef;text-decoration:none;
+  font-weight:700;font-size:11.5px;line-height:1.4;text-align:center;
+ }
+ .mobile-shortcuts a:active{background:#e5ede3}
+ .mobile-nav{
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  height:calc(70px + env(safe-area-inset-bottom));
+  padding:3px 3px env(safe-area-inset-bottom);
+  box-shadow:0 -7px 23px #19382a18;
+ }
+ .mobile-nav button{min-width:0;min-height:54px;font-size:10.5px;line-height:1.45;touch-action:manipulation}
+ .mobile-nav button span{font-size:21px}
+ .mobile-nav button:focus-visible,.mobile-shortcuts a:focus-visible{outline:3px solid #b69650;outline-offset:-3px}
+ .topbar{padding:0 15px}
+ .top-actions{gap:7px}
+ .header-auth{min-height:42px;padding:9px 13px;font-size:12px}
+ main{padding:23px 14px calc(110px + env(safe-area-inset-bottom));max-width:100%;min-width:0}
+ .footer{padding:14px 14px calc(106px + env(safe-area-inset-bottom));line-height:1.8;gap:10px}
+ .hero{padding:24px 20px;min-height:0}
+ .hero h2{font-size:clamp(22px,6.5vw,27px);line-height:1.5}
+ .hero p{font-size:14px;line-height:1.85}
+ .hero .hero-actions{align-items:stretch}
+ .btn{white-space:normal;min-height:46px;padding:10px 13px;line-height:1.5;text-align:center}
+ .hero .btn{width:100%}
+ .page-title{font-size:clamp(25px,7vw,30px)}
+ .page-description{margin-bottom:20px}
+ .panel{padding:17px}
+ .reader-layout,.article,.article-layout,.reading-section{min-width:0}
+ .article-head h1{font-size:clamp(24px,6vw,30px)}
+ .article-head .actions{align-items:stretch}
+ .article-head .actions .btn{flex:1;min-width:120px}
+ .article-hook,.reader-lead{font-size:15.5px;line-height:1.95}
+ .reading-section p{font-size:15.5px;line-height:2.15}
+ .reading-section h2{font-size:20px;line-height:1.55}
+ .evidence-claim p,.evidence-overview p{font-size:13px;line-height:1.9}
+ .evidence-source-link{min-height:44px;white-space:normal;overflow-wrap:anywhere}
+ .visual-step{min-height:44px}
+ .resume-text strong{white-space:normal;overflow-wrap:anywhere;line-height:1.55}
+ .resume-row{align-items:flex-start;gap:8px}
+ .resume-row .link-btn{min-height:44px;flex-shrink:0}
+ .graph-toolbar button,.graph-toolbar select{min-height:44px}
+ input,textarea,select{font-size:16px!important}
+ .dialog{max-height:calc(100dvh - 24px);overflow-y:auto;overscroll-behavior:contain}
+ .dialog-backdrop{padding:12px}
+ .dialog button{min-height:44px}
+ .source-item a,.figure-link{overflow-wrap:anywhere}
+ .fact-box{padding:17px 19px}
+ .section-head{gap:8px}
+ .section-head .rule{display:none}
+ .section-head .link-btn{min-height:44px}
+ .related-item{min-height:48px}
+}
+@media(max-width:360px){
+ .mobile-nav button{font-size:10px}
+ .mobile-nav button span{font-size:19px}
+ .mobile-shortcuts a{font-size:10.5px}
+ .page-title{letter-spacing:0}
+ .card-foot{flex-wrap:wrap}
+}
