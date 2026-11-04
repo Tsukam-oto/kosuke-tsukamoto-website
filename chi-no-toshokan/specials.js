@@ -132,6 +132,29 @@ window.addEventListener('hashchange',()=>{
  const h=decodeURIComponent(location.hash.replace('#',''));
  if(index[h]&&active!==h)select(h,true);
 });
+/* 自動収集された論文の「結論」ではなく、図書館が提案する調査の問い。 */
+const DISCOVERY_QUESTIONS={
+ 'adler':'アドラー心理学は、文化が変わるとどう理解されるのでしょうか？',
+ 'therapeutic-alliance':'心理療法の「協働する関係」は、なぜ注目されるのでしょうか？',
+ 'care':'ケアとは、技法でしょうか。それとも関係でしょうか？',
+ 'habit-formation':'習慣は、意志の強さだけで生まれるのでしょうか？',
+ 'memory':'思い出す行為は、記憶をどのように変えるのでしょうか？',
+ 'notation':'楽譜の仕組みが変わると、作れる音楽も変わるのでしょうか？',
+ 'temperament':'調律を少し変えると、どのような可能性が生まれるのでしょうか？',
+ 'beethoven5':'たった数音の動機が、大きな交響曲を支えられるのでしょうか？',
+ 'ravelbolero':'同じ旋律でも、音色を変えると何が起こるのでしょうか？',
+ 'bachcello':'一つの楽器から複数の声部が聞こえるのはなぜでしょうか？',
+ 'music-emotion':'音楽はなぜ、ある人の感情を強く動かすのでしょうか？',
+ 'odyssey-xenia':'古代の物語で、知らない客を迎える意味は何だったのでしょうか？',
+ 'zeus-titans':'ギリシャ神話では、なぜ神々の世代交代が描かれるのでしょうか？',
+ 'bronze-collapse':'青銅器時代の社会の変化は、どんな資料から分かるのでしょうか？',
+ 'oral-epic':'文字がなくても、長い物語はどうやって伝わるのでしょうか？',
+ 'ancient-writing':'文字の記録が少ない時代を、どう研究するのでしょうか？',
+ 'roman-concrete':'古代ローマの建築材料には、どんな工夫があったのでしょうか？',
+ 'exoplanets':'光しか届かない遠い惑星を、どうやって見つけるのでしょうか？',
+ 'microbiome':'発酵食品と体の関係は、何を調べれば分かるのでしょうか？',
+ 'city':'都市が生まれて発展した理由を、何から探れるのでしょうか？'
+};
 async function loadCandidates(){
  const node=$('fresh-sources');
  try{
@@ -144,8 +167,9 @@ async function loadCandidates(){
    items.push(x);areas.add(x.area);if(items.length===3)break;
   }
   node.innerHTML=items.length?items.map(x=>
-   '<article class="candidate"><span class="type">'+E(x.area)+' ／ 書誌情報・未照合</span><h3>'+E(x.title)+'</h3>'+
-   '<p>発見した資料のタイトルです。研究結果の内容は未検証で、ここでは断定しません。</p>'+
+   '<article class="candidate"><span class="type">'+E(x.area)+' ／ 書誌情報・未照合</span>'+
+   '<h3>'+E((x.topicIds||[]).map(t=>DISCOVERY_QUESTIONS[t]).find(Boolean)||'この研究は、何を問いかけているのでしょうか？')+'</h3>'+
+   '<p><strong>資料のタイトル：</strong>'+E(x.title)+'</p><p>この問いは図書館からの提案です。資料の研究結果を要約・保証するものではありません。</p>'+
    '<a target="_blank" rel="noopener noreferrer" href="'+E(safeUrl(x.url,candidateHosts))+'">資料元で内容を確認 ↗</a></article>'
   ).join(''):'<div class="loading">現在表示できる候補がありません。</div>';
   const at=d.lastRunAt?new Date(d.lastRunAt):null;
