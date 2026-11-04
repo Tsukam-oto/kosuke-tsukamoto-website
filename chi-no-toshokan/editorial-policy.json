@@ -1,0 +1,157 @@
+{
+  "schemaVersion": 1,
+  "rulebookVersion": "1.0",
+  "lastUpdated": "2026-11-04",
+  "authoritativeSource": "Google Docs",
+  "rulebookUrl": "https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit",
+  "mode": "private_drafts_only",
+  "unattended_publication": false,
+  "statement": "通常時の操作をゼロに近づける。完全無人投稿できると偽らない。品質や権利が不明なら投稿しない。",
+  "sourcePolicy": {
+    "allowed": [
+      "explicitly approved public-safe editorial records",
+      "public research metadata as topic only",
+      "verified original sources",
+      "user-approved conversation extracts"
+    ],
+    "prohibitedWithoutApproval": [
+      "entire ChatGPT conversation archive",
+      "school-internal documents",
+      "student or parent identifiers",
+      "private Apple Music history",
+      "unreleased composition",
+      "anonymous rap persona linked to real name"
+    ],
+    "publicResearchDossierStatus": "unverified-metadata-not-publishable"
+  },
+  "magazines": [
+    {
+      "id": "ai-work",
+      "goalPerWeek": 2,
+      "readers": "AIで仕事を改善したい人"
+    },
+    {
+      "id": "music-education",
+      "goalPerWeek": 2,
+      "readers": "音楽教育関係者"
+    },
+    {
+      "id": "composing",
+      "goalPerWeek": 1,
+      "readers": "音楽制作に興味のある人"
+    },
+    {
+      "id": "knowledge",
+      "goalPerWeek": 1,
+      "readers": "音楽理論・歴史・知識探究の読者"
+    },
+    {
+      "id": "tools",
+      "goalPerWeek": 1,
+      "readers": "実用教材・ICTツールを必要とする人"
+    }
+  ],
+  "articleFormats": {
+    "short": {
+      "targetMinChars": 800,
+      "targetMaxChars": 1200,
+      "bodyImages": "optional",
+      "toc": "usually-unnecessary"
+    },
+    "standard": {
+      "targetMinChars": 1500,
+      "targetMaxChars": 2500,
+      "bodyImages": "only-when-useful",
+      "toc": "when-headings-are-useful"
+    },
+    "deep": {
+      "targetMinChars": 3000,
+      "targetMaxChars": 5000,
+      "bodyImages": "only-when-verified",
+      "toc": "when-headings-are-useful"
+    }
+  },
+  "noteVisuals": {
+    "headerWidth": 1280,
+    "headerHeight": 670,
+    "maxMB": 10,
+    "imagesNeedSourceRights": true,
+    "neverFabricateRealWorldPhotos": true,
+    "style": "restrained; readable on mobile; no unrelated decoration"
+  },
+  "writing": {
+    "keep": [
+      "the user's actual questions",
+      "thinking process",
+      "uncertainty",
+      "verified observations",
+      "natural Japanese style",
+      "readability"
+    ],
+    "avoid": [
+      "fake successes",
+      "fake emotions",
+      "fabricated teacher or student reactions",
+      "every-article same three points",
+      "padding for character count",
+      "misleading clickbait"
+    ],
+    "factCheck": "Every claim tied to credible source or tagged as unverified; research metadata alone does not prove claims."
+  },
+  "publication": {
+    "default": "hold_for_verified_official_integration",
+    "availableNow": "prepare private manuscript package; manually publish on note",
+    "noteAPIRestriction": "Official publishing API is intended for note pro corporate customers through supported partners; do not use undocumented APIs.",
+    "prohibitReadyIf": [
+      "no explicit publication scope",
+      "school/student/parent personal data",
+      "unverified claims",
+      "unknown image/audio/sheet music rights",
+      "unapproved unpublished creative intent",
+      "broken deployment",
+      "no official publisher integration"
+    ],
+    "publishedRequiresPublicUrl": true
+  },
+  "targetCadence": {
+    "startPerWeek": 4,
+    "steadyPerWeek": 7,
+    "indicators": [
+      "quality",
+      "unverified-claims",
+      "duplicate-rate",
+      "human-input-minutes",
+      "private-draft-inventory",
+      "7-day-pageviews"
+    ]
+  },
+  "featureStatus": {
+    "currentlyImplemented": [
+      "private records under RLS",
+      "magazine routing",
+      "research idea intake from public metadata",
+      "copy editorial briefs",
+      "write and store draft body",
+      "canvas cover PNG export",
+      "heading extraction and suggested note TOC",
+      "suggested body visuals",
+      "mobile readability preview",
+      "manual 7-day metrics"
+    ],
+    "notImplemented": [
+      "all-chat automatic extraction",
+      "continuous AI draft generation",
+      "automatic AI image generation",
+      "autonomous validation of source text",
+      "official personal note publishing",
+      "note engagement auto-fetch"
+    ]
+  },
+  "safeguards": {
+    "stopOnError": true,
+    "neverPubliclyStorePrivateDrafts": true,
+    "noSecretsInRepository": true,
+    "disableAutoPublicWhenRulebookMismatch": true,
+    "authRequiredToReadPrivateDrafts": true
+  }
+}
