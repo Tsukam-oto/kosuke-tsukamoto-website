@@ -1,0 +1,5 @@
+/* 記事の根拠と医療的な助言の境界をモバイルでも読みやすく。 */
+.clinical-note{background:#f1f5ee;border:1px solid #d3e1d4;border-left:4px solid #4e7b67;border-radius:4px 12px 12px 4px;padding:16px 20px;margin:16px 0 22px;color:#284e3b}
+.clinical-note strong{display:block;font-size:14px;margin-bottom:5px}
+.clinical-note p{font-size:13px;line-height:1.9;margin:0}
+@media(max-width:650px){.clinical-note{padding:14px 15px;margin:12px 0 18px}.clinical-note strong{font-size:13px}.clinical-note p{font-size:12px;line-height:1.9}.education-visual .edu-svg{max-width:100%;height:auto}.claim-board,.evidence-overview{min-width:0}.evidence-source-link{overflow-wrap:anywhere}}
