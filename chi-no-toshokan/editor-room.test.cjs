@@ -10,6 +10,8 @@ const src=fs.readFileSync(path.join(base,'editor-room.js'),'utf8');
 let checks=0; const check=(title,ok)=>{assert.ok(ok,title);checks++};
 check('mobile viewport',html.includes('viewport-fit=cover'));
 check('mobile layout breakpoint',css.includes('@media(max-width:770px)'));
+check('quick memo mobile entry',html.includes('id="quick-text"')&&html.includes('id="quick-save"')&&css.includes('.quick-controls'));
+check('quick memo saved as private note',src.includes("async function saveQuick()")&&src.includes("kind:'note'")&&src.includes("stage:'seed'"));
 check('noindex for private management',html.includes('noindex,nofollow,noarchive'));
 check('auth-gated app element',html.includes('id="private-app" hidden'));
 check('cloud records use existing RLS-backed table',src.includes("const TABLE='knowledge_records',PREFIX='note:editor:'"));
