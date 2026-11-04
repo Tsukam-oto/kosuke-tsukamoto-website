@@ -85,6 +85,33 @@
 .reading-raw pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:430px;overflow:auto;font-size:12px;line-height:1.9;background:#f6f3f0;border-radius:9px;padding:12px}
 @media(max-width:760px){.reading-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.reading-metrics strong{font-size:22px}.reading-expanded{padding:11px}.reading-meta-pair,.reading-change{grid-template-columns:1fr}.reading-pair-card{padding:14px 0}}
 .draft-readings{border-top:1px solid #e7dfe8;padding-top:20px;margin:23px 0 24px}.draft-readings>h3{margin:0 0 7px;font-size:16px}.draft-readings>h3 small{font-size:10px;font-weight:500;color:#83748d;margin-left:6px}.draft-reading-card{border:1px solid #e8e0e9;border-radius:14px;padding:18px;margin:13px 0;background:#fff}.draft-kind{font-size:10px;letter-spacing:.04em;color:#6e5f7b}.draft-reading-card h4{font-size:14px;line-height:1.7;margin:8px 0 12px}.draft-quotes{background:#f8f6f8;border-left:3px solid #9a8aa1;padding:12px 14px;border-radius:5px}.draft-quotes strong{font-size:11px;color:#746a7c}.draft-quotes p{font-size:12px;line-height:1.8;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0 0}.draft-reading-card dl{margin:15px 0 0}.draft-reading-card dt{font-size:11px;font-weight:800;margin-top:12px;color:#796d81}.draft-reading-card dd{margin:4px 0 0;font-size:12px;line-height:1.85;color:#464355}.stats{grid-template-columns:repeat(auto-fit,minmax(145px,1fr));max-width:950px}
+
+.cross-intro{padding:18px 20px;margin-bottom:20px;border-top:2px solid #786487;background:#fff;border-radius:0 0 12px 12px}
+.cross-intro strong{font-size:16px;line-height:1.65;color:#363047}
+.cross-intro p{font-size:12px;line-height:1.95;color:#686275;margin:9px 0 0}
+.cross-toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin:0 0 19px}
+.cross-toolbar .field{flex:1 1 230px;margin:0}
+.cross-toolbar .field span{font-size:11px;font-weight:750}
+.cross-toolbar input,.cross-toolbar select{width:100%;font-size:13px;min-height:42px}
+.cross-card{border:1px solid #e1dadf;background:#fff;border-radius:16px;padding:19px;margin:0 0 15px;box-shadow:0 3px 15px #24203906}
+.cross-card-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.cross-card-top span{font-size:11px;font-weight:800;color:#62536c}
+.cross-card-top small{font-size:10px;color:#79747d}
+.cross-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.cross-source{background:#faf8fa;border:1px solid #ede7ed;border-radius:12px;padding:15px;min-width:0;display:flex;flex-direction:column}
+.cross-source .cross-kind{font-size:10px;color:#777080;margin:0 0 5px}
+.cross-source h3{font-size:14px;line-height:1.6;overflow-wrap:anywhere;margin:0 0 12px}
+.cross-source blockquote{font-size:12px;line-height:1.85;white-space:pre-wrap;overflow-wrap:anywhere;padding:10px 0 10px 12px;margin:0 0 13px;border-left:3px solid #ae97b5;flex:1;min-height:65px;color:#3e3449}
+.cross-link{align-self:start;font-size:11px}
+.cross-reading{display:grid;grid-template-columns:155px minmax(0,1fr);column-gap:12px;row-gap:9px;padding-top:14px;margin:14px 0 0;border-top:1px solid #eee9ee}
+.cross-reading dt{color:#766c7b;font-size:11px;font-weight:750;line-height:1.8}
+.cross-reading dd{font-size:12px;line-height:1.9;margin:0;overflow-wrap:anywhere}
+.cross-foot{margin:14px 0 0;font-size:10px;line-height:1.7;color:#95909a}
+.cross-source-modal{width:min(860px,100%);max-height:min(95vh,1200px);overflow:auto;background:#fff;border-radius:15px;padding:22px}
+.cross-source-modal h2{font-size:19px;line-height:1.55;margin:0}
+.cross-source-modal pre{padding:20px;border-radius:12px;background:#f8f6f8;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/2 system-ui,sans-serif;max-height:63vh;overflow:auto}
+.cross-source-modal .cross-modal-head{display:flex;align-items:start;justify-content:space-between;gap:15px}
+@media(max-width:680px){.cross-grid{grid-template-columns:1fr}.cross-card{padding:14px}.cross-reading{grid-template-columns:1fr;row-gap:4px}.cross-reading dt{margin-top:9px}.cross-intro{padding:14px}.cross-source-modal{padding:12px}.cross-source-modal pre{padding:13px}}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -93,14 +120,15 @@
 <script defer src="./app.js"></script>
 </head><body>
 <div class="layout">
-<aside class="nav"><div class="mark">KOTOBA NO CHISŌ<small>書き残した言葉と、その記録の日付を。</small></div><nav class="navlinks" aria-label="ナビゲーション"><button class="active" data-view="strata">言葉の地層</button><button data-view="import">日付付きで回収</button><button data-view="discovery">作品とのつながり</button><a href="../lyric-constellation/">歌詞の星座へ</a></nav><div class="navfoot">原文はそのまま。<br>採用・未使用は後から判断。<br>「余白」は取り込みません。</div></aside>
+<aside class="nav"><div class="mark">KOTOBA NO CHISŌ<small>書き残した言葉と、その記録の日付を。</small></div><nav class="navlinks" aria-label="ナビゲーション"><button class="active" data-view="strata">言葉の地層</button><button data-view="import">日付付きで回収</button><button data-view="discovery">作品とのつながり</button><button data-view="cross">作品を横断して読む</button><a href="../lyric-constellation/">歌詞の星座へ</a></nav><div class="navfoot">原文はそのまま。<br>採用・未使用は後から判断。<br>「余白」は取り込みません。</div></aside>
 <main class="content">
 <div class="embed-tools" aria-label="言葉の地層の画面切替">
 <button type="button" class="active" data-view="strata">メモ一覧</button>
 <button type="button" data-view="import">日付付きで回収</button>
 <button type="button" data-view="discovery">作品とのつながり</button>
+<button type="button" data-view="cross">作品を横断して読む</button>
 </div>
-<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.1</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
+<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.2</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><div class="stat"><b id="countReadings">—</b><small>原文に沿った初回精読</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
 <div class="toolbar"><input id="search" class="search" type="search" placeholder="言葉・作品名を探す" aria-label="検索"><select id="skyFilter" class="filter" aria-label="創作名義"><option value="all">すべての名義</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option><option value="unassigned">未分類</option></select><button class="btn dark" data-view="import">＋ 回収する</button></div>
@@ -110,8 +138,16 @@
 <section class="step"><h2>02　コピーした言葉を保存</h2><p>Appleメモ以外でも使えます。日付が分かる場合だけ入力してください。</p><form id="manualForm"><div class="field"><label for="manualTitle">仮タイトル</label><input id="manualTitle" placeholder="例：冬のメモ" maxlength="320" required></div><div class="field"><label for="manualBody">原文（改行を保持）</label><textarea id="manualBody" placeholder="自分が書いた言葉をそのまま貼り付ける" required></textarea></div><div class="field"><label for="manualDate">記録日（分かる場合のみ）</label><input id="manualDate" type="date"></div><div class="field"><label for="manualSky">名義</label><select id="manualSky"><option value="unassigned">未分類</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option></select></div><button type="submit" class="btn dark">原文を記録する</button></form></section></div>
 <div class="notice">取り込み後、まずはこのブラウザ内に保管されます。本人アカウントでログインし、内容を確認してから「クラウドに保存」を押してください。原文をGitHubや公開サイトにアップロードする必要はありません。</div></div>
 <div id="view-discovery" class="hidden"><div class="eyebrow">TRACES & ECHOES</div><h1 class="heading">どこかで、<span>生きている言葉。</span></h1><p class="lead">メモの全文から、同題稿・共通する行・似た表現を読み比べます。<br>完成作品との照合結果も確認でき、採用や改稿の経緯はご本人が判断できます。</p><div class="panel" id="discoveryOutput"></div></div>
+<div id="view-cross" class="hidden"><div class="eyebrow">READINGS IN DIALOGUE</div>
+<h1 class="heading">言葉と、<span>言葉のあいだ。</span></h1>
+<p class="lead">木乃伊・合唱曲・詩・書きかけの言葉を、出典の異なる原文で照らし合わせます。<br>同じ表現が残る場合と、同じ問いに別の答えがある場合を区別します。</p>
+<div id="crossOutput"></div></div>
 <footer class="bottom">初期状態は空です。自分で読み込んだ原稿だけを管理します。原文の出典・日時は書き換えず、分類はいつでも変更できます。<br><a href="../lyric-constellation/">歌詞の星座</a>と連携するための独立した地層DBです。</footer>
 </main></div>
 <div id="toast" class="toast" role="status"></div>
+<div id="crossSourceModal" class="modal-back hidden" role="dialog" aria-modal="true" aria-labelledby="crossSourceTitle">
+<div class="cross-source-modal"><div class="cross-modal-head"><h2 id="crossSourceTitle">作品の原文</h2><button class="btn" id="crossSourceClose" type="button">閉じる</button></div>
+<p id="crossSourceMeta" class="muted"></p><pre id="crossSourceText"></pre>
+</div></div>
 <div id="authModal" class="modal-back hidden"><div class="modal"><h2>本人専用クラウド</h2><p class="muted">「余白 LYRIC NOTE」と同じSupabaseアカウントでログインできます。余白の原稿を取り込むことはありません。</p><form id="authForm"><div class="field"><label>メールアドレス</label><input type="email" id="loginEmail" required autocomplete="email"></div><div class="field"><label>パスワード</label><input type="password" id="loginPassword" required autocomplete="current-password"></div><button class="btn dark" type="submit">ログインして既存記録を読む</button> <button class="btn" type="button" id="authCancel">閉じる</button></form><p class="muted" id="authMessage"></p></div></div>
 </body></html>
