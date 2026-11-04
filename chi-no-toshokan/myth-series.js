@@ -154,7 +154,12 @@ async function init(){
  }catch(e){cloud='error';syncMessage=String(e.message||e);render()}
 }
 if(!chapters.length){dom('sync-status').textContent='連載データを読み込めませんでした。';return}
-if(window.matchMedia?.('(max-width:850px)')?.matches){const menu=dom('toc-disclosure');if(menu)menu.open=false}
+const tocScreen=window.matchMedia?.('(max-width:850px)');
+const tocMenu=dom('toc-disclosure');
+if(tocScreen&&tocMenu){
+ tocMenu.open=!tocScreen.matches;
+ tocScreen.addEventListener?.('change',event=>{tocMenu.open=!event.matches});
+}
 const initial=getHash();current=initial===-1?Math.max(0,chapters.findIndex(c=>c.id===progress.lastRead)):initial;
 render();init();
 window.MYTH_BOOK_DEBUG={count:chapters.length,getState:()=>({cloud,owner:!!owner,current,completed:[...progress.completed]}),chapterIds:chapters.map(c=>c.id)};
