@@ -35,7 +35,7 @@ assert.match(logged,/初回の仮説と照らし合わせる/);
 assert.equal((logged.match(/class="reading-challenge"/g)||[]).length,2);
 assert.ok(!logged.includes('<iframe>'),'Must escape revision HTML');
 assert.ok(!logged.includes('<script>bad</script>'),'Must escape challenge observation');
-assert.match(logged,/この読みへの反例/);
+assert.match(logged,/反例を通して、読み直す。/);
 assert.match(logged,/決めつけてはいけないこと/);
 assert.match(logged,/data-cross-note/);
 assert.match(logged,/data-cross-work/);

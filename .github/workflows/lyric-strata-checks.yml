@@ -1,0 +1,32 @@
+name: Lyric strata regression checks
+
+on:
+  pull_request:
+    paths:
+      - 'lyric-strata/**'
+      - '.github/workflows/lyric-strata-checks.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'lyric-strata/**'
+      - '.github/workflows/lyric-strata-checks.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run synthetic reading and cross-source tests
+        run: |
+          node lyric-strata/cross-compare.test.cjs
+          node lyric-strata/reading-paths.test.cjs
+          node lyric-strata/deep-work.test.cjs
+          node lyric-strata/deep-work-navigation.test.cjs
