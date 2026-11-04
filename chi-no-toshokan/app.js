@@ -1,4 +1,4 @@
-/* 知の図書館 v1.3.1 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.4.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -72,13 +72,33 @@ function renderTopicCard(t,index=0){
  <span class="category">${esc(t.domain)}</span><h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p>
  <div class="card-foot"><span>${saved?'<span class="badge gold">蔵書に登録</span>':read?'<span class="badge">閲覧済み</span>':'約3分の探究'}</span><button data-open="${esc(t.id)}">探究する　↗</button></div></article>`;
 }
+let dailyChoice={key:'',topicId:''};
 function makeDailyTopic(){
- const dateNum=Number(today().replaceAll('-',''));
- const never=TOPICS.filter(t=>!isSeen(t.id));
- const base=never.length?never:TOPICS.slice().sort((a,b)=>(visit(a.id)?.lastVisited||'').localeCompare(visit(b.id)?.lastVisited||''));
- // 同日のホーム再表示では内容が安定し、閲覧後は別の未読へ切り替わる。
- const pos=(dateNum*31+base.length*17)%base.length;
- return base[pos];
+ const key=`knowledge-library:daily:${currentUser?.id||'visitor'}:${today()}`;
+ if(dailyChoice.key===key && BY_ID[dailyChoice.topicId])return BY_ID[dailyChoice.topicId];
+ let stored='';
+ try{stored=localStorage.getItem(key)||''}catch{}
+ if(BY_ID[stored]){dailyChoice={key,topicId:stored};return BY_ID[stored]}
+ const unread=TOPICS.filter(t=>!isSeen(t.id));
+ const base=unread.length?unread:TOPICS.slice().sort((a,b)=>(visit(a.id)?.lastVisited||'').localeCompare(visit(b.id)?.lastVisited||''));
+ const chosen=base[hashCode(key)%base.length];
+ // 初期の認証確認中に選んだ候補は確定しない。読み込み後に既読を考慮する。
+ if(cloudStatus!=='loading'){
+  dailyChoice={key,topicId:chosen.id};
+  try{localStorage.setItem(key,chosen.id)}catch{}
+ }
+ return chosen;
+}
+function homeRecommendations(dailyId){
+ const known=knownDomains();
+ const candidates=TOPICS.filter(t=>t.id!==dailyId).sort((a,b)=>{
+  const rank=t=>(isSeen(t.id)?4:0)+(known.has(t.domain)?1:0);
+  return rank(a)-rank(b) || hashCode(today()+':'+a.id)-hashCode(today()+':'+b.id);
+ });
+ const result=[],domains=new Set();
+ for(const t of candidates){if(!domains.has(t.domain)){result.push(t);domains.add(t.domain)}if(result.length===6)break}
+ for(const t of candidates){if(result.length===6)break;if(!result.some(x=>x.id===t.id))result.push(t)}
+ return result;
 }
 function chooseEncounter(mode,skip=[]){
  const exclusions=new Set([...lastEncounterIds.slice(-4),...skip]);
@@ -103,8 +123,8 @@ function chooseEncounter(mode,skip=[]){
 function getEncounter(){if(!currentEncounter || !BY_ID[currentEncounter])currentEncounter=chooseEncounter(encounterMode);return BY_ID[currentEncounter]}
 function renderHome(){
  const t=makeDailyTopic();const seen=userVisits().slice(0,3);
- const surprising=TOPICS.filter(x=>!isSeen(x.id)&&x.id!==t.id).sort((a,b)=>a.domain.localeCompare(b.domain)).slice(0,6);
- const recs=[...surprising,...TOPICS.filter(x=>x.id!==t.id)].slice(0,6);
+ const recs=homeRecommendations(t.id);
+ const pendingQuestions=Object.values(records.question).filter(q=>q.payload?.status!=='resolved' && q.payload?.text).sort((a,b)=>(b.payload?.createdAt||'').localeCompare(a.payload?.createdAt||'')).slice(0,2);
  return `<div class="kicker">WELCOME TO YOUR LIBRARY</div><h1 class="page-title">世界には、まだ知らないことがある。</h1><p class="page-description">新しい問いから始まり、思いがけない分野へつながっていく。今日も一つ、扉を開いてみませんか。</p>
  <section class="hero"><div class="hero-content"><div class="kicker">TODAY'S DISCOVERY — ${esc(today())}</div><div class="topic-name">${esc(t.domain)}</div><h2>${esc(t.title)}</h2><p>${esc(t.hook)}<br>${esc(t.summary)}</p><div class="hero-actions"><button class="btn btn-light" data-open="${esc(t.id)}">このテーマを探究する　↗</button><button class="btn btn-outline" style="color:#f2f4ec;border-color:#7f9c8f" data-nav="encounter">違う世界をのぞく</button></div></div></section>
  <section class="stats" aria-label="学びの記録"><div class="stat"><b>${TOPICS.length}</b><small>用意された探究の入口</small></div><div class="stat"><b>${allVisitedCount()}</b><small>学んだテーマ</small></div><div class="stat"><b>${savedCount()}</b><small>私の蔵書</small></div><div class="stat"><b>${questionsCount()}</b><small>未解決の疑問</small></div></section>
@@ -112,6 +132,7 @@ function renderHome(){
  <section class="panel"><div class="panel-title">あなたへの招待状</div><p>これまでの興味から、あえて少し離れた場所へ。</p><div style="border-top:1px solid var(--line);padding-top:14px"><span class="badge gold">未知との遭遇</span><h3 style="font-size:19px;margin:12px 0">知っている世界の外側へ</h3><p>ジャンルを指定しなくても、知らなかった分野が現れます。</p><button class="btn btn-soft" data-nav="encounter">偶然の一冊をめくる　↗</button></div></section></div>
  ${journeyRecords().length?`<section class="panel" style="margin-top:22px"><div class="panel-title">続きから考える探究</div>${journeyRecords().slice(0,2).map(r=>`<div class="resume-row"><div class="resume-index">⌁</div><div class="resume-text"><strong>${esc(r.payload.title)}</strong><small>${esc(r.payload.nextStep||r.payload.guidingQuestion||'次の問いを探す')}</small></div><button class="link-btn" data-action="resume-journey" data-id="${esc(r.id)}">再開 ↗</button></div>`).join('')}<button class="mini-link" data-thread-tab="journeys">すべての探究を見る ↗</button></section>`:''}
  ${threadRecords().length?`<section class="panel" style="margin-top:22px"><div class="panel-title">会話から続く探究</div>${threadRecords().slice(0,2).map(r=>`<div class="resume-row"><div class="resume-index">↝</div><div class="resume-text"><strong>${esc(r.payload.title)}</strong><small>次の一歩：${esc(r.payload.nextStep||'学びを振り返る')}</small></div><button class="link-btn" data-thread="${esc(r.id)}">再開 ↗</button></div>`).join('')}<button class="mini-link" data-nav="threads">全トークの探究記録を見る ↗</button></section>`:`<section class="panel" style="margin-top:22px"><div class="panel-title">トークをまたいで学ぶ</div><p class="small">ChatGPTの学習内容を、知識の地図につなげて保存できます。学習の続きを他のトークから再開できます。</p><button class="btn btn-soft" data-nav="threads">トーク横断を始める ↗</button></section>`}
+ ${pendingQuestions.length?`<section class="panel" style="margin-top:22px"><div class="panel-title">まだ答えの出ていない問い</div><p class="small">以前の自分が気になったことから、今日の探究を再開できます。</p>${pendingQuestions.map(q=>`<div class="resume-row"><div class="resume-index">?</div><div class="resume-text"><strong>${esc(q.payload.text)}</strong><small>${esc(BY_ID[q.payload.topicId]?.domain||'分野を限定しない問い')}</small></div><button class="link-btn" data-action="chat-question" data-id="${esc(q.id)}">考える ↗</button></div>`).join('')}<button class="mini-link" data-nav="questions">疑問帳を開く ↗</button></section>`:''}
  ${sectionTitle('まだ開いていない扉','library','テーマを探す')}<div class="card-grid">${recs.map(renderTopicCard).join('')}</div>`;
 }
 function renderEncounter(){const t=getEncounter();const counts=knownDomains().size;return `<div class="kicker">SERENDIPITY</div><h1 class="page-title">未知との遭遇</h1><p class="page-description">普段は選ばない本棚にも、驚くほど面白い世界があります。分野を行き来して偶然を楽しみましょう。</p>
@@ -400,7 +421,7 @@ async function save(kind,id,payload,opts={}){
   if(records[kind][key]===row){if(old)records[kind][key]=old;else delete records[kind][key];}
   if(!opts.silent)render();
   if(isConflict){dialog={type:'plain-prompt',conflict:true,prompt:'保存競合を検知しました。別端末の変更を上書きしないよう、クラウドへの保存を中止しました。\n\nこの下に保存できなかった文章があります。必要な部分をコピーしてから閉じてください。\n\n'+JSON.stringify({kind,id,payload:row.payload},null,2)};renderDialog();notice('別端末の更新と競合しました。文章をコピーしてから同期を再確認してください。',true)}
-  else notice('保存に失敗しました: '+(e.message||e),true);
+  else {if(kind!=='visit'){dialog={type:'plain-prompt',saveFail:true,prompt:'通信エラーのためクラウドへ保存できませんでした。\nこの下は保存を試みた内容です。閉じる前にコピーして保管してください。\n\n'+JSON.stringify({kind,id,payload:row.payload},null,2)};renderDialog()}notice('保存に失敗しました。文章をコピーして保管してください: '+(e.message||e),true)}
   return false}
 }
 async function remove(kind,key){if(!needAuth())return false;const old=deep(records[kind][key]||null);if(!old)return false;delete records[kind][key];render();try{await queueWrite(key,async()=>{const {data,error}=await client.from('knowledge_records').delete().eq('user_id',old.user_id).eq('id',key).eq('updated_at',old.updated_at).select('id');if(error)throw error;if(!data?.some(x=>x.id===key))throw new Error('別端末で変更されたため、削除を中止しました。')});notice('削除しました');return true}catch(e){records[kind][key]=old;render();notice('削除できませんでした: '+e.message,true);return false}}
@@ -416,7 +437,7 @@ function renderDialog(){if(!dialog){modalLayer.innerHTML='';return}
  } else if(dialog.type==='thread'){renderThreadModal();
  } else if(dialog.type==='handoff'){renderHandoffModal();
  } else if(dialog.type==='export-chooser'){renderExportChooser();
- } else if(dialog.type==='plain-prompt'){modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><h2>${dialog.conflict?'保存競合 — 未保存の文章':'コピーする文章'}</h2><textarea class="textarea" readonly style="min-height:280px">${esc(dialog.prompt||'')}</textarea></section></div>`;
+ } else if(dialog.type==='plain-prompt'){modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><h2>${dialog.conflict?'保存競合 — 未保存の文章':dialog.saveFail?'保存できなかった文章':'コピーする文章'}</h2><textarea class="textarea" readonly style="min-height:280px">${esc(dialog.prompt||'')}</textarea></section></div>`;
  } else if(dialog.type==='question'){
  const record=dialog.recId?records.question[dialog.recId]:null;const p=record?.payload||{};
  modalLayer.innerHTML=`<div class="dialog-backdrop" data-action="close-modal"><section class="dialog" role="dialog" aria-modal="true" aria-label="疑問を記録する"><button class="dialog-close" data-action="close-modal" aria-label="閉じる">×</button><div class="kicker">SAVE A QUESTION</div><h2>${record?'疑問を編集する':'問いを残す'}</h2><div class="form-grid"><div class="form-group"><label for="questionText">疑問</label><textarea class="textarea" id="questionText" placeholder="知りたいことを書いてください">${esc(dialog.text||p.text||'')}</textarea></div><div class="form-group"><label for="questionTopic">関連するテーマ</label><select class="select" id="questionTopic" style="width:100%"><option value="">関連テーマなし</option>${TOPICS.map(t=>`<option value="${esc(t.id)}" ${t.id===(dialog.topicId||p.topicId)?'selected':''}>${esc(t.title)}</option>`).join('')}</select></div><div class="form-group"><label for="questionAnswer">自分で見つけた答え・手がかり（空欄可）</label><textarea class="textarea" id="questionAnswer">${esc(p.answer||'')}</textarea></div><div class="form-group"><label for="questionStatus">状態</label><select class="select" id="questionStatus"><option value="open" ${p.status!=='resolved'?'selected':''}>まだ解決していない</option><option value="resolved" ${p.status==='resolved'?'selected':''}>理解した・解決した</option></select></div><div class="actions"><button class="btn" data-action="submit-question">${record?'変更を保存':'疑問を保存'}</button>${record?'<button class="btn btn-danger" data-action="delete-question">削除する</button>':''}</div></div></section></div>`;
@@ -502,7 +523,7 @@ async function handleClick(ev){
  if(action==='delete-question'){if(!needAuth())return;if(!dialog?.recId)return;if(!confirm('この疑問を削除しますか？'))return;const k=dialog.recId;closeModal();await remove('question',k);return}
  if(action==='save-note'&&t){if(!needAuth())return;const p=deep(book(id))||{topicId:id,addedAt:new Date().toISOString(),favorite:false,understanding:0};p.ownSummary=document.getElementById('ownSummary').value.trim();p.notes=document.getElementById('ownNotes').value.trim();await save('book',id,p);return}
  if(action==='chat'&&t){await startChat(t);return}
- if(action==='chat-question'){const r=records.question[id];if(!r)return;await startChat(BY_ID[r.payload.topicId]||TOPICS[0],r.payload.text);return}
+ if(action==='chat-question'){const r=records.question[id];if(!r)return;const topic=BY_ID[r.payload.topicId];if(topic)await startChat(topic,r.payload.text);else await copyPromptOpen(`『知の図書館』の疑問帳に保存していた問いから探究を始めます。\n私の疑問：${r.payload.text}\n${r.payload.answer?`現在の手がかり：${r.payload.answer}\n`:''}関連分野を勝手に決めず、理解するための前提から説明してください。事実と仮説を分け、信頼できる資料と、次に掘り下げる問いを示してください。`);return}
  if(action==='graph-reset'){render();return}
  if(action==='graph-focus-next'){const rel=BY_ID[mapFocus]?.related?.filter(id=>BY_ID[id])||[];if(rel.length){mapFocus=rel[Math.floor(Math.random()*rel.length)];render()}return}
  if(action==='export'){await exportData();return}
