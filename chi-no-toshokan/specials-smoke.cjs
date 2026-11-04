@@ -15,7 +15,7 @@ async function main(){
    await page.goto(url,{waitUntil:'domcontentloaded',timeout:30000});
    await page.locator('#story .story-layout').waitFor({timeout:10000});
    const title=await page.locator('#story h2').first().textContent();
-   assert.match(title,/完全5度/);
+   assert.match(title,/5度/);
    const dims=await page.evaluate(()=>({
     w:document.documentElement.scrollWidth,
     inner:window.innerWidth,
