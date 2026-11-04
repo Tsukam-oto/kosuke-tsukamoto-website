@@ -1,9 +1,9 @@
-/* 知の図書館 v1.8.0: 日本時間の曜日棚。出典・記事そのものは既存data.jsを参照。 */
+/* 知の図書館 v1.9.0: 日本時間の曜日棚。出典・記事そのものは既存data.jsを参照。 */
 window.KNOWLEDGE_WEEKLY = Object.freeze({
   timezone:'Asia/Tokyo',
   days:[
-    {day:'日',label:'知識をつなぐ日',short:'知のつながり',description:'違う分野を組み合わせて、新しい問いを見つける',topicIds:['acoustics','language-sounds','memory','symbiosis','temperament','philosophy','zero','writing']},
-    {day:'月',label:'人間を知る日',short:'心理・自己理解',description:'心理学・臨床・ケア・自己研鑽の入口',topicIds:['memory','sleep','circadian','language-sounds','philosophy','culture']},
+    {day:'日',label:'知識をつなぐ日',short:'知のつながり',description:'違う分野を組み合わせて、新しい問いを見つける',topicIds:['acoustics','language-sounds','memory','symbiosis','temperament','philosophy','zero','writing','adler-community','therapeutic-alliance','habit-formation']},
+    {day:'月',label:'人間を知る日',short:'心理・自己理解',description:'心理学・臨床・ケア・自己研鑽の入口',topicIds:['therapeutic-alliance','habit-formation','adler-community','psychotherapy-map','activation','procrastination-mood','memory','sleep','circadian','language-sounds','philosophy','culture']},
     {day:'火',label:'音のしくみの日',short:'音楽理論・作曲',description:'音律・和声・音響・楽譜から音楽を考える',topicIds:['temperament','acoustics','notation']},
     {day:'水',label:'過去と物語の日',short:'歴史・神話',description:'神話・考古・文字・哲学をたどる',topicIds:['zeus-titans','homer-history','bronze-collapse','oral-epic','writing','indus','calendar']},
     {day:'木',label:'科学の不思議の日',short:'科学・数学',description:'宇宙・生命・地球・数学の「なぜ？」',topicIds:['astronomy','spectra','evolution','magnetism','geology','zero','infinity','symbiosis','extinction']},
