@@ -56,6 +56,7 @@ function renderList(){
  $('countAll').textContent=data.length;
  $('countDated').textContent=data.filter(e=>e.date_status!=='unknown'&&e.source_created_local).length;
  $('countUnknown').textContent=data.filter(e=>!e.source_created_local).length;
+ $('countMatches').textContent=user?uniqueCandidates().length:'—';
  const items=activeList();let last='';
  if(!items.length){$('noteList').innerHTML='<div class="empty-state">まだ言葉がありません。<br>「回収する」から日付付きで取り込めます。</div>';return;}
  $('noteList').innerHTML=items.map(e=>{
