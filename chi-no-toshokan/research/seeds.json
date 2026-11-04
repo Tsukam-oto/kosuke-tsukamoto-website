@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "topics": [
+    {
+      "id": "notation",
+      "area": "音楽",
+      "query": "Guido Arezzo medieval musical notation",
+      "link": "./#article/notation"
+    },
+    {
+      "id": "temperament",
+      "area": "音楽",
+      "query": "history equal temperament musical tuning systems",
+      "link": "./#article/temperament"
+    },
+    {
+      "id": "beethoven5",
+      "area": "音楽",
+      "query": "Beethoven fifth symphony motivic development",
+      "link": "./music-library.html#work/beethoven5"
+    },
+    {
+      "id": "ravelbolero",
+      "area": "音楽",
+      "query": "Ravel Bolero orchestration timbre",
+      "link": "./music-library.html#work/ravelbolero"
+    },
+    {
+      "id": "bachcello",
+      "area": "音楽",
+      "query": "Bach cello suites historically informed performance",
+      "link": "./music-library.html#work/bachcello"
+    },
+    {
+      "id": "music-emotion",
+      "area": "音楽",
+      "query": "music emotion expectancy neuropsychology review",
+      "link": "./music-library.html"
+    },
+    {
+      "id": "adler",
+      "area": "心理・臨床",
+      "query": "Adlerian psychology psychotherapy review",
+      "link": ""
+    },
+    {
+      "id": "therapeutic-alliance",
+      "area": "心理・臨床",
+      "query": "therapeutic alliance psychotherapy meta analysis",
+      "link": ""
+    },
+    {
+      "id": "care",
+      "area": "心理・臨床",
+      "query": "psychotherapy care therapeutic process qualitative",
+      "link": ""
+    },
+    {
+      "id": "habit-formation",
+      "area": "心理・臨床",
+      "query": "habit formation behavior change longitudinal review",
+      "link": ""
+    },
+    {
+      "id": "memory",
+      "area": "心理・臨床",
+      "query": "memory reconsolidation human systematic review",
+      "link": "./#article/memory"
+    },
+    {
+      "id": "odyssey-xenia",
+      "area": "神話・歴史",
+      "query": "Homer Odyssey xenia hospitality",
+      "link": "./myth-series.html#chapter/odyssey"
+    },
+    {
+      "id": "zeus-titans",
+      "area": "神話・歴史",
+      "query": "Hesiod Theogony divine succession mythology",
+      "link": "./#article/zeus-titans"
+    },
+    {
+      "id": "bronze-collapse",
+      "area": "神話・歴史",
+      "query": "Late Bronze Age collapse Mediterranean archaeology",
+      "link": "./#article/bronze-collapse"
+    },
+    {
+      "id": "oral-epic",
+      "area": "神話・歴史",
+      "query": "Homeric oral formulaic epic composition",
+      "link": "./#article/oral-epic"
+    },
+    {
+      "id": "ancient-writing",
+      "area": "神話・歴史",
+      "query": "Linear B Greek alphabet archaeological history",
+      "link": "./myth-series.html#chapter/history"
+    },
+    {
+      "id": "roman-concrete",
+      "area": "科学・社会",
+      "query": "Roman concrete self healing lime clasts research",
+      "link": "./#article/concrete"
+    },
+    {
+      "id": "exoplanets",
+      "area": "科学・社会",
+      "query": "exoplanet transit detection observational astronomy",
+      "link": "./#article/astronomy"
+    },
+    {
+      "id": "microbiome",
+      "area": "科学・社会",
+      "query": "fermented foods microbiome health review",
+      "link": "./#article/fermentation"
+    },
+    {
+      "id": "city",
+      "area": "科学・社会",
+      "query": "urban history archaeology resilience cities",
+      "link": "./#article/city"
+    }
+  ],
+  "musicbrainz": [
+    {
+      "topicId": "beethoven5",
+      "query": "Symphony No. 5 Beethoven"
+    },
+    {
+      "topicId": "ravelbolero",
+      "query": "Bolero Ravel"
+    }
+  ],
+  "museum": [
+    {
+      "topicId": "zeus-titans",
+      "objectId": 247308
+    }
+  ],
+  "anchors": [
+    {
+      "topicId": "zeus-titans",
+      "title": "Hesiod, Theogony (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodTheogony.html"
+    },
+    {
+      "topicId": "odyssey-xenia",
+      "title": "Hesiod, Works and Days (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html"
+    }
+  ]
+}
