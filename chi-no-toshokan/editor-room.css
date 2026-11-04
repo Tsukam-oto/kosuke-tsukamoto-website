@@ -3,3 +3,34 @@
 @media(max-width:380px){.intro h1{font-size:27px}.stats strong{font-size:23px}}
 
 .quick-panel{background:#ebf2e9;border:1px solid #c8ddca;border-radius:15px;padding:19px 22px;margin:17px 0 20px}.quick-panel h2{margin:0;font-size:18px}.quick-panel p{font-size:12.5px;color:#516c59;margin:4px 0 11px}.quick-controls{display:flex;gap:10px;align-items:stretch}.quick-controls textarea{min-width:0;flex:1;resize:vertical;min-height:68px;background:#fffefa;color:#243e32;border:1px solid #bfcebf;border-radius:10px;padding:9px 12px;font:inherit;font-size:14px}.quick-controls button{padding:8px 18px;border-radius:10px;border:1px solid #235b43;font-weight:700;min-width:130px}.quick-panel small{display:block;margin-top:9px;color:#607563;font-size:11px}@media(max-width:690px){.quick-panel{padding:15px 14px}.quick-controls{flex-direction:column}.quick-controls button{min-height:48px}.quick-controls textarea{font-size:16px}}
+
+/* v0.2: magazine identity + capacity forecast; controls always visible on phones. */
+.magazine-panel{border:1px solid #d7e4d7;background:#fffefa;border-radius:17px;padding:21px;margin:17px 0 23px}
+.magazine-panel .panel-head{margin-bottom:14px;flex-wrap:wrap}
+.magazine-panel h2{font-size:19px}
+.small-note{font-size:11.5px;color:#587261;line-height:1.85}
+.magazine-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}
+.magazine-card{border:1px solid #dbe5db;border-radius:11px;padding:12px 13px;background:#f6f9f3;min-width:0;display:flex;flex-direction:column}
+.magazine-card strong{font-size:12.5px;line-height:1.65;color:#23533e}
+.magazine-card p{font-size:11.5px;color:#536f5c;line-height:1.8;margin:8px 0 10px;flex:1}
+.magazine-card small{font-size:10px;line-height:1.6;color:#677b69}
+.cadence-details{border-top:1px solid #dce7dc;margin-top:15px;padding-top:5px}
+.cadence-details summary{cursor:pointer;list-style:none;min-height:48px;display:flex;align-items:center;color:#245940;font-weight:800;font-size:14px;line-height:1.65}
+.cadence-details summary::-webkit-details-marker{display:none}
+.cadence-details summary::before{content:"+";display:inline-grid;place-items:center;width:25px;height:25px;margin-right:10px;border:1px solid #cddccc;background:#f1f6ee;border-radius:6px;flex-shrink:0}
+.cadence-details[open] summary::before{content:"−"}
+.cadence-details>p{font-size:12px;color:#5b715f;margin:2px 0 13px}
+.cadence-inputs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.cadence-inputs label{font-size:12px;font-weight:700;color:#2c5942;padding:11px 12px;background:#f5f8f3;border-radius:10px;line-height:1.75}
+.cadence-inputs label strong{font-size:17px;font-variant-numeric:tabular-nums}
+.cadence-inputs input{display:block;width:100%;accent-color:#2c674c;min-height:40px;cursor:pointer;touch-action:pan-y}
+.cadence-output{padding:14px 16px;background:#edf3e9;border:1px solid #d3e4d2;border-radius:11px;margin:12px 0;display:grid;gap:5px}
+.cadence-output strong{font-size:16px;line-height:1.5}
+.cadence-output span{font-size:13px;line-height:1.8}
+.cadence-output small{font-size:11px;line-height:1.8;color:#526e59}
+.weekly-table{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:8px;margin-top:8px}
+.weekly-item{border-radius:10px;border:1px solid #d6e4d7;background:#f4f8f3;padding:10px 7px;display:flex;flex-direction:column;gap:4px}
+.weekly-item strong{color:#28523c;font-size:13px}.weekly-item span{font-size:11px;line-height:1.6;font-weight:700}.weekly-item small{font-size:10px;color:#5d7462;line-height:1.5}
+.magazine-advice{font-size:11px;background:#f2f6ed;color:#566f5b;border-radius:8px;padding:9px 12px;line-height:1.8;margin-top:7px}
+@media(max-width:950px){.magazine-list{grid-template-columns:repeat(3,minmax(0,1fr))}.weekly-table{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:690px){.magazine-panel{padding:16px 13px}.magazine-list{display:flex;overflow-x:auto;scroll-snap-type:x proximity;gap:8px;padding:2px 1px 9px;margin:0 -2px;-webkit-overflow-scrolling:touch}.magazine-card{flex:0 0 75%;max-width:275px;scroll-snap-align:start;padding:13px}.magazine-card strong{font-size:14px}.magazine-card p{font-size:12.5px}.cadence-inputs{grid-template-columns:1fr;gap:8px}.cadence-inputs label{font-size:13px}.cadence-output strong{font-size:15px}.weekly-table{grid-template-columns:repeat(2,minmax(0,1fr))}.weekly-item{padding:10px}.weekly-item span{font-size:12px}.cadence-details summary{font-size:13px}}
