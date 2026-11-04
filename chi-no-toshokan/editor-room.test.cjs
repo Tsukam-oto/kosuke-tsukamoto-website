@@ -41,7 +41,7 @@ const elements={};
 const create=id=>elements[id]||(elements[id]={
  value:'',innerHTML:'',textContent:'',hidden:false,disabled:false,handlers:{},
  classList:{toggle(){}},
- addEventListener(type,fn){this.handlers[type]=fn},
+ addEventListener(type,fn){const previous=this.handlers[type];this.handlers[type]=previous?(...args)=>{previous(...args);return fn(...args)}:fn},
  focus(){},reset(){},
  scrollIntoView(){},
 });
