@@ -1,0 +1,37 @@
+/* v1.6.1: story-first reading without confusing interpretation and evidence */
+.scene-art,.museum-art{margin:24px 0 34px;overflow:hidden;border-radius:15px;background:#edf2ed;border:1px solid #d4dcd2}
+.scene-art svg{max-height:330px}
+.scene-art figcaption,.museum-art figcaption{display:block;padding:14px 18px;color:#647369;font-size:12px;line-height:1.75}
+.story-atmosphere{background:linear-gradient(130deg,#f4f0e5,#e9eee5);border-radius:14px;padding:20px 22px;margin:25px 0 35px;border-left:4px solid #bda474}
+.story-atmosphere span{display:block;font-size:11px;color:#8c7956;letter-spacing:.08em;font-weight:800;margin-bottom:6px}
+.story-atmosphere p{font-size:15px;line-height:2.05;margin:0}
+.museum-art{display:grid;grid-template-columns:minmax(180px,40%) minmax(0,1fr);align-items:center;gap:0;background:#f4f2eb}
+.museum-image{height:100%;min-height:280px;display:flex;justify-content:center;align-items:center;background:#e2dfd7}
+.museum-image img{display:block;width:100%;height:100%;max-height:390px;object-fit:contain}
+.museum-art figcaption{font-size:13px;padding:24px 25px}
+.museum-art figcaption b{display:block;font-size:17px;color:#274637;line-height:1.5;margin-bottom:12px}
+.museum-art figcaption span{display:block;line-height:1.9;margin-bottom:13px}
+.museum-art figcaption a{font-size:12px;font-weight:700}
+.deeper-reading{padding-top:8px}
+.deeper-reading h3{font-size:21px;color:#315447;padding:11px 0 13px;margin:17px 0 24px;border-bottom:1px solid #d5dfd4;letter-spacing:.015em}
+.deeper-reading p{font-size:16px;line-height:2.25;margin-bottom:26px}
+.chapter-glossary{border:1px solid #cad9cd;border-radius:12px;margin:30px 0 20px;background:#f7f9f4}
+.chapter-glossary summary{list-style:none;cursor:pointer;padding:16px 18px;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.chapter-glossary summary::-webkit-details-marker{display:none}
+.chapter-glossary summary span{font-size:22px;color:#66816e;line-height:1}
+.chapter-glossary[open] summary span{transform:rotate(45deg)}
+.chapter-glossary dl{margin:0 18px 20px;border-top:1px solid #d6e1d8}
+.chapter-glossary dl>div{padding:13px 2px;border-bottom:1px solid #e0e7de}
+.chapter-glossary dt{font-weight:700;color:#315a47;font-size:14px}
+.chapter-glossary dd{margin:2px 0 0;font-size:13px;color:#526c5c;line-height:1.8}
+.figure svg{max-height:290px}
+@media(max-width:680px){
+ .museum-art{display:block}
+ .museum-image{min-height:0;height:240px}
+ .museum-image img{max-height:240px}
+ .museum-art figcaption{padding:14px 17px}
+ .deeper-reading h3{font-size:19px}
+ .deeper-reading p{font-size:15px;line-height:2.15}
+ .story-atmosphere{padding:16px 17px}
+ .scene-art figcaption{padding:10px 12px}
+}
