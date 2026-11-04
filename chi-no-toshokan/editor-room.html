@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="./editor-room.css">
 <title>知の図書館｜AI実践と発信の編集室</title>
 <script defer src="./editor-magazines.js"></script>
+<script defer src="./editor-note-package.js"></script>
 <script defer src="./editor-room.js"></script>
 </head><body>
 <header class="header"><a href="./" class="brand">◈ 知の図書館</a><span>編集室｜本人専用</span><a href="./research-dossiers.html">研究の調査票</a></header>
@@ -81,6 +82,30 @@
      <div class="draft-counters" aria-live="polite"><strong id="article-count">0字</strong><span id="reading-time">推定読書時間：未計測</span><span id="article-range">字数の目安を表示</span></div>
      <div id="editor-lint" class="editor-lint" aria-live="polite"></div>
      <div class="form-actions"><button type="button" id="copy-article" class="secondary">本文をコピーしてnoteへ</button></div>
+     <details class="note-package">
+       <summary>画像・目次・プレビューをまとめる｜note投稿パッケージ</summary>
+       <p class="small-note">見出し画像は1280×670pxのPNGを自動生成します。本文の目次・画像配置は原稿から提案します。noteへのアップロードと目次の挿入操作は本人が行います。</p>
+       <div class="note-package-grid">
+         <section aria-label="noteの見出し画像">
+           <h4>見出し画像</h4>
+           <canvas id="note-cover" width="1280" height="670" aria-label="生成されたnote見出し画像のプレビュー" role="img"></canvas>
+           <div class="form-actions">
+             <button type="button" id="refresh-cover" class="secondary">タイトルから再生成</button>
+             <button type="button" id="download-cover" class="primary">PNGを保存</button>
+           </div>
+         </section>
+         <section aria-label="見出しと本文の図解">
+           <h4>目次に使う見出し</h4>
+           <div id="note-toc" class="note-toc" aria-live="polite"></div>
+           <h4>本文中の画像・図解候補</h4>
+           <div id="note-visuals" class="note-visuals" aria-live="polite"></div>
+           <div class="form-actions"><button type="button" id="copy-note-plan" class="secondary">投稿手順・画像案をコピー</button></div>
+         </section>
+       </div>
+       <h4>スマホ向け記事プレビュー</h4>
+       <div id="note-preview" class="note-preview" aria-live="polite"></div>
+       <p class="small-note">このプレビューはnote本体と完全に同じ表示ではありません。投稿時にはnoteエディタで大見出し・小見出しを指定し、「＋」→「目次」、画像のアップロードを行ってください。</p>
+     </details>
      <p class="small-note">機械的な読みやすさチェックは文章を評価・公開承認するものではありません。出典・権利・学校の内部情報と本人の言葉は、人が確認してください。</p>
     </section>
     <label for="stage">編集上の段階</label>
