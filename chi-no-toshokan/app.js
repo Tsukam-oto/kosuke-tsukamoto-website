@@ -1,4 +1,4 @@
-/* 知の図書館 v1.4.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.4.1 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -9,6 +9,7 @@ const PUBLIC_KEY = 'sb_publishable_dxiidJt1gVcFwkVR2fg1HA_6gHAZNDz';
 const CLOUD_IMPORT_URL = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.57.4/+esm';
 let client = null, currentUser = null, cloudStatus = 'loading', cloudError = '', fetching = false;
 let lastCloudRefresh=0, syncDiagnostic={status:'idle',text:'',at:null};
+let fetchingOwner='',pendingCrossAccountReload=false,dailySyncWarning='';
 const writeQueues=new Map();
 let records = {book:{}, visit:{}, question:{}, note:{}, thread:{}};
 let view = 'home', selectedId = null, currentEncounter = null, encounterMode = 'unfamiliar';
@@ -75,6 +76,12 @@ function renderTopicCard(t,index=0){
 let dailyChoice={key:'',topicId:''};
 function makeDailyTopic(){
  const key=`knowledge-library:daily:${currentUser?.id||'visitor'}:${today()}`;
+ const sharedId=currentUser?records.note[`note:daily:${today()}`]?.payload?.topicId:'';
+ if(BY_ID[sharedId]){
+  dailyChoice={key,topicId:sharedId};
+  try{localStorage.setItem(key,sharedId)}catch{}
+  return BY_ID[sharedId];
+ }
  if(dailyChoice.key===key && BY_ID[dailyChoice.topicId])return BY_ID[dailyChoice.topicId];
  let stored='';
  try{stored=localStorage.getItem(key)||''}catch{}
@@ -360,7 +367,7 @@ async function resumeJourney(r){
 }
 
 function renderSettings(){return `<div class="kicker">YOUR SPACE</div><h1 class="page-title">保存・設定</h1><p class="page-description">${globalThis.__KNOWLEDGE_DEMO?'操作プレビューです。保存内容はこの画面だけに残り、クラウドへは送信しません。正式公開版では本人のクラウドへ同期されます。':'学習記録はクラウドに保存され、同じアカウントで別の端末から利用できます。公開される記事と個人の記録は分離しています。'}</p>
- <div class="settings-grid"><section class="panel"><div class="panel-title">クラウド同期</div><p class="small">${currentUser?`ログイン：${esc(currentUser.email||'認証済み')}<br>状態：${cloudStatus==='ready'?'同期可能':'接続確認中'}`:'未ログイン。閲覧のみ利用できます。保存・復元には認証が必要です。'}</p>${cloudError?`<p class="status-line warn">${esc(cloudError)}</p>`:''}<button class="btn" data-action="auth">${currentUser?'アカウントを表示':'ログインして同期する'}</button>${currentUser?'<button class="btn btn-outline" data-action="refresh">同期を再確認する</button><button class="btn btn-soft" data-action="diagnose-sync">保存・読み戻し・削除を診断</button>':''}${currentUser?`<p class="small" id="sync-diagnostic" role="status" aria-live="polite">${esc(syncDiagnostic.text||'クラウドの書き込み診断はまだ実施していません。')}</p>${lastCloudRefresh?`<p class="small">最終取得：${esc(new Date(lastCloudRefresh).toLocaleString('ja-JP'))}</p>`:''}`:''}</section>
+ <div class="settings-grid"><section class="panel"><div class="panel-title">クラウド同期</div><p class="small">${currentUser?`ログイン：${esc(currentUser.email||'認証済み')}<br>状態：${cloudStatus==='ready'?'同期可能':'接続確認中'}`:'未ログイン。閲覧のみ利用できます。保存・復元には認証が必要です。'}</p>${cloudError?`<p class="status-line warn">${esc(cloudError)}</p>`:''}${dailySyncWarning?`<p class="status-line warn">${esc(dailySyncWarning)}</p>`:''}<button class="btn" data-action="auth">${currentUser?'アカウントを表示':'ログインして同期する'}</button>${currentUser?'<button class="btn btn-outline" data-action="refresh">同期を再確認する</button><button class="btn btn-soft" data-action="diagnose-sync">保存・読み戻し・削除を診断</button>':''}${currentUser?`<p class="small" id="sync-diagnostic" role="status" aria-live="polite">${esc(syncDiagnostic.text||'クラウドの書き込み診断はまだ実施していません。')}</p>${lastCloudRefresh?`<p class="small">最終取得：${esc(new Date(lastCloudRefresh).toLocaleString('ja-JP'))}</p>`:''}`:''}</section>
  <section class="panel"><div class="panel-title">バックアップとエクスポート</div><p class="small">蔵書、しおり、疑問帳、トーク由来の学習記録、探究プロジェクト、気づきの履歴をJSON形式で一括書き出します。バックアップを別の端末で読み込むこともできます。</p><div class="actions"><button class="btn btn-soft" data-action="export">JSONを書き出す ↓</button><button class="btn btn-outline" data-action="import">バックアップから復元 ↑</button><input id="importFile" type="file" accept="application/json,.json" hidden /></div></section>
  <section class="panel"><div class="panel-title">探究の質</div><p class="small">記事は固定の編集コンテンツです。AIと話すときはプロンプトをコピーし、ChatGPTで開きます。ChatGPTの回答は自動同期されません。引き継ぎJSONを選択・確認してから取り込みます。</p><p class="small">データに利用者の操作履歴を保存します。広告・解析トラッカーは設置していません。</p></section>
  <section class="panel"><div class="panel-title">データと費用</div><p class="small">同期：既存のSupabase。クライアントには公開用キーのみを使用し、ユーザー単位のアクセス制御を有効化しています。</p><p class="small">AI API：未接続。追加の従量料金は発生させません。クラウド利用は既存プランの制限に従います。</p></section></div>`}
@@ -424,7 +431,7 @@ async function save(kind,id,payload,opts={}){
   else {if(kind!=='visit'){dialog={type:'plain-prompt',saveFail:true,prompt:'通信エラーのためクラウドへ保存できませんでした。\nこの下は保存を試みた内容です。閉じる前にコピーして保管してください。\n\n'+JSON.stringify({kind,id,payload:row.payload},null,2)};renderDialog()}notice('保存に失敗しました。文章をコピーして保管してください: '+(e.message||e),true)}
   return false}
 }
-async function remove(kind,key){if(!needAuth())return false;const old=deep(records[kind][key]||null);if(!old)return false;delete records[kind][key];render();try{await queueWrite(key,async()=>{const {data,error}=await client.from('knowledge_records').delete().eq('user_id',old.user_id).eq('id',key).eq('updated_at',old.updated_at).select('id');if(error)throw error;if(!data?.some(x=>x.id===key))throw new Error('別端末で変更されたため、削除を中止しました。')});notice('削除しました');return true}catch(e){records[kind][key]=old;render();notice('削除できませんでした: '+e.message,true);return false}}
+async function remove(kind,key){if(!needAuth())return false;const old=deep(records[kind][key]||null);if(!old)return false;delete records[kind][key];render();try{await queueWrite(key,async()=>{const {data,error}=await client.from('knowledge_records').delete().eq('user_id',old.user_id).eq('id',key).eq('updated_at',old.updated_at).select('id');if(error)throw error;if(!data?.some(x=>x.id===key))throw new Error('別端末で変更されたため、削除を中止しました。')});notice('削除しました');return true}catch(e){if(currentUser?.id===old.user_id && !records[kind][key]){records[kind][key]=old;render()}notice('削除できませんでした: '+e.message,true);return false}}
 async function openArticle(id){if(!BY_ID[id])return;sessionSeen.add(id);const old=visit(id)||{};if(currentUser&&cloudStatus==='ready'){await save('visit',id,{topicId:id,lastVisited:new Date().toISOString(),readIndex:Number(old.readIndex||0)},{silent:true,quiet:true})}navigate('article',id)}
 function showAuth(){dialog={type:'auth',message:''};renderDialog()}
 function showQuestion(topicId='',text='',recId=''){dialog={type:'question',topicId,text,recId};renderDialog()}
@@ -449,15 +456,55 @@ async function initCloud(){
  try{
   const mod=await import(CLOUD_IMPORT_URL);
   client=mod.createClient(API_URL,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
-  client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;syncDiagnostic={status:'idle',text:'',at:null};lastCloudRefresh=0;records={book:{},visit:{},question:{},note:{},thread:{}};cloudStatus='guest';render()}else if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){const prior=currentUser?.id;currentUser=session?.user||null;if(currentUser&&prior!==currentUser.id){setTimeout(()=>loadCloud(),0)}}});
+  client.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_OUT'){currentUser=null;dailySyncWarning='';syncDiagnostic={status:'idle',text:'',at:null};lastCloudRefresh=0;records={book:{},visit:{},question:{},note:{},thread:{}};cloudStatus='guest';render()}else if(event==='SIGNED_IN'||event==='TOKEN_REFRESHED'){const prior=currentUser?.id;currentUser=session?.user||null;if(currentUser&&prior!==currentUser.id){if(prior){records={book:{},visit:{},question:{},note:{},thread:{}};dailySyncWarning='';cloudStatus='loading';render()}setTimeout(()=>loadCloud(),0)}}});
   const {data,error}=await client.auth.getUser();if(error && !String(error.message||'').toLowerCase().includes('session'))throw error;
   if(data?.user){currentUser=data.user;await loadCloud()} else {cloudStatus='guest';render()}
  }catch(e){cloudStatus='error';cloudError=String(e.message||e);render()}
 }
-async function loadCloud(){if(!currentUser||!client||fetching)return;const loadingFor=currentUser.id;fetching=true;cloudStatus='loading';updateChrome();
+function chooseSharedDaily(groups,owner){
+ const key=`knowledge-library:daily:${owner}:${today()}`;
+ const visited=new Set(Object.values(groups.visit).map(r=>r.payload?.topicId).filter(Boolean));
+ const unread=TOPICS.filter(t=>!visited.has(t.id)&&!sessionSeen.has(t.id));
+ const base=unread.length?unread:TOPICS.slice().sort((a,b)=>(groups.visit['visit:'+a.id]?.payload?.lastVisited||'').localeCompare(groups.visit['visit:'+b.id]?.payload?.lastVisited||''));
+ return base[hashCode(key)%base.length]?.id||TOPICS[0]?.id;
+}
+async function ensureSharedDaily(groups,owner){
+ if(!TOPICS.length)return;
+ const key='note:daily:'+today();
+ if(BY_ID[groups.note[key]?.payload?.topicId])return;
+ const now=new Date().toISOString();
+ const row={id:key,kind:'note',user_id:owner,created_at:now,updated_at:now,payload:{entryType:'daily-discovery',day:today(),topicId:chooseSharedDaily(groups,owner)}};
+ const created=await client.from('knowledge_records').insert(row);
+ if(!created.error){groups.note[key]=row;return}
+ // Other device won the insert race: read its choice instead of overwriting it.
+ if(created.error.code==='23505'){
+  const found=await client.from('knowledge_records').select('id,kind,payload,created_at,updated_at').eq('user_id',owner).eq('id',key).single();
+  if(found.error)throw found.error;
+  if(!BY_ID[found.data?.payload?.topicId])throw new Error('今日の発見の共有記録を読み戻せませんでした');
+  groups.note[key]=found.data;
+  return;
+ }
+ throw created.error;
+}
+async function loadCloud(){
+ if(!currentUser||!client)return;
+ if(fetching){if(fetchingOwner!==currentUser.id)pendingCrossAccountReload=true;return}
+ const loadingFor=currentUser.id;
+ fetching=true;fetchingOwner=loadingFor;cloudStatus='loading';updateChrome();
  try{await Promise.all([...writeQueues.values()].map(job=>job.catch(()=>{})));let rows=[];let page=0;while(page<30){const {data,error}=await client.from('knowledge_records').select('id,kind,payload,created_at,updated_at').order('updated_at',{ascending:false}).range(page*1000,(page+1)*1000-1);if(error)throw error;rows.push(...(data||[]));if((data||[]).length<1000)break;page++}
- if(currentUser?.id!==loadingFor)return;const groups={book:{},visit:{},question:{},note:{},thread:{}};rows.forEach(r=>{if(groups[r.kind]&&r.id)groups[r.kind][r.id]=r});records=groups;cloudStatus='ready';cloudError='';lastCloudRefresh=Date.now();render();
- }catch(e){if(currentUser?.id===loadingFor){cloudStatus='error';cloudError=e.message||String(e);render();notice('同期できませんでした。保存は停止中です。',true)}}finally{fetching=false}
+ if(currentUser?.id!==loadingFor)return;
+ const groups={book:{},visit:{},question:{},note:{},thread:{}};
+ rows.forEach(r=>{if(groups[r.kind]&&r.id)groups[r.kind][r.id]=r});
+ dailySyncWarning='';
+ try{await ensureSharedDaily(groups,loadingFor)}catch(e){dailySyncWarning='今日の発見の端末間共有を確認できませんでした: '+(e.message||e)}
+ if(currentUser?.id!==loadingFor)return;
+ records=groups;cloudStatus='ready';cloudError='';lastCloudRefresh=Date.now();render();
+ if(dailySyncWarning)notice(dailySyncWarning,true);
+ }catch(e){if(currentUser?.id===loadingFor){cloudStatus='error';cloudError=e.message||String(e);render();notice('同期できませんでした。保存は停止中です。',true)}}finally{
+  fetching=false;fetchingOwner='';
+  if(pendingCrossAccountReload&&currentUser){pendingCrossAccountReload=false;queueMicrotask(()=>loadCloud())}
+  else pendingCrossAccountReload=false;
+ }
 }
 function promptText(t,question=''){const b=book(t.id)||{};const v=visit(t.id)||{};const summary=b.ownSummary?`\n私の学習メモ: ${b.ownSummary}`:'';
  return `『知の図書館』で学習を続けます。テーマ:「${t.title}」(${t.domain})。\n前回までの要点: ${t.summary}${summary}\n読了段階: ${v.readIndex||0}/${t.sections?.length||0}。\n${question?`私の疑問: ${question}\n`:''}小さな問いから段階的に深掘りしてください。事実・仮説・学説の対立を区別し、根拠と参考文献を示し、私が「なぜ」「それ以前は」「本当にそうなのか」と質問したら、答えを繰り返すのではなく根拠を検討してください。既習の内容を長々と復習せず、その先からお願いします。`}
