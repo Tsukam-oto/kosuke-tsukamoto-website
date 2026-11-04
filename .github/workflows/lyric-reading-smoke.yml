@@ -33,5 +33,6 @@ jobs:
         run: |
           node lyric-constellation/deep-reading.test.js
           node lyric-constellation/author-review.test.js
+          node lyric-constellation/mummy-research.test.cjs
       - name: Browser smoke – desktop and mobile
         run: node lyric-constellation/browser-smoke.cjs
