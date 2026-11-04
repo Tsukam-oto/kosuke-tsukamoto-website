@@ -874,7 +874,40 @@ async function loadMasterReadingCorpus(user,epoch){
  }
 }
 
-async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===user.id)return;const epoch=++cloudEpoch;masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='loading';cloudUser=user;cloudBusy=true;cloudDirty=false;cloudBlocked=false;previousLocal=JSON.parse(JSON.stringify(db));setCloudStatus('クラウド読込中…','pending');cloudButton().textContent='同期中';try{
+
+async function loadMummyResearch(user,epoch){
+ if(!user?.id||!cloudClient)return;
+ rapResearchStatus='loading';
+ try{
+  const [a,b,c]=await Promise.all([
+   cloudClient.from('lyric_research_sources').select('id,source_key,title,author_credit,date_label,date_precision,original_text,provenance,verification_status')
+    .eq('user_id',user.id).eq('source_key','essay:2022-08:sakui-musa').limit(1),
+   cloudClient.from('lyric_research_passages').select('id,source_id,section_key,heading,evidence_a,evidence_b,interpretation,alternative,inquiry,assessment_status')
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(100),
+   cloudClient.from('lyric_research_connections').select('id,source_id,work_id,theme_key,heading,interpretation,alternative,essay_evidence,lyric_evidence,lyric_line,assessment_status')
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(200)
+  ]);
+  if(a.error)throw a.error;
+  if(b.error)throw b.error;
+  if(c.error)throw c.error;
+  if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
+  rapResearchSource=a.data?.[0]||null;
+  rapResearchPassages=(b.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
+  rapResearchConnections=(c.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
+  rapResearchStatus='ready';
+  render();
+ }catch(err){
+  if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
+  rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];
+  rapResearchStatus='error';console.warn('owner-only rap research load failed',err);render();
+ }
+}
+function clearMummyResearch(){
+ rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];
+ rapResearchStatus='signed_out';window.MummyResearchView?.reset?.();
+}
+
+async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===user.id)return;const epoch=++cloudEpoch;masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='loading';clearMummyResearch();rapResearchStatus='loading';cloudUser=user;cloudBusy=true;cloudDirty=false;cloudBlocked=false;previousLocal=JSON.parse(JSON.stringify(db));setCloudStatus('クラウド読込中…','pending');cloudButton().textContent='同期中';try{
   let remote=await readCloudState();if(!remote){const {error}=await cloudClient.from('lyric_constellation_state').insert({user_id:user.id,payload:statePayload({userWorks:[],notes:{},customWords:[]}),revision:0});if(error&&error.code!=='23505')throw error;remote=await readCloudState();}
   if(epoch!==cloudEpoch||!cloudUser)return;
   const cachekey=CLOUD_CACHE_PREFIX+user.id;let cache=null;try{cache=JSON.parse(localStorage.getItem(cachekey)||'null')}catch{}
@@ -885,7 +918,7 @@ async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===us
     // Preserve both versions; never overwrite a newer cloud revision without review.
     db=statePayload(cache.payload);cloudDirty=true;cloudBlocked=true;setCloudStatus('別端末との競合・要確認','pending');toast('別端末に更新があります。JSONバックアップを保存してください。');
   }else{db=remotePayload;localStorage.setItem(cachekey,JSON.stringify({revision:cloudRevision,payload:db}));setCloudStatus('クラウド同期済み','online');}
-  selected=works()[0]?.id||null;render();cloudButton().textContent='同期設定';await loadMasterReadingCorpus(user,epoch);if(cloudDirty&&!cloudBlocked)pushCloud();
+  selected=works()[0]?.id||null;render();cloudButton().textContent='同期設定';await Promise.all([loadMasterReadingCorpus(user,epoch),loadMummyResearch(user,epoch)]);if(cloudDirty&&!cloudBlocked)pushCloud();
 }catch(err){setCloudStatus('同期エラー','pending');toast('クラウド読込に失敗：'+(err.message||'再試行してください'));cloudButton().textContent='同期設定';}finally{cloudBusy=false;if(cloudDirty&&!cloudBlocked&&cloudUser&&cloudRevision!==null){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,50);}}}
 async function pushCloud(){if(!cloudUser||cloudWriting||cloudBlocked||!cloudDirty||cloudRevision===null||cloudBusy)return;const myEpoch=cloudEpoch,uid=cloudUser.id,oldRev=cloudRevision;
 cloudWriting=true;cloudDirty=false;const snapshot=statePayload(db);setCloudStatus('クラウド保存中…','pending');try{const{data,error}=await cloudClient.from('lyric_constellation_state').update({payload:snapshot,revision:oldRev+1,updated_at:new Date().toISOString()}).eq('user_id',uid).eq('revision',oldRev).select('revision');if(error)throw error;if(myEpoch!==cloudEpoch)return;
@@ -895,8 +928,8 @@ localStorage.setItem(CLOUD_CACHE_PREFIX+uid,JSON.stringify({revision:cloudRevisi
 if(cloudDirty){setCloudStatus('続けて同期中…','pending');}else{setCloudStatus('クラウド同期済み','online');}
 }catch(err){cloudDirty=true;setCloudStatus('未同期・再試行が必要','pending');console.warn('cloud sync error',err);toast('同期できていません。データはこの端末に残っています。');}
 finally{cloudWriting=false;if(cloudDirty&&!cloudBlocked&&myEpoch===cloudEpoch){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,1400);}}}
-async function cloudRefresh(){if(!cloudUser)return;const incoming=await readCloudState();if(!incoming){toast('クラウド側の保存領域が見つかりません。');return;}if(cloudDirty||cloudBlocked||cloudWriting){toast('この端末に未同期の変更があります。JSONに書き出してから再確認してください。');return;}cloudRevision=Number(incoming.revision);db=statePayload(incoming.payload);cloudPrevious=db;localStorage.setItem(CLOUD_CACHE_PREFIX+cloudUser.id,JSON.stringify({revision:cloudRevision,payload:db}));render();await loadMasterReadingCorpus(cloudUser,cloudEpoch);setCloudStatus('クラウド同期済み','online');toast('クラウドの記録を確認しました。')}
-async function cloudLogout(){if(!cloudUser)return;if(cloudDirty||cloudBlocked){toast('未同期の変更があります。バックアップしてからログアウトしてください。');return;}if(!confirm('この端末のログインを解除しますか？ クラウドに保存済みの原稿は残ります。'))return;const uid=cloudUser.id;const res=await cloudClient.auth.signOut();if(res.error){toast(res.error.message);return;}++cloudEpoch;localStorage.removeItem(CLOUD_CACHE_PREFIX+uid);cloudUser=null;cloudRevision=null;cloudPrevious=null;cloudDirty=false;cloudBlocked=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');toast('ログアウトしました。')}
+async function cloudRefresh(){if(!cloudUser)return;const incoming=await readCloudState();if(!incoming){toast('クラウド側の保存領域が見つかりません。');return;}if(cloudDirty||cloudBlocked||cloudWriting){toast('この端末に未同期の変更があります。JSONに書き出してから再確認してください。');return;}cloudRevision=Number(incoming.revision);db=statePayload(incoming.payload);cloudPrevious=db;localStorage.setItem(CLOUD_CACHE_PREFIX+cloudUser.id,JSON.stringify({revision:cloudRevision,payload:db}));render();await Promise.all([loadMasterReadingCorpus(cloudUser,cloudEpoch),loadMummyResearch(cloudUser,cloudEpoch)]);setCloudStatus('クラウド同期済み','online');toast('クラウドの記録を確認しました。')}
+async function cloudLogout(){if(!cloudUser)return;if(cloudDirty||cloudBlocked){toast('未同期の変更があります。バックアップしてからログアウトしてください。');return;}if(!confirm('この端末のログインを解除しますか？ クラウドに保存済みの原稿は残ります。'))return;const uid=cloudUser.id;const res=await cloudClient.auth.signOut();if(res.error){toast(res.error.message);return;}++cloudEpoch;localStorage.removeItem(CLOUD_CACHE_PREFIX+uid);cloudUser=null;cloudRevision=null;cloudPrevious=null;cloudDirty=false;cloudBlocked=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';clearMummyResearch();load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');toast('ログアウトしました。')}
 function importDeviceLocal(){if(!cloudUser)return;let local;try{local=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{}if(!local||(local.userWorks||[]).length===0&&Object.keys(local.notes||{}).length===0&&Object.keys(local.readingReviews||{}).length===0){toast('このブラウザに引き継げる下書きや精読記録がありません');return;}if(!confirm('この端末の非公開作品・メモ・精読の本人確認をクラウド側へ追加します。既存のクラウド作品は保持します。'))return;try{const r=mergeImported(local);render();toast(`${r.added}作品を追加。クラウドへの保存を開始しました。`)}catch(err){toast(err.message)}}
 async function importFromYohaku(){if(!cloudUser)return;try{const {data,error}=await cloudClient.from('lyric_notes').select('id,title,body,original_body,kind,created_at').order('created_at',{ascending:true}).limit(250);if(error)throw error;if(!data?.length){toast('余白に取り込める記録がありません。');return;}
 const chosen=data.filter(x=>String(x.original_body||x.body||'').trim()).filter(x=>!db.userWorks.some(w=>w.id==='yohaku-'+x.id));if(!chosen.length){toast('余白の記録は取り込み済みです。');return;}if(!confirm(`余白 LYRIC NOTEの本人原文 ${chosen.length}件を、歌詞の星座の非公開作品として取り込みますか？ 原本は変更しません。`))return;let count=0;for(const x of chosen){const w=cleanWork({id:'yohaku-'+x.id,title:x.title||'無題',lyrics:x.original_body||x.body,year:x.created_at?.slice(0,4),credit:'本人原文（余白 LYRIC NOTEより取り込み）',kind:'ラップ（木乃伊）',sky:'rap',tags:[]});if(w){db.userWorks.push(w);count++;}}if(count){save();switchSky('rap');toast(`${count}件を木乃伊の空に取り込みました。余白の原本は変更していません。`)}
@@ -908,7 +941,7 @@ const ua=navigator.userAgent||'';if(/iphone|ipad|ipod/i.test(ua)){toast('Safari�
 // Keep login handling separate from published lyrics and existing local backup functionality.
 document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{switch(b.id){case'cloudTop':case'cloudLogin':showCloud();break;case'authClose':document.getElementById('authDialog').close();break;case'authLink':{const email=document.getElementById('cloudEmail').value.trim();if(!email){authMessage('メールアドレスを入力してください');return;}const{error}=await ensureCloud().auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});authMessage(error?error.message:'メールを送信しました。届いたリンクまたは認証コードをご確認ください。');break;}case'authVerify':{const email=document.getElementById('cloudEmail').value.trim(),token=document.getElementById('cloudCode').value.trim();if(!email||!token){authMessage('メールアドレスと認証コードを入力してください');return;}const{data,error}=await ensureCloud().auth.verifyOtp({email,token,type:'email'});if(error)authMessage(error.message);else{document.getElementById('authDialog').close();await startCloudSession(data.user);}break;}case'cloudRefresh':await cloudRefresh();break;case'cloudLocalImport':importDeviceLocal();break;case'cloudYohaku':case'importRap':if(!cloudUser)showCloud();else await importFromYohaku();break;case'cloudLogout':await cloudLogout();break;case'installPwa':installPwa();break;}}catch(err){authMessage(err.message||String(err));toast('クラウド処理でエラーが発生しました。')}});
 document.getElementById('authForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;try{const{data,error}=await ensureCloud().auth.signInWithPassword({email:f.elements.email.value.trim(),password:f.elements.password.value});if(error){authMessage(error.message);return;}document.getElementById('authDialog').close();await startCloudSession(data.user);}catch(err){authMessage(err.message||String(err))}});
-async function startAuth(){try{const cli=ensureCloud();cli.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='USER_UPDATED'){if(session?.user&&session.user.id!==cloudUser?.id)setTimeout(()=>startCloudSession(session.user),0);}else if(event==='SIGNED_OUT'&&cloudUser){setTimeout(()=>{if(cloudUser){++cloudEpoch;cloudUser=null;cloudRevision=null;cloudBlocked=false;cloudDirty=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');}},0)}});
+async function startAuth(){try{const cli=ensureCloud();cli.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='USER_UPDATED'){if(session?.user&&session.user.id!==cloudUser?.id)setTimeout(()=>startCloudSession(session.user),0);}else if(event==='SIGNED_OUT'&&cloudUser){setTimeout(()=>{if(cloudUser){++cloudEpoch;cloudUser=null;cloudRevision=null;cloudBlocked=false;cloudDirty=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';clearMummyResearch();load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');}},0)}});
 const {data,error}=await cli.auth.getSession();if(error)throw error;if(data?.session?.user)await startCloudSession(data.session.user);else setCloudStatus('端末内で利用中');
 }catch(err){console.warn('cloud auth initialization',err);setCloudStatus('ログイン機能を確認してください','pending');}}
 window.addEventListener('DOMContentLoaded',startAuth);
