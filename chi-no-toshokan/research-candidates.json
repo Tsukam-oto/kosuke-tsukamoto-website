@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastRunAt": "2026-11-04T10:07:48+00:00",
+  "lastRunAt": "2026-11-04T10:12:20+00:00",
   "editorialPolicy": "これは検索APIから得た候補資料と書誌情報です。本文・研究結果・原典の該当箇所は未照合です。記事の根拠として承認していません。",
   "automation": {
     "frequency": "週2回（GitHub Actions）",
@@ -44,7 +44,7 @@
       "recordType": "article",
       "doi": "",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "met:247308",
@@ -68,7 +68,7 @@
       "imageRights": "Met Open Access / CC0",
       "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
@@ -87,7 +87,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
@@ -106,7 +106,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
@@ -125,7 +125,7 @@
       "recordType": "Ballet",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
@@ -144,7 +144,7 @@
       "recordType": "",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.5406/j.ctvpj7j1r.17",
@@ -166,7 +166,7 @@
       "recordType": "book-chapter",
       "doi": "10.5406/j.ctvpj7j1r.17",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.4324/9781315820262-8",
@@ -188,7 +188,7 @@
       "recordType": "book-chapter",
       "doi": "10.4324/9781315820262-8",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.4324/9781315820262-7",
@@ -210,7 +210,7 @@
       "recordType": "book-chapter",
       "doi": "10.4324/9781315820262-7",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.4324/9781315820262-6",
@@ -232,7 +232,7 @@
       "recordType": "book-chapter",
       "doi": "10.4324/9781315820262-6",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.4102/lit.v37i1.1250",
@@ -256,7 +256,7 @@
       "recordType": "article",
       "doi": "10.4102/lit.v37i1.1250",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.3840/003269",
@@ -278,7 +278,7 @@
       "recordType": "dataset",
       "doi": "10.3840/003269",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.3390/nu14071527",
@@ -304,7 +304,7 @@
       "recordType": "review",
       "doi": "10.3390/nu14071527",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.30958/ajt.12-4-1",
@@ -328,7 +328,7 @@
       "recordType": "article",
       "doi": "10.30958/ajt.12-4-1",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.2307/3356776",
@@ -352,7 +352,7 @@
       "recordType": "journal-article",
       "doi": "10.2307/3356776",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.17758/uruae23.ua0524404",
@@ -374,7 +374,7 @@
       "recordType": "proceedings-article",
       "doi": "10.17758/uruae23.ua0524404",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.15385/jmo.2012.3.1.4",
@@ -399,7 +399,7 @@
       "recordType": "article",
       "doi": "10.15385/jmo.2012.3.1.4",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1484/j.jua.5.137197",
@@ -424,7 +424,7 @@
       "recordType": "journal-article",
       "doi": "10.1484/j.jua.5.137197",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1484/j.jua.5.131730",
@@ -449,7 +449,7 @@
       "recordType": "journal-article",
       "doi": "10.1484/j.jua.5.131730",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1353/jip.2019.0006",
@@ -474,7 +474,7 @@
       "recordType": "article",
       "doi": "10.1353/jip.2019.0006",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1353/hel.2010.a406972",
@@ -498,7 +498,7 @@
       "recordType": "article",
       "doi": "10.1353/hel.2010.a406972",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1201/b18279-8",
@@ -520,7 +520,7 @@
       "recordType": "book-chapter",
       "doi": "10.1201/b18279-8",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1186/s42779-026-00328-3",
@@ -544,7 +544,7 @@
       "recordType": "journal-article",
       "doi": "10.1186/s42779-026-00328-3",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oso/9780190498900.003.0013",
@@ -568,7 +568,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oso/9780190498900.003.0013",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oseo/instance.00296191",
@@ -590,7 +590,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oseo/instance.00296191",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oseo/instance.00296190",
@@ -612,7 +612,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oseo/instance.00296190",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oseo/instance.00280596",
@@ -636,7 +636,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oseo/instance.00280596",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oseo/instance.00280567",
@@ -660,7 +660,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oseo/instance.00280567",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/oseo/instance.00280463",
@@ -684,7 +684,7 @@
       "recordType": "book-chapter",
       "doi": "10.1093/oseo/instance.00280463",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/gmo/9781561592630.article.11968",
@@ -708,7 +708,7 @@
       "recordType": "reference-entry",
       "doi": "10.1093/gmo/9781561592630.article.11968",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1093/actrade/9780199538317.book.1",
@@ -732,7 +732,7 @@
       "recordType": "edited-book",
       "doi": "10.1093/actrade/9780199538317.book.1",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1037/pst0000534.supp",
@@ -754,7 +754,7 @@
       "recordType": "journal-article",
       "doi": "10.1037/pst0000534.supp",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1037/a0022425.supp",
@@ -776,7 +776,7 @@
       "recordType": "journal-article",
       "doi": "10.1037/a0022425.supp",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1037/a0021175.supp",
@@ -798,7 +798,7 @@
       "recordType": "journal-article",
       "doi": "10.1037/a0021175.supp",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1016/j.micpath.2025.107718",
@@ -824,7 +824,7 @@
       "recordType": "review",
       "doi": "10.1016/j.micpath.2025.107718",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "doi:10.1016/b978-0-323-98341-9.00018-9",
@@ -850,7 +850,7 @@
       "recordType": "book-chapter",
       "doi": "10.1016/b978-0-323-98341-9.00018-9",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "anchor:zeus-titans",
@@ -868,13 +868,13 @@
       "evidenceStatus": "書誌・作品情報のみ",
       "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     },
     {
       "id": "anchor:odyssey-xenia",
       "kind": "curated-reference-path",
-      "title": "Hesiod, Works and Days (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "title": "Homer, Odyssey, Book VI (translated text)",
+      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
       "area": "原典・翻訳",
       "topicIds": [
         "odyssey-xenia"
@@ -886,7 +886,25 @@
       "evidenceStatus": "書誌・作品情報のみ",
       "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
+      "lastSeen": "2026-11-04T10:12:20+00:00"
+    },
+    {
+      "id": "anchor:human-ages",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Works and Days (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "human-ages"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:12:20+00:00",
+      "lastSeen": "2026-11-04T10:12:20+00:00"
     }
   ]
 }
