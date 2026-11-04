@@ -32,3 +32,4 @@ jobs:
           node lyric-strata/deep-work-navigation.test.cjs
           node lyric-strata/related-constellation.test.cjs
           node lyric-strata/pdf-audit-panel.test.cjs
+          node lyric-strata/versioned-proofreading.test.cjs
