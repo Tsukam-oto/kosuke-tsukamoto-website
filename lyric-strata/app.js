@@ -456,6 +456,30 @@ async function loadDeepWorkReadings(){
   if(error)throw error;deepWorkReadings=rows||[];deepWorkError='';
  }catch(e){deepWorkReadings=[];deepWorkError=e.message||'取得エラー';}
 }
+function relatedConstellationPanel(workId){
+ if(!user||!workId)return '';
+ const related=crossReadings.filter(c=>c.left_work_id===workId||c.right_work_id===workId)
+  .map(c=>{
+   const otherId=c.left_work_id===workId?c.right_work_id:c.left_work_id;
+   const other=otherId?masterWorks.get(otherId):null;
+   const quoteHere=c.left_work_id===workId?c.evidence_left:c.evidence_right;
+   const quoteThere=c.left_work_id===workId?c.evidence_right:c.evidence_left;
+   return other?{c,other,quoteHere,quoteThere}:null;
+  }).filter(Boolean).sort((a,b)=>a.c.topic.localeCompare(b.c.topic,'ja')||
+   a.other.title.localeCompare(b.other.title,'ja'));
+ if(!related.length)return '';
+ const shown=related.slice(0,8);
+ return '<details class="deep-related"><summary>この作品から、ほかの作品へ（'+related.length+'組）</summary>'+
+ '<p class="muted">原文を根拠にした作者未確認の比較です。同じ人物・出来事・制作順を示すものではありません。</p>'+
+ shown.map(x=>'<article class="deep-related-card"><p class="deep-related-topic">'+esc(x.c.topic)+'</p>'+
+ '<h4>《'+esc(x.other.title)+'》との読み比べ</h4>'+
+ '<div class="deep-related-quotes"><blockquote>'+esc(x.quoteHere||'')+'</blockquote>'+
+ '<blockquote>'+esc(x.quoteThere||'')+'</blockquote></div>'+
+ '<p>'+esc(x.c.interpretation||'')+'</p><p class="muted">別の読み・留保：'+esc(x.c.alternative||'')+'</p>'+
+ '<button class="btn" type="button" data-cross-work="'+esc(x.other.id)+'">比較する相手の歌詞全文へ</button></article>').join('')+
+ (related.length>shown.length?'<p class="muted">ほかの比較は下の「作品間の横断読解」で確認できます。</p>':'')+
+ '<p class="muted">引用は保存時点の本文と照合したものです。木乃伊のPDF抽出歌詞は原本校正前です。</p></details>';
+}
 function renderDeepWorkReadings(){
  const box=$('deepWorkOutput');if(!box)return;
  if(!user){box.innerHTML='<p class="muted">個別の二巡目精読は本人ログイン後に表示します。</p>';return;}
@@ -510,7 +534,7 @@ function renderDeepWorkReadings(){
  '<h3>'+esc(r.title)+'</h3><div class="deep-work-parts">'+
  sections.map(([label,text])=>'<section><h4>'+esc(label)+'</h4><p>'+esc(text)+'</p></section>').join('')+
  '</div><h4>本文の根拠</h4><div class="deep-work-quotes">'+quotes+'</div>'+
- '<div class="deep-work-question"><strong>さらに考える問い</strong><p>'+esc(r.question)+'</p></div>'+action+
+ '<div class="deep-work-question"><strong>さらに考える問い</strong><p>'+esc(r.question)+'</p></div>'+relatedConstellationPanel(w?.id)+action+
  '<p class="muted">木乃伊のPDF抽出歌詞は原本校正前です。作品内の語り手と現実の作者は同一視しません。</p></article></section>';
 }
 
