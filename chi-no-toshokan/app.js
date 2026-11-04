@@ -122,7 +122,8 @@ function weekdayShelfMarkup(active){
   const isToday=offset===0;
   return '<button type="button" class="weekday-card '+(isToday?'today':'')+'" data-open="'+esc(example?.id||active.id)+'" '+(isToday?'aria-current="date"':'')+'><small>'+esc(day.day)+'曜日'+(isToday?' · 今日':'')+'</small><strong>'+esc(day.short)+'</strong><span>記事を読む ↗</span></button>';
  }).join('');
- return '<section class="weekday-shelf" aria-labelledby="weekday-shelf-title"><div class="weekday-shelf-heading"><div><div class="kicker">YOUR SEVEN DAYS</div><h2 id="weekday-shelf-title">曜日ごとに、違う世界の扉を。</h2></div><span class="weekday-shelf-now">'+esc(current.day)+'曜日：'+esc(current.label)+'</span></div><p class="weekday-shelf-description">'+esc(current.description)+'。曜日の枠を越えた発見も大切にします。</p><div class="weekday-scroll" aria-label="今日から7日間のテーマ">'+strip+'</div><p class="weekday-shelf-footnote">※ 18:30の通知とは曜日のテーマを共有しますが、取り上げる問い・記事はそれぞれ独立して選ばれます。</p></section>';
+ const extraLink=dayIndex===2?'<a class="weekday-special-link" href="./music-library.html#theory">音楽理論を音で試す ↗</a>':dayIndex===3?'<a class="weekday-special-link" href="./myth-series.html">ギリシャ神話の連載を読む ↗</a>':dayIndex===5?'<a class="weekday-special-link" href="./music-library.html">おすすめの1曲を聴く ↗</a>':'';
+ return '<section class="weekday-shelf" aria-labelledby="weekday-shelf-title"><div class="weekday-shelf-heading"><div><div class="kicker">YOUR SEVEN DAYS</div><h2 id="weekday-shelf-title">曜日ごとに、違う世界の扉を。</h2></div><span class="weekday-shelf-now">'+esc(current.day)+'曜日：'+esc(current.label)+'</span></div><p class="weekday-shelf-description">'+esc(current.description)+'。曜日の枠を越えた発見も大切にします。</p><div class="weekday-scroll" aria-label="今日から7日間のテーマ">'+strip+'</div>'+extraLink+'<p class="weekday-shelf-footnote">※ 18:30の通知とは曜日のテーマを共有しますが、取り上げる問い・記事はそれぞれ独立して選ばれます。</p></section>';
 }
 let dailyChoice={key:'',topicId:''};
 function makeDailyTopic(){
