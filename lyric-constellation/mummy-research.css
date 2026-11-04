@@ -43,3 +43,30 @@
 .mummy-work-row .btn{margin-top:10px}
 .mummy-count{font-size:12px;color:#5b6b7a}
 @media(max-width:760px){.mummy-stats,.mummy-reading-grid,.mummy-compare,.mummy-work-list{grid-template-columns:repeat(2,minmax(0,1fr))}.mummy-reading-grid,.mummy-compare,.mummy-work-list{grid-template-columns:1fr}.mummy-section{padding:17px 0}.mummy-reading-card,.mummy-connection{padding:12px}}
+
+
+/* Song-first close reading, author's essay remains an optional independent work. */
+.mummy-corpus-head{display:flex;justify-content:space-between;align-items:flex-start;gap:7px}
+.mummy-corpus-head strong{flex:1;min-width:0}
+.mummy-corpus-head small{flex:0 0 auto;font-size:9px;color:#3d5a70;background:#edf1f4;padding:3px 6px;border-radius:5px}
+.mummy-work-row.mummy-current{border-color:#6c8498;box-shadow:0 0 0 1px #6c8498 inset}
+.mummy-work-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:9px}
+.mummy-work-actions button{max-width:100%}
+.mummy-selected{scroll-margin-top:18px;background:#f6f7f8;border:1px solid #e0e5e8;border-radius:15px;padding:17px;margin:18px 0 0;min-width:0}
+.mummy-selected-head{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.mummy-selected-head h3{font-size:18px;line-height:1.5;margin:4px 0}
+.mummy-selected-head small{font-size:10px;color:#6e7b8a}
+.mummy-selected .mummy-reading-grid{margin:12px 0 0}
+.mummy-empty-reading{padding:14px;background:#fff;border:1px dashed #d1d7dc;border-radius:8px;font-size:12px;line-height:1.9;color:#65727f}
+.mummy-connection .mummy-work-actions{margin:14px 0 0}
+.mummy-other-doc{border:1px solid #dddfe2;border-radius:12px;padding:13px;background:#fafaf9}
+.mummy-other-doc>summary{cursor:pointer;font-size:13px;font-weight:700;line-height:1.8}
+.mummy-other-doc>summary small{font-size:10px;font-weight:400;color:#647584;margin-left:8px}
+.mummy-other-doc[open] > summary{margin-bottom:14px}
+.mummy-essay-dialogues{margin:16px 0;padding:12px;border:1px solid #e3e5e9;border-radius:10px}
+.mummy-essay-dialogues>summary{font-size:12px;font-weight:650;cursor:pointer}
+.mummy-reading-card .mummy-compare{grid-template-columns:1fr;gap:3px}
+.mummy-reading-card .mummy-compare blockquote{margin:4px 0}
+.mummy-reading-card .mummy-compare small{font-size:9px;color:#63768a}
+.mummy-connection .mummy-question{margin:10px 0}
+@media(max-width:760px){.mummy-selected{padding:12px}.mummy-corpus-head{flex-wrap:wrap}}
