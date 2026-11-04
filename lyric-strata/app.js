@@ -241,7 +241,6 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('DOMContentLoaded',()=>{
  read();current=data[0]?.source_id||null;
- document.querySelectorAll('button[data-view]').forEach(b=>b.addEventListener('click',()=>go(b.dataset.view)));
  $('search').addEventListener('input',renderList);
  $('skyFilter').addEventListener('change',renderList);
  $('manualForm').addEventListener('submit',manualSubmit);
