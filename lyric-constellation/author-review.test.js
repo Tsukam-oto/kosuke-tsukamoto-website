@@ -11,7 +11,7 @@ const db={notes:{retained:'existing notes'},readingReviews:{},userWorks:[]};
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saveOK=true,savedCalls=0;const messages=[];
 const progress={textContent:''};
-const doc={querySelector:()=>progress,createElement:()=>({dataset:{}})};
+const doc={querySelector:()=>progress,getElementById:()=>null,createElement:()=>({dataset:{}})};
 const runtime=new Function('db','corpus','engine','doc','messages','getSaveOK','recordSave','esc',[
  'const window={LyricCloseReading:engine};',
  'const sky="choir",selected=corpus[0].id;',
@@ -20,9 +20,16 @@ const runtime=new Function('db','corpus','engine','doc','messages','getSaveOK','
  'const save=()=>{recordSave();return getSaveOK()};',
  'const toast=x=>messages.push(x),confirm=()=>true;',
  helpers,
- 'return {readingReviewKey,readingTextMarker,reviewIsChecked,cleanReadingReviews,readingReviewForm,readingReviewDashboard,saveReadingReview,clearReadingReview,getReadingReview};'
+ 'return {readingReviewKey,readingTextMarker,reviewIsChecked,cleanReadingReviews,readingReviewForm,readingReviewDashboard,readingJournalRows,readingJournalList,readingJournalSummary,saveReadingReview,clearReadingReview,getReadingReview};'
 ].join('\n'))(db,corpus,engine,doc,messages,()=>saveOK,()=>savedCalls++,esc);
 assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'));
+const rowsBefore=runtime.readingJournalRows(corpus);
+assert.equal(rowsBefore.length,22,'one topic per unique work interpretation or dialogue');
+assert.equal(new Set(rowsBefore.map(r=>r.key)).size,22);
+assert.equal(rowsBefore.filter(r=>r.state==='new').length,22);
+assert.equal((runtime.readingJournalList(rowsBefore,'all').match(/class="reading-journal-item"/g)||[]).length,22);
+assert.equal((runtime.readingJournalList(rowsBefore,'different').match(/class="reading-journal-item"/g)||[]).length,0);
+assert.ok(runtime.readingJournalSummary(rowsBefore).includes('data-reading-filter="needs"'));
 const spring=corpus.find(w=>w.title==='春にあふれて'),morning=corpus.find(w=>w.title==='朝になったら');
 const d1=engine.analyze(spring,corpus).dialogues.find(d=>d.otherTitle==='朝になったら');
 const d2=engine.analyze(morning,corpus).dialogues.find(d=>d.otherTitle==='春にあふれて');
@@ -42,6 +49,11 @@ assert.equal(db.readingReviews[key].stance,'different');
 assert.equal(db.readingReviews[key].comment,'当時は別の意図で書きました。');
 assert.equal(db.notes.retained,'existing notes');
 assert.ok(runtime.readingReviewDashboard().includes('1 / 22テーマ'));
+const rowsChecked=runtime.readingJournalRows(corpus);
+assert.equal(rowsChecked.filter(r=>r.checked).length,1);
+assert.equal(rowsChecked.filter(r=>r.state==='verified').length,1);
+assert.equal((runtime.readingJournalList(rowsChecked,'different').match(/class="reading-journal-item"/g)||[]).length,1);
+assert.equal((runtime.readingJournalList(rowsChecked,'needs').match(/class="reading-journal-item"/g)||[]).length,21);
 assert.ok(runtime.reviewIsChecked(spring,'dialogue',d1.title,d1.otherId));
 assert.ok(runtime.reviewIsChecked(morning,'dialogue',d2.title,d2.otherId));
 const originalLyric=spring.lyrics;
@@ -49,11 +61,13 @@ spring.lyrics+='\n追加した一行';
 assert.ok(!runtime.reviewIsChecked(morning,'dialogue',d2.title,d2.otherId),'edited lyrics must invalidate old review');
 assert.ok(runtime.readingReviewForm(spring,'dialogue',d1.title,d1.otherId).includes('歌詞原文が更新されました'));
 assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'));
+assert.equal(runtime.readingJournalRows(corpus).filter(r=>r.state==='stale').length,1);
 spring.lyrics=originalLyric;
 assert.ok(runtime.readingReviewDashboard().includes('1 / 22テーマ'));
 const oldStance=db.readingReviews[key].stance;
 db.readingReviews[key].stance='pending';
 assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'),'pending is not verified');
+assert.equal(runtime.readingJournalRows(corpus).filter(r=>r.state==='pending').length,1);
 db.readingReviews[key].stance=oldStance;
 assert.ok(runtime.readingReviewForm(morning,'dialogue',d2.title,d2.otherId).includes('当時は別の意図で書きました。'));
 const stored=JSON.stringify(db.readingReviews[key]);saveOK=false;
@@ -109,4 +123,4 @@ for(const w of corpus){
  assert.ok(drawer.innerHTML.includes('data-source-tag='));
 }
 assert.ok(!html.includes('当時は別の意図で書きました。'));
-console.log('author review v4: verified/pending/obsolete status, 22 topics, cross-work source signatures, 11 reading views, cloud migration and backup imports passed');
+console.log('author review v5: 22 theme indexes, need/different filters, verified/pending/stale states, backup and 11 reading views passed');
