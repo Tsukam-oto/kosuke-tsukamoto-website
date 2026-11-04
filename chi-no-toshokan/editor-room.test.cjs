@@ -13,6 +13,9 @@ check('mobile viewport',html.includes('viewport-fit=cover'));
 check('mobile layout breakpoint',css.includes('@media(max-width:770px)'));
 check('quick memo mobile entry',html.includes('id="quick-text"')&&html.includes('id="quick-save"')&&css.includes('.quick-controls'));
 check('quick memo saved as private note',src.includes("async function saveQuick()")&&src.includes("kind:'note'")&&src.includes("stage:'seed'"));
+check('metric input and comparison are private',html.includes('id="format-outcomes"')&&html.includes('id="pv7"')&&html.indexOf('id="format-outcomes"')>html.indexOf('id="private-app" hidden'));
+check('note metrics are manual only',!src.includes("fetch('https://note.com")&&html.includes('手入力'));
+check('retains PV as distinct from read completion',html.includes('PVは読了人数ではありません'));
 check('article body remains in private app',html.includes('id="article-body"')&&html.includes('id="article-count"')&&html.indexOf('id="article-body"')>html.indexOf('id="private-app" hidden'));
 check('copying a draft is manual',html.includes('id="copy-article"')&&src.includes("clipboard.writeText(text)"));
 check('length guidelines are explicitly non-binding',magSrc.includes('字数より内容を優先')&&magSrc.includes('公式が保証した最適文字数ではありません'));
@@ -51,6 +54,7 @@ const source=src.replace(/\ninit\(\);\nwindow\.EDITOR_DEBUG=/,'\nwindow.EDITOR_D
 check('test runner removes only automatic auth initialization',source!==src);
 vm.runInNewContext(source,{window:win,document:doc,navigator,URL,Date,Math,setTimeout,clearTimeout,console},{timeout:5000});
 check('editorial prompt exists',typeof win.EDITOR_DEBUG.makePrompt==='function');
+check('outcome display is conservative',create('format-outcomes').innerHTML.includes('比較には不足'));
 check('new manuscript controls initialized',!!create('format').innerHTML&&!!create('article-range').textContent);
 create('article-body').value='業務改善でAIを使いました。これはまだ実証していません。';
 create('article-body').handlers.input();
@@ -79,6 +83,9 @@ create('lesson').value='確認手順を残す';
 create('stage').value='seed';
 create('sources').value='';
 create('public-url').value='';
+create('pv7').value='';
+create('impressions7').value='';
+create('likes7').value='';
 create('format').value='standard';
 create('article-body').value='授業で試したことを記録する。';
 (async()=>{
