@@ -1,0 +1,27 @@
+/* v1.8.0 | 七曜日のテーマをスマートフォンで横へスワイプして選べる棚 */
+.weekday-shelf{margin:18px 0 23px;padding:18px 20px 13px;border:1px solid #d6e3d4;background:#fbfcf7;border-radius:16px}
+.weekday-shelf-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.weekday-shelf-heading h2{margin:3px 0 0;font-size:20px;letter-spacing:-.02em;color:#253f35;line-height:1.55}
+.weekday-shelf-now{font-size:12px;color:#366348;font-weight:700;border:1px solid #bfd5c2;border-radius:30px;padding:5px 11px;background:#ecf4e9}
+.weekday-shelf-description{font-size:13px;color:#5f7765;margin:8px 0 12px;line-height:1.8}
+.weekday-scroll{display:flex;gap:9px;overflow-x:auto;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;scrollbar-width:thin;padding:3px 2px 11px}
+.weekday-card{display:flex;flex:0 0 151px;flex-direction:column;justify-content:center;gap:3px;text-align:left;border:1px solid #d9e3d6;border-radius:12px;background:#fffefb;padding:12px 13px;min-height:92px;color:#315442;scroll-snap-align:start;cursor:pointer}
+.weekday-card small{color:#78907c;font-size:11px;font-weight:700}
+.weekday-card strong{font-size:13px;line-height:1.5}
+.weekday-card span{font-size:11px;color:#648b72}
+.weekday-card.today{background:#24533e;border-color:#24533e;color:#fff}
+.weekday-card.today small,.weekday-card.today span{color:#d9e9d9}
+.weekday-card:focus-visible{outline:3px solid #b39458;outline-offset:2px}
+.weekday-shelf-footnote{font-size:11px;color:#7c897f;line-height:1.7;margin:4px 0 0}
+@media(max-width:650px){
+ .weekday-shelf{margin:13px 0 17px;padding:14px 12px 10px;border-radius:14px}
+ .weekday-shelf-heading{align-items:flex-start;gap:7px}
+ .weekday-shelf-heading h2{font-size:17px}
+ .weekday-shelf-now{font-size:11px}
+ .weekday-shelf-description{font-size:12px;margin:8px 0 9px}
+ .weekday-scroll{gap:7px;margin:0 -2px;padding:3px 2px 10px}
+ .weekday-card{flex-basis:132px;min-height:90px;padding:10px 11px}
+ .weekday-card strong{font-size:12px}
+ .weekday-shelf-footnote{font-size:11px}
+}
+@media(max-width:360px){.weekday-card{flex-basis:124px}}
