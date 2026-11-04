@@ -1,0 +1,15 @@
+'use strict';
+const assert=require('node:assert/strict');
+const X=require('./cross-compare.js');
+assert.equal(X.normalized(' 「少し、ずつ」 '),'少しずつ');
+assert.deepEqual(X.inspect('一行目\n\n二行目'),{lineCount:2,characters:8,opening:[{line:1,text:'一行目'},{line:3,text:'二行目'}],ending:[{line:1,text:'一行目'},{line:3,text:'二行目'}]});
+const a='架空の主人公がここで歌っている\n同じ表現を未来まで残しておきたいよ\n同じ表現を未来まで残しておきたいよ\nありがとう';
+const b='別の主人公がここにいる\n同じ表現を未来まで残しておきたいよ\nまた新しい朝';
+const r=X.compare(a,b);
+assert.equal(r.sharedCount,1,'count each repeated exact line once');
+assert.equal(r.shared[0].leftLine,2);
+assert.equal(r.shared[0].rightLine,2);
+assert.equal(X.compare('短い','短い').sharedCount,0,'common short formulas are not a lineage claim');
+assert.equal(X.compare('僕が君に渡した言葉はこれだ','それと違う言葉を聞いた').sharedCount,0,'do not invent semantic connection');
+assert.ok(r.notice.includes('意味しません'));
+console.log('cross-compare: exact long lines, source positions, no false short matches passed');

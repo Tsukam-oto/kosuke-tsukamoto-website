@@ -7,6 +7,9 @@ let data=[], current=null, view='strata', cloud=null, user=null, syncing=false;
 let masterCandidates=[],masterWorks=new Map(),matchLoadError='';
 let readingReportCache=null, readingFocus=-1, readingShow=20;
 let draftReadings=[],draftReadingLoadError='';
+let crossReadings=[],crossLoadError='',crossTopic='all',crossTerm='',crossLimit=15;
+let crossOpenSerial=0;
+let compareLeft='',compareRight='',compareSerial=0,songReadingRecords=[];
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const newId=()=>window.crypto?.randomUUID?.()||('local-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -104,7 +107,7 @@ function renderDetail(){
  '<button class="btn dark" id="saveClass">分類を保存</button><p class="muted">原文とメモの日時は変更できません。日付の修正は新しい記録を追加して履歴として残します。</p>';
 }
 function render(){
- const views=['strata','import','discovery'];
+ const views=['strata','import','discovery','cross'];
  for(const k of views)$('view-'+k).classList.toggle('hidden',view!==k);
  document.querySelectorAll('[data-view]').forEach(b=>b.classList.toggle('active',b.dataset.view===view));
  $('syncStatus').textContent=user?(syncing?'クラウド処理中…':'本人ログイン済み'):'この端末内';
@@ -118,6 +121,7 @@ function render(){
  }
  renderList();renderDetail();
  if(view==='discovery')renderDiscovery();
+ if(view==='cross')renderCross();
 }
 function go(to){view=to;render();window.scrollTo({top:0,behavior:'instant'});}
 
@@ -288,7 +292,7 @@ async function loadMasterCandidates(){
  try{
   const [a,b]=await Promise.all([
    client().from('lyric_strata_match_candidates').select('id,entry_id,work_id,method,evidence,evidence_count,score,review_status,algorithm_version').eq('user_id',user.id).limit(2000),
-   client().from('lyric_master_works').select('id,title,sky,source_name,source_page_start,verification_status').eq('user_id',user.id).limit(500)
+   client().from('lyric_master_works').select('id,title,sky,source_name,source_page_start,verification_status,original_book_index,credited_author,authorship_status').eq('user_id',user.id).limit(500)
   ]);
   if(a.error)throw a.error;if(b.error)throw b.error;
   masterCandidates=a.data||[];
@@ -307,6 +311,197 @@ async function reviewCandidate(id,decision){
  if(!changed?.length){toast('判定を更新できませんでした。再ログインして確認してください。');return;}
  item.review_status=decision;renderDiscovery();toast('ご本人の判定を保存しました。メモの原文・作品DBは変更していません。');
 }
+
+const crossRelationNames={text_overlap:'本文に共通表現',counterpoint:'異なる答え・緊張',resonance:'問いの共鳴',reframing:'言い直し',possible_revision:'改稿の可能性'};
+function crossDoc(link,side){
+ const prefix=side==='left'?'left':'right';
+ const workId=link[prefix+'_work_id'],noteId=link[prefix+'_entry_id'];
+ const quote=link['evidence_'+prefix];
+ if(noteId){
+  const n=data.find(e=>e.id===noteId);
+  if(!n||!n.original_text.includes(quote))return null;
+  return {type:'note',id:noteId,title:n.title||'無題',kind:'創作メモ',date:n.source_created_local?.slice(0,10)||'記録日未確認',
+    label:'メモの原文へ',sourceId:n.source_id,quote};
+ }
+ if(workId){
+  const w=masterWorks.get(workId);
+  if(!w)return null;
+  const kind=w.sky==='rap'?'木乃伊':w.sky==='choir'?'合唱・詩':'個人作品';
+  return {type:'work',id:workId,title:w.title,kind,date:'',label:'作品の原文へ',quote};
+ }
+ return null;
+}
+async function loadCrossReadings(){
+ if(!user){crossReadings=[];crossLoadError='';return;}
+ try{
+  const {data:rows,error}=await client().from('lyric_cross_readings').select(
+   'link_key,topic,relation_type,left_work_id,left_entry_id,right_work_id,right_entry_id,evidence_left,evidence_right,'+
+   'left_source_version,right_source_version,observation,interpretation,alternative,inquiry,assessment_status'
+  ).eq('user_id',user.id).limit(1000);
+  if(error)throw error;
+  crossReadings=rows||[];crossLoadError='';
+ }catch(e){crossReadings=[];crossLoadError=e.message||'取得エラー';}
+}
+function crossVisible(){
+ return crossReadings.map(r=>({record:r,left:crossDoc(r,'left'),right:crossDoc(r,'right')}))
+  .filter(x=>x.left&&x.right)
+  .filter(x=>crossTopic==='all'||x.record.topic===crossTopic)
+  .filter(x=>{
+    const q=crossTerm.trim().normalize('NFKC').toLowerCase();
+    if(!q)return true;
+    return [x.left.title,x.right.title,x.record.topic,x.record.interpretation,x.record.inquiry,
+            x.record.evidence_left,x.record.evidence_right].some(v=>String(v||'').normalize('NFKC').toLowerCase().includes(q));
+  }).sort((a,b)=>a.record.topic.localeCompare(b.record.topic,'ja')||a.record.link_key.localeCompare(b.record.link_key));
+}
+function crossAction(d){
+ return '<button class="btn cross-link" data-'+(d.type==='note'?'cross-note':'cross-work')+'="'+esc(d.type==='note'?d.sourceId:d.id)+'">'+esc(d.label)+'</button>';
+}
+function crossCard(model){
+ const r=model.record,a=model.left,b=model.right;
+ return '<article class="cross-card"><div class="cross-card-top"><span>'+esc(r.topic)+'</span><small>'+esc(crossRelationNames[r.relation_type]||'対照')+'</small></div>'+
+ '<div class="cross-grid">'+
+ [a,b].map(d=>'<div class="cross-source"><p class="cross-kind">'+esc(d.kind)+(d.date?' · メモ作成 '+esc(d.date):'')+'</p>'+
+ '<h3>《'+esc(d.title)+'》</h3><blockquote>'+esc(d.quote)+'</blockquote>'+crossAction(d)+'</div>').join('')+
+ '</div><dl class="cross-reading"><dt>横断して考える</dt><dd>'+esc(r.interpretation)+'</dd>'+
+ '<dt>別の読み方・確認が必要なこと</dt><dd>'+esc(r.alternative)+'</dd>'+
+ '<dt>次に考える問い</dt><dd>'+esc(r.inquiry)+'</dd></dl>'+
+ '<p class="cross-foot">出典本文の引用を照合済み。内容は仮説であり、作者の意図・没／採用・制作順を断定しません。</p></article>';
+}
+function renderCrossRows(){
+ const box=$('crossResults');if(!box)return;
+ if(!user){box.innerHTML='<div class="notice">この横断読解は本人専用です。ログインすると、創作メモ・木乃伊の作品・合唱曲を原文付きで比較できます。</div>';return;}
+ if(crossLoadError){box.innerHTML='<div class="notice">横断読解を取得できませんでした：'+esc(crossLoadError)+'</div>';return;}
+ const models=crossVisible(),shown=models.slice(0,crossLimit);
+ box.innerHTML='<p class="muted">該当 '+models.length+'組 ／ '+shown.length+'組を表示。類似は同じ制作意図・人物・時系列を意味しません。</p>'+
+ (shown.map(crossCard).join('')||'<div class="empty-state">一致する比較がありません。検索語や問いを変えてください。</div>')+
+ (models.length>shown.length?'<button class="btn" id="crossMore">さらに比較を表示</button>':'');
+}
+
+async function loadSongReadingRecords(){
+ if(!user){songReadingRecords=[];return;}
+ try{
+  const {data:rows,error}=await client().from('lyric_song_readings').select(
+   'work_id,heading,evidence_a,evidence_b,observation,interpretation,alternative,inquiry,source_version_no'
+  ).eq('user_id',user.id).limit(2000);
+  if(error)throw error;
+  songReadingRecords=rows||[];
+ }catch(e){songReadingRecords=[];console.warn('Song reading summaries unavailable',e);}
+}
+function compareCatalogOptions(){
+ if(!user)return '';
+ const excluded=new Set(draftReadings.filter(r=>r.note_kind==='reference').map(r=>r.entry_id));
+ const works=[...masterWorks.values()];
+ const groups=[
+  ['木乃伊｜歌詞集',works.filter(w=>w.sky==='rap').sort((a,b)=>(a.original_book_index??999)-(b.original_book_index??999)).map(w=>['w:'+w.id,(w.original_book_index??'?')+' ｜ '+w.title])],
+  ['合唱曲・詩',works.filter(w=>w.sky==='choir').sort((a,b)=>a.title.localeCompare(b.title,'ja')).map(w=>['w:'+w.id,w.title])],
+  ['個人作品',works.filter(w=>w.sky==='personal').map(w=>['w:'+w.id,w.title])],
+  ['言葉の地層｜Appleメモ',data.filter(n=>n.id&&!excluded.has(n.id)).sort((a,b)=>(a.source_created_local||'').localeCompare(b.source_created_local||''))
+    .map(n=>['n:'+n.id,n.title||'無題'])]
+ ];
+ return groups.map(([name,items])=>'<optgroup label="'+esc(name)+'">'+items.map(([val,name])=>
+  '<option value="'+esc(val)+'">'+esc(name)+'</option>').join('')+'</optgroup>').join('');
+}
+function renderCompareLab(){
+ const root=$('compareLab');
+ if(!root)return;
+ if(!user){root.innerHTML='<p class="muted">任意の二作品の比較には本人ログインが必要です。</p>';return;}
+ const list=compareCatalogOptions();
+ root.innerHTML='<p class="muted">木乃伊168作品、合唱・個人作品13件、地層の創作メモから二つを選びます。歌詞全文は選んだ時だけ取得し、原文の同一行を機械的に照合します。解釈の一致や改稿を自動判定しません。</p>'+
+ '<div class="compare-pickers">'+
+ [1,2].map((n,i)=>'<label class="field"><span>'+n+'つ目の資料</span><select id="compareSelect'+n+'"><option value="">作品・草稿を選ぶ</option>'+
+ list.replaceAll('value="'+esc(i===0?compareLeft:compareRight)+'"','value="'+esc(i===0?compareLeft:compareRight)+'" selected')+
+ '</select></label>').join('')+
+ '</div><button class="btn dark" id="runCompare">この二作品を並べて読む</button>'+
+ '<div id="compareOutput" aria-live="polite"></div>';
+}
+function compareReadingSummary(d){
+ const rows=d.type==='note'?draftReadings.filter(r=>r.entry_id===d.id):
+  songReadingRecords.filter(r=>r.work_id===d.id&&Number(r.source_version_no)===Number(d.version));
+ const valid=rows.filter(r=>d.text.includes(r.evidence_a)&&(!r.evidence_b||d.text.includes(r.evidence_b)));
+ if(!valid.length)return '<p class="muted">この資料に付けた個別の精読メモは表示対象外です（本文版が未照合、または精読未登録）。</p>';
+ return valid.slice(0,3).map(r=>'<div class="compare-reading"><strong>'+esc(r.heading)+'</strong>'+
+ '<p>'+esc(r.interpretation)+'</p><p class="muted">別の読み：'+esc(r.alternative)+'</p></div>').join('');
+}
+async function getCompareDoc(key){
+ if(key.startsWith('n:')){
+  const e=data.find(e=>e.id===key.slice(2));
+  if(!e)return null;
+  return {type:'note',id:e.id,title:e.title||'無題',text:e.original_text,version:null,source:'Appleメモの保存原文（元の記録日 '+(e.source_created_local?.slice(0,10)||'未確認')+'）'};
+ }
+ if(!key.startsWith('w:'))return null;
+ const id=key.slice(2),w=masterWorks.get(id);
+ if(!user||!w)return null;
+ const {data:body,error}=await client().from('lyric_master_text_versions')
+  .select('literal_text,version_no,text_status').eq('user_id',user.id).eq('work_id',id).order('version_no',{ascending:false}).limit(1).maybeSingle();
+ if(error)throw error;
+ if(!body)return null;
+ return {type:'work',id,title:w.title,text:body.literal_text,version:body.version_no,
+  source:(w.sky==='rap'?'木乃伊・PDF抽出原文／校正前':w.sky==='choir'?'合唱・詩':'個人作品')+
+   ' ／ 保存本文 v'+body.version_no+(w.authorship_status&&w.authorship_status!=='sole'?' ／ 著作者・共作者について要確認':'')};
+}
+function compareSourceCard(d,side){
+ const info=window.CrossSourceCompare.inspect(d.text);
+ return '<article class="compare-text-card"><span class="cross-kind">'+esc(d.source)+'</span>'+
+ '<h3>《'+esc(d.title)+'》</h3><p class="muted">'+info.lineCount+'行 ／ 冒頭から末尾までの保存原文</p>'+
+ '<pre>'+esc(d.text)+'</pre><details><summary>この資料の個別精読を読む</summary>'+compareReadingSummary(d)+'</details></article>';
+}
+async function runCompare(){
+ if(!user||!window.CrossSourceCompare)return;
+ if(!compareLeft||!compareRight){toast('二つの資料を選択してください。');return;}
+ if(compareLeft===compareRight){toast('異なる二つの資料を選んでください。');return;}
+ const output=$('compareOutput');
+ if(!output)return;
+ output.innerHTML='<p class="muted">選択した二つの保存原文を確認しています…</p>';
+ const serial=++compareSerial;
+ try{
+  const [a,b]=await Promise.all([getCompareDoc(compareLeft),getCompareDoc(compareRight)]);
+  if(serial!==compareSerial||!user)return;
+  if(!a||!b){output.innerHTML='<p class="muted">どちらかの資料を取得できませんでした。</p>';return;}
+  const comparison=window.CrossSourceCompare.compare(a.text,b.text);
+  const lines=comparison.shared.map(r=>'<p><small>左 L'+r.leftLine+' ／ 右 L'+r.rightLine+'</small> '+esc(r.text)+'</p>').join('');
+  output.innerHTML='<div class="compare-match"><strong>同じ行が見つかった件数：'+comparison.sharedCount+'</strong>'+
+   '<p class="muted">12文字以上の比較可能な行を照合しました。一致しなくても意味的な関連がないとは限りません。</p>'+
+   (lines?'<div class="compare-match-lines">'+lines+'</div>':'<p class="muted">一定以上の長さの一致行はありません。両方の本文を読んで比較できます。</p>')+
+   (comparison.moreShared?'<p class="muted">他 '+comparison.moreShared+'行が一致しています。</p>':'')+
+   '</div><div class="compare-source-grid">'+compareSourceCard(a,'left')+compareSourceCard(b,'right')+'</div>';
+ }catch(e){if(serial===compareSerial){output.innerHTML='<p class="notice">本文を取得できませんでした：'+esc(e.message||e)+'</p>';}}
+}
+
+function renderCross(){
+ const root=$('crossOutput');if(!root)return;
+ const topicSet=[...new Set(crossReadings.map(x=>x.topic))].sort((a,b)=>a.localeCompare(b,'ja'));
+ root.innerHTML='<div class="cross-intro"><strong>原文から、作品の外へ。</strong><p>個別の歌詞・未発表メモ・完成作品の読みを比較します。同じ言葉が残る場合、違う答えになる場合、互いに問いを投げかける場合を分けています。エッセイや年表を唯一の基準にはしません。</p></div>'+
+ '<div class="cross-toolbar"><label class="field"><span>問いから探す</span><select id="crossTopic"><option value="all">すべての問い（'+crossReadings.length+'組）</option>'+
+ topicSet.map(t=>'<option value="'+esc(t)+'" '+(crossTopic===t?'selected':'')+'>'+esc(t)+'（'+crossReadings.filter(x=>x.topic===t).length+'）</option>').join('')+
+ '</select></label><label class="field"><span>言葉・作品名・問い</span><input id="crossQuery" type="search" placeholder="例：朝、頑張れ、日常" value="'+esc(crossTerm)+'"></label></div>'+
+ '<details class="cross-compare-lab"><summary>好きな二作品を原文ごと並べる（全資料から選択）</summary><div id="compareLab"></div></details>'+
+ '<div id="crossResults" aria-live="polite"></div>';
+ renderCompareLab();
+ renderCrossRows();
+}
+async function openCrossWork(id){
+ const w=masterWorks.get(id);if(!user||!w){toast('本人ログイン後に閲覧できます。');return;}
+ const modal=$('crossSourceModal'),head=$('crossSourceTitle'),meta=$('crossSourceMeta'),body=$('crossSourceText');
+ modal.classList.remove('hidden');head.textContent='《'+w.title+'》';meta.textContent='原文を読み込み中…';body.textContent='';
+ const serial=++crossOpenSerial;
+ try{
+  const {data:record,error}=await client().from('lyric_master_text_versions')
+   .select('literal_text,version_no,text_status').eq('user_id',user.id).eq('work_id',id)
+   .order('version_no',{ascending:false}).limit(1).maybeSingle();
+  if(error)throw error;
+  if(serial!==crossOpenSerial||modal.classList.contains('hidden')||!user)return;
+  if(!record){meta.textContent='原文がありません。';return;}
+  const relevant=crossReadings.flatMap(r=>r.left_work_id===id?[r.evidence_left]:r.right_work_id===id?[r.evidence_right]:[]);
+  const n=relevant.filter(q=>record.literal_text.includes(q)).length;
+  meta.textContent=(w.sky==='rap'?'木乃伊・PDF抽出原文（未校正）':w.sky==='choir'?'合唱・詩':'個人作品')+
+   ' ／ 保存本文 v'+record.version_no+' ／ 関連する引用 '+n+'/'+relevant.length+'件を現在の本文で再照合';
+  body.textContent=record.literal_text;
+ }catch(e){if(serial===crossOpenSerial){meta.textContent='原文の取得に失敗しました：'+(e.message||e);body.textContent='';}}
+}
+function closeCrossSource(){
+ ++crossOpenSerial;$('crossSourceModal').classList.add('hidden');$('crossSourceText').textContent='';
+}
+
 function renderDiscovery(){
  $('discoveryOutput').innerHTML='<h2>メモ同士を読み解く</h2>'+readingPairsView()+
  '<h2 class="match-subhead">完成作品の原文と照合</h2>'+workCandidateView();
@@ -343,7 +538,7 @@ async function cloudLoad(){
    else if(!old.dirty){Object.assign(old,row,{synced:true,dirty:false});}
   }
   if(extra||remote?.length){readingReportCache=null;save();}
-  await Promise.all([loadMasterCandidates(),loadDraftReadings()]);
+  await Promise.all([loadMasterCandidates(),loadDraftReadings(),loadCrossReadings(),loadSongReadingRecords()]);
   toast('クラウドから '+(remote?.length||0)+'件を確認、新規 '+extra+'件を追加しました。');
  }catch(e){toast('クラウド読み込み失敗：'+(e.message||e));}finally{syncing=false;render();}
 }
@@ -382,12 +577,17 @@ async function authSubmit(e){
 async function authClick(){
  if(!user){authModal(true);return;}
  if(!confirm('ログアウトしますか？ この端末に残した原文は削除されません。'))return;
- try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
+ try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';crossReadings=[];crossLoadError='';songReadingRecords=[];compareLeft='';compareRight='';++compareSerial;closeCrossSource();if($('compareOutput'))$('compareOutput').replaceChildren();if($('crossOutput'))$('crossOutput').replaceChildren();render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
 }
 async function initSession(){
  try{const {data:r,error}=await client().auth.getSession();if(error)throw error;if(r.session?.user){user=r.session.user;await cloudLoad();}else render();}catch(e){render();console.warn('Auth unavailable',e);}
 }
 document.addEventListener('click',e=>{
+ const crossNote=e.target.closest('[data-cross-note]');if(crossNote){current=crossNote.dataset.crossNote;go('strata');return;}
+ const crossWork=e.target.closest('[data-cross-work]');if(crossWork){openCrossWork(crossWork.dataset.crossWork);return;}
+ if(e.target.id==='runCompare'){runCompare();return;}
+ if(e.target.id==='crossMore'){crossLimit+=15;renderCrossRows();return;}
+ if(e.target.id==='crossSourceClose'||e.target.id==='crossSourceModal'){closeCrossSource();return;}
  const note=e.target.closest('[data-note]');
  if(note){current=note.dataset.note;go('strata');return;}
  const reading=e.target.closest('button[data-reading-open]');if(reading){const i=Number(reading.dataset.readingOpen);readingFocus=readingFocus===i?-1:i;renderDiscovery();return;}
@@ -397,8 +597,16 @@ document.addEventListener('click',e=>{
  if(btn){go(btn.dataset.view);return;}
  if(e.target.id==='saveClass'){saveClassification();return;}
 });
+document.addEventListener('input',e=>{if(e.target.id==='crossQuery'){crossTerm=e.target.value;crossLimit=15;renderCrossRows();}});
+document.addEventListener('change',e=>{
+ if(e.target.id==='crossTopic'){crossTopic=e.target.value;crossLimit=15;renderCrossRows();}
+ if(e.target.id==='compareSelect1')compareLeft=e.target.value;
+ if(e.target.id==='compareSelect2')compareRight=e.target.value;
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('crossSourceModal').classList.contains('hidden'))closeCrossSource();});
 document.addEventListener('DOMContentLoaded',()=>{
  read();readingReportCache=null;current=data[0]?.source_id||null;
+ if(location.hash==='#cross')view='cross';
  $('search').addEventListener('input',renderList);
  $('skyFilter').addEventListener('change',renderList);
  $('manualForm').addEventListener('submit',manualSubmit);
