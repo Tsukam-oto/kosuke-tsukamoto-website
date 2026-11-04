@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "lastRunAt": null,
+  "editorialPolicy": "この一覧は資料候補です。本文・研究結果・原典の記述を照合していないため、記事の根拠としては未承認です。",
+  "automation": {
+    "frequency": "週2回（GitHub Actions・有効化検証中）",
+    "method": "公開APIの書誌・作品メタデータ"
+  },
+  "runSummary": {
+    "topicsSearched": [],
+    "providerCallsSucceeded": 0,
+    "errors": []
+  },
+  "items": [
+    {
+      "id": "anchor:zeus-titans",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Theogony — translated text",
+      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "翻訳原典への入口。神話が史実だったと示す資料ではありません。"
+    },
+    {
+      "id": "anchor:odyssey-xenia",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Works and Days — translated text",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "古典資料への入口。内容の照合は未実施です。"
+    }
+  ]
+}
