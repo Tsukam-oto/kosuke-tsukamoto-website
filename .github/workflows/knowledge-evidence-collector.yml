@@ -39,29 +39,37 @@ jobs:
           RESEARCH_CONTACT_EMAIL: ${{ vars.RESEARCH_CONTACT_EMAIL }}
         run: python chi-no-toshokan/research/collect.py
 
-      - name: Publish only the public candidate ledger
+      - name: Create research preparation sheets from collected metadata
+        run: python chi-no-toshokan/research/build_dossiers.py
+
+      - name: Publish only the candidate ledger and unverified research sheets
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          FILE="chi-no-toshokan/research-candidates.json"
-          if git diff --quiet -- "$FILE"; then
-            echo "Candidate ledger unchanged"
-            exit 0
-          fi
-          CONTENT="$(base64 -w 0 "$FILE")"
-          for attempt in 1 2 3 4; do
-            echo "Updating public candidate ledger (attempt $attempt)"
-            SHA="$(gh api "repos/$GITHUB_REPOSITORY/contents/$FILE" --jq '.sha')"
-            if gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$FILE" \
-              -f sha="$SHA" \
-              -f content="$CONTENT" \
-              -f branch="main" \
-              -f message="Refresh unverified source candidates" >/dev/null; then
-              echo "Candidate ledger published"
-              exit 0
+          for FILE in chi-no-toshokan/research-candidates.json chi-no-toshokan/research-dossiers.json; do
+            if [ -f "$FILE" ] && git ls-files --error-unmatch "$FILE" >/dev/null 2>&1 && git diff --quiet -- "$FILE"; then
+              echo "$FILE unchanged"
+              continue
             fi
-            sleep "$((attempt * 7))"
+            CONTENT="$(base64 -w 0 "$FILE")"
+            PUBLISHED=0
+            for attempt in 1 2 3 4; do
+              echo "Updating $FILE (attempt $attempt)"
+              SHA="$(gh api "repos/$GITHUB_REPOSITORY/contents/$FILE" --jq '.sha' 2>/dev/null || true)"
+              ARGS=(-f "content=$CONTENT" -f "branch=main" -f "message=Refresh unverified source research data")
+              if [ -n "$SHA" ]; then
+                ARGS+=(-f "sha=$SHA")
+              fi
+              if gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$FILE" "${ARGS[@]}" >/dev/null; then
+                PUBLISHED=1
+                break
+              fi
+              sleep "$((attempt * 7))"
+            done
+            if [ "$PUBLISHED" -ne 1 ]; then
+              echo "Could not update $FILE; no verified-claim status was modified."
+              exit 1
+            fi
           done
-          echo "Candidate ledger could not be published; previous data remains unchanged"
-          exit 1
+          echo "Source metadata and unverified research sheets published"
