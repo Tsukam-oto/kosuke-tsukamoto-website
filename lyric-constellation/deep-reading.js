@@ -4,9 +4,9 @@
 (function(root){
 'use strict';
 const WORDS=[
- {label:'一人称（単数）',keys:['僕','私','わたし','ぼく']},
- {label:'一人称（複数）',keys:['僕ら','僕たち','私たち','わたしたち','ぼくら']},
- {label:'二人称',keys:['あなた','君','きみ']}
+ {label:'一人称（単数）',keys:['僕','私','わたし','ぼく','俺','おれ']},
+ {label:'一人称（複数）',keys:['僕ら','僕たち','私たち','わたしたち','ぼくら','俺ら','俺たち']},
+ {label:'二人称',keys:['あなた','君','きみ','お前','あんた']}
 ];
 const MOTIFS=[
  {id:'time',label:'時間・季節',keys:['朝','夜','明日','今日','昨日','春','夏','秋','冬','季節']},
@@ -64,7 +64,7 @@ function countOccurrences(text,needle){
  let i=0,n=0;while((i=text.indexOf(needle,i))!==-1){i+=needle.length;n++}return n;
 }
 function pronounReading(lines){
- const re=/(僕たち|私たち|わたしたち|僕ら|ぼくら|あなた|わたし|ぼく|僕|私|君|きみ)/g;
+ const re=/(僕たち|私たち|わたしたち|俺たち|俺ら|僕ら|ぼくら|あなた|わたし|あんた|お前|ぼく|おれ|僕|私|君|きみ|俺)/g;
  const classified=new Map(WORDS.map(w=>[w.label,{label:w.label,count:0,examples:[]}]));
  for(const line of lines){
   re.lastIndex=0;let m;
@@ -288,13 +288,47 @@ function dialogueRead(work,others){
  }
  return out;
 }
+
+/* Mechanical reading questions for authenticated master copies. No invented lyric lines. */
+function privateQuestions(work,lines,stanzas,variants,transitions,people,questions){
+ if(work.sourceSystem!=='lyric_master'||lines.length<4)return [];
+ const out=[];
+ const add=(heading,proof,prompt,alternative)=>{
+  const evidence=[...new Map(proof.filter(Boolean).map(p=>[p.number,p])).values()].slice(0,3)
+    .map(p=>({line:p.number,text:p.text}));
+  if(!evidence.length)return;
+  out.push({heading,hypothesis:prompt,alternative,evidence,kind:'source_question',
+   coverage:evidenceSpan(evidence,stanzas),reconsider:null});
+ };
+ add('冒頭から結末へ',[lines[0],lines[lines.length-1]],
+   '最初と最後の言葉を並べたとき、語り手の見方はどのように変わるでしょうか。',
+   '本文中の登場順と、実際の経験・制作の順序は異なる場合があります。');
+ const singular=people.find(p=>p.label==='一人称（単数）'),second=people.find(p=>p.label==='二人称');
+ if(singular?.count&&second?.count)add('語り手と呼びかける相手',[singular.examples[0],second.examples[0]],
+   'この二つの呼びかけは誰の声として読むことができるでしょうか。',
+   '人称表現だけで実在の人物や制作意図を特定することはできません。');
+ if(variants.length)add('似た言葉が再登場する箇所',[variants[0].before,variants[0].after],
+   '繰り返しの中で違う語句に、どんな意味がありそうでしょうか。',
+   '類似した行が意図的な改稿であるとは限りません。');
+ if(questions.length)add('問いを残す表現',questions.slice(0,2),
+   'この問いは誰に向かい、作品の終わりではどう扱われるでしょうか。',
+   '疑問形が必ず回答を求めるとは限らず、反語の可能性もあります。');
+ if(transitions.length&&out.length<4){
+  const t=transitions[0];
+  add('言葉の転換点',[t.prev,t.line,t.next],
+    '接続表現の前後で、どの見方が並んでいるでしょうか。',
+    '接続詞だけでは思想や語り手の変化を確定できません。');
+ }
+ return out.slice(0,4);
+}
+
 function crossRead(work,others){
- if(work.origin!=='official')return [];
+ if(work.origin!=='official'&&work.sourceSystem!=='lyric_master')return [];
  const lines=splitLines(work.lyrics);
  const keys=new Set(lines.flatMap(x=>MOTIFS.flatMap(m=>m.keys.filter(k=>x.text.includes(k)))));
  const out=[];
  for(const other of (others||[])){
-  if(!other||other.id===work.id||other.origin!=='official'||other.sky!==work.sky)continue;
+  if(!other||other.id===work.id||other.sky!==work.sky||(work.origin==='official'?other.origin!=='official':other.sourceSystem!=='lyric_master'))continue;
   const otherLines=splitLines(other.lyrics);
   const rich=MOTIFS.filter(m=>m.id!=='relation').map(m=>{
    const hits=m.keys.filter(k=>keys.has(k)&&otherLines.some(x=>x.text.includes(k)));
@@ -309,13 +343,14 @@ function analyze(work,others=[]){
  if(!work||typeof work.lyrics!=='string')throw Error('歌詞原文がありません');
  const lines=splitLines(work.lyrics);
  const stanzas=splitStanzas(work.lyrics);
+ const variants=variantRepetitions(lines,stanzas),transitions=transitionClues(stanzas),people=pronounReading(lines),questions=questionLines(lines);
  return {title:work.title,origin:work.origin,lines:lines.length,
   opening:lines.slice(0,3),ending:lines.slice(-3),
-  stanzas:overviewStanzas(stanzas),motifJourney:motifJourney(stanzas),transitions:transitionClues(stanzas),variants:variantRepetitions(lines,stanzas),
-  pronouns:pronounReading(lines),questions:questionLines(lines),
+  stanzas:overviewStanzas(stanzas),motifJourney:motifJourney(stanzas),transitions,variants,
+  pronouns:people,questions,
   repeats:repeats(lines),motifs:motifs(lines),
-  readings:curated(work,lines).map(r=>({...r,coverage:evidenceSpan(r.evidence,stanzas)})),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
+  readings:work.sourceSystem==='lyric_master'?privateQuestions(work,lines,stanzas,variants,transitions,people,questions):curated(work,lines).map(r=>({...r,coverage:evidenceSpan(r.evidence,stanzas)})),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
   caution:'人称やモチーフは表記に基づく観察です。意味、語り手、制作意図、創作年代を自動確定しません。'};
 }
-root.LyricCloseReading={version:'close-reading-2.1',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines,splitStanzas,variantRepetitions,transitionClues,motifJourney};
+root.LyricCloseReading={version:'close-reading-3.0',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines,splitStanzas,variantRepetitions,transitionClues,motifJourney};
 })(typeof window!=='undefined'?window:globalThis);

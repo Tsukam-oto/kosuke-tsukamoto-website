@@ -252,6 +252,10 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 .reading-journal-empty{font-size:12px;color:#60746a;padding:12px 0}
 .reading-journal-focused{outline:2px solid #9cacbd;outline-offset:4px;border-radius:12px}
 @media(max-width:760px){.reading-journal-items{grid-template-columns:1fr}.reading-journal-filter{flex:1;min-width:100px;text-align:center}.reading-journal-item{padding:12px}}
+
+.master-provenance{font-size:10px;color:#745d41;background:#f7efe2;border-radius:6px;padding:4px 6px;display:inline-block;margin-top:3px}
+.master-source-warning{border:1px solid #e4d8c4;background:#fcf8f0;color:#735c3c;border-radius:10px;padding:11px 12px;font-size:11px;line-height:1.9;margin:12px 0}
+.reading-journal-more{grid-column:1/-1;display:flex;justify-content:center;margin:8px}.reading-journal-more .btn{min-width:220px}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
@@ -322,6 +326,7 @@ const norm=x=>String(x||'').normalize('NFKC').toLocaleLowerCase('ja');
 const clamp=(a,min,max)=>Math.max(min,Math.min(max,a));
 const safeId=()=>`u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
 let db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};let localWorks=[];
+let masterReadingWorks=[],masterPendingWorks=[],masterReadStatus='signed_out';
 let sky='choir',view='constellation',selected=null,term='',query='',visibility='all',order='new',editing=null,pairIds=[];
 function cleanWork(w){if(!w||typeof w!=='object')return null;const title=String(w.title||'').trim().slice(0,140),lyrics=String(w.lyrics??w.text??'').slice(0,120000);if(!title||!lyrics.trim())return null;return {id:String(w.id||safeId()).slice(0,90),title,lyrics,year:Number(w.year)||null,credit:String(w.credit||'').slice(0,250),kind:String(w.kind||'その他').slice(0,70),tags:Array.isArray(w.tags)?w.tags.map(t=>String(t).slice(0,30)).slice(0,30):[],sky:resolveSky(w),origin:'private',updatedAt:String(w.updatedAt||new Date().toISOString())};}
 
@@ -437,8 +442,8 @@ function refreshAuthorReviewCounts(){
  if(shown)shown.textContent=st.saved+' / '+st.total;
  // Keep journal counts and filters accurate after saving, without closing the expanded panel.
  const journal=document.getElementById('readingJournal');
- if(journal&&sky==='choir'){
-  const rows=readingJournalRows(works().filter(x=>x.origin==='official'));
+ if(journal){
+  const rows=readingJournalRows(works().filter(x=>x.origin==='official'||x.sourceSystem==='lyric_master'));
   const summary=journal.querySelector('summary > small');
   if(summary)summary.textContent='本人確認 '+rows.filter(x=>x.checked).length+' / '+rows.length+'テーマ';
   const wrap=document.createElement('div');wrap.innerHTML=readingJournalSummary(rows);
@@ -450,12 +455,12 @@ function refreshAuthorReviewCounts(){
 }
 
 /* v5: one reading journal for the 14 interpretations and 8 cross-work dialogues. */
-let readingJournalFilter='needs';
+let readingJournalFilter='needs',readingJournalLimit=36;
 const readingJournalFilters={needs:'要確認',all:'すべて',different:'異なる読み',verified:'確認済み'};
 function readingJournalRows(corpus){
  const uniq=new Map();
  for(const w of corpus){
-  const report=window.LyricCloseReading.analyze(w,corpus);
+  const report=window.LyricCloseReading.analyze(w,w.sourceSystem==='lyric_master'?[]:corpus);
   for(const r of report.readings){
    const key=readingReviewKey(w,'hypothesis',r.heading);
    if(!uniq.has(key))uniq.set(key,{key,w,heading:r.heading,kind:'hypothesis',otherId:'',reference:r.evidence[0]||null});
@@ -480,7 +485,8 @@ function readingJournalList(rows,mode){
  const pr={stale:0,pending:1,new:2,verified:3};
  const ordered=found.slice().sort((a,b)=>pr[a.state]-pr[b.state]||a.w.title.localeCompare(b.w.title,'ja')||a.heading.localeCompare(b.heading,'ja'));
  if(!ordered.length)return '<p class="reading-journal-empty">この条件に該当するテーマはありません。</p>';
- return ordered.map(r=>'<article class="reading-journal-item"><div class="reading-journal-top">'+
+ const visible=ordered.slice(0,readingJournalLimit);
+ return visible.map(r=>'<article class="reading-journal-item"><div class="reading-journal-top">'+
   '<span class="reading-journal-status status-'+r.state+'">'+esc(r.stateName)+'</span><small>'+
   esc(r.kind==='dialogue'?'作品間の対話':'作品内の精読')+'</small></div>'+
   '<h4>'+esc(r.heading)+'</h4><div class="reading-journal-work">《'+esc(r.w.title)+'》'+
@@ -488,7 +494,8 @@ function readingJournalList(rows,mode){
   (r.reference?'<div class="reading-journal-quote"><small>L'+r.reference.line+'</small>'+esc(r.reference.text)+'</div>':'')+
   (r.state==='verified'?'<p class="reading-journal-stance">本人の判断：'+esc(readingStances[r.stance]||'確認済み')+'</p>':'')+
   (r.comment?'<p class="reading-journal-comment">本人メモ：'+esc(r.comment.slice(0,110))+(r.comment.length>110?'…':'')+'</p>':'')+
-  '<button class="btn sm" data-open-reading="'+esc(r.w.id)+'" data-reading-topic="'+esc(r.key)+'">この解釈と原文を読む</button></article>').join('');
+  '<button class="btn sm" data-open-reading="'+esc(r.w.id)+'" data-reading-topic="'+esc(r.key)+'">この解釈と原文を読む</button></article>').join('')+
+ (ordered.length>readingJournalLimit?'<div class="reading-journal-more"><button class="btn sm" type="button" data-reading-more="true">続きのテーマを表示（残り '+(ordered.length-readingJournalLimit)+'件）</button></div>':'');
 }
 function readingJournalSummary(rows){
  const counts={all:rows.length,needs:rows.filter(r=>!r.checked).length,verified:rows.filter(r=>r.checked).length,
@@ -502,17 +509,19 @@ function readingJournalSummary(rows){
 }
 
 function readingReviewDashboard(){
- if(sky!=='choir'||!window.LyricCloseReading?.analyze)return '';
- const corpus=works().filter(w=>w.origin==='official'),rows=readingJournalRows(corpus);
+ if(!window.LyricCloseReading?.analyze)return '';
+ const corpus=works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master');
+ if(!corpus.length)return '';
+ const rows=readingJournalRows(corpus);
  return '<details class="reading-dashboard" id="readingJournal"><summary><span class="eyebrow">READING JOURNAL / 作者の検証</span>'+
  '<strong>精読を、自分の記録にする</strong><small>本人確認 '+rows.filter(r=>r.checked).length+' / '+rows.length+'テーマ</small></summary>'+
- '<p class="desc">解釈をテーマごとに読み返せます。未確認・判断保留・歌詞の改訂後に再確認したいものを優先します。作者自身の意図と読み手の解釈は別々に扱います。</p>'+
+ '<p class="desc">'+(sky==='rap'?'木乃伊の歌詞全文から、根拠のある問いを作成しています。PDF抽出のため未校正です。個々の曲の完成状態や制作意図は断定しません。':'解釈をテーマごとに読み返せます。')+' 未確認・判断保留・原文の改訂後に再確認したいものを優先します。</p>'+
  readingJournalSummary(rows)+
  '<p class="desc">「異なる読み」は、意図と異なる解釈と、意図とは別に成立する解釈です。作品間の対話は双方で共通の1テーマ。件数は評価点ではありません。</p></details>';
 }
 function load(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY));if(d&&typeof d==='object'){db.userWorks=(Array.isArray(d.userWorks)?d.userWorks:[]).map(cleanWork).filter(Boolean).filter(w=>!PUBLIC.some(p=>p.id===w.id)).slice(0,1200);db.notes=typeof d.notes==='object'&&d.notes?Object.fromEntries(Object.entries(d.notes).slice(0,1300).map(([k,v])=>[k,String(v).slice(0,30000)])):{};db.readingReviews=cleanReadingReviews(d.readingReviews);db.customWords=(Array.isArray(d.customWords)?d.customWords:[]).map(x=>String(x).trim().slice(0,40)).filter(Boolean).slice(0,140);db.updatedAt=d.updatedAt||null;}}catch(e){console.warn('storage unavailable',e);}selected=PUBLIC[0]?.id;}
 function save(){try{db.updatedAt=new Date().toISOString();localStorage.setItem(STORAGE_KEY,JSON.stringify(db));$('#save-status').textContent='保存済み '+new Date().toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});return true}catch(e){toast('保存できませんでした。バックアップを書き出してください。');return false}}
-function works(){return [...PUBLIC,...db.userWorks].filter(w=>resolveSky(w)===sky)}
+function works(){return [...PUBLIC,...db.userWorks,...masterReadingWorks].filter(w=>resolveSky(w)===sky)}
 function getWork(id){return works().find(w=>w.id===id)}
 
 /* Exact fragments, observed locally. Never infer or generate lyrics. */
@@ -606,7 +615,17 @@ function rapDiscovery(){
 }
 function viewConstellation(){const s=summary(),most=s.conn[0],a=most?getWork(most.a):null,b=most?getWork(most.b):null;return header(sky==='rap'?'木乃伊の空。':'書いた言葉は、星座になる。',sky==='rap'?'余白から取り込んだ本人の言葉が、もう一つの星座になります。合唱の空とは交わりません。':'11篇の公開作品と、これから書く言葉。繰り返し現れる語を辿り、作品同士を読み直します。')+statStrip()+rapDiscovery()+(sky==='rap'&&!s.all.length?`<div class="rap-welcome"><strong>木乃伊の星座を、ここから。</strong><p>「余白 LYRIC NOTE」に記録した原文を取り込むか、リリックを新しく登録してください。元の記録は変更しません。</p><button id="importRap" class="btn primary">余白の原文を取り込む</button> <button id="addWorkSmall" class="btn">原文を登録</button></div>`:'')+`<div class="grid-2"><div><div class="dark-card"><div class="dark-head"><div><div class="eyebrow" style="color:#e1c894">CONSTELLATION / 言葉の連なり</div><h2>言葉で結ばれた作品</h2><p>星を選ぶと、作品と関連語が開きます。</p></div><span style="font:italic 18px Georgia,serif;color:#c7b187">${sky==='rap'&&s.all.length>40?'代表40 / 全'+s.all.length:s.all.length} stars</span></div><div class="constellation-scroll">${renderGraph()}</div><div class="dark-bottom"><span>● 星＝作品</span><span>― 線＝主な共通語のつながり</span>${sky==='rap'&&s.all.length>40?'<span>星図は代表40点。作品画面で全件を確認できます。</span>':''}<span>${term?'強調する言葉：':''}<b>${esc(term||'全体')}</b></span></div></div>${pills()}<div class="insight">この地図は歌詞の文字列一致に基づいています。似た意味の語の自動統合や、作品の思想の判定は行っていません。</div></div><div>${selectedWorkCard()}<div class="panel" style="margin-top:18px"><div class="eyebrow">OBSERVATION / 今回の発見</div><h2>最も言葉が重なる組</h2>${most?`<p style="font-weight:800">《${esc(a.title)}》 と 《${esc(b.title)}》</p><div class="word-cloud">${most.shared.slice(0,14).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><p class="notice">観察語が多く共起した組です。似た意味の作品だと断定するものではありません。</p><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}" style="margin-top:12px">並べて読み比べる</button>`:'<p>作品を追加すると、共通語が見つかります。</p>'}</div></div></div>`}
 function sortWorks(list){return list.sort((a,b)=>order==='old'?(a.year||9999)-(b.year||9999):order==='az'?a.title.localeCompare(b.title,'ja'):(b.year||0)-(a.year||0))}
-function viewWorks(){const all=sortWorks(works().filter(w=>(visibility==='all'||(visibility==='official'?w.origin==='official':w.origin==='private'))&&(!query||norm(w.title+' '+w.lyrics+' '+w.credit).includes(norm(query)))));return header('作品を読む。',sky==='rap'?'木乃伊名義の原文と断片だけを表示します。合唱・詩は別の空です。':'公開歌詞11篇を原文・作者表記付きで収録。木乃伊のリリックとは分けています。')+`<div class="panel"><div class="control-row"><input class="search" id="searchWorks" type="search" placeholder="作品名・歌詞・作者から検索" value="${esc(query)}"><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filterWorks" class="search" style="width:auto"><option value="all" ${visibility==='all'?'selected':''}>すべて</option><option value="official" ${visibility==='official'?'selected':''}>公開作品のみ</option><option value="private" ${visibility==='private'?'selected':''}>非公開のみ</option></select><select id="sortWorks" class="search" style="width:auto"><option value="new" ${order==='new'?'selected':''}>新しい順</option><option value="old" ${order==='old'?'selected':''}>古い順</option><option value="az" ${order==='az'?'selected':''}>作品名順</option></select></div></div><div class="notice">公式公開版の原文は読み取り専用。作品を開いて「作品を深く読む」を選ぶと、問い・反復・人称・別解を原文の行番号とともに確認できます。分析結果は推測として示し、原文を書き換えません。</div></div>${readingReviewDashboard()}<div class="section-top"><h2>収録作品 <span class="small-muted">${all.length}篇</span></h2><button class="btn sm" id="addWorkSmall">＋ 作品を追加</button></div><div class="works-list">${all.map(w=>`<button class="work-card ${w.origin==='private'?'private':''}" data-open="${esc(w.id)}"><span class="eyebrow">${w.year||'—'} / ${w.origin==='official'?'PUBLISHED':'PRIVATE'}</span><strong>《${esc(w.title)}》</strong><small>${esc(w.credit||'作者表記なし')}</small><div class="tags">${formatTags(w)}</div></button>`).join('')}</div>${all.length?'':'<div class="empty">該当する作品がありません。</div>'}`}
+function masterReadNotice(){
+ if(sky==='rap'&&!cloudUser)return '<div class="notice">木乃伊の歌詞は非公開です。ご本人のアカウントでログインすると、原文を読み込めます。</div>';
+ if(masterReadStatus==='loading')return '<div class="notice">本人専用の歌詞原文を読み込んでいます。</div>';
+ if(masterReadStatus==='error')return '<div class="notice">原文の読込に失敗しました。同期設定から再読込してください。内容を推測して補完しません。</div>';
+ if(masterReadStatus!=='ready')return '';
+ const loaded=masterReadingWorks.filter(w=>w.sky===sky),pending=masterPendingWorks.filter(w=>w.sky===sky);
+ if(!loaded.length&&!pending.length)return '';
+ return '<div class="notice">本人専用アーカイブ：原文 '+loaded.length+'件'+(pending.length?' ／ 原文待ち '+pending.length+'件：'+pending.map(x=>'《'+esc(x.title)+'》').join('・'):'')+
+ '。PDF抽出の歌詞は未校正であり、完成・公開を意味しません。共作の意図・権利は断定しません。</div>';
+}
+function viewWorks(){const all=sortWorks(works().filter(w=>(visibility==='all'||(visibility==='official'?w.origin==='official':w.origin==='private'))&&(!query||norm(w.title+' '+w.lyrics+' '+w.credit).includes(norm(query)))));return header('作品を読む。',sky==='rap'?'木乃伊名義の原文と断片だけを表示します。合唱・詩は別の空です。':'公開歌詞11篇を原文・作者表記付きで収録。木乃伊のリリックとは分けています。')+`<div class="panel"><div class="control-row"><input class="search" id="searchWorks" type="search" placeholder="作品名・歌詞・作者から検索" value="${esc(query)}"><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filterWorks" class="search" style="width:auto"><option value="all" ${visibility==='all'?'selected':''}>すべて</option><option value="official" ${visibility==='official'?'selected':''}>公開作品のみ</option><option value="private" ${visibility==='private'?'selected':''}>非公開のみ</option></select><select id="sortWorks" class="search" style="width:auto"><option value="new" ${order==='new'?'selected':''}>新しい順</option><option value="old" ${order==='old'?'selected':''}>古い順</option><option value="az" ${order==='az'?'selected':''}>作品名順</option></select></div></div><div class="notice">公式公開版の原文は読み取り専用。作品を開いて「作品を深く読む」を選ぶと、問い・反復・人称・別解を原文の行番号とともに確認できます。分析結果は推測として示し、原文を書き換えません。</div></div>${masterReadNotice()}${readingReviewDashboard()}<div class="section-top"><h2>収録作品 <span class="small-muted">${all.length}篇</span></h2><button class="btn sm" id="addWorkSmall">＋ 作品を追加</button></div><div class="works-list">${all.map(w=>`<button class="work-card ${w.origin==='private'?'private':''}" data-open="${esc(w.id)}"><span class="eyebrow">${w.year||'—'} / ${w.origin==='official'?'PUBLISHED':w.sourceSystem==='lyric_master'?'PRIVATE SOURCE':'PRIVATE'}</span><strong>《${esc(w.title)}》</strong><small>${esc(w.credit||'作者表記なし')}</small>${w.sourceSystem==='lyric_master'?'<small class="master-provenance">'+esc(w.sourceStatus==='unverified_pdf_extract'?'PDF抽出・未校正':'作者原本')+'</small>':''}<div class="tags">${formatTags(w)}</div></button>`).join('')}</div>${all.length?'':'<div class="empty">該当する作品がありません。</div>'}`}
 function findInText(text,word){const idx=norm(text).indexOf(norm(word));if(idx<0)return '';const arr=text.split('\n');let at=0;for(let i=0;i<arr.length;i++){if(norm(arr[i]).includes(norm(word))){return arr.slice(Math.max(0,i-1),Math.min(arr.length,i+2)).join('\n').trim()}}return ''}
 function highlight(text,word){if(!word)return esc(text);const a=String(text),na=norm(a),nb=norm(word);let idx=na.indexOf(nb);if(idx<0)return esc(a);if(na.length!==a.length)return esc(a);let out='',start=0;while(idx>=0){out+=esc(a.slice(start,idx))+'<mark>'+esc(a.slice(idx,idx+word.length))+'</mark>';start=idx+word.length;idx=na.indexOf(nb,start)}return out+esc(a.slice(start));}
 function viewWords(){const df=wordDF(),sorted=[...df].sort((a,b)=>b[1].df-a[1].df||b[1].count-a[1].count),chosen=term||sorted[0]?.[0]||'',results=works().filter(w=>occurrences(w.lyrics,chosen)>0);return header('言葉を、見つけ直す。','同じ言葉は、別の作品ではどんな場所に置かれているのでしょう。文字列の出現を原文の前後と一緒に辿れます。')+`<div class="grid-2"><div class="panel"><div class="section-top" style="margin-top:0"><h2>観察語の索引</h2><span class="desc">登場する作品数の多い順</span></div><div class="word-cloud">${sorted.map(([t,info])=>`<button data-term="${esc(t)}" class="word ${chosen===t?'active':''}"><strong>${esc(t)}</strong><small>${info.df}作品 · ${info.count}回</small></button>`).join('')}</div><div class="section-top"><h2>言葉の追加</h2></div><div class="control-row"><input id="newWord" class="search" placeholder="観察したい言葉を入力"><button id="addWord" class="btn sm">＋ 追加</button></div><p class="desc">単語ではなく「文字列」を探しています。「風」は「風景」「南風」の中にも数えられます。形態素解析ではありません。</p></div><div class="panel"><div class="eyebrow">KEYWORD IN CONTEXT</div><h2 style="font-size:30px;margin:4px 0">${esc(chosen||'—')}</h2><p class="panel-sub">${results.length}作品に登場 / 合計 ${results.reduce((s,w)=>s+occurrences(w.lyrics,chosen),0)}回</p><div class="metric-bar"><i style="width:${Math.round(results.length/Math.max(1,works().length)*100)}%"></i></div><p class="desc">頻度は文章の長さや繰り返しにも影響されます。</p></div></div><div class="section-top"><h2>実際に使われている箇所</h2><span class="desc">初めに見つかった箇所を表示</span></div><div class="term-results">${results.map(w=>`<div class="term-result"><h3>《${esc(w.title)}》 <small>${w.year||'—'}</small></h3><div class="eyebrow">${occurrences(w.lyrics,chosen)} OCCURRENCES</div><blockquote>${highlight(findInText(w.lyrics,chosen),chosen)}</blockquote><button class="btn sm" data-open="${esc(w.id)}" style="margin-top:11px">全文で確かめる</button></div>`).join('')}</div>`}
@@ -675,7 +694,7 @@ function openDeepReading(id,topicKey=''){
  const a=window.LyricCloseReading.analyze(w,works());
  const reviewProgress=workReviewStats(w,a);
  const intro='<div class="deep-intro"><div class="eyebrow">CLOSE READING / 読みの仮説</div><h2>《'+esc(w.title)+'》を読み解く</h2>'+
- '<p>言葉の出現を数えるだけでなく、<strong>どの位置に置かれ、前後で何が変わるか</strong>を読みます。観察・仮説・別の読みを区別します。</p>'+ '<div class="author-review-progress"><strong>本人の確認 <span>'+reviewProgress.saved+' / '+reviewProgress.total+'</span></strong><small>評価ではなく、作者としての意図や異論の記録です。未回答のままでも構いません。</small></div>'+
+ '<p>言葉の出現を数えるだけでなく、<strong>どの位置に置かれ、前後で何が変わるか</strong>を読みます。観察・仮説・別の読みを区別します。</p>'+ (w.sourceSystem==='lyric_master'?'<p class="master-source-warning">'+(w.sourceStatus==='unverified_pdf_extract'?'この歌詞はPDF抽出・未校正です。':'この歌詞は非公開の本人専用原文です。')+' 以下は本文の観察と問いであり、作者の意図・完成状態を確定するものではありません。</p>':'')+ '<div class="author-review-progress"><strong>本人の確認 <span>'+reviewProgress.saved+' / '+reviewProgress.total+'</span></strong><small>評価ではなく、作者としての意図や異論の記録です。未回答のままでも構いません。</small></div>'+
  '<div class="deep-quickmetrics"><span><b>'+a.stanzas.length+'</b><small>段落</small></span><span><b>'+a.variants.length+'</b><small>似た形で再登場する行</small></span><span><b>'+a.transitions.length+'</b><small>接続表現の手がかり</small></span><span><b>'+a.readings.length+'</b><small>根拠付きの読みの仮説</small></span></div>'+ 
  '<div class="deep-actions"><button class="btn sm" data-open="'+esc(w.id)+'">原文を読む</button></div></div>';
  const structure='<section class="deep-section"><div class="eyebrow">01 / STRUCTURE</div><h3>冒頭と結末の距離</h3>'+
@@ -689,7 +708,7 @@ function openDeepReading(id,topicKey=''){
  const readings='<section class="deep-section"><div class="eyebrow">05 / HYPOTHESES</div><h3>歌詞の解釈と、それに対する別の読み</h3>'+
  (a.readings.length?a.readings.map(r=>'<article class="deep-reading-card" data-reading-key="'+esc(readingReviewKey(w,'hypothesis',r.heading))+'"><h4>'+esc(r.heading)+'</h4>'+
  '<span class="deep-pill">原文の根拠</span> <small class="deep-coverage">'+esc(r.coverage.note)+'</small><div class="deep-evidence">'+r.evidence.map(deepQuote).join('')+'</div>'+
- '<span class="deep-pill">解釈の仮説</span><p>'+esc(r.hypothesis)+'</p>'+
+ '<span class="deep-pill">'+(r.kind==='source_question'?'原文から考える問い':'解釈の仮説')+'</span><p>'+esc(r.hypothesis)+'</p>'+
  '<span class="deep-pill">異なる解釈</span><p>'+esc(r.alternative)+'</p>'+ (r.reconsider?'<div class="deep-recheck"><strong>この解釈をもう一度考える箇所</strong>'+deepQuote(r.reconsider.passage)+'<p>'+esc(r.reconsider.question)+'</p><small>反証とは限りません。別の見方を試す手がかりです。</small></div>':'')+readingReviewForm(w,'hypothesis',r.heading)+'</article>').join(''):
  '<div class="deep-reading-card"><h4>この作品の仮説は、まだ登録されていません。</h4>'+
  '<p>人称や反復の観察から、ご自身の読みを記録できます。AIが作者の意図を確定することはありません。</p></div>')+'</section>';
@@ -730,19 +749,25 @@ function openDeepReading(id,topicKey=''){
  }
 }
 
-function openWork(id){const w=getWork(id);if(!w)return;selected=id;const lex=term;const credit=w.credit||'作者表記なし';const plain=w.lyrics.split(/\n\s*\n/).map(p=>`<p>${highlight(p,lex)}</p>`).join('');$('#drawer').innerHTML=`<div class="drawer-top"><span class="eyebrow">${w.origin==='official'?'PUBLISHED ARCHIVE':'PRIVATE ARCHIVE'}</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div><div class="eyebrow">${esc(w.year||'YEAR UNKNOWN')} / ${esc(w.kind)}</div><h2>《${esc(w.title)}》</h2><div class="reading-stat">${w.lyrics.split('\n').filter(Boolean).length}行 · ${tokens(w).length}種類の観察語</div><div class="deep-entry"><button class="btn primary" data-deep-work="${esc(w.id)}">この作品を深く読む</button><small>原文の根拠、繰り返し、違う読み方まで。</small></div><div class="word-cloud" style="margin:14px 0 24px">${tokens(w).slice(0,16).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="poem-text">${plain}</div><p class="reading-meta" style="font-size:11px;color:#728092;border-top:1px solid #e5e7e7;padding-top:16px">${esc(credit)}<br>${w.origin==='official'?'<a href="https://kosuke-tsukamoto-website.pages.dev/lyrics/" target="_blank" rel="noopener noreferrer">公式サイト掲載版</a>':'ご自身だけの非公開作品'}</p><div class="note-box"><h3>この作品についての自分のメモ（非公開）</h3><textarea id="noteText" placeholder="制作意図、後から気付いたこと、変化の記録など。原文は変更しません。">${esc(db.notes[w.id]||'')}</textarea><div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="${esc(w.id)}">メモを保存</button></div></div><div class="form-actions" style="justify-content:start;margin-top:22px">${w.origin==='private'?`<button class="btn" data-edit="${esc(w.id)}">編集</button><button class="btn danger" data-delete="${esc(w.id)}">削除</button>`:`<button class="btn" data-clone="${esc(w.id)}">非公開の複製を作る</button>`}</div><footer>歌詞の新規生成は行いません。関連性は原文の語句と手動のメモをもとに確認できます。</footer>`;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');if(view==='constellation')render();}
+function openWork(id){const w=getWork(id);if(!w)return;selected=id;const lex=term;const credit=w.credit||'作者表記なし';const plain=w.lyrics.split(/\n\s*\n/).map(p=>`<p>${highlight(p,lex)}</p>`).join('');$('#drawer').innerHTML=`<div class="drawer-top"><span class="eyebrow">${w.origin==='official'?'PUBLISHED ARCHIVE':'PRIVATE ARCHIVE'}</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div><div class="eyebrow">${esc(w.year||'YEAR UNKNOWN')} / ${esc(w.kind)}</div><h2>《${esc(w.title)}》</h2><div class="reading-stat">${w.lyrics.split('\n').filter(Boolean).length}行 · ${tokens(w).length}種類の観察語</div><div class="deep-entry"><button class="btn primary" data-deep-work="${esc(w.id)}">この作品を深く読む</button><small>原文の根拠、繰り返し、違う読み方まで。</small></div><div class="word-cloud" style="margin:14px 0 24px">${tokens(w).slice(0,16).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="poem-text">${plain}</div>${w.sourceSystem==='lyric_master'?`<p class="master-source-warning">${w.sourceStatus==='unverified_pdf_extract'?'PDFから抽出した未校正テキストです。文字や行の区切りに誤りが残る可能性があります。':'本人専用の作品原文です。'} ${w.authorshipStatus&&w.authorshipStatus!=='sole_author'?'共作・著作者の確認が必要な場合があります。':''}原本を公開したり、本人の制作意図を確定したりしません。${esc(w.sourceBook||'')}</p>`:''}<p class="reading-meta" style="font-size:11px;color:#728092;border-top:1px solid #e5e7e7;padding-top:16px">${esc(credit)}<br>${w.origin==='official'?'<a href="https://kosuke-tsukamoto-website.pages.dev/lyrics/" target="_blank" rel="noopener noreferrer">公式サイト掲載版</a>':'ご自身だけの非公開作品'}</p><div class="note-box"><h3>この作品についての自分のメモ（非公開）</h3><textarea id="noteText" placeholder="制作意図、後から気付いたこと、変化の記録など。原文は変更しません。">${esc(db.notes[w.id]||'')}</textarea><div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="${esc(w.id)}">メモを保存</button></div></div><div class="form-actions" style="justify-content:start;margin-top:22px">${w.origin==='private'&&!w.readOnly?`<button class="btn" data-edit="${esc(w.id)}">編集</button><button class="btn danger" data-delete="${esc(w.id)}">削除</button>`:`<button class="btn" data-clone="${esc(w.id)}">非公開の複製を作る</button>`}</div><footer>歌詞の新規生成は行いません。関連性は原文の語句と手動のメモをもとに確認できます。</footer>`;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');if(view==='constellation')render();}
 function closeWork(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');$('#scrim').classList.remove('show')}
-function openEditor(id=null,clone=false,sourceText=null){editing=id&&!clone?id:null;const w=id?getWork(id):null;const f=$('#editForm');f.reset();f.elements.id.value=editing||'';f.elements.sky.value=w?resolveSky(w):sky;f.elements.kind.value=sky==='rap'?'ラップ（木乃伊）':'合唱・詩';if(w){f.elements.title.value=clone?w.title+'（下書き）':w.title;f.elements.year.value=w.year||'';f.elements.credit.value=w.credit||'';f.elements.kind.value=w.kind||'その他';f.elements.lyrics.value=w.lyrics;f.elements.tags.value=(w.tags||[]).join('、')}if(sourceText){f.elements.lyrics.value=sourceText;f.elements.title.value=sourceText.slice(0,12).split('\n')[0]||'無題'}$('#modal-title').textContent=editing?'作品を編集':clone?'公開作品から非公開の下書きを作成':'新しい作品を登録';$('#editor').showModal();}
+function openEditor(id=null,clone=false,sourceText=null){const w=id?getWork(id):null;if(w?.readOnly&&!clone){toast('歌詞集の原本はここから変更できません。非公開の複製を作って編集してください。');return;}editing=id&&!clone?id:null;const f=$('#editForm');f.reset();f.elements.id.value=editing||'';f.elements.sky.value=w?resolveSky(w):sky;f.elements.kind.value=sky==='rap'?'ラップ（木乃伊）':'合唱・詩';if(w){f.elements.title.value=clone?w.title+'（下書き）':w.title;f.elements.year.value=w.year||'';f.elements.credit.value=w.credit||'';f.elements.kind.value=w.kind||'その他';f.elements.lyrics.value=w.lyrics;f.elements.tags.value=(w.tags||[]).join('、')}if(sourceText){f.elements.lyrics.value=sourceText;f.elements.title.value=sourceText.slice(0,12).split('\n')[0]||'無題'}$('#modal-title').textContent=editing?'作品を編集':clone?'公開作品から非公開の下書きを作成':'新しい作品を登録';$('#editor').showModal();}
 function exportBackup(){const data={app:'lyric-constellation',version:3,exportedAt:new Date().toISOString(),source:'official 11 poems',userWorks:db.userWorks,notes:db.notes,readingReviews:cleanReadingReviews(db.readingReviews),customWords:db.customWords};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`歌詞の星座_バックアップ_${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('バックアップを書き出しました。安全な場所に保存してください。')}
 function mergeImported(d){const source=Array.isArray(d)?d:Array.isArray(d.userWorks)?d.userWorks:Array.isArray(d.works)?d.works:[];if(!source.length&&!(d.notes&&typeof d.notes==='object')&&!(d.readingReviews&&typeof d.readingReviews==='object'))throw Error('読み込める作品・メモ・読みの確認がありません');const rows=source.map(cleanWork).filter(Boolean).filter(w=>!PUBLIC.some(p=>p.id===w.id));let added=0,updated=0;for(const w of rows){let k=db.userWorks.findIndex(z=>z.id===w.id);if(k<0){const same=db.userWorks.some(z=>z.title===w.title&&z.lyrics===w.lyrics);if(same)continue;db.userWorks.push(w);added++}else if(db.userWorks[k].lyrics!==w.lyrics||db.userWorks[k].title!==w.title){w.id=safeId();w.title=w.title+'（バックアップから）';db.userWorks.push(w);added++}}if(d.notes&&typeof d.notes==='object')for(const [k,v]of Object.entries(d.notes)){if(typeof v==='string'&&v.trim()&&!db.notes[k])db.notes[k]=v.slice(0,30000)}if(d.readingReviews&&typeof d.readingReviews==='object'){db.readingReviews??={};for(const [key,item] of Object.entries(cleanReadingReviews(d.readingReviews)))if(!db.readingReviews[key])db.readingReviews[key]=item;}if(Array.isArray(d.customWords))db.customWords=[...new Set([...db.customWords,...d.customWords.map(String)])].slice(0,140);if(d.vocab&&typeof d.vocab==='string')db.customWords=[...new Set([...db.customWords,...d.vocab.split(/[、,\n]/).map(x=>x.trim()).filter(Boolean)])].slice(0,140);save();return{added,updated};}
 function migrateOld(){let restored=0;for(const key of ['three_observatories_release_v1','three_observatory_proto_v01']){try{const d=JSON.parse(localStorage.getItem(key));if(d&&Array.isArray(d.works)){const o=mergeImported(d);restored+=o.added}}catch(e){}}render();toast(restored?`旧データから${restored}作品を取り込みました。`:'引き継げる旧データが見つかりませんでした。旧版のJSONも読み込めます。')}
 function compare(a,b){const A=getWork(a),B=getWork(b);if(!A||!B)return;const comm=tokens(A).filter(x=>tokens(B).includes(x));selected=a;term=comm[0]||'';const panel=`<div class="drawer-top"><span class="eyebrow">COMPARE / 2篇を読む</span><button class="close" id="closeDrawer">×</button></div><h2 style="font-size:22px">《${esc(A.title)}》<br>と《${esc(B.title)}》</h2><p class="desc">共通する表記：${comm.length}種類</p><div class="word-cloud">${comm.map(w=>`<button class="word" data-term="${esc(w)}">${esc(w)}</button>`).join('')}</div><div class="term-results" style="grid-template-columns:1fr;margin-top:22px">${[A,B].map(w=>`<div class="term-result"><h3>${esc(w.title)}</h3><div class="poem-text" style="white-space:pre-line;line-height:1.9;font-size:12px">${highlight(w.lyrics.slice(0,1700),term)}</div></div>`).join('')}</div><p class="notice">共通する語を読んで、作品の内容がどう異なるかをご自身で確かめられます。</p>`;$('#drawer').innerHTML=panel;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');}
 document.addEventListener('click',async e=>{const target=e.target.closest('button,[data-open],[data-term],[data-compare]');if(!target)return;if(target.matches('[data-sky]')){switchSky(target.dataset.sky);return}if(target.matches('[data-view]')){go(target.dataset.view);return}
+if(target.hasAttribute('data-reading-more')){
+ readingJournalLimit+=36;
+ const journal=target.closest('.reading-dashboard');if(journal){const rows=readingJournalRows(works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master'));const list=journal.querySelector('#readingJournalItems');if(list)list.innerHTML=readingJournalList(rows,readingJournalFilter);}
+ return;
+}
 if(target.hasAttribute('data-reading-filter')){
  readingJournalFilter=target.dataset.readingFilter;
+ readingJournalLimit=36;
  const journal=target.closest('.reading-dashboard');
  if(journal){
-  const rows=readingJournalRows(works().filter(w=>w.origin==='official'));
+  const rows=readingJournalRows(works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master'));
   const wrap=document.createElement('div');wrap.innerHTML=readingJournalSummary(rows);
   const list=journal.querySelector('#readingJournalItems');
   if(list)list.innerHTML=wrap.querySelector('#readingJournalItems').innerHTML;
@@ -751,7 +776,7 @@ if(target.hasAttribute('data-reading-filter')){
  return;
 }
 if(target.hasAttribute('data-open-reading')){openDeepReading(target.dataset.openReading,target.dataset.readingTopic);return}
-if(target.hasAttribute('data-save-reading')){saveReadingReview(target.dataset.saveReading,target.closest('.author-review'));return}if(target.hasAttribute('data-clear-reading')){clearReadingReview(target.dataset.clearReading,target.closest('.author-review'));return}if(target.hasAttribute('data-deep-work')){openDeepReading(target.dataset.deepWork);return}if(target.hasAttribute('data-open')){openWork(target.dataset.open);return}if(target.hasAttribute('data-term')){term=target.dataset.term;view=target.closest('#drawer')?view:(view==='words'?'words':'constellation');render();if(target.closest('#drawer'))openWork(selected);return}if(target.hasAttribute('data-compare')){const [a,b]=target.dataset.compare.split('|');compare(a,b);return}switch(target.id){case'backupTop':case'exportSettings':exportBackup();break;case'addTop':case'addWorkSmall':openEditor();break;case'closeDrawer':closeWork();break;case'closeEditor':case'cancelEditor':$('#editor').close();break;case'importSettings':$('#importFile').click();break;case'importText':$('#textFile').click();break;case'addWord':{const val=$('#newWord')?.value.trim().slice(0,40);if(val&&!words().includes(val)){db.customWords.push(val);save();term=val;render();toast('観察語に追加しました')}else toast('未入力か、既に登録されています');break}case'migrateOld':migrateOld();break;case'erasePrivate':{if(!confirm('非公開作品・個人メモ・精読の本人確認・追加観察語をすべて削除します。事前にバックアップを取ってください。続けますか？'))break;if(!confirm('本当に削除しますか？ この操作は取り消せません。'))break;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};save();render();closeWork();toast('個人データを端末内から消去しました');break}case'saveNote':{const w=getWork(target.dataset.id);if(w){db.notes[w.id]=$('#noteText').value;save();toast('自分のメモを保存しました')}break}default:if(target.hasAttribute('data-edit')){const id=target.dataset.edit;closeWork();openEditor(id)}else if(target.hasAttribute('data-clone')){const id=target.dataset.clone;closeWork();openEditor(id,true)}else if(target.hasAttribute('data-delete')){const id=target.dataset.delete;const w=getWork(id);if(w?.origin==='private'&&confirm(`《${w.title}》を削除しますか？`)){db.userWorks=db.userWorks.filter(x=>x.id!==id);delete db.notes[id];save();closeWork();render();toast('非公開作品を削除しました')}}break}});
+if(target.hasAttribute('data-save-reading')){saveReadingReview(target.dataset.saveReading,target.closest('.author-review'));return}if(target.hasAttribute('data-clear-reading')){clearReadingReview(target.dataset.clearReading,target.closest('.author-review'));return}if(target.hasAttribute('data-deep-work')){openDeepReading(target.dataset.deepWork);return}if(target.hasAttribute('data-open')){openWork(target.dataset.open);return}if(target.hasAttribute('data-term')){term=target.dataset.term;view=target.closest('#drawer')?view:(view==='words'?'words':'constellation');render();if(target.closest('#drawer'))openWork(selected);return}if(target.hasAttribute('data-compare')){const [a,b]=target.dataset.compare.split('|');compare(a,b);return}switch(target.id){case'backupTop':case'exportSettings':exportBackup();break;case'addTop':case'addWorkSmall':openEditor();break;case'closeDrawer':closeWork();break;case'closeEditor':case'cancelEditor':$('#editor').close();break;case'importSettings':$('#importFile').click();break;case'importText':$('#textFile').click();break;case'addWord':{const val=$('#newWord')?.value.trim().slice(0,40);if(val&&!words().includes(val)){db.customWords.push(val);save();term=val;render();toast('観察語に追加しました')}else toast('未入力か、既に登録されています');break}case'migrateOld':migrateOld();break;case'erasePrivate':{if(!confirm('非公開作品・個人メモ・精読の本人確認・追加観察語をすべて削除します。事前にバックアップを取ってください。続けますか？'))break;if(!confirm('本当に削除しますか？ この操作は取り消せません。'))break;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};save();render();closeWork();toast('個人データを端末内から消去しました');break}case'saveNote':{const w=getWork(target.dataset.id);if(w){db.notes[w.id]=$('#noteText').value;save();toast('自分のメモを保存しました')}break}default:if(target.hasAttribute('data-edit')){const id=target.dataset.edit;closeWork();openEditor(id)}else if(target.hasAttribute('data-clone')){const id=target.dataset.clone;closeWork();openEditor(id,true)}else if(target.hasAttribute('data-delete')){const id=target.dataset.delete;const w=getWork(id);if(w?.origin==='private'&&!w.readOnly&&confirm(`《${w.title}》を削除しますか？`)){db.userWorks=db.userWorks.filter(x=>x.id!==id);delete db.notes[id];save();closeWork();render();toast('非公開作品を削除しました')}}break}});
 document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.star-node[data-open]')){e.preventDefault();openWork(e.target.dataset.open)}if(e.key==='Escape')closeWork()});
 $('#scrim').addEventListener('click',closeWork);
 $('#editForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;const row=cleanWork({id:editing||safeId(),title:f.elements.title.value,lyrics:f.elements.lyrics.value,year:f.elements.year.value,credit:f.elements.credit.value,kind:f.elements.kind.value,sky:f.elements.sky.value,tags:f.elements.tags.value.split(/[、,\n]/).map(x=>x.trim()).filter(Boolean)});if(!row)return toast('タイトルと原文を入力してください');const k=db.userWorks.findIndex(w=>w.id===row.id);if(k>=0)db.userWorks[k]=row;else db.userWorks.push(row);save();$('#editor').close();sky=row.sky;try{localStorage.setItem(SKY_PREF,sky)}catch{}selected=row.id;view='works';render();openWork(row.id);toast('原文をそのまま保存しました')});
@@ -786,7 +811,61 @@ function authMessage(s){document.getElementById('auth-message').textContent=s;}
 function showCloud(){if(cloudUser){go('settings');return;}openAuth();}
 function ensureCloud(){if(cloudClient)return cloudClient;if(!window.supabase?.createClient){throw Error('ログイン用ライブラリを読み込めません。通信状況を確認してください。');}cloudClient=window.supabase.createClient(CLOUD_URL,CLOUD_PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});return cloudClient;}
 async function readCloudState(){const{data,error}=await cloudClient.from('lyric_constellation_state').select('payload,revision').eq('user_id',cloudUser.id).maybeSingle();if(error)throw error;return data;}
-async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===user.id)return;const epoch=++cloudEpoch;cloudUser=user;cloudBusy=true;cloudDirty=false;cloudBlocked=false;previousLocal=JSON.parse(JSON.stringify(db));setCloudStatus('クラウド読込中…','pending');cloudButton().textContent='同期中';try{
+
+/* Private source corpus. Reads only under the signed-in user's Supabase RLS.
+   Never cache song bodies in public assets, localStorage or the public constellation seed. */
+async function loadMasterReadingCorpus(user,epoch){
+ if(!user?.id||!cloudClient)return;
+ masterReadStatus='loading';
+ try{
+  const query=cloudClient.from('lyric_master_works')
+   .select('id,sky,title,form,collection_title,track_no,original_book_index,verification_status,authorship_status,source_review_note,source_page_start,source_page_end,source_name')
+   .eq('user_id',user.id).order('original_book_index',{ascending:true});
+  const [catalogResponse,textResponse]=await Promise.all([
+   query,
+   cloudClient.from('lyric_master_text_versions')
+    .select('work_id,version_no,literal_text,text_status,source_ref')
+    .eq('user_id',user.id).order('version_no',{ascending:false}).limit(500)
+  ]);
+  if(catalogResponse.error)throw catalogResponse.error;
+  if(textResponse.error)throw textResponse.error;
+  if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
+  const versions=new Map();
+  for(const v of textResponse.data||[]){
+   if(!versions.has(v.work_id)&&typeof v.literal_text==='string'&&v.literal_text.trim())versions.set(v.work_id,v);
+  }
+  const found=[],pending=[];
+  for(const r of catalogResponse.data||[]){
+   if(r.sky!=='rap'&&r.sky!=='choir'&&r.sky!=='personal')continue;
+   const v=versions.get(r.id),targetSky=r.sky==='rap'?'rap':'choir';
+   // The 11 published originals continue to use the curated, immutable public seed.
+   if(r.sky==='choir'&&PUBLIC.some(w=>w.title===r.title))continue;
+   if(!v){pending.push({title:r.title,sky:targetSky,sourceId:r.id});continue;}
+   found.push({
+    id:'master-'+r.id,title:r.title,lyrics:v.literal_text,sky:targetSky,
+    origin:'private',sourceSystem:'lyric_master',sourceStatus:v.text_status,
+    sourceRef:v.source_ref||'',sourceReviewStatus:r.verification_status,
+    authorReviewNote:r.source_review_note||'',authorshipStatus:r.authorship_status||'',
+    sourcePages:[r.source_page_start,r.source_page_end],sourceBook:r.source_name||'',
+    collection:r.collection_title||'',trackNo:r.track_no,
+    kind:r.sky==='rap'?'ラップ（木乃伊）':'歌曲・詩（非公開）',
+    credit:r.sky==='rap'?'木乃伊｜本人専用の歌詞集':'本人専用の歌詞原文',
+    year:null,tags:[r.collection_title,v.text_status==='unverified_pdf_extract'?'未校正':'原文あり'].filter(Boolean),
+    readOnly:true,updatedAt:''
+   });
+  }
+  masterReadingWorks=found;masterPendingWorks=pending;masterReadStatus='ready';
+  selected=works()[0]?.id||null;
+  render();
+ }catch(err){
+  if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
+  masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='error';
+  console.warn('private lyric master read',err);
+  render();
+ }
+}
+
+async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===user.id)return;const epoch=++cloudEpoch;masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='loading';cloudUser=user;cloudBusy=true;cloudDirty=false;cloudBlocked=false;previousLocal=JSON.parse(JSON.stringify(db));setCloudStatus('クラウド読込中…','pending');cloudButton().textContent='同期中';try{
   let remote=await readCloudState();if(!remote){const {error}=await cloudClient.from('lyric_constellation_state').insert({user_id:user.id,payload:statePayload({userWorks:[],notes:{},customWords:[]}),revision:0});if(error&&error.code!=='23505')throw error;remote=await readCloudState();}
   if(epoch!==cloudEpoch||!cloudUser)return;
   const cachekey=CLOUD_CACHE_PREFIX+user.id;let cache=null;try{cache=JSON.parse(localStorage.getItem(cachekey)||'null')}catch{}
@@ -797,7 +876,7 @@ async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===us
     // Preserve both versions; never overwrite a newer cloud revision without review.
     db=statePayload(cache.payload);cloudDirty=true;cloudBlocked=true;setCloudStatus('別端末との競合・要確認','pending');toast('別端末に更新があります。JSONバックアップを保存してください。');
   }else{db=remotePayload;localStorage.setItem(cachekey,JSON.stringify({revision:cloudRevision,payload:db}));setCloudStatus('クラウド同期済み','online');}
-  selected=works()[0]?.id||null;render();cloudButton().textContent='同期設定';if(cloudDirty&&!cloudBlocked)pushCloud();
+  selected=works()[0]?.id||null;render();cloudButton().textContent='同期設定';await loadMasterReadingCorpus(user,epoch);if(cloudDirty&&!cloudBlocked)pushCloud();
 }catch(err){setCloudStatus('同期エラー','pending');toast('クラウド読込に失敗：'+(err.message||'再試行してください'));cloudButton().textContent='同期設定';}finally{cloudBusy=false;if(cloudDirty&&!cloudBlocked&&cloudUser&&cloudRevision!==null){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,50);}}}
 async function pushCloud(){if(!cloudUser||cloudWriting||cloudBlocked||!cloudDirty||cloudRevision===null||cloudBusy)return;const myEpoch=cloudEpoch,uid=cloudUser.id,oldRev=cloudRevision;
 cloudWriting=true;cloudDirty=false;const snapshot=statePayload(db);setCloudStatus('クラウド保存中…','pending');try{const{data,error}=await cloudClient.from('lyric_constellation_state').update({payload:snapshot,revision:oldRev+1,updated_at:new Date().toISOString()}).eq('user_id',uid).eq('revision',oldRev).select('revision');if(error)throw error;if(myEpoch!==cloudEpoch)return;
@@ -807,8 +886,8 @@ localStorage.setItem(CLOUD_CACHE_PREFIX+uid,JSON.stringify({revision:cloudRevisi
 if(cloudDirty){setCloudStatus('続けて同期中…','pending');}else{setCloudStatus('クラウド同期済み','online');}
 }catch(err){cloudDirty=true;setCloudStatus('未同期・再試行が必要','pending');console.warn('cloud sync error',err);toast('同期できていません。データはこの端末に残っています。');}
 finally{cloudWriting=false;if(cloudDirty&&!cloudBlocked&&myEpoch===cloudEpoch){clearTimeout(cloudTimer);cloudTimer=setTimeout(pushCloud,1400);}}}
-async function cloudRefresh(){if(!cloudUser)return;const incoming=await readCloudState();if(!incoming){toast('クラウド側の保存領域が見つかりません。');return;}if(cloudDirty||cloudBlocked||cloudWriting){toast('この端末に未同期の変更があります。JSONに書き出してから再確認してください。');return;}cloudRevision=Number(incoming.revision);db=statePayload(incoming.payload);cloudPrevious=db;localStorage.setItem(CLOUD_CACHE_PREFIX+cloudUser.id,JSON.stringify({revision:cloudRevision,payload:db}));render();setCloudStatus('クラウド同期済み','online');toast('クラウドの記録を確認しました。')}
-async function cloudLogout(){if(!cloudUser)return;if(cloudDirty||cloudBlocked){toast('未同期の変更があります。バックアップしてからログアウトしてください。');return;}if(!confirm('この端末のログインを解除しますか？ クラウドに保存済みの原稿は残ります。'))return;const uid=cloudUser.id;const res=await cloudClient.auth.signOut();if(res.error){toast(res.error.message);return;}++cloudEpoch;localStorage.removeItem(CLOUD_CACHE_PREFIX+uid);cloudUser=null;cloudRevision=null;cloudPrevious=null;cloudDirty=false;cloudBlocked=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');toast('ログアウトしました。')}
+async function cloudRefresh(){if(!cloudUser)return;const incoming=await readCloudState();if(!incoming){toast('クラウド側の保存領域が見つかりません。');return;}if(cloudDirty||cloudBlocked||cloudWriting){toast('この端末に未同期の変更があります。JSONに書き出してから再確認してください。');return;}cloudRevision=Number(incoming.revision);db=statePayload(incoming.payload);cloudPrevious=db;localStorage.setItem(CLOUD_CACHE_PREFIX+cloudUser.id,JSON.stringify({revision:cloudRevision,payload:db}));render();await loadMasterReadingCorpus(cloudUser,cloudEpoch);setCloudStatus('クラウド同期済み','online');toast('クラウドの記録を確認しました。')}
+async function cloudLogout(){if(!cloudUser)return;if(cloudDirty||cloudBlocked){toast('未同期の変更があります。バックアップしてからログアウトしてください。');return;}if(!confirm('この端末のログインを解除しますか？ クラウドに保存済みの原稿は残ります。'))return;const uid=cloudUser.id;const res=await cloudClient.auth.signOut();if(res.error){toast(res.error.message);return;}++cloudEpoch;localStorage.removeItem(CLOUD_CACHE_PREFIX+uid);cloudUser=null;cloudRevision=null;cloudPrevious=null;cloudDirty=false;cloudBlocked=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');toast('ログアウトしました。')}
 function importDeviceLocal(){if(!cloudUser)return;let local;try{local=JSON.parse(localStorage.getItem(STORAGE_KEY)||'null')}catch{}if(!local||(local.userWorks||[]).length===0&&Object.keys(local.notes||{}).length===0&&Object.keys(local.readingReviews||{}).length===0){toast('このブラウザに引き継げる下書きや精読記録がありません');return;}if(!confirm('この端末の非公開作品・メモ・精読の本人確認をクラウド側へ追加します。既存のクラウド作品は保持します。'))return;try{const r=mergeImported(local);render();toast(`${r.added}作品を追加。クラウドへの保存を開始しました。`)}catch(err){toast(err.message)}}
 async function importFromYohaku(){if(!cloudUser)return;try{const {data,error}=await cloudClient.from('lyric_notes').select('id,title,body,original_body,kind,created_at').order('created_at',{ascending:true}).limit(250);if(error)throw error;if(!data?.length){toast('余白に取り込める記録がありません。');return;}
 const chosen=data.filter(x=>String(x.original_body||x.body||'').trim()).filter(x=>!db.userWorks.some(w=>w.id==='yohaku-'+x.id));if(!chosen.length){toast('余白の記録は取り込み済みです。');return;}if(!confirm(`余白 LYRIC NOTEの本人原文 ${chosen.length}件を、歌詞の星座の非公開作品として取り込みますか？ 原本は変更しません。`))return;let count=0;for(const x of chosen){const w=cleanWork({id:'yohaku-'+x.id,title:x.title||'無題',lyrics:x.original_body||x.body,year:x.created_at?.slice(0,4),credit:'本人原文（余白 LYRIC NOTEより取り込み）',kind:'ラップ（木乃伊）',sky:'rap',tags:[]});if(w){db.userWorks.push(w);count++;}}if(count){save();switchSky('rap');toast(`${count}件を木乃伊の空に取り込みました。余白の原本は変更していません。`)}
@@ -820,7 +899,7 @@ const ua=navigator.userAgent||'';if(/iphone|ipad|ipod/i.test(ua)){toast('Safari�
 // Keep login handling separate from published lyrics and existing local backup functionality.
 document.addEventListener('click',async e=>{const b=e.target.closest('button');if(!b)return;try{switch(b.id){case'cloudTop':case'cloudLogin':showCloud();break;case'authClose':document.getElementById('authDialog').close();break;case'authLink':{const email=document.getElementById('cloudEmail').value.trim();if(!email){authMessage('メールアドレスを入力してください');return;}const{error}=await ensureCloud().auth.signInWithOtp({email,options:{shouldCreateUser:false,emailRedirectTo:location.origin+location.pathname}});authMessage(error?error.message:'メールを送信しました。届いたリンクまたは認証コードをご確認ください。');break;}case'authVerify':{const email=document.getElementById('cloudEmail').value.trim(),token=document.getElementById('cloudCode').value.trim();if(!email||!token){authMessage('メールアドレスと認証コードを入力してください');return;}const{data,error}=await ensureCloud().auth.verifyOtp({email,token,type:'email'});if(error)authMessage(error.message);else{document.getElementById('authDialog').close();await startCloudSession(data.user);}break;}case'cloudRefresh':await cloudRefresh();break;case'cloudLocalImport':importDeviceLocal();break;case'cloudYohaku':case'importRap':if(!cloudUser)showCloud();else await importFromYohaku();break;case'cloudLogout':await cloudLogout();break;case'installPwa':installPwa();break;}}catch(err){authMessage(err.message||String(err));toast('クラウド処理でエラーが発生しました。')}});
 document.getElementById('authForm').addEventListener('submit',async e=>{e.preventDefault();const f=e.target;try{const{data,error}=await ensureCloud().auth.signInWithPassword({email:f.elements.email.value.trim(),password:f.elements.password.value});if(error){authMessage(error.message);return;}document.getElementById('authDialog').close();await startCloudSession(data.user);}catch(err){authMessage(err.message||String(err))}});
-async function startAuth(){try{const cli=ensureCloud();cli.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='USER_UPDATED'){if(session?.user&&session.user.id!==cloudUser?.id)setTimeout(()=>startCloudSession(session.user),0);}else if(event==='SIGNED_OUT'&&cloudUser){setTimeout(()=>{if(cloudUser){++cloudEpoch;cloudUser=null;cloudRevision=null;cloudBlocked=false;cloudDirty=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');}},0)}});
+async function startAuth(){try{const cli=ensureCloud();cli.auth.onAuthStateChange((event,session)=>{if(event==='SIGNED_IN'||event==='INITIAL_SESSION'||event==='USER_UPDATED'){if(session?.user&&session.user.id!==cloudUser?.id)setTimeout(()=>startCloudSession(session.user),0);}else if(event==='SIGNED_OUT'&&cloudUser){setTimeout(()=>{if(cloudUser){++cloudEpoch;cloudUser=null;cloudRevision=null;cloudBlocked=false;cloudDirty=false;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';load();render();cloudButton().textContent='ログイン・同期';setCloudStatus('端末内で利用中');}},0)}});
 const {data,error}=await cli.auth.getSession();if(error)throw error;if(data?.session?.user)await startCloudSession(data.session.user);else setCloudStatus('端末内で利用中');
 }catch(err){console.warn('cloud auth initialization',err);setCloudStatus('ログイン機能を確認してください','pending');}}
 window.addEventListener('DOMContentLoaded',startAuth);

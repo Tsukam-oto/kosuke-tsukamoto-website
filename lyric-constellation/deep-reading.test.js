@@ -74,4 +74,23 @@ assert.ok(results.find(x=>x.title==='All around you').readings.some(r=>r.reconsi
 const privateReconsider=E.analyze({id:'private-copy',title:'All around you',origin:'private',sky:'choir',lyrics:'せっかくひとりぼっちに'},works);
 assert.equal(privateReconsider.readings.length,0,'do not apply public interpretations to a private copy');
 
-console.log('close-reading v4: all 11 works, 14 evidence-backed rereading prompts, 8 literary dialogues, stanza and private isolation verified');
+
+/* A private source text is read for literal evidence only, not assigned public-song editorial intent. */
+const syntheticRap={
+ id:'master-fake',title:'朝になったら',sky:'rap',origin:'private',sourceSystem:'lyric_master',
+ lyrics:'俺はまだ言葉を探している\n君は遠くの窓から空を眺めていた\n\n今日も何もわからない\nそれでも僕らは歩いている\n俺があなたに伝えたい言葉\nどうしてこの夜が長いのだろう\n\n明日になったら別の道かもしれない'
+};
+const privateA=E.analyze(syntheticRap,[syntheticRap]);
+assert.ok(privateA.readings.length>=3,'private lyrics should have grounded reading questions');
+assert.ok(privateA.readings.every(r=>r.kind==='source_question'));
+assert.ok(privateA.readings.every(r=>r.evidence.every(e=>syntheticRap.lyrics.split('\n')[e.line-1].trim()===e.text)));
+assert.ok(!privateA.readings.some(r=>r.heading==='「僕」と「僕ら」の間に何があるか'),'do not use choir editorial guesses for a rap title');
+const single=privateA.pronouns.find(p=>p.label==='一人称（単数）');
+const second=privateA.pronouns.find(p=>p.label==='二人称');
+assert.ok(single.count>=2&&second.count>=2,'recognize 俺 and 君/あなた');
+const otherRap={...syntheticRap,id:'master-other',title:'別の歌',lyrics:'俺は夜の空を見上げる\n君に届く言葉の歌\nまた夜が来た\nでも朝が来る'};
+const otherChoir={...otherRap,id:'master-choir',sky:'choir'};
+assert.equal(E.analyze(syntheticRap,[otherChoir]).cross.length,0,'never mix rap and choir private sources');
+assert.equal(E.analyze({title:'非公開',origin:'private',sky:'rap',lyrics:syntheticRap.lyrics},[]).readings.length,0,'only master-linked private texts gain source-only prompts');
+
+console.log('close-reading v6: 11 official works, 14 close readings, 8 dialogues, and private rap source-grounded questions passed');
