@@ -416,7 +416,7 @@ function challengeCard(c){
  '<header><div><span class="reading-challenge-source">'+esc(source.kind)+'</span><h5>《'+esc(source.title)+'》</h5></div>'+
  '<small>'+esc(CHALLENGE_KIND_NAMES[c.challenge_kind]||'再検討')+'</small></header>'+
  '<blockquote>'+esc(source.quote)+'</blockquote>'+
- '<dl><dt>従来の読みでは見落とすこと</dt><dd>'+esc(c.observation)+'</dd>'+
+ '<dl><dt>問い直す従来の前提</dt><dd>'+esc(c.challenged_assumption)+'</dd>'+'<dt>原文に見えること</dt><dd>'+esc(c.observation)+'</dd>'+
  '<dt>この反例で修正すること</dt><dd>'+esc(c.revised_reading)+'</dd>'+
  '<dt>反論・留保</dt><dd>'+esc(c.alternative)+'</dd>'+
  '<dt>決めつけないこと</dt><dd>'+esc(c.limit_note)+'</dd></dl>'+
@@ -454,8 +454,8 @@ function readingPathsPanel(){
  const evidence=Array.isArray(active.anchors)?active.anchors:[];
  const valid=evidence.filter(a=>readingPathSource(a));
  const sections=[
-  ['読みの中心',active.core_hypothesis],['歌詞の書き方・構造',active.formal_mechanism],
-  ['同時に残る矛盾',active.central_tension],['この読みへの反例',active.counterreading],
+  ['歌詞の書き方・構造',active.formal_mechanism],
+  ['初回から残る矛盾',active.central_tension],['初回に挙げた別解',active.counterreading],
   ['決めつけてはいけないこと',active.inference_limit]
  ];
  return '<section class="reading-paths">'+
@@ -470,7 +470,7 @@ function readingPathsPanel(){
  '<h4 class="reading-path-evidence-title">根拠となる作品・原文</h4>'+
  '<div class="reading-path-sources">'+(valid.map(readPathEvidence).join('')||'<p>出典の照合が必要です。</p>')+'</div>'+
  '<div class="reading-path-next"><strong>次に考える問い</strong><p>'+esc(active.next_inquiry)+'</p></div>'+
- '<p class="reading-path-note">全引用は非公開データベースの現在の保存原文と照合済みです。ただし、木乃伊のPDF抽出本文は原本との校正前です。歌詞の語り手と実在の作者は同一視しません。</p>'+
+ '<p class="reading-path-note">原文引用は保存時点で照合済みです。後から歌詞本文を変更した場合は、原文を開いて再確認が必要です。木乃伊のPDF抽出本文は原本との校正前です。歌詞の語り手と実在の作者は同一視しません。</p>'+
  '</div></section>';
 }
 function renderReadingPaths(){
