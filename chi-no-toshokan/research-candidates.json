@@ -1,21 +1,861 @@
 {
   "schemaVersion": 1,
-  "lastRunAt": null,
-  "editorialPolicy": "この一覧は資料候補です。本文・研究結果・原典の記述を照合していないため、記事の根拠としては未承認です。",
+  "lastRunAt": "2026-11-04T10:07:48+00:00",
+  "editorialPolicy": "これは検索APIから得た候補資料と書誌情報です。本文・研究結果・原典の該当箇所は未照合です。記事の根拠として承認していません。",
   "automation": {
-    "frequency": "週2回（GitHub Actions・有効化検証中）",
+    "frequency": "週2回（GitHub Actions）",
     "method": "公開APIの書誌・作品メタデータ"
   },
   "runSummary": {
-    "topicsSearched": [],
-    "providerCallsSucceeded": 0,
+    "topicsSearched": [
+      "adler",
+      "therapeutic-alliance",
+      "odyssey-xenia",
+      "zeus-titans",
+      "microbiome",
+      "city",
+      "notation",
+      "temperament"
+    ],
+    "providerCallsSucceeded": 15,
     "errors": []
   },
   "items": [
     {
+      "id": "openalex:W2966849946",
+      "kind": "research-metadata",
+      "title": "From China to South Korea: Two Perspectives on Adlerian Psychology in Asia",
+      "url": "https://openalex.org/W2966849946",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2012,
+      "authors": [
+        "Sun Shu-fang",
+        "James Robert Bitter"
+      ],
+      "publication": "Digital Commons - East Tennessee State University (East Tennessee State University)",
+      "recordType": "article",
+      "doi": "",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "met:247308",
+      "kind": "museum-object",
+      "title": "Terracotta pelike (jar)",
+      "url": "https://www.metmuseum.org/art/collection/search/247308",
+      "area": "美術館所蔵品",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "The Met"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": null,
+      "medium": "Terracotta",
+      "objectDate": "ca. 460–450 BCE",
+      "accession": "06.1021.144",
+      "imageUrl": "https://images.metmuseum.org/CRDImages/gr/web-large/DP161808.jpg",
+      "imageRights": "Met Open Access / CC0",
+      "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
+      "kind": "music-work-metadata",
+      "title": "Symphony no. 5",
+      "url": "https://musicbrainz.org/work/bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
+      "area": "音楽作品データ",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "MusicBrainz"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "recordType": "Symphony",
+      "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
+      "kind": "music-work-metadata",
+      "title": "Symphony no. 5",
+      "url": "https://musicbrainz.org/work/adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
+      "area": "音楽作品データ",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "MusicBrainz"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "recordType": "Symphony",
+      "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
+      "kind": "music-work-metadata",
+      "title": "Boléro",
+      "url": "https://musicbrainz.org/work/487527b9-a525-33f4-b948-ea41b9a2672f",
+      "area": "音楽作品データ",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "MusicBrainz"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "recordType": "Ballet",
+      "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
+      "kind": "music-work-metadata",
+      "title": "Ravel",
+      "url": "https://musicbrainz.org/work/005f669d-00d1-4b64-b7ea-dca40e57c32f",
+      "area": "音楽作品データ",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "MusicBrainz"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "recordType": "",
+      "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.5406/j.ctvpj7j1r.17",
+      "kind": "research-metadata",
+      "title": "Twelve-Step Equal Temperament",
+      "url": "https://doi.org/10.5406/j.ctvpj7j1r.17",
+      "area": "音楽",
+      "topicIds": [
+        "temperament"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [],
+      "publication": "The Arithmetic of Listening",
+      "recordType": "book-chapter",
+      "doi": "10.5406/j.ctvpj7j1r.17",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-8",
+      "kind": "research-metadata",
+      "title": "Adlerian family counselling and family psychotherapy",
+      "url": "https://doi.org/10.4324/9781315820262-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-8",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-7",
+      "kind": "research-metadata",
+      "title": "Adlerian counselling and psychotherapy today",
+      "url": "https://doi.org/10.4324/9781315820262-7",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-7",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-6",
+      "kind": "research-metadata",
+      "title": "Classical Adlerian Psychology",
+      "url": "https://doi.org/10.4324/9781315820262-6",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-6",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.4102/lit.v37i1.1250",
+      "kind": "research-metadata",
+      "title": "‘Treppie does not like guests’: Xenia in Marlene van Niekerk’s Triomf",
+      "url": "https://doi.org/10.4102/lit.v37i1.1250",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2016,
+      "authors": [
+        "Marius Crous"
+      ],
+      "publication": "Literator",
+      "recordType": "article",
+      "doi": "10.4102/lit.v37i1.1250",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.3840/003269",
+      "kind": "research-metadata",
+      "title": "Pythagorean, Meantone, and Equal Temperament Musical Scales",
+      "url": "https://doi.org/10.3840/003269",
+      "area": "音楽",
+      "topicIds": [
+        "temperament"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2008,
+      "authors": [],
+      "publication": "Wolfram Demonstrations Project",
+      "recordType": "dataset",
+      "doi": "10.3840/003269",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.3390/nu14071527",
+      "kind": "research-metadata",
+      "title": "Fermented Foods, Health and the Gut Microbiome",
+      "url": "https://doi.org/10.3390/nu14071527",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "Natasha Leeuwendaal",
+        "Catherine Stanton",
+        "Paul William O’Toole"
+      ],
+      "publication": "Nutrients",
+      "recordType": "review",
+      "doi": "10.3390/nu14071527",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.30958/ajt.12-4-1",
+      "kind": "research-metadata",
+      "title": "Resonant Connections: The Stroke Rods of Badia Tedalda and the Musical Legacy of Guido d’Arezzo",
+      "url": "https://doi.org/10.30958/ajt.12-4-1",
+      "area": "音楽",
+      "topicIds": [
+        "notation"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Mark Konewko"
+      ],
+      "publication": "Athens Journal of Tourism",
+      "recordType": "article",
+      "doi": "10.30958/ajt.12-4-1",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.2307/3356776",
+      "kind": "research-metadata",
+      "title": "Easy Rule for Tuning Organs and Harmoniums in Equal Temperament",
+      "url": "https://doi.org/10.2307/3356776",
+      "area": "音楽",
+      "topicIds": [
+        "temperament"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1879,
+      "authors": [
+        "Alexander J. Ellis"
+      ],
+      "publication": "The Musical Times and Singing Class Circular",
+      "recordType": "journal-article",
+      "doi": "10.2307/3356776",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.17758/uruae23.ua0524404",
+      "kind": "research-metadata",
+      "title": "Guido d-Arezzo-s Musical Notation and Their Significance in the Development of Musical Pedagogy through Interactive Digital Technologies in the Digital Age",
+      "url": "https://doi.org/10.17758/uruae23.ua0524404",
+      "area": "音楽",
+      "topicIds": [
+        "notation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [],
+      "publication": "International Conference Proceedings IASET-24, WCBES-24, IABW2M-24, IEMSSH-24 &amp; IMESH-24 May 13-15, 2024 Istanbul (Turkiye)",
+      "recordType": "proceedings-article",
+      "doi": "10.17758/uruae23.ua0524404",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.15385/jmo.2012.3.1.4",
+      "kind": "research-metadata",
+      "title": "Guido of Arezzo and His Influence on Music Learning",
+      "url": "https://doi.org/10.15385/jmo.2012.3.1.4",
+      "area": "音楽",
+      "topicIds": [
+        "notation"
+      ],
+      "providers": [
+        "Crossref",
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2012,
+      "authors": [
+        "Anna Reisenweaver"
+      ],
+      "publication": "Musical Offerings",
+      "recordType": "article",
+      "doi": "10.15385/jmo.2012.3.1.4",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1484/j.jua.5.137197",
+      "kind": "research-metadata",
+      "title": "Placing Space, Shaping Cities, and Making History in the Ancient Classical World",
+      "url": "https://doi.org/10.1484/j.jua.5.137197",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [
+        "Rubina Raja",
+        "Søren Sindbæk"
+      ],
+      "publication": "Journal of Urban Archaeology",
+      "recordType": "journal-article",
+      "doi": "10.1484/j.jua.5.137197",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1484/j.jua.5.131730",
+      "kind": "research-metadata",
+      "title": "Embattled Cities: The Urban Reinvention of History – Editorial",
+      "url": "https://doi.org/10.1484/j.jua.5.131730",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "Rubina Raja",
+        "Søren M. Sindbæk"
+      ],
+      "publication": "Journal of Urban Archaeology",
+      "recordType": "journal-article",
+      "doi": "10.1484/j.jua.5.131730",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1353/jip.2019.0006",
+      "kind": "research-metadata",
+      "title": "Adlerian Psychotherapy: A Resource for Practitioners and Students",
+      "url": "https://doi.org/10.1353/jip.2019.0006",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Leigh Johnson-Migalski",
+        "David Tuan Vo"
+      ],
+      "publication": "The Journal of Individual Psychology",
+      "recordType": "article",
+      "doi": "10.1353/jip.2019.0006",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1353/hel.2010.a406972",
+      "kind": "research-metadata",
+      "title": "Helen's Hands: Weaving for Kleos in the Odyssey",
+      "url": "https://doi.org/10.1353/hel.2010.a406972",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [
+        "Melissa Mueller"
+      ],
+      "publication": "Helios",
+      "recordType": "article",
+      "doi": "10.1353/hel.2010.a406972",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1201/b18279-8",
+      "kind": "research-metadata",
+      "title": "Diet, Microbiome, and Human Health",
+      "url": "https://doi.org/10.1201/b18279-8",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2015,
+      "authors": [],
+      "publication": "Health Benefits of Fermented Foods and Beverages",
+      "recordType": "book-chapter",
+      "doi": "10.1201/b18279-8",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1186/s42779-026-00328-3",
+      "kind": "research-metadata",
+      "title": "Traditional fermented foods, indigenous knowledge systems, and gut microbiome health among tribal communities of Tripura, India: an integrative review",
+      "url": "https://doi.org/10.1186/s42779-026-00328-3",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Manabendra Debnath"
+      ],
+      "publication": "Journal of Ethnic Foods",
+      "recordType": "journal-article",
+      "doi": "10.1186/s42779-026-00328-3",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780190498900.003.0013",
+      "kind": "research-metadata",
+      "title": "Spatial Representation of Vienna’s Street-Level Environment",
+      "url": "https://doi.org/10.1093/oso/9780190498900.003.0013",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2020,
+      "authors": [
+        "Angelika Psenner"
+      ],
+      "publication": "Digital Cities",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oso/9780190498900.003.0013",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00296191",
+      "kind": "research-metadata",
+      "title": "Works and Days",
+      "url": "https://doi.org/10.1093/oseo/instance.00296191",
+      "area": "神話・歴史",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2008,
+      "authors": [],
+      "publication": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00296191",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00296190",
+      "kind": "research-metadata",
+      "title": "Theogony",
+      "url": "https://doi.org/10.1093/oseo/instance.00296190",
+      "area": "神話・歴史",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2008,
+      "authors": [],
+      "publication": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00296190",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280596",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280596",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1980,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Oxford World's Classics: Homer: The Odyssey",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280596",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280567",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280567",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2018,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Oxford World's Classics: Homer: The Odyssey",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280567",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280463",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280463",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2018,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Homer: Odyssey, Book 1",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280463",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/gmo/9781561592630.article.11968",
+      "kind": "research-metadata",
+      "title": "Guido of Arezzo",
+      "url": "https://doi.org/10.1093/gmo/9781561592630.article.11968",
+      "area": "音楽",
+      "topicIds": [
+        "notation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2001,
+      "authors": [
+        "Claude V. Palisca"
+      ],
+      "publication": "Oxford Music Online",
+      "recordType": "reference-entry",
+      "doi": "10.1093/gmo/9781561592630.article.11968",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1093/actrade/9780199538317.book.1",
+      "kind": "research-metadata",
+      "title": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+      "url": "https://doi.org/10.1093/actrade/9780199538317.book.1",
+      "area": "神話・歴史",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2008,
+      "authors": [
+        "Hesiod"
+      ],
+      "publication": "",
+      "recordType": "edited-book",
+      "doi": "10.1093/actrade/9780199538317.book.1",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1037/pst0000534.supp",
+      "kind": "research-metadata",
+      "title": "Supplemental Material for The Relationship Between Interpersonal Problems and Therapeutic Alliance in Psychotherapy: A Three-Level Mixed-Effects Meta-Analysis",
+      "url": "https://doi.org/10.1037/pst0000534.supp",
+      "area": "心理・臨床",
+      "topicIds": [
+        "therapeutic-alliance"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [],
+      "publication": "Psychotherapy",
+      "recordType": "journal-article",
+      "doi": "10.1037/pst0000534.supp",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1037/a0022425.supp",
+      "kind": "research-metadata",
+      "title": "Supplemental Material for The Relationship Between Adult Attachment Style and Therapeutic Alliance in Individual Psychotherapy: A Meta-Analytic Review",
+      "url": "https://doi.org/10.1037/a0022425.supp",
+      "area": "心理・臨床",
+      "topicIds": [
+        "therapeutic-alliance"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2011,
+      "authors": [],
+      "publication": "Psychotherapy",
+      "recordType": "journal-article",
+      "doi": "10.1037/a0022425.supp",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1037/a0021175.supp",
+      "kind": "research-metadata",
+      "title": "Supplemental Material for DROPOUT AND THERAPEUTIC ALLIANCE: A META-ANALYSIS OF ADULT INDIVIDUAL PSYCHOTHERAPY",
+      "url": "https://doi.org/10.1037/a0021175.supp",
+      "area": "心理・臨床",
+      "topicIds": [
+        "therapeutic-alliance"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [],
+      "publication": "Psychotherapy: Theory, Research, Practice, Training",
+      "recordType": "journal-article",
+      "doi": "10.1037/a0021175.supp",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.micpath.2025.107718",
+      "kind": "research-metadata",
+      "title": "Comprehensive review of food Archaeome: Exploring the understudied microbiome and health benefits of fermented foods",
+      "url": "https://doi.org/10.1016/j.micpath.2025.107718",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [
+        "Ramalakshmi Alaguthevar",
+        "Amol Vishwas Pawale",
+        "Balakrishnan Murugesan"
+      ],
+      "publication": "Microbial Pathogenesis",
+      "recordType": "review",
+      "doi": "10.1016/j.micpath.2025.107718",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-323-98341-9.00018-9",
+      "kind": "research-metadata",
+      "title": "Fermented foods and gut microbiome: a focus on African Indigenous fermented foods",
+      "url": "https://doi.org/10.1016/b978-0-323-98341-9.00018-9",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2023,
+      "authors": [
+        "Beatrice Mofoluwaso Fasogbon",
+        "Oluwaseun Hannah Ademuyiwa",
+        "Oluwafemi Ayodeji Adebo"
+      ],
+      "publication": "Indigenous Fermented Foods for the Tropics",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-323-98341-9.00018-9",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
+    },
+    {
       "id": "anchor:zeus-titans",
       "kind": "curated-reference-path",
-      "title": "Hesiod, Theogony — translated text",
+      "title": "Hesiod, Theogony (translated text)",
       "url": "https://www.theoi.com/Text/HesiodTheogony.html",
       "area": "原典・翻訳",
       "topicIds": [
@@ -26,12 +866,14 @@
       ],
       "reviewStatus": "未照合",
       "evidenceStatus": "書誌・作品情報のみ",
-      "note": "翻訳原典への入口。神話が史実だったと示す資料ではありません。"
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
     },
     {
       "id": "anchor:odyssey-xenia",
       "kind": "curated-reference-path",
-      "title": "Hesiod, Works and Days — translated text",
+      "title": "Hesiod, Works and Days (translated text)",
       "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
       "area": "原典・翻訳",
       "topicIds": [
@@ -42,7 +884,9 @@
       ],
       "reviewStatus": "未照合",
       "evidenceStatus": "書誌・作品情報のみ",
-      "note": "古典資料への入口。内容の照合は未実施です。"
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-04T10:07:48+00:00"
     }
   ]
 }
