@@ -40,14 +40,28 @@ jobs:
         run: python chi-no-toshokan/research/collect.py
 
       - name: Publish only the public candidate ledger
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          git config user.name "knowledge-library-research-bot"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add chi-no-toshokan/research-candidates.json
-          if ! git diff --cached --quiet; then
-            git commit -m "Refresh unverified research source candidates [skip ci]"
-            git pull --rebase origin main
-            git push origin HEAD:main
-          else
+          set -euo pipefail
+          FILE="chi-no-toshokan/research-candidates.json"
+          if git diff --quiet -- "$FILE"; then
             echo "Candidate ledger unchanged"
+            exit 0
           fi
+          CONTENT="$(base64 -w 0 "$FILE")"
+          for attempt in 1 2 3 4; do
+            echo "Updating public candidate ledger (attempt $attempt)"
+            SHA="$(gh api "repos/$GITHUB_REPOSITORY/contents/$FILE" --jq '.sha')"
+            if gh api --method PUT "repos/$GITHUB_REPOSITORY/contents/$FILE" \
+              -f sha="$SHA" \
+              -f content="$CONTENT" \
+              -f branch="main" \
+              -f message="Refresh unverified source candidates [skip ci]" >/dev/null; then
+              echo "Candidate ledger published"
+              exit 0
+            fi
+            sleep "$((attempt * 7))"
+          done
+          echo "Candidate ledger could not be published; previous data remains unchanged"
+          exit 1
