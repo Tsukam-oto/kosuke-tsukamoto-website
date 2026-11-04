@@ -11,7 +11,7 @@ const db={notes:{retained:'existing notes'},readingReviews:{},userWorks:[]};
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let saveOK=true,savedCalls=0;const messages=[];
 const progress={textContent:''};
-const doc={querySelector:()=>progress,createElement:()=>({dataset:{}})};
+const doc={querySelector:()=>progress,getElementById:()=>null,createElement:()=>({dataset:{}})};
 const runtime=new Function('db','corpus','engine','doc','messages','getSaveOK','recordSave','esc',[
  'const window={LyricCloseReading:engine};',
  'const sky="choir",selected=corpus[0].id;',
