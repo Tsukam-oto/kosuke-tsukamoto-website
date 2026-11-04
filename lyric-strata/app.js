@@ -6,6 +6,7 @@ const STORE='lyric_strata_local_v1', MAX_NOTE=250000;
 let data=[], current=null, view='strata', cloud=null, user=null, syncing=false;
 let masterCandidates=[],masterWorks=new Map(),matchLoadError='';
 let readingReportCache=null, readingFocus=-1, readingShow=20;
+let draftReadings=[],draftReadingLoadError='';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const newId=()=>window.crypto?.randomUUID?.()||('local-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -55,6 +56,7 @@ function activeList(){
 }
 function renderList(){
  $('countAll').textContent=data.length;
+ $('countReadings').textContent=user?new Set(draftReadings.map(r=>r.entry_id)).size:'—';
  $('countDated').textContent=data.filter(e=>e.date_status!=='unknown'&&e.source_created_local).length;
  $('countUnknown').textContent=data.filter(e=>!e.source_created_local).length;
  $('countMatches').textContent=user?uniqueCandidates().length:'—';
@@ -64,8 +66,28 @@ function renderList(){
   const head=formatDate(e);let out='';
   if(head!==last){out='<div class="date-head">'+esc(head)+'</div>';last=head;}
   const teaser=e.original_text.replace(/\s+/g,' ').slice(0,68);
-  return out+'<button class="note-item '+(current===e.source_id?'selected':'')+'" data-note="'+esc(e.source_id)+'"><strong>'+esc(e.title)+'</strong><small>'+esc(displayDate(e))+' · '+esc(skyNames[e.sky]||'未分類')+' · '+esc(classNames[e.classification]||'未判定')+'</small><div class="excerpt">'+esc(teaser)+'</div></button>';
+  return out+'<button class="note-item '+(current===e.source_id?'selected':'')+'" data-note="'+esc(e.source_id)+'"><strong>'+esc(e.title)+'</strong><small>'+esc(displayDate(e))+' · '+esc(skyNames[e.sky]||'未分類')+' · '+esc(classNames[e.classification]||'未判定')+(user&&draftReadings.some(r=>r.entry_id===e.id)?' · 仮精読あり':'')+'</small><div class="excerpt">'+esc(teaser)+'</div></button>';
  }).join('');
+}
+const draftNoteNames={lyric:'歌詞案',fragment:'短い断片',prose:'散文',mixed:'複数の案・断片',reference:'創作補助資料',unresolved:'種類未確認'};
+function draftReadingView(e){
+ if(!user)return '<div class="draft-readings"><h3>この言葉を読む</h3><p class="muted">精読は本人専用クラウドに保存されています。ログインすると原文に沿った読みを表示します。</p></div>';
+ if(draftReadingLoadError)return '<div class="draft-readings"><h3>この言葉を読む</h3><p class="muted">精読を取得できませんでした：'+esc(draftReadingLoadError)+'</p></div>';
+ const matches=draftReadings.filter(r=>r.entry_id===e.id && typeof e.original_text==='string' && e.original_text.includes(r.evidence_a) && (!r.evidence_b||e.original_text.includes(r.evidence_b)));
+ if(!matches.length)return '<div class="draft-readings"><h3>この言葉を読む</h3><p class="muted">この原文に一致する精読記録はまだありません。原文は変更しません。</p></div>';
+ return '<section class="draft-readings"><h3>この言葉を読む <small>仮説・作者未確認</small></h3><p class="muted">一つのメモが一曲とは限りません。採用・未使用・没の判定ではなく、書かれた言葉から考えられる読みです。</p>'+
+ matches.map(r=>'<article class="draft-reading-card"><span class="draft-kind">'+esc(draftNoteNames[r.note_kind]||'種類未確認')+'</span><h4>'+esc(r.heading)+'</h4>'+
+ '<div class="draft-quotes"><strong>原文の根拠</strong><p>'+esc(r.evidence_a)+'</p>'+(r.evidence_b?'<p>'+esc(r.evidence_b)+'</p>':'')+'</div>'+
+ '<dl><dt>本文から確認できること</dt><dd>'+esc(r.observation)+'</dd><dt>読みの仮説</dt><dd>'+esc(r.interpretation)+'</dd>'+
+ '<dt>別の読み・留保</dt><dd>'+esc(r.alternative)+'</dd><dt>さらに考える問い</dt><dd>'+esc(r.inquiry)+'</dd></dl></article>').join('')+'</section>';
+}
+async function loadDraftReadings(){
+ if(!user){draftReadings=[];draftReadingLoadError='';return;}
+ try{
+  const {data:rows,error}=await client().from('lyric_strata_readings').select('entry_id,note_kind,heading,evidence_a,evidence_b,observation,interpretation,alternative,inquiry,assessment_status').eq('user_id',user.id).limit(1000);
+  if(error)throw error;
+  draftReadings=rows||[];draftReadingLoadError='';
+ }catch(e){draftReadings=[];draftReadingLoadError=e.message||'取得エラー';}
 }
 function renderDetail(){
  const e=data.find(r=>r.source_id===current);
@@ -74,7 +96,7 @@ function renderDetail(){
  '<br>更新日：'+esc(e.source_modified_local?e.source_modified_local.replace('T',' '):'不明')+
  '<br>出典：'+esc(e.source_app==='apple_notes'?'Appleメモ / '+(e.source_folder||'フォルダ未設定'):'手入力')+
  '<br>日時の根拠：'+esc(e.date_status==='app_metadata'?'Appleメモの記録':'手入力の記録日（未検証）')+'</div>'+
- '<pre>'+esc(e.original_text)+'</pre><div class="row"><label class="label">名義</label><select class="select-input" id="editSky">'+
+ '<pre>'+esc(e.original_text)+'</pre>'+draftReadingView(e)+'<div class="row"><label class="label">名義</label><select class="select-input" id="editSky">'+
  Object.entries(skyNames).map(([k,v])=>'<option value="'+k+'" '+(e.sky===k?'selected':'')+'>'+esc(v)+'</option>').join('')+
  '</select></div><div class="row"><label class="label">現在の扱い</label><select class="select-input" id="editClass">'+
  Object.entries(classNames).map(([k,v])=>'<option value="'+k+'" '+(e.classification===k?'selected':'')+'>'+esc(v)+'</option>').join('')+
@@ -321,7 +343,7 @@ async function cloudLoad(){
    else if(!old.dirty){Object.assign(old,row,{synced:true,dirty:false});}
   }
   if(extra||remote?.length){readingReportCache=null;save();}
-  await loadMasterCandidates();
+  await Promise.all([loadMasterCandidates(),loadDraftReadings()]);
   toast('クラウドから '+(remote?.length||0)+'件を確認、新規 '+extra+'件を追加しました。');
  }catch(e){toast('クラウド読み込み失敗：'+(e.message||e));}finally{syncing=false;render();}
 }
@@ -360,7 +382,7 @@ async function authSubmit(e){
 async function authClick(){
  if(!user){authModal(true);return;}
  if(!confirm('ログアウトしますか？ この端末に残した原文は削除されません。'))return;
- try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
+ try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
 }
 async function initSession(){
  try{const {data:r,error}=await client().auth.getSession();if(error)throw error;if(r.session?.user){user=r.session.user;await cloudLoad();}else render();}catch(e){render();console.warn('Auth unavailable',e);}
