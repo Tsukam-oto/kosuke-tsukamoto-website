@@ -142,6 +142,49 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 .deep-personal-note .note-box{margin-top:13px}
 .deep-disclaimer{font-size:11px;line-height:1.9;color:#657386;border-top:1px solid var(--border);padding:18px 0 0}
 @media(max-width:760px){.deep-two-col{grid-template-columns:1fr}.deep-section{padding:19px 0}.deep-read .deep-quote{font-size:11px}.deep-reading-card{padding:12px}.deep-entry{padding:12px}}
+
+/* Narrative reading v2: numbered stanzas, qualified motifs, reappearing phrases */
+.deep-details{border-top:1px solid var(--border)}
+.deep-details>summary{display:flex;align-items:center;flex-wrap:wrap;gap:10px;cursor:pointer;list-style:none;padding:2px 0 14px}
+.deep-details>summary::-webkit-details-marker{display:none}
+.deep-details>summary .eyebrow{width:100%;display:block}
+.deep-details>summary strong{font-size:17px;flex:1;line-height:1.5}
+.deep-details>summary small{color:var(--muted);font-size:10px}
+.deep-details>summary::after{content:"−";font-size:19px;color:#6b7589}
+.deep-details:not([open])>summary::after{content:"+"}
+.deep-stanzas{border-left:2px solid #ccd3db;margin:15px 0 24px 15px}
+.deep-stanza{display:grid;grid-template-columns:52px minmax(0,1fr);gap:9px;padding:0 0 18px;position:relative}
+.deep-stanza-rail{display:flex;flex-direction:column;align-items:flex-start}
+.deep-stanza-rail strong{margin-left:-15px;background:#283c5c;color:white;min-width:28px;text-align:center;line-height:28px;border-radius:50%;font:600 14px/28px Georgia,serif}
+.deep-stanza-rail small{font-size:9px;line-height:1.6;color:#758299}
+.deep-stanza-body{min-width:0;border:1px solid #e8e6e3;border-radius:12px;padding:10px;background:#faf9f7}
+.deep-stanza-body .deep-quote{margin:4px 0}
+.deep-stanza-tags{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px}
+.deep-stanza-tags span{font-size:10px;background:#e9edf2;border-radius:5px;color:#50667e;padding:4px 7px}
+.deep-context-note{font-size:9px;color:#77808e;line-height:1.7;display:block;padding-top:6px}
+.deep-minor{font-size:13px;color:#34455d;margin:22px 0 12px}
+.deep-journey{padding:11px 12px;margin-bottom:10px;background:#f5f6f4;border:1px solid #e7e7e2;border-radius:12px}
+.deep-journey>b{font-size:12px;display:block}
+.deep-journey>small{font-size:10px;color:#7a8491}
+.deep-journey .deep-two-col{margin:9px 0 0}
+.deep-variant{border:1px solid #e8e6e3;background:#fbfbf9;border-radius:13px;margin:12px 0;padding:11px}
+.deep-variant-caption{display:flex;gap:20px;justify-content:space-around;color:#768497;font-size:10px}
+.deep-variant .deep-two-col{margin:6px 0}
+.deep-variant>.desc{font-size:10px;line-height:1.7}
+.deep-transition{border:1px solid #e8e6e3;background:#fafaf8;border-radius:12px;padding:12px;margin:12px 0;display:grid;grid-template-columns:70px minmax(0,1fr);gap:10px}
+.deep-transition>.deep-pill{align-self:start}
+.deep-transition>div{min-width:0}
+.deep-transition>div>small{font-size:10px;color:#7d8493;display:block;margin-top:8px}
+.deep-coverage{font-size:10px;color:#727f8b}
+@media(max-width:760px){
+.deep-stanza{grid-template-columns:39px minmax(0,1fr);gap:5px}
+.deep-stanza-rail strong{font-size:13px}
+.deep-stanza-rail small{font-size:9px}
+.deep-variant-caption{display:none}
+.deep-transition{grid-template-columns:1fr;gap:5px}
+.deep-details>summary strong{font-size:15px}
+}
+.deep-quickmetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:16px 0}.deep-quickmetrics span{padding:9px 8px;border-radius:10px;background:#f3f5f7;border:1px solid #e6e9ed;min-width:0}.deep-quickmetrics b{display:block;font:normal 22px/1.3 Georgia,serif;color:#314968}.deep-quickmetrics small{display:block;font-size:9px;color:#6f7b8d;line-height:1.5}.deep-details>summary:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}@media(max-width:760px){.deep-quickmetrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
@@ -332,6 +375,46 @@ function deepPronouns(profiles){
  return '<div class="deep-pronouns">'+present.map(p=>'<div><strong>'+esc(p.label)+'</strong><b>'+p.count+'</b><small>回（文字列表記）</small>'+
  p.examples.slice(0,2).map(deepQuote).join('')+'</div>').join('')+'</div>';
 }
+
+function deepStanzaFlow(a){
+ const entries=a.stanzas.map(st=>{
+   const excerpts=[...new Map([...st.opening,...st.ending].map(e=>[e.number,e])).values()];
+   return '<article class="deep-stanza"><div class="deep-stanza-rail"><strong>'+st.index+'</strong><small>L'+st.start+'–'+st.end+'</small></div>'+
+     '<div class="deep-stanza-body">'+
+      (st.motifs.length?'<div class="deep-stanza-tags">'+st.motifs.map(m=>'<span>'+esc(m)+'</span>').join('')+'</div>':'')+
+      excerpts.map(deepQuote).join('')+
+      '<small class="deep-context-note">この段落：'+st.count+'行。最初と最後の行を抜粋しています。</small></div></article>';
+ }).join('');
+ const journey=a.motifJourney.slice(0,3).map(m=>
+   '<div class="deep-journey"><b>'+esc(m.label)+'</b><small>段落 '+m.stanzas.join(' → ')+'</small>'+
+   '<div class="deep-two-col">'+deepColumn('初めの登場',m.first?[m.first]:[],'—',false)+
+   deepColumn('後の登場',m.last?[m.last]:[],'—',false)+'</div></div>'
+ ).join('');
+ return '<details class="deep-section deep-details"><summary><span class="eyebrow">02 / STANZA MOVEMENT</span><strong>段落を追って、言葉の動きを読む</strong><small>'+a.stanzas.length+'段落</small></summary>'+
+  '<p class="desc">改行のまとまりをそのまま段落として扱い、各段落の冒頭と結末を並べます。色の付いた語群は文字列による索引であり、その段落の意味を確定しません。</p>'+
+  '<div class="deep-stanzas">'+entries+'</div>'+
+  (journey?'<h4 class="deep-minor">複数の段落にまたがる語群</h4>'+journey:'')+
+  '</details>';
+}
+function deepRepetitionFlow(a){
+ const pairs=a.variants.slice(0,7).map(x=>
+  '<article class="deep-variant"><div class="deep-variant-caption"><span>本文中の先の位置</span><span>本文中の後の位置</span></div>'+
+   '<div class="deep-two-col">'+deepColumn('登場A',[x.before],'—',false)+deepColumn('登場B',[x.after],'—',false)+'</div>'+
+   '<p class="desc">第'+x.firstStanza+'段落と第'+x.lastStanza+'段落（本文の位置）。<strong>似た表記</strong>であり、表現を修正した履歴ではありません。</p></article>'
+ ).join('');
+ const transitions=a.transitions.slice(0,8).map(x=>
+  '<div class="deep-transition"><span class="deep-pill">'+esc(x.marker)+'</span>'+
+   '<div>'+deepQuote(x.line)+(x.prev?'<small>直前の行（同段落）</small>'+deepQuote(x.prev):'')+
+   (x.next?'<small>直後の行（同段落）</small>'+deepQuote(x.next):'')+'</div></div>'
+ ).join('');
+ return '<details class="deep-section deep-details" open><summary><span class="eyebrow">03 / REPETITION & PIVOT</span><strong>繰り返す言葉は、何が違うのか</strong><small>'+a.variants.length+'件の類似行</small></summary>'+
+  '<p class="desc">語句が少し異なって再登場する箇所を、本文での登場順に比較します。類似度は検索の手がかりであり、反復の意味や制作時の改稿順は推定しません。</p>'+
+  (pairs||'<p class="desc">今回の基準で該当する類似行はありません。反復や意味の変化が存在しないという意味ではありません。</p>')+
+  '<h4 class="deep-minor">接続表現が示す転換の手がかり</h4>'+
+  (transitions||'<p class="desc">主な接続表現は検出されませんでした。接続詞なしの転換は自動検出できません。</p>')+
+  '</details>';
+}
+
 function openDeepReading(id){
  const w=getWork(id);if(!w)return;
  if(!window.LyricCloseReading?.analyze){toast('読み解き機能を読み込めません。ページを再読み込みしてください。');return;}
@@ -339,24 +422,25 @@ function openDeepReading(id){
  const a=window.LyricCloseReading.analyze(w,works());
  const intro='<div class="deep-intro"><div class="eyebrow">CLOSE READING / 読みの仮説</div><h2>《'+esc(w.title)+'》を読み解く</h2>'+
  '<p>言葉の出現を数えるだけでなく、<strong>どの位置に置かれ、前後で何が変わるか</strong>を読みます。観察・仮説・別の読みを区別します。</p>'+
+ '<div class="deep-quickmetrics"><span><b>'+a.stanzas.length+'</b><small>段落</small></span><span><b>'+a.variants.length+'</b><small>似た形で再登場する行</small></span><span><b>'+a.transitions.length+'</b><small>接続表現の手がかり</small></span><span><b>'+a.readings.length+'</b><small>根拠付きの読みの仮説</small></span></div>'+ 
  '<div class="deep-actions"><button class="btn sm" data-open="'+esc(w.id)+'">原文を読む</button></div></div>';
  const structure='<section class="deep-section"><div class="eyebrow">01 / STRUCTURE</div><h3>冒頭と結末の距離</h3>'+
  '<div class="deep-two-col">'+deepColumn('冒頭',a.opening,'冒頭なし',false)+deepColumn('結末',a.ending,'結末なし',false)+'</div>'+
  '<p class="deep-question">読みの問い：冒頭の状況は、結末で解決されているでしょうか。それとも意味が変わり、あるいは答えないまま残されていますか。</p></section>';
- const language='<section class="deep-section"><div class="eyebrow">02 / TEXTUAL OBSERVATIONS</div><h3>何を繰り返し、誰に語るか</h3>'+
+ const language='<section class="deep-section"><div class="eyebrow">04 / TEXTUAL OBSERVATIONS</div><h3>何を繰り返し、誰に語るか</h3>'+
  '<p class="desc">一人称の出現＝語り手の交代とは限りません。人称・問い・反復は文脈を読み返すための入口です。</p>'+
  deepPronouns(a.pronouns)+
  '<div class="deep-two-col">'+deepColumn('反復する表現',a.repeats.slice(0,5),'同じ形の繰り返しは検出されませんでした。',true)+
  deepColumn('問いかけの手がかり',a.questions.slice(0,5),'明示的な疑問形は検出されませんでした。',false)+'</div></section>';
- const readings='<section class="deep-section"><div class="eyebrow">03 / HYPOTHESES</div><h3>歌詞の解釈と、それに対する別の読み</h3>'+
+ const readings='<section class="deep-section"><div class="eyebrow">05 / HYPOTHESES</div><h3>歌詞の解釈と、それに対する別の読み</h3>'+
  (a.readings.length?a.readings.map(r=>'<article class="deep-reading-card"><h4>'+esc(r.heading)+'</h4>'+
- '<span class="deep-pill">原文の根拠</span><div class="deep-evidence">'+r.evidence.map(deepQuote).join('')+'</div>'+
+ '<span class="deep-pill">原文の根拠</span> <small class="deep-coverage">'+esc(r.coverage.note)+'</small><div class="deep-evidence">'+r.evidence.map(deepQuote).join('')+'</div>'+
  '<span class="deep-pill">解釈の仮説</span><p>'+esc(r.hypothesis)+'</p>'+
  '<span class="deep-pill">異なる解釈</span><p>'+esc(r.alternative)+'</p></article>').join(''):
  '<div class="deep-reading-card"><h4>この作品の仮説は、まだ登録されていません。</h4>'+
  '<p>人称や反復の観察から、ご自身の読みを記録できます。AIが作者の意図を確定することはありません。</p></div>')+'</section>';
 
- const dialogue='<section class="deep-section"><div class="eyebrow">04 / LITERARY DIALOGUE</div><h3>異なる作品が対話するところ</h3>'+
+ const dialogue='<section class="deep-section"><div class="eyebrow">06 / LITERARY DIALOGUE</div><h3>異なる作品が対話するところ</h3>'+
  '<p class="desc">共通語だけでは見つけにくい対照・緊張関係を、双方の原文に根拠がある場合だけ表示します。これは読み手が検討する仮説であり、制作意図や直接の影響関係ではありません。</p>'+
  (a.dialogues.length?a.dialogues.map(d=>'<article class="deep-reading-card"><h4>'+esc(d.title)+'</h4>'+
  '<div class="deep-two-col">'+deepColumn('《'+esc(w.title)+'》',d.here,'—',false)+deepColumn('《'+esc(d.otherTitle)+'》',d.there,'—',false)+'</div>'+
@@ -364,19 +448,19 @@ function openDeepReading(id){
  '<span class="deep-pill">別の読み</span><p>'+esc(d.alternative)+'</p>'+
  '<button class="btn sm" data-deep-work="'+esc(d.otherId)+'">比較作品を精読する</button></article>').join(''):
  '<p class="desc">この作品について、原文で確認できた対話候補はまだありません。無関係という意味ではありません。</p>')+'</section>';
- const relations='<section class="deep-section"><div class="eyebrow">05 / CROSS-WORK READING</div><h3>ほかの作品と読み比べる</h3>'+
+ const relations='<section class="deep-section"><div class="eyebrow">07 / CROSS-WORK READING</div><h3>ほかの作品と読み比べる</h3>'+
  (a.cross.length?a.cross.map(x=>'<article class="deep-cross"><h4>《'+esc(x.title)+'》</h4>'+
  x.topics.slice(0,2).map(t=>'<div class="deep-cross-block"><b>'+esc(t.label)+'：'+esc(t.words.join('・'))+'</b>'+
  '<div class="deep-two-col">'+deepColumn('この作品',t.here?[t.here]:[],'—',false)+deepColumn('比較作品',t.there?[t.there]:[],'—',false)+'</div></div>').join('')+
  '<button class="btn sm" data-deep-work="'+esc(x.id)+'">この作品も深く読む</button></article>').join(''):
  '<p class="desc">現在の空にある作品間で、今回の比較条件を満たす候補はありません。</p>')+
  '<p class="desc">ここは語句や場面の共通性を示します。「同じテーマ」「影響関係がある」と断定していません。名義の異なる空の作品は混ぜません。</p></section>';
- const note='<section class="deep-section deep-personal-note"><div class="eyebrow">06 / YOUR INTENT</div><h3>制作した本人の意図は、別の記録として</h3>'+
+ const note='<section class="deep-section deep-personal-note"><div class="eyebrow">08 / YOUR INTENT</div><h3>制作した本人の意図は、別の記録として</h3>'+
  '<p class="desc">上の観察や仮説と、ご自身の制作意図を混同しないためのメモ欄です。ここに書いた内容をAIの結論として扱いません。</p>'+
  '<div class="note-box"><textarea id="noteText" placeholder="当時考えていたこと／読みとして違うと思った点／別の読みなど。">'+esc(db.notes[w.id]||'')+'</textarea>'+
  '<div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="'+esc(w.id)+'">本人メモを保存</button></div></div></section>';
  $('#drawer').innerHTML='<div class="drawer-top"><span class="eyebrow">EVIDENCE FIRST</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div>'+
- '<div class="deep-read">'+intro+structure+language+readings+dialogue+relations+note+
+ '<div class="deep-read">'+intro+structure+deepStanzaFlow(a)+deepRepetitionFlow(a)+language+readings+dialogue+relations+note+
  '<p class="deep-disclaimer">'+esc(a.caution)+' 分析対象は現在この画面で読み込んでいる作品で、原文は一切変更していません。</p></div>';
  $('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');
  $('#drawer').scrollTop=0;

@@ -29,4 +29,32 @@ assert.equal(closed.pronouns.find(x=>x.label==='一人称（単数）').count,0,
 assert.equal(closed.repeats[0].count,2);
 const ex=E.evidenceFor(E.splitLines('一行\n\n次の行'), '次の行');
 assert.equal(ex.line,3,'source line numbering includes original blank lines');
-console.log('close-reading: 11 published works, 14 anchored readings, 8 dialogue pairs, private isolation and line-number checks passed');
+
+/* Narrative v2: all positions are verifiable source-line numbers, never draft chronology. */
+const sample=E.splitStanzas('一行目\n二行目\n\nその後\n\n終わり');
+assert.equal(sample.length,3);
+assert.equal(sample[0].start,1);
+assert.equal(sample[1].start,4);
+assert.equal(sample[2].end,6);
+const sampleText='僕を待っているから\n僕らを待っているから\n\nそれでも前を向く\nなんでもないような\nなんでもないようで';
+const sampleLines=E.splitLines(sampleText),sampleStanzas=E.splitStanzas(sampleText);
+const variants=E.variantRepetitions(sampleLines,sampleStanzas);
+assert.ok(variants.some(x=>x.before.text==='僕を待っているから'&&x.after.text==='僕らを待っているから'));
+assert.ok(variants.some(x=>x.before.text==='なんでもないような'&&x.after.text==='なんでもないようで'));
+assert.ok(variants.every(x=>x.before.number<x.after.number));
+const pivots=E.transitionClues(sampleStanzas);
+assert.ok(pivots.some(x=>x.marker==='それでも'));
+assert.ok(!pivots.some(x=>x.line.text.startsWith('なんでも')));
+const bye=results.find(x=>x.title==='All around you');
+assert.ok(bye.variants.some(x=>x.before.text.includes('見つかる')&&x.after.text.includes('見つからない')));
+const morning=results.find(x=>x.title==='朝になったら');
+assert.ok(morning.variants.some(x=>x.before.text==='僕を待っているから'&&x.after.text==='僕らを待っているから'));
+const spring=results.find(x=>x.title==='春にあふれて');
+assert.ok(spring.variants.some(x=>x.before.text==='いられるようになるまで'&&x.after.text==='いられるようになって'));
+assert.ok(results.every(x=>x.stanzas.length>=1));
+assert.ok(results.every(x=>x.readings.every(h=>h.coverage.stanzaCount>=1)));
+assert.ok(results.every(x=>x.variants.every(p=>p.before.number>0&&p.after.number>p.before.number)));
+const privateNarrative=E.analyze({title:'非公開',sky:'rap',origin:'private',lyrics:sampleText},[]);
+assert.ok(privateNarrative.stanzas.length===2&&privateNarrative.readings.length===0);
+
+console.log('close-reading v2: 11 works, 14 readings, 8 dialogues, stanza movement, variants, transitions and private isolation passed');
