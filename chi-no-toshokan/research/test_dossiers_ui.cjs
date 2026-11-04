@@ -45,7 +45,8 @@ async function main(){
  const sample=tainted.dossiers.find(x=>x.sources.length);
  assert(sample);
  sample.sources[0].title='<img src=x onerror=alert(1)>';
- sample.sources[0].url='javascript:alert(1)';
+ sample.sources.push({...sample.sources[0],id:'malicious-link',
+  title:'Dangerous URL',url:'javascript:alert(1)'});
  const freshElements={};
  const getFresh=id=>freshElements[id]||(freshElements[id]={
   innerHTML:'',textContent:'',listeners:{},children:[],
