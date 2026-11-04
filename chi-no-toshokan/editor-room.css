@@ -60,3 +60,14 @@
 .outcome-card b{font-size:15px;color:#284c36;line-height:1.5}
 .outcome-card small{font-size:10.5px;color:#698070;line-height:1.7}
 @media(max-width:690px){.metrics-inputs{grid-template-columns:1fr}.format-outcomes{grid-template-columns:1fr}.outcome-card{padding:13px}}
+
+/* Imported topics are public, unverified metadata; private decisions stay under RLS. */
+.research-inbox{padding:10px 17px 16px;border:1px solid #d5e1d5;border-radius:13px;background:#eef4e9;margin:0 0 21px}
+.research-inbox summary{cursor:pointer;display:block;color:#24523b;font-weight:800;line-height:1.65;padding:8px 0;font-size:14px}
+.research-inbox>p{font-size:12px;color:#536f5a;margin:8px 0}
+.research-ideas{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;color:#50705a;font-size:12px;margin-top:10px}
+.research-idea{display:flex;flex-direction:column;gap:7px;background:#fffefa;border:1px solid #d7e5d6;border-radius:11px;padding:13px;min-width:0}
+.research-idea strong{font-size:13px;color:#2a563f;line-height:1.65}
+.research-idea small{font-size:11px;color:#647868}
+.research-idea button{margin-top:auto;align-self:flex-start;padding:7px 11px;min-height:44px;border:1px solid #c2d9c5;background:#ebf4eb;border-radius:8px;color:#285a40;font-size:11px;font-weight:700}
+@media(max-width:690px){.research-ideas{grid-template-columns:1fr}.research-inbox{padding:8px 12px 14px}.research-idea{padding:13px}.research-idea button{width:100%}}
