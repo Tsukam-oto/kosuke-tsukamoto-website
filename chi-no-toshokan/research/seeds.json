@@ -5,121 +5,141 @@
       "id": "notation",
       "area": "音楽",
       "query": "Guido Arezzo medieval musical notation",
-      "link": "./#article/notation"
+      "link": "./#article/notation",
+      "label": "なぜ音楽を楽譜に書くようになったのか"
     },
     {
       "id": "temperament",
       "area": "音楽",
       "query": "history equal temperament musical tuning systems",
-      "link": "./#article/temperament"
+      "link": "./#article/temperament",
+      "label": "音律はなぜ複数あるのか"
     },
     {
       "id": "beethoven5",
       "area": "音楽",
       "query": "Beethoven fifth symphony motivic development",
-      "link": "./music-library.html#work/beethoven5"
+      "link": "./music-library.html#work/beethoven5",
+      "label": "ベートーヴェン第5番を動機と形式から聴く"
     },
     {
       "id": "ravelbolero",
       "area": "音楽",
       "query": "Ravel Bolero orchestration timbre",
-      "link": "./music-library.html#work/ravelbolero"
+      "link": "./music-library.html#work/ravelbolero",
+      "label": "ラヴェル《ボレロ》の音色はどう変わるのか"
     },
     {
       "id": "bachcello",
       "area": "音楽",
       "query": "Bach cello suites historically informed performance",
-      "link": "./music-library.html#work/bachcello"
+      "link": "./music-library.html#work/bachcello",
+      "label": "バッハの無伴奏作品の構造を聴く"
     },
     {
       "id": "music-emotion",
       "area": "音楽",
       "query": "music emotion expectancy neuropsychology review",
-      "link": "./music-library.html"
+      "link": "./music-library.html",
+      "label": "音楽が感情を動かすのはなぜか"
     },
     {
       "id": "adler",
       "area": "心理・臨床",
       "query": "Adlerian psychology psychotherapy review",
-      "link": ""
+      "link": "",
+      "label": "アドラー心理学の発想と現代研究"
     },
     {
       "id": "therapeutic-alliance",
       "area": "心理・臨床",
       "query": "therapeutic alliance psychotherapy meta analysis",
-      "link": ""
+      "link": "",
+      "label": "心理療法で治療関係は何を意味するか"
     },
     {
       "id": "care",
       "area": "心理・臨床",
       "query": "psychotherapy care therapeutic process qualitative",
-      "link": ""
+      "link": "",
+      "label": "臨床心理学におけるケアの考え方"
     },
     {
       "id": "habit-formation",
       "area": "心理・臨床",
       "query": "habit formation behavior change longitudinal review",
-      "link": ""
+      "link": "",
+      "label": "習慣はどう形成・維持されるのか"
     },
     {
       "id": "memory",
       "area": "心理・臨床",
       "query": "memory reconsolidation human systematic review",
-      "link": "./#article/memory"
+      "link": "./#article/memory",
+      "label": "記憶は保存されたままなのか"
     },
     {
       "id": "odyssey-xenia",
       "area": "神話・歴史",
       "query": "Homer Odyssey xenia hospitality",
-      "link": "./myth-series.html#chapter/odyssey"
+      "link": "./myth-series.html#chapter/odyssey",
+      "label": "『オデュッセイア』の客人歓待と社会"
     },
     {
       "id": "zeus-titans",
       "area": "神話・歴史",
       "query": "Hesiod Theogony divine succession mythology",
-      "link": "./#article/zeus-titans"
+      "link": "./#article/zeus-titans",
+      "label": "『神統記』の神々の世代交代"
     },
     {
       "id": "bronze-collapse",
       "area": "神話・歴史",
       "query": "Late Bronze Age collapse Mediterranean archaeology",
-      "link": "./#article/bronze-collapse"
+      "link": "./#article/bronze-collapse",
+      "label": "青銅器時代の終焉はなぜ起こったのか"
     },
     {
       "id": "oral-epic",
       "area": "神話・歴史",
       "query": "Homeric oral formulaic epic composition",
-      "link": "./#article/oral-epic"
+      "link": "./#article/oral-epic",
+      "label": "叙事詩は口承でどう受け継がれたのか"
     },
     {
       "id": "ancient-writing",
       "area": "神話・歴史",
       "query": "Linear B Greek alphabet archaeological history",
-      "link": "./myth-series.html#chapter/history"
+      "link": "./myth-series.html#chapter/history",
+      "label": "線文字Bとギリシャ文字の歴史"
     },
     {
       "id": "roman-concrete",
       "area": "科学・社会",
       "query": "Roman concrete self healing lime clasts research",
-      "link": "./#article/concrete"
+      "link": "./#article/concrete",
+      "label": "古代ローマのコンクリートはなぜ長持ちするのか"
     },
     {
       "id": "exoplanets",
       "area": "科学・社会",
       "query": "exoplanet transit detection observational astronomy",
-      "link": "./#article/astronomy"
+      "link": "./#article/astronomy",
+      "label": "太陽系外惑星はどう発見されるのか"
     },
     {
       "id": "microbiome",
       "area": "科学・社会",
       "query": "fermented foods microbiome health review",
-      "link": "./#article/fermentation"
+      "link": "./#article/fermentation",
+      "label": "発酵食品と腸内微生物の研究"
     },
     {
       "id": "city",
       "area": "科学・社会",
       "query": "urban history archaeology resilience cities",
-      "link": "./#article/city"
+      "link": "./#article/city",
+      "label": "都市と社会はどう発展してきたのか"
     }
   ],
   "musicbrainz": [
