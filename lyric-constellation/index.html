@@ -435,6 +435,18 @@ function refreshAuthorReviewCounts(){
  const a=window.LyricCloseReading.analyze(w,works()),st=workReviewStats(w,a);
  const shown=document.querySelector('#drawer .author-review-progress strong span');
  if(shown)shown.textContent=st.saved+' / '+st.total;
+ // Keep journal counts and filters accurate after saving, without closing the expanded panel.
+ const journal=document.getElementById('readingJournal');
+ if(journal&&sky==='choir'){
+  const rows=readingJournalRows(works().filter(x=>x.origin==='official'));
+  const summary=journal.querySelector('summary > small');
+  if(summary)summary.textContent='本人確認 '+rows.filter(x=>x.checked).length+' / '+rows.length+'テーマ';
+  const wrap=document.createElement('div');wrap.innerHTML=readingJournalSummary(rows);
+  const list=journal.querySelector('#readingJournalItems');
+  if(list)list.innerHTML=wrap.querySelector('#readingJournalItems').innerHTML;
+  const controls=journal.querySelector('.reading-journal-filters');
+  if(controls)controls.innerHTML=wrap.querySelector('.reading-journal-filters').innerHTML;
+ }
 }
 
 /* v5: one reading journal for the 14 interpretations and 8 cross-work dialogues. */
