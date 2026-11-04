@@ -57,4 +57,21 @@ assert.ok(results.every(x=>x.variants.every(p=>p.before.number>0&&p.after.number
 const privateNarrative=E.analyze({title:'非公開',sky:'rap',origin:'private',lyrics:sampleText},[]);
 assert.ok(privateNarrative.stanzas.length===2&&privateNarrative.readings.length===0);
 
-console.log('close-reading v2: 11 works, 14 readings, 8 dialogues, stanza movement, variants, transitions and private isolation passed');
+
+/* v4: every reading has source-grounded re-examination material outside initial evidence. */
+assert.equal(results.reduce((n,a)=>n+a.readings.length,0),14);
+for(const analysis of results){
+ for(const item of analysis.readings){
+  assert.ok(item.reconsider,'missing reconsideration for '+analysis.title+': '+item.heading);
+  const candidate=item.reconsider.passage;
+  assert.ok(candidate.line>0);
+  assert.ok(candidate.text);
+  assert.ok(!item.evidence.some(p=>p.line===candidate.line),'reconsider must be a different source line');
+  assert.ok(item.reconsider.question.includes('でしょうか'),'question must be an open prompt');
+ }
+}
+assert.ok(results.find(x=>x.title==='All around you').readings.some(r=>r.reconsider.passage.text.includes('ひとりぼっち')));
+const privateReconsider=E.analyze({id:'private-copy',title:'All around you',origin:'private',sky:'choir',lyrics:'せっかくひとりぼっちに'},works);
+assert.equal(privateReconsider.readings.length,0,'do not apply public interpretations to a private copy');
+
+console.log('close-reading v4: all 11 works, 14 evidence-backed rereading prompts, 8 literary dialogues, stanza and private isolation verified');
