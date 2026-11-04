@@ -30,3 +30,43 @@
 .journey-related{display:flex;flex-wrap:wrap;gap:5px 18px;margin:15px 0}.journey-related .mini-link{width:auto}.journey-related small{font-size:11px;color:#798579}.journey-suggestion{display:flex;justify-content:space-between;align-items:center;gap:15px;padding:12px 0;border-top:1px solid var(--line)}.journey-suggestion div{min-width:0}.journey-suggestion b{display:block;font-size:13px}.journey-suggestion small{display:block;color:#869187;font-size:11px}.journey-suggestion .btn{flex:none}
 .thread-picker{padding:12px;border:1px solid #dbe0d7;border-radius:9px;max-height:210px;overflow:auto}.thread-picker legend{color:#5c7062;font-size:12px;font-weight:700;padding:0 6px}.thread-picker label{display:flex;align-items:flex-start;gap:12px;padding:10px 3px;border-bottom:1px solid #e9ede5;font-size:13px}.thread-picker input{margin-top:5px;accent-color:#2c604b}.thread-picker label span{flex:1}.thread-picker small{font-size:10px;color:#9b9b8b;display:block}.journey-history{border-top:1px solid #e4e6db;margin-top:25px;padding-top:16px}.journey-history h3{font-size:15px}.history-entry{background:#f6f7f1;padding:12px 15px;border-radius:9px;margin:9px 0}.history-entry small{font-size:10px;color:#8a7a61}.history-entry p{white-space:pre-wrap;margin:7px 0;font-size:12px}
 @media(max-width:650px){.journey-card{padding:17px}.journey-card h3{font-size:18px}.journey-question{font-size:14px}.journey-suggestion{align-items:flex-start}.journey-suggestion .btn{font-size:11px;padding:9px 10px}}
+
+/* v1.5 根拠・視覚化 */
+.evidence-mark{display:inline-block;margin:9px 0 0;color:#6b7b71;font-size:10px;letter-spacing:.02em}
+.evidence-mark.checked{color:#3d6b58}.evidence-mark.pending{color:#8c8a78}
+.evidence-overview{border:1px solid #d5dfd4;border-left:4px solid #648d75;border-radius:13px;padding:23px 25px;background:#f2f6ef;margin:10px 0 25px}
+.evidence-overview.pending{background:#f6f5ef;border-color:#e4e1d5;border-left-color:#baa985}
+.evidence-overview h2{font-size:17px;line-height:1.6;margin:8px 0 9px}
+.evidence-overview p{font-size:13px;line-height:1.9;color:#52665b;margin:6px 0}
+.evidence-caption{font-size:10px;letter-spacing:.14em;color:#79917f;font-weight:800}
+.evidence-count{font-size:12px;color:#527e63;background:#e0ede2;padding:3px 9px;border-radius:5px;white-space:nowrap}
+.evidence-overview .evidence-disclaimer{color:#7e7b6c;font-size:11px;margin-top:10px}
+.education-visual{border:1px solid #deded3;border-radius:14px;padding:22px;margin:22px 0 29px;background:#fffefa}
+.education-visual h2{font-size:19px;margin:8px 0}.education-visual p{font-size:13px;line-height:1.9;color:#56685b;margin:9px 0 13px}
+.edu-svg{display:block;width:100%;height:auto;overflow:visible}
+.visual-actions{display:flex;gap:8px;flex-wrap:wrap;margin:17px 0}
+.visual-step{padding:9px 13px;border:1px solid #cbd7c9;border-radius:8px;background:#f6f8f3;color:#445e4d;font-size:12px}
+.visual-step.active,.visual-step[aria-pressed=true]{background:#285542;border-color:#285542;color:#fff}
+.education-visual .visual-caption{padding:13px 15px;background:#eff4ea;border-radius:8px;margin:8px 0 0;color:#335447}
+.education-visual .visual-disclaimer{font-size:11px;color:#797f76;margin-bottom:0}
+.visual-slider-label{font-size:12px;color:#486456;display:block;margin:20px 0 6px}
+#planetSize{width:100%;accent-color:#356650;cursor:pointer;min-height:24px}
+.education-visual .visual-metric{font-weight:700;color:#275447}
+.claim-board{margin:23px 0}.claim-board .section-head{margin-bottom:13px}
+.evidence-claim{border:1px solid #e1e4d8;background:#fffefa;border-radius:11px;padding:17px 19px;margin:10px 0}
+.claim-top{display:flex;align-items:center;gap:10px;font-size:11px}.claim-id{color:#afa17f;font-weight:800}
+.claim-type{background:#e7f0e7;color:#385e48;padding:3px 9px;border-radius:6px;font-weight:700}
+.claim-type.debate{background:#f4ecd9;color:#886a37}.claim-type.interpretation{background:#e9ecf0;color:#596879}
+.evidence-claim h3{margin:10px 0 6px;line-height:1.6;font-size:15px}
+.evidence-claim p{font-size:12px;color:#596b60;line-height:1.85;margin:0 0 10px}
+.claim-citations{display:flex;gap:8px;flex-wrap:wrap;margin-top:9px}
+.evidence-source-link{display:inline-flex;gap:7px;align-items:center;color:#3e6855;font-weight:700;background:#f0f5ed;border-radius:6px;padding:7px 10px;font-size:11px;text-decoration:none;max-width:100%;overflow-wrap:anywhere}
+.evidence-source-link span{font-weight:500;color:#788d7d;font-size:10px}
+.evidence-source-link:hover{background:#e3ede1}
+.section-sources{background:#f6f6f0;border-left:2px solid #acbca9;padding:8px 14px;margin-top:13px;font-size:11px;line-height:1.7;display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+.section-sources>span{font-weight:700;color:#6a826d}.section-sources a{overflow-wrap:anywhere}
+.evidence-source-card>div{width:100%}.evidence-source-card small{display:block;color:#8d835f;font-size:11px}.evidence-source-card a{font-size:13px;font-weight:700;display:block;overflow-wrap:anywhere}
+.evidence-source-card p{font-size:11px;color:#677569;margin:5px 0 0}
+.evidence-figures{border:1px solid #dfe4d9;border-radius:10px;padding:17px;margin:20px 0;background:#fafbf5}.evidence-figures h3{font-size:14px;margin:0 0 12px}
+.figure-link{display:block;border-top:1px solid #e5e8df;padding:12px 0;text-decoration:none}.figure-link strong{display:block;color:#39644f;font-size:13px}.figure-link span{display:block;font-size:11px;color:#718074;margin-top:4px}
+@media(max-width:650px){.education-visual,.evidence-overview{padding:17px}.evidence-claim{padding:15px}.visual-actions{gap:6px}.visual-step{padding:8px 9px;font-size:11px}.edu-svg{min-width:0}.evidence-source-link{white-space:normal}}
