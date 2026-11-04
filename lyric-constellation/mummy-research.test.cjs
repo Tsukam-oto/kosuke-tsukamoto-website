@@ -57,7 +57,7 @@ V.chooseMode('awaiting');assert.ok(!V.list().includes('テスト曲1'));assert.o
 V.chooseMode('all');
 
 const publicPage=V.build({status:'signed_out',source:essay,passages:[passage],connections:[connection],works});
-assert.ok(publicPage.includes('本人専用の研究室'));
+assert.ok(publicPage.includes('本人専用の精読室'));
 assert.ok(!publicPage.includes(essay.original_text));
 assert.ok(!publicPage.includes(connection.lyric_evidence));
 const privatePage=V.build({status:'ready',source:essay,passages:[passage],connections:[connection],works});
