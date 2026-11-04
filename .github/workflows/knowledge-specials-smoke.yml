@@ -1,0 +1,39 @@
+name: Knowledge Specials · responsive browser verification
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'chi-no-toshokan/specials*'
+      - '.github/workflows/knowledge-specials-smoke.yml'
+permissions:
+  contents: read
+jobs:
+  browser-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: |
+          npm install --no-save --no-package-lock @playwright/test@1.57.0
+          npx playwright install --with-deps --only-shell chromium
+      - name: Exercise five mobile and desktop widths
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 >/tmp/chi-toshokan-http.log 2>&1 &
+          sleep 2
+          node chi-no-toshokan/specials-smoke.cjs
+      - name: Store screenshots and server log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: specials-browser-diagnostics
+          path: |
+            /tmp/chi-no-toshokan-smoke/
+            /tmp/chi-toshokan-http.log
+          retention-days: 5
