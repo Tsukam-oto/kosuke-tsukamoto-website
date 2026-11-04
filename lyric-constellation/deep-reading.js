@@ -97,6 +97,88 @@ function motifs(lines){
   return {id:m.id,label:m.label,count:examples.length,examples:examples.slice(0,3)};
  }).filter(x=>x.count>0);
 }
+
+/* v2: stanza movement and near-repetition grounded in the song's own positions.
+   "Later in the text" is never called "later composition"; text order is not draft order. */
+function splitStanzas(source){
+ const raw=String(source||'').split(/\r?\n/);const out=[];let part=[];
+ const flush=()=>{if(!part.length)return;out.push({index:out.length+1,start:part[0].number,end:part[part.length-1].number,lines:part});part=[];};
+ raw.forEach((text,i)=>{if(text.trim())part.push({number:i+1,text:text.trim()});else flush();});flush();
+ return out;
+}
+const plain=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s　「」『』（）()【】、。．!！?？:：;；・,…“”"'‘’\-―〜～]/g,'');
+function overviewStanzas(stanzas){
+ return stanzas.map(s=>{
+  const matched=MOTIFS.map(m=>({label:m.label,count:s.lines.filter(x=>m.keys.some(k=>x.text.includes(k))).length}))
+    .filter(x=>x.count).sort((a,b)=>b.count-a.count).slice(0,3);
+  return {index:s.index,start:s.start,end:s.end,count:s.lines.length,opening:s.lines.slice(0,2),
+    ending:s.lines.slice(-2),motifs:matched.map(x=>x.label)};
+ });
+}
+function locateStanza(stanzas,line){
+ const s=stanzas.find(x=>x.start<=line&&x.end>=line);return s?s.index:null;
+}
+function motifJourney(stanzas){
+ const out=[];
+ for(const m of MOTIFS){
+  const appearances=stanzas.map(s=>{
+   const matches=s.lines.filter(x=>m.keys.some(k=>x.text.includes(k)));
+   return matches.length?{stanza:s.index,lines:matches}:null;
+  }).filter(Boolean);
+  if(appearances.length<2)continue;
+  const first=appearances[0],last=appearances[appearances.length-1];
+  out.push({label:m.label,stanzas:appearances.map(x=>x.stanza),first:first.lines[0],last:last.lines[last.lines.length-1]});
+ }
+ return out.sort((a,b)=>b.stanzas.length-a.stanzas.length).slice(0,5);
+}
+function transitionClues(stanzas){
+ const patterns=[
+  {re:/^それでも/,word:'それでも'}, {re:/^だから/,word:'だから'},
+  {re:/^だけど/,word:'だけど'}, {re:/^しかし/,word:'しかし'},
+  {re:/^でも(?!の)/,word:'でも'}, {re:/^なのに/,word:'なのに'},
+  {re:/^一方で/,word:'一方で'}, {re:/けれど[、。．.!！?？\s]*$/,word:'けれど'},
+  {re:/^それなのに/,word:'それなのに'}, {re:/^それなのに/,word:'それなのに'}
+ ];
+ const out=[];
+ for(const s of stanzas)for(let i=0;i<s.lines.length;i++){
+  const line=s.lines[i],m=patterns.find(p=>p.re.test(line.text));
+  if(!m)continue;
+  out.push({stanza:s.index,marker:m.word,line,prev:i?s.lines[i-1]:null,next:s.lines[i+1]||null});
+ }
+ return out.slice(0,10);
+}
+function grams(s){
+ const out=new Set();for(let i=0;i+2<=s.length;i++)out.add(s.slice(i,i+2));return out;
+}
+function commonStart(a,b){let i=0;while(i<Math.min(a.length,b.length)&&a[i]===b[i])i++;return i;}
+function commonEnd(a,b){let i=0;while(i<Math.min(a.length,b.length)&&a[a.length-1-i]===b[b.length-1-i])i++;return i;}
+function variantRepetitions(lines,stanzas){
+ const all=lines.map(l=>({...l,key:plain(l.text)}))
+  .filter(x=>x.key.length>=8&&x.key.length<=95).slice(0,250);
+ const valid=all.map(x=>({...x,bigrams:grams(x.key),stanza:locateStanza(stanzas,x.number)}));
+ const pool=[],seen=new Set();
+ for(let i=0;i<valid.length;i++)for(let j=i+1;j<valid.length;j++){
+  const a=valid[i],b=valid[j];if(a.key===b.key)continue;
+  const max=Math.max(a.key.length,b.key.length),min=Math.min(a.key.length,b.key.length);
+  if(max-min>Math.max(5,max*.35))continue;
+  let common=0;for(const item of a.bigrams)if(b.bigrams.has(item))common++;
+  const dice=2*common/(a.bigrams.size+b.bigrams.size||1);
+  const start=commonStart(a.key,b.key),end=commonEnd(a.key,b.key);
+  const bridge=Math.max(start,end);
+  if(!((dice>=.7&&bridge>=3)||(dice>=.58&&bridge>=6)))continue;
+  const key=[a.key,b.key].sort().join('↔');if(seen.has(key))continue;seen.add(key);
+  const score=dice+Math.min(bridge,12)*.012+(a.stanza!==b.stanza?.06:0);
+  pool.push({before:{number:a.number,text:a.text},after:{number:b.number,text:b.text},
+    firstStanza:a.stanza,lastStanza:b.stanza,matchedPrefix:start,matchedSuffix:end,score});
+ }
+ pool.sort((a,b)=>b.score-a.score||a.before.number-b.before.number);
+ return pool.slice(0,8);
+}
+function evidenceSpan(lines,stanzas){
+ const used=[...new Set(lines.map(x=>locateStanza(stanzas,x.line)).filter(Boolean))];
+ return {stanzas:used,stanzaCount:used.length,note:used.length>1?'複数の段落に根拠があります':'同じ段落内の根拠です'};
+}
+
 function curated(work,lines){
  if(work.origin!=='official')return [];
  return (EDITORIAL[work.title]||[]).map(item=>{
@@ -175,12 +257,14 @@ function crossRead(work,others){
 function analyze(work,others=[]){
  if(!work||typeof work.lyrics!=='string')throw Error('歌詞原文がありません');
  const lines=splitLines(work.lyrics);
+ const stanzas=splitStanzas(work.lyrics);
  return {title:work.title,origin:work.origin,lines:lines.length,
   opening:lines.slice(0,3),ending:lines.slice(-3),
+  stanzas:overviewStanzas(stanzas),motifJourney:motifJourney(stanzas),transitions:transitionClues(stanzas),variants:variantRepetitions(lines,stanzas),
   pronouns:pronounReading(lines),questions:questionLines(lines),
   repeats:repeats(lines),motifs:motifs(lines),
-  readings:curated(work,lines),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
+  readings:curated(work,lines).map(r=>({...r,coverage:evidenceSpan(r.evidence,stanzas)})),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
   caution:'人称やモチーフは表記に基づく観察です。意味、語り手、制作意図、創作年代を自動確定しません。'};
 }
-root.LyricCloseReading={version:'close-reading-1.0',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines};
+root.LyricCloseReading={version:'close-reading-2.0',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines,splitStanzas,variantRepetitions,transitionClues,motifJourney};
 })(typeof window!=='undefined'?window:globalThis);
