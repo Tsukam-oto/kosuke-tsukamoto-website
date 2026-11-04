@@ -223,6 +223,12 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 .reading-dashboard-work strong{font-size:11px;display:block;overflow-wrap:anywhere}
 .reading-dashboard-work small{font-size:10px;display:block;color:#6b8171;margin-top:6px}
 @media(max-width:760px){.reading-dashboard{padding:13px}.reading-dashboard-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.author-review-warning{background:#fff4e1;border:1px solid #edd8a9;color:#76562b;font-size:11px;line-height:1.9;padding:12px;border-radius:8px}
+.deep-recheck{background:#f0f4f8;border:1px solid #d9e3ed;border-radius:12px;padding:13px;margin:16px 0}
+.deep-recheck>strong{font-size:12px;color:#365773;display:block;margin:0 0 9px}
+.deep-recheck>p{font-size:12px;line-height:1.9;margin:9px 0;color:#3e5265}
+.deep-recheck>small{font-size:10px;line-height:1.7;color:#60758a;display:block}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
@@ -308,6 +314,24 @@ function readingReviewKey(w,kind,heading,otherId=''){
  const owner=kind==='dialogue'?[String(w.id),String(otherId)].sort().join('↔'):String(w.id);
  return ('reading-v1|'+kind+'|'+owner+'|'+String(heading)).slice(0,450);
 }
+
+/* Non-cryptographic provenance marker used ONLY to notice when referenced lyric text changed.
+   Never use for authentication, publication or content integrity guarantees. */
+function readingTextMarker(w,kind,otherId=''){
+ const other=kind==='dialogue'?getWork(otherId):null;
+ if(kind==='dialogue'&&!other)return null;
+ const items=(kind==='dialogue'?[w,other]:[w]).sort((a,b)=>String(a.id).localeCompare(String(b.id)));
+ const raw=items.map(x=>String(x.id)+':'+String(x.lyrics?.length??0)+':'+String(x.lyrics||'')).join('\u001f');
+ let hash=2166136261;
+ for(let i=0;i<raw.length;i++){hash^=raw.charCodeAt(i);hash=Math.imul(hash,16777619)>>>0;}
+ return 'text-fnv1a-'+hash.toString(16).padStart(8,'0');
+}
+function reviewIsChecked(w,kind,heading,otherId=''){
+ const saved=getReadingReview(readingReviewKey(w,kind,heading,otherId));
+ const tag=readingTextMarker(w,kind,otherId);
+ return !!(tag&&saved&&saved.stance!=='pending'&&saved.sourceTag===tag);
+}
+
 function cleanReadingReviews(input){
  if(!input||typeof input!=='object'||Array.isArray(input))return {};
  const out=Object.create(null);let count=0;
@@ -318,17 +342,21 @@ function cleanReadingReviews(input){
   const comment=String(source.comment||'').slice(0,5000);
   const at=typeof source.updatedAt==='string'&&/^\d{4}-\d\d-\d\dT/.test(source.updatedAt)?source.updatedAt.slice(0,35):null;
   if(!comment&&!source.stance)continue;
-  out[key]={stance,comment,updatedAt:at};count++;
+  const sourceTag=typeof source.sourceTag==='string'&&/^text-fnv1a-[0-9a-f]{8}$/.test(source.sourceTag)?source.sourceTag:null;
+  out[key]={stance,comment,updatedAt:at,sourceTag};count++;
  }
  return out;
 }
 function getReadingReview(key){return db.readingReviews?.[key]||null;}
 function readingReviewForm(w,kind,heading,otherId=''){
  const key=readingReviewKey(w,kind,heading,otherId),saved=getReadingReview(key);
+ const sourceTag=readingTextMarker(w,kind,otherId);
+ const needsRecheck=!!saved&&(!sourceTag||!saved.sourceTag||saved.sourceTag!==sourceTag);
  const stance=saved?.stance||'pending';
- const summary=saved?(readingStances[stance]||'本人の確認あり'):'まだ本人未確認';
- return '<details class="author-review"><summary><span class="author-review-mark">本人の視点</span><strong>この読みを検証する</strong><small class="author-review-current">'+esc(summary)+'</small></summary>'+
- '<div class="author-review-body"><p>ここから先は<strong>ご自身による確認</strong>です。読みの仮説に賛同する必要はありません。制作当時の意図や、今の解釈を書き残せます。</p>'+
+ const summary=needsRecheck?'原文との対応を再確認':saved?(stance==='pending'?'判断保留':readingStances[stance]||'本人の確認あり'):'まだ本人未確認';
+ return '<details class="author-review" data-source-tag="'+esc(sourceTag||'')+'"><summary><span class="author-review-mark">本人の視点</span><strong>この読みを検証する</strong><small class="author-review-current">'+esc(summary)+'</small></summary>'+
+ '<div class="author-review-body">'+(needsRecheck?'<p class="author-review-warning">'+(saved.sourceTag?'保存後に歌詞原文が更新されました。':'このメモは以前の方式で保存されています。')+' 以前の記録は残していますが、今の歌詞を確認してから保存し直してください。</p>':'')+
+ '<p>ここから先は<strong>ご自身による確認</strong>です。読みの仮説に賛同する必要はありません。制作当時の意図や、今の解釈を書き残せます。</p>'+
  '<label>読みとの距離<select class="author-review-select" data-reading-stance>'+
  Object.entries(readingStances).map(([value,label])=>'<option value="'+value+'" '+(stance===value?'selected':'')+'>'+esc(label)+'</option>').join('')+'</select></label>'+
  '<label>制作意図・異なる解釈・気づき<textarea data-reading-comment maxlength="5000" placeholder="例：この箇所は当時、励ますつもりではなく、言葉が届かない気持ちとして書いていました。">'+esc(saved?.comment||'')+'</textarea></label>'+
@@ -346,9 +374,11 @@ function saveReadingReview(key,holder){
  const comment=String(raw).slice(0,5000);
  db.readingReviews??={};
  const previous=getReadingReview(key);
- db.readingReviews[key]={stance,comment,updatedAt:new Date().toISOString()};
+ const sourceTag=String(holder.dataset?.sourceTag||'');
+ db.readingReviews[key]={stance,comment,updatedAt:new Date().toISOString(),sourceTag:/^text-fnv1a-[0-9a-f]{8}$/.test(sourceTag)?sourceTag:null};
  if(!save()){if(previous)db.readingReviews[key]=previous;else delete db.readingReviews[key];toast('記録を保存できませんでした。');return;}
- holder.querySelector('.author-review-current').textContent=readingStances[stance];
+ holder.querySelector('.author-review-current').textContent=stance==='pending'?'判断保留':readingStances[stance];
+ holder.querySelector('.author-review-warning')?.remove();
  holder.querySelector('.author-review-save-state').textContent='端末に保存しました。'+(cloudUser?' クラウドの同期状態を確認してください。':' ログイン前の記録はこの端末内にあります。');
  refreshAuthorReviewCounts();
  if(!holder.querySelector('[data-clear-reading]')){
@@ -372,7 +402,7 @@ function clearReadingReview(key,holder){
 }
 function workReviewStats(w,report){
  const keys=[...report.readings.map(r=>readingReviewKey(w,'hypothesis',r.heading)),...report.dialogues.map(d=>readingReviewKey(w,'dialogue',d.title,d.otherId))];
- return {total:keys.length,saved:keys.filter(k=>!!getReadingReview(k)).length};
+ return {total:keys.length,saved:[...report.readings.map(r=>reviewIsChecked(w,'hypothesis',r.heading)),...report.dialogues.map(d=>reviewIsChecked(w,'dialogue',d.title,d.otherId))].filter(Boolean).length};
 }
 
 
@@ -389,15 +419,16 @@ function readingReviewDashboard(){
  const entries=corpus.map(w=>{
   const a=window.LyricCloseReading.analyze(w,corpus);
   const refs=[...a.readings.map(r=>readingReviewKey(w,'hypothesis',r.heading)),...a.dialogues.map(d=>readingReviewKey(w,'dialogue',d.title,d.otherId))];
-  return {w,refs,checked:refs.filter(k=>!!getReadingReview(k)).length};
+  return {w,refs,checked:[...a.readings.map(r=>reviewIsChecked(w,'hypothesis',r.heading)),...a.dialogues.map(d=>reviewIsChecked(w,'dialogue',d.title,d.otherId))].filter(Boolean).length};
  });
- const unique=new Set(entries.flatMap(x=>x.refs)),reviewed=[...unique].filter(k=>!!getReadingReview(k)).length;
+ const unique=new Set(entries.flatMap(x=>x.refs));
+ const reviewed=[...new Map(entries.flatMap(({w})=>{const a=window.LyricCloseReading.analyze(w,corpus);return [...a.readings.map(r=>[readingReviewKey(w,'hypothesis',r.heading),reviewIsChecked(w,'hypothesis',r.heading)]),...a.dialogues.map(d=>[readingReviewKey(w,'dialogue',d.title,d.otherId),reviewIsChecked(w,'dialogue',d.title,d.otherId)])];})).values()].filter(Boolean).length;
  return '<details class="reading-dashboard"><summary><span class="eyebrow">READING JOURNAL / 作者の検証</span>'+
  '<strong>精読を、自分の記録にする</strong><small>本人確認 '+reviewed+' / '+unique.size+'テーマ</small></summary>'+
  '<p class="desc">作品内の解釈と、作品間の対話について、ご自身の意図に近いか・別の読みが成り立つかを確かめられます。未確認でも構いません。</p>'+
  '<div class="reading-dashboard-grid">'+entries.map(x=>'<button class="reading-dashboard-work" data-deep-work="'+esc(x.w.id)+'"><strong>《'+esc(x.w.title)+'》</strong>'+
  '<small>この作品の確認 '+x.checked+' / '+x.refs.length+'</small></button>').join('')+'</div>'+
- '<p class="desc">同じ作品間の対話は双方の作品から開けますが、確認メモは共通です。数値は評価点ではありません。</p></details>';
+ '<p class="desc">同じ作品間の対話は双方の作品から開けますが、確認メモは共通です。保留中、原文改訂後、旧方式で保存された未照合のメモは確認済みに数えません。数値は評価点ではありません。</p></details>';
 }
 
 function load(){try{const d=JSON.parse(localStorage.getItem(STORAGE_KEY));if(d&&typeof d==='object'){db.userWorks=(Array.isArray(d.userWorks)?d.userWorks:[]).map(cleanWork).filter(Boolean).filter(w=>!PUBLIC.some(p=>p.id===w.id)).slice(0,1200);db.notes=typeof d.notes==='object'&&d.notes?Object.fromEntries(Object.entries(d.notes).slice(0,1300).map(([k,v])=>[k,String(v).slice(0,30000)])):{};db.readingReviews=cleanReadingReviews(d.readingReviews);db.customWords=(Array.isArray(d.customWords)?d.customWords:[]).map(x=>String(x).trim().slice(0,40)).filter(Boolean).slice(0,140);db.updatedAt=d.updatedAt||null;}}catch(e){console.warn('storage unavailable',e);}selected=PUBLIC[0]?.id;}
@@ -580,7 +611,7 @@ function openDeepReading(id){
  (a.readings.length?a.readings.map(r=>'<article class="deep-reading-card"><h4>'+esc(r.heading)+'</h4>'+
  '<span class="deep-pill">原文の根拠</span> <small class="deep-coverage">'+esc(r.coverage.note)+'</small><div class="deep-evidence">'+r.evidence.map(deepQuote).join('')+'</div>'+
  '<span class="deep-pill">解釈の仮説</span><p>'+esc(r.hypothesis)+'</p>'+
- '<span class="deep-pill">異なる解釈</span><p>'+esc(r.alternative)+'</p>'+readingReviewForm(w,'hypothesis',r.heading)+'</article>').join(''):
+ '<span class="deep-pill">異なる解釈</span><p>'+esc(r.alternative)+'</p>'+ (r.reconsider?'<div class="deep-recheck"><strong>この解釈をもう一度考える箇所</strong>'+deepQuote(r.reconsider.passage)+'<p>'+esc(r.reconsider.question)+'</p><small>反証とは限りません。別の見方を試す手がかりです。</small></div>':'')+readingReviewForm(w,'hypothesis',r.heading)+'</article>').join(''):
  '<div class="deep-reading-card"><h4>この作品の仮説は、まだ登録されていません。</h4>'+
  '<p>人称や反復の観察から、ご自身の読みを記録できます。AIが作者の意図を確定することはありません。</p></div>')+'</section>';
 
