@@ -509,7 +509,7 @@ function relatedConstellationPanel(workId){
  '<p>'+esc(x.c.interpretation||'')+'</p><p class="muted">別の読み・留保：'+esc(x.c.alternative||'')+'</p>'+
  '<button class="btn" type="button" data-cross-work="'+esc(x.other.id)+'">比較する相手の歌詞全文へ</button></article>').join('')+
  (related.length>shown.length?'<p class="muted">ほかの比較は下の「作品間の横断読解」で確認できます。</p>':'')+
- '<p class="muted">引用は保存時点の本文と照合したものです。木乃伊のPDF抽出歌詞は原本校正前です。</p></details>';
+ '<p class="muted">引用は保存時点の本文と照合したものです。木乃伊のPDF抽出本文は一部校正済み・全文目視校正は未完了です。</p></details>';
 }
 function renderDeepWorkReadings(){
  const box=$('deepWorkOutput');if(!box)return;
@@ -566,7 +566,7 @@ function renderDeepWorkReadings(){
  sections.map(([label,text])=>'<section><h4>'+esc(label)+'</h4><p>'+esc(text)+'</p></section>').join('')+
  '</div><h4>本文の根拠</h4><div class="deep-work-quotes">'+quotes+'</div>'+
  '<div class="deep-work-question"><strong>さらに考える問い</strong><p>'+esc(r.question)+'</p></div>'+relatedConstellationPanel(w?.id)+action+
- '<p class="muted">木乃伊のPDF抽出歌詞は原本校正前です。作品内の語り手と現実の作者は同一視しません。</p></article></section>';
+ '<p class="muted">木乃伊のPDF抽出歌詞は一部を校正済みですが全文目視校正は未完了です。作品内の語り手と現実の作者は同一視しません。</p></article></section>';
 }
 
 function readingPathsPanel(){
@@ -707,21 +707,22 @@ function sourceAuditPanel(){
  const audited=[...masterWorks.values()].filter(w=>w.sky==='rap'&&(w.source_review_note||'').includes('PDF一次照合2026-11-05'));
  if(!audited.length)return '<p class="muted">PDF原本の照合記録はまだ読み込まれていません。</p>';
  const corrected=audited.filter(w=>(w.source_review_note||'').includes('【部分校正2026-11-05】'));
+ const extractOnly=audited.filter(w=>(w.source_review_note||'').includes('【照合分類2026-11-05】'));
   const flagged=audited.filter(w=>w.source_review_note.includes('差異あり ['))
   .sort((a,b)=>(a.original_book_index??999)-(b.original_book_index??999));
  const ok=audited.length-flagged.length;
- const pending=flagged.filter(w=>!corrected.includes(w));
+ const pending=flagged.filter(w=>!corrected.includes(w)&&!extractOnly.includes(w));
  return '<section class="source-audit"><h2>PDF原本の校正記録</h2>'+
   '<p>木乃伊の歌詞集について、保存本文とPDFの文字層を照合した一次監査です。'+
   '空白・改行・全半角の差を除いて一致した資料は '+ok+' / '+audited.length+' 件、'+
-  '一次監査で差異があった資料は '+flagged.length+' 件、そのうち部分校正v2保存は '+corrected.length+' 件、未修復・要確認は '+pending.length+' 件です。文字層の差異は印刷原本の誤字と同義ではありません。</p>'+
+  '一次監査で差異があった資料は '+flagged.length+' 件。そのうち部分校正v2保存は '+corrected.length+' 件、文字抽出・Unicode表記の違いとして確認したのは '+extractOnly.length+' 件、未修復・要確認は '+pending.length+' 件です。文字層の差異は印刷原本の誤字と同義ではありません。</p>'+
   '<details><summary>要確認の'+flagged.length+'作品を表示</summary>'+
   '<ol>'+flagged.map(w=>{
-   const audit=(w.source_review_note||'').split('PDF一次照合2026-11-05：').at(-1).split('【部分校正2026-11-05】')[0].trim();
-   const fixed=corrected.includes(w);
+   const audit=(w.source_review_note||'').split('PDF一次照合2026-11-05：').at(-1).split(/【(?:部分校正|照合分類|照合保留)2026-11-05】/)[0].trim();
+   const fixed=corrected.includes(w),extract=extractOnly.includes(w);
    return '<li><strong>'+esc(w.title)+'</strong>'+
     '<span>収録順 '+String((w.original_book_index??-1)+1)+' ／ PDF '+esc(w.source_page_start??'?')+'ページ</span>'+
-    '<p>'+esc(audit||'確認が必要です。')+'</p>'+ (fixed?'<p class="audit-done">部分校正版v2保存済み（元版保持・全文校正は未完了）</p>':'<p class="audit-pending">原本との差異を引き続き確認</p>')+
+    '<p>'+esc(audit||'確認が必要です。')+'</p>'+ (fixed?'<p class="audit-done">部分校正版v2保存済み（元版保持・全文校正は未完了）</p>':extract?'<p class="audit-nofix">別の抽出方法で確認済み。今回の差異による本文修正は不要</p>':'<p class="audit-pending">本文と精読引用を同時に修正する必要があります</p>')+
     (fixed?'<button type="button" class="btn" data-audit-history="'+esc(w.id)+'">校正前後の全文を比較</button>':'')+
     '<button type="button" class="btn" data-cross-work="'+esc(w.id)+'">現在の保存原文へ</button></li>';
   }).join('')+'</ol></details>'+
