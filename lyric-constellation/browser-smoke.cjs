@@ -62,6 +62,22 @@ async function runScenario(browser,base,{mobile}){
   assert.equal(entries.length,1,'one feedback entry stored in temporary browser storage');
   assert.equal(entries[0].comment,syntheticComment);
   assert.match(entries[0].sourceTag||'',/^text-fnv1a-/,'source freshness marker saved');
+  await page.locator('#drawer #closeDrawer').click();
+  const journal=page.locator('#readingJournal');
+  await journal.locator('summary').click();
+  assert.match(await journal.locator('summary').innerText(),/1 \/ 22テーマ/,'journal updates after saving');
+  await journal.locator('[data-reading-filter="different"]').click();
+  assert.equal(await journal.locator('.reading-journal-item').count(),1,'a different reading is found with one tap');
+  await journal.locator('[data-reading-filter="all"]').click();
+  assert.equal(await journal.locator('.reading-journal-item').count(),22,'all 22 unique themes are listed');
+  await journal.locator('[data-reading-filter="needs"]').click();
+  assert.equal(await journal.locator('.reading-journal-item').count(),21,'verified reviews are excluded from the needs list');
+  await journal.locator('[data-reading-filter="all"]').click();
+  const topic=journal.locator('.reading-journal-item').filter({hasText:'「僕」と「僕ら」の間に何があるか'}).first();
+  await topic.locator('[data-open-reading]').click();
+  const focused=page.locator('#drawer .reading-journal-focused');
+  assert.match(await focused.locator('h4').innerText(),/「僕」と「僕ら」の間に何があるか/);
+  assert.equal(await focused.locator('.author-review').getAttribute('open'),'','topic opens its own author review');
   await page.reload({waitUntil:'domcontentloaded'});
   await page.locator('nav [data-view="works"]').click();
   await page.locator('button.work-card').filter({hasText:'朝になったら'}).first().click();
@@ -78,7 +94,7 @@ async function runScenario(browser,base,{mobile}){
   // Local storage and display are verified. Account-to-account sync is deliberately not touched.
   assert.equal(errors.length,0,'uncaught JS errors: '+errors.join(' / '));
   console.log('PASS '+(mobile?'mobile (390px)':'desktop (1365px)')+
-   ': navigate → close read → source citation → save → reload → restore → pending excluded');
+   ': navigate → evidence → journal filters → direct topic → save → reload → restore → pending excluded');
  } finally {await context.close()}
 }
 (async()=>{
