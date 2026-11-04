@@ -15,7 +15,7 @@ check('rulebook linked only in auth-gated area',html.indexOf('103erzlFgvoIIsvBHx
 check('rulebook reference and published policies are grounded',editorialPolicy.rulebookUrl==='https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit'&&editorialPolicy.schemaVersion===1);
 check('unattended auto-publication cannot run',editorialPolicy.unattended_publication===false&&editorialPolicy.mode==='private_drafts_only');
 check('private data excluded from automatic source policy',editorialPolicy.sourcePolicy.prohibitedWithoutApproval.includes('entire ChatGPT conversation archive'));
-check('policy magazine ids match the editor catalog',editorialPolicy.magazines.map(x=>x.id).join(',')===JSON.parse(JSON.stringify([])).join(',') || editorialPolicy.magazines.length===5);
+check('five policy magazine definitions exist',editorialPolicy.magazines.length===5);
 check('mobile viewport',html.includes('viewport-fit=cover'));
 check('editor note package scripts loaded before app',html.indexOf('src="./editor-note-package.js"')<html.indexOf('src="./editor-room.js"'));
 check('PNG header and TOC controls gated behind login',html.indexOf('id="download-cover"')>html.indexOf('id="private-app" hidden')&&html.includes('id="note-toc"'));
@@ -68,6 +68,7 @@ const cv=create('note-cover');cv.getContext=()=>ctx;
 P.cover(cv,'note記事のタイトル','AIと仕事をつくる','ai-work');
 check('valid note cover dimensions',cv.width===1280&&cv.height===670&&coverDrawCount>2);
 check('five distinct magazines',win.EDITOR_MAGAZINES.magazines.length===5);
+check('machine policy magazine ids match the editor catalog',editorialPolicy.magazines.map(x=>x.id).join(',')===win.EDITOR_MAGAZINES.magazines.map(x=>x.id).join(','));
 check('three article formats',win.EDITOR_MAGAZINES.formats.length===3);
 check('short/standard/feature targets',win.EDITOR_MAGAZINES.formats.map(x=>x.min).join(',')==='800,1500,3000');
 check('7-day rotation totals 7',win.EDITOR_MAGAZINES.weeklyPlan.length===7&&win.EDITOR_MAGAZINES.magazines.reduce((a,b)=>a+b.weeklyGoal,0)===7);
