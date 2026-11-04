@@ -34,7 +34,9 @@ window.MUSIC_PROGRESS=(()=>{
  function emit(){const snap=state();for(const fn of observers){try{fn(snap)}catch(e){/* subscribers cannot break saving */}}}
  function state(){
   const values=Object.values(entries);
-  return {phase,error,owner:!!owner,entries:JSON.parse(JSON.stringify(entries)),later:values.filter(x=>x.status==='later').length,done:values.filter(x=>x.status==='done').length};
+  const guestValues=Object.values(diskRead(''));
+  const guestAvailable=owner?guestValues.filter(x=>x.status!=='none').length:0;
+  return {phase,error,owner:!!owner,guestAvailable,entries:JSON.parse(JSON.stringify(entries)),later:values.filter(x=>x.status==='later').length,done:values.filter(x=>x.status==='done').length};
  }
  function subscribe(fn){if(typeof fn==='function'){observers.add(fn);fn(state());return ()=>observers.delete(fn)}return ()=>{}}
  function set(id,status){
@@ -96,6 +98,18 @@ window.MUSIC_PROGRESS=(()=>{
    phase='error';error='クラウドへの反映に失敗しました。端末の記録は残っています。'+(e?.message?' '+e.message:'');emit();
   });
  }
+ function importGuest(){
+  if(!owner||phase==='checking')return false;
+  const guest=diskRead('');
+  if(!Object.values(guest).some(x=>x.status!=='none'))return false;
+  entries=merge(entries,guest);
+  const stored=diskWrite();
+  if(!stored){emit();return false}
+  // Explicit import only. Remove the unowned copy after the per-user copy is safe.
+  try{localStorage.removeItem(key(''))}catch{}
+  phase='syncing';error='';emit();queueSync();
+  return true;
+ }
  async function retry(){
   if(!owner||!client)return false;
   const uid=owner,g=generation;
@@ -151,5 +165,5 @@ window.MUSIC_PROGRESS=(()=>{
  entries=diskRead('');
  phase='checking';emit();
  start();
- return {state,subscribe,set,retry,start};
+ return {state,subscribe,set,retry,importGuest,start};
 })();
