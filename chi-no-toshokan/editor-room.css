@@ -94,3 +94,13 @@
 .note-preview .preview-gap{height:10px}
 .note-preview .preview-notice{font-size:11px;color:#829186;margin-top:19px}
 @media(max-width:770px){.note-package{padding:10px 11px}.note-package-grid{grid-template-columns:1fr;gap:9px}.note-preview{padding:18px 15px;max-height:420px}.note-package .form-actions button{flex:1 1 100%;}}
+
+/* private operational rulebook anchor; status is candid about unconnected automation */
+.editor-rulebook{display:grid;grid-template-columns:1fr auto;gap:10px 20px;background:#edf4ea;border:1px solid #d5e5d4;border-radius:14px;padding:17px 20px;margin:0 0 20px;align-items:start}
+.editor-rulebook strong{font-size:15px;color:#285941}
+.editor-rulebook p{margin:5px 0 0;color:#536c5a;font-size:12px;line-height:1.8}
+.editor-rulebook>div:nth-child(2){display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+.editor-rulebook a{color:#236044;border:1px solid #c1d8c1;background:#fffefa;padding:8px 11px;border-radius:8px;font-size:12px;font-weight:700;text-decoration:none;white-space:nowrap}
+.editor-rulebook a:hover{background:#dfebe0}
+.editor-rulebook .rulebook-status{grid-column:1/-1;padding:9px 12px;background:#fafbf7;border-left:3px solid #a9bdae;border-radius:4px;font-size:11px;margin:1px 0 0}
+@media(max-width:780px){.editor-rulebook{grid-template-columns:1fr;padding:14px 13px;gap:9px}.editor-rulebook>div:nth-child(2){display:grid;grid-template-columns:1fr 1fr;gap:7px}.editor-rulebook a{text-align:center;white-space:normal;font-size:11px}.editor-rulebook .rulebook-status{grid-column:auto}}
