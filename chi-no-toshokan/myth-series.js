@@ -65,6 +65,7 @@ function render(){
  if(cloud==='guest')status='未ログイン：進捗はこの端末だけに保存します。別端末での同期には図書館からログインしてください。';
  if(cloud==='error')status='クラウドを確認できません。進捗は端末内に残っています。 '+syncMessage;
  dom('sync-status').textContent=status;
+ window.MYTH_ENHANCER?.afterRender(ch);
 }
 async function fetchRemote(){
  const {data,error}=await sb.from('knowledge_records').select('id,user_id,kind,payload,created_at,updated_at').eq('user_id',owner).eq('id',id).maybeSingle();
