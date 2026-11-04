@@ -4,6 +4,7 @@
 const CLOUD_URL="https://nroyxwozdxwnrqyierjx.supabase.co", CLOUD_PUBLIC_KEY="sb_publishable_dxiidJt1gVcFwkVR2fg1HA_6gHAZNDz";
 const STORE='lyric_strata_local_v1', MAX_NOTE=250000;
 let data=[], current=null, view='strata', cloud=null, user=null, syncing=false;
+let masterCandidates=[],masterWorks=new Map(),matchLoadError='';
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const newId=()=>window.crypto?.randomUUID?.()||('local-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -169,6 +170,71 @@ function wordCandidates(a,b){
  }
  return match;
 }
+
+const candidateMethodNames={
+ master_lyrics:'歌詞原文の一致',
+ book_pdf_unverified:'歌詞集PDF（校正前）の一致',
+ title_only:'作品名が一致（本文未照合）'
+};
+const decisionNames={unreviewed:'経緯未確認',confirmed:'本人が関連を確認',uncertain:'確認保留',unrelated:'関連なし'};
+function uniqueCandidates(){
+ const byPair=new Map();
+ const priority=c=>c.review_status!=='unreviewed'?10000:0;
+ for(const c of masterCandidates){
+  const key=c.entry_id+'|'+c.work_id;
+  const old=byPair.get(key);
+  if(!old||priority(c)+c.score>priority(old)+old.score)byPair.set(key,c);
+ }
+ return [...byPair.values()].sort((a,b)=>b.score-a.score||String(a.id).localeCompare(String(b.id)));
+}
+function workCandidateView(){
+ if(!user)return '<div class="candidate-notice">既存作品との照合結果は本人専用です。右上からログインすると、クラウドに保存された発掘候補を確認できます。</div>';
+ if(matchLoadError)return '<div class="candidate-notice">照合結果を読み込めませんでした：'+esc(matchLoadError)+'</div>';
+ const pairs=uniqueCandidates(), visible=pairs.filter(c=>c.review_status!=='unrelated');
+ const noteByID=new Map(data.map(e=>[e.id,e]));
+ const notesSeen=new Set(pairs.map(c=>c.entry_id));
+ const body=visible.map(c=>{
+  const n=noteByID.get(c.entry_id),w=masterWorks.get(c.work_id);
+  if(!n||!w)return '';
+  const labels=Array.isArray(c.evidence)?c.evidence.slice(0,5):[];
+  const bookInfo=c.method==='book_pdf_unverified'?' · 『日と間と目』PDF '+(w.source_page_start||'不明')+'ページ':'';
+  return '<article class="match-card"><div class="match-card-top"><span class="match-source '+(c.method==='title_only'?'weak':'')+'">'+esc(candidateMethodNames[c.method]||'一致候補')+'</span><span class="match-review">'+esc(decisionNames[c.review_status]||'経緯未確認')+'</span></div>'+
+   '<div class="match-titles"><strong>'+esc(n.title)+'</strong><span>と</span><strong>《'+esc(w.title)+'》</strong></div>'+
+   '<p class="muted">メモ作成日：'+esc(displayDate(n))+' · 作品分類：'+esc(skyNames[w.sky]||w.sky)+esc(bookInfo)+'</p>'+
+   (labels.length?'<div class="match-fragments">'+labels.map(p=>'<span>'+esc(p)+'</span>').join('')+'</div>':'<p class="muted">タイトルの一致のみです。歌詞本文が同じとは限りません。</p>')+
+   '<div class="match-actions"><button class="btn" data-note="'+esc(n.source_id)+'">メモ原文を見る</button>'+
+   '<button class="btn '+(c.review_status==='confirmed'?'purple':'')+'" data-candidate="'+esc(c.id)+'" data-decision="confirmed">関連を確認</button>'+
+   '<button class="btn" data-candidate="'+esc(c.id)+'" data-decision="uncertain">保留</button>'+
+   '<button class="btn" data-candidate="'+esc(c.id)+'" data-decision="unrelated">関連なし</button></div></article>';
+ }).join('');
+ return '<div class="candidate-summary"><div><strong>'+pairs.length+'</strong><small>作品との照合候補</small></div><div><strong>'+notesSeen.size+' / '+data.length+'</strong><small>候補のあるメモ</small></div><div><strong>'+pairs.filter(c=>c.method==='master_lyrics').length+'</strong><small>本文一致の作品ペア</small></div></div>'+
+  (body||'<div class="candidate-notice">現在表示できる作品の照合候補はありません。原文の採用関係は未確認のままです。</div>')+
+  '<p class="muted">照合対象：正本DBの作品181件（歌詞全文は12件、木乃伊168件は歌詞集PDFから文字列を照合）。一致しないことは「未使用」の証明ではありません。完成曲の歌詞と同じ行があっても、制作時の転用関係を自動確定しません。</p>';
+}
+async function loadMasterCandidates(){
+ if(!user){masterCandidates=[];masterWorks=new Map();matchLoadError='';return;}
+ try{
+  const [a,b]=await Promise.all([
+   client().from('lyric_strata_match_candidates').select('id,entry_id,work_id,method,evidence,evidence_count,score,review_status,algorithm_version').eq('user_id',user.id).limit(2000),
+   client().from('lyric_master_works').select('id,title,sky,source_name,source_page_start,verification_status').eq('user_id',user.id).limit(500)
+  ]);
+  if(a.error)throw a.error;if(b.error)throw b.error;
+  masterCandidates=a.data||[];
+  masterWorks=new Map((b.data||[]).map(w=>[w.id,w]));
+  matchLoadError='';
+ }catch(e){matchLoadError=e.message||'不明なエラー';masterCandidates=[];masterWorks=new Map();}
+}
+async function reviewCandidate(id,decision){
+ if(!user){toast('ログインが必要です。');return;}
+ if(!['confirmed','uncertain','unrelated'].includes(decision))return;
+ const item=masterCandidates.find(c=>c.id===id);if(!item)return;
+ const {data:changed,error}=await client().from('lyric_strata_match_candidates')
+  .update({review_status:decision,updated_at:new Date().toISOString()})
+  .eq('user_id',user.id).eq('id',id).select('id,review_status');
+ if(error){toast('判定の保存に失敗：'+error.message);return;}
+ if(!changed?.length){toast('判定を更新できませんでした。再ログインして確認してください。');return;}
+ item.review_status=decision;renderDiscovery();toast('ご本人の判定を保存しました。メモの原文・作品DBは変更していません。');
+}
 function renderDiscovery(){
  const items=data.filter(e=>e.original_text.length>=6).slice(0,70), found=[];
  for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
@@ -178,8 +244,8 @@ function renderDiscovery(){
  }
  found.sort((a,b)=>b.phrases[0].length-a.phrases[0].length);
  const info='<p class="muted">暫定的に最初の70件から5文字以上の連続一致を探します。名義が異なる原稿は結びません。AIが新しい歌詞を書き足すことはありません。</p>';
- if(!found.length){$('discoveryOutput').innerHTML='<h2>共通する言葉の候補</h2><p class="muted">今の登録内容からは明確な一致が見つかっていません。</p>'+info;return;}
- $('discoveryOutput').innerHTML='<h2>共通する言葉の候補</h2>'+
+ if(!found.length){$('discoveryOutput').innerHTML='<h2>完成作品との照合</h2>'+workCandidateView()+'<h2 class="match-subhead">メモ同士の一致</h2><p class="muted">今の登録内容からは明確な一致が見つかっていません。</p>'+info;return;}
+ $('discoveryOutput').innerHTML='<h2>完成作品との照合</h2>'+workCandidateView()+'<h2 class="match-subhead">メモ同士の一致</h2>'+
  found.slice(0,30).map(x=>'<div style="padding:12px 0;border-bottom:1px solid #ece5ec"><div><strong>'+esc(x.a.title)+'</strong> × <strong>'+esc(x.b.title)+'</strong></div><div class="links">'+x.phrases.map(p=>'<span>'+esc(p)+'</span>').join('')+'</div><div class="mini">'+esc(displayDate(x.a))+' ／ '+esc(displayDate(x.b))+'</div></div>').join('')+info;
 }
 function manualSubmit(e){
@@ -213,6 +279,7 @@ async function cloudLoad(){
    else if(!old.dirty){Object.assign(old,row,{synced:true,dirty:false});}
   }
   if(extra||remote?.length)save();
+  await loadMasterCandidates();
   toast('クラウドから '+(remote?.length||0)+'件を確認、新規 '+extra+'件を追加しました。');
  }catch(e){toast('クラウド読み込み失敗：'+(e.message||e));}finally{syncing=false;render();}
 }
@@ -251,14 +318,15 @@ async function authSubmit(e){
 async function authClick(){
  if(!user){authModal(true);return;}
  if(!confirm('ログアウトしますか？ この端末に残した原文は削除されません。'))return;
- try{const {error}=await client().auth.signOut();if(error)throw error;user=null;render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
+ try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
 }
 async function initSession(){
  try{const {data:r,error}=await client().auth.getSession();if(error)throw error;if(r.session?.user){user=r.session.user;await cloudLoad();}else render();}catch(e){render();console.warn('Auth unavailable',e);}
 }
 document.addEventListener('click',e=>{
  const note=e.target.closest('[data-note]');
- if(note){current=note.dataset.note;renderList();renderDetail();return;}
+ if(note){current=note.dataset.note;go('strata');return;}
+ const review=e.target.closest('button[data-candidate][data-decision]');if(review){reviewCandidate(review.dataset.candidate,review.dataset.decision);return;}
  const btn=e.target.closest('button[data-view]');
  if(btn){go(btn.dataset.view);return;}
  if(e.target.id==='saveClass'){saveClassification();return;}
