@@ -1,0 +1,79 @@
+/* v1.7.1 | long-form reading optimised for phones. */
+.toc-disclosure{min-width:0;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.toc-disclosure .toc-scroll{min-height:0}
+.toc-disclosure summary{display:none}
+.mobile-reader-bar{display:none}
+@media(max-width:850px){
+ .story-shell{padding-bottom:calc(124px + env(safe-area-inset-bottom));gap:15px;min-width:0}
+ .chapters{border-radius:13px}
+ .chapters-head{padding:12px 15px 4px}
+ .chapters .status{padding:0 15px 10px}
+ .chapters .progress-line{margin:0 15px 8px}
+ .toc-disclosure{display:block}
+ .toc-disclosure summary{
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;list-style:none;padding:10px 15px 13px;
+  min-height:46px;border-top:1px solid #e0e7dc;
+  font-weight:700;font-size:13px;color:#305a44;
+  background:#f4f7f1;touch-action:manipulation;
+ }
+ .toc-disclosure summary::-webkit-details-marker{display:none}
+ .toc-disclosure summary span{font-size:18px;line-height:1}
+ .toc-disclosure[open] summary span{transform:rotate(180deg)}
+ .chapters .toc-scroll{max-height:min(46dvh,340px);overflow-y:auto;display:block;padding:0 7px 12px}
+ .toc-scroll h3{margin:12px 9px 4px}
+ .toc-item{min-height:48px;padding:12px 10px;align-items:center}
+ .toc-item .title{font-size:13px}
+ .read-area{min-width:0}
+ .story-card{min-width:0}
+ .chapter-body{max-width:690px}
+ .chapter-body p{font-size:16px;line-height:2.1;letter-spacing:0;margin-bottom:25px}
+ .deeper-reading p{font-size:16px;line-height:2.1}
+ .story-card h2{line-height:1.45}
+ .refs a{display:flex;align-items:center;min-height:44px;padding:7px 0;overflow-wrap:anywhere}
+ .mobile-reader-bar{
+  position:fixed;z-index:70;left:0;right:0;bottom:0;
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;padding:8px 9px calc(8px + env(safe-area-inset-bottom));
+  border-top:1px solid #d0ded1;background:#fffdf7;
+  box-shadow:0 -8px 25px #18332720;
+ }
+ .mobile-reader-bar button{
+  min-width:0;min-height:56px;padding:7px 4px;
+  border:1px solid #c5d5c5;background:#edf3eb;
+  border-radius:10px;color:#2d513e;
+  font-size:12px;font-weight:800;line-height:1.35;
+  touch-action:manipulation;
+ }
+ .mobile-reader-bar button:last-child{color:#fff;background:#235744;border-color:#235744}
+ .mobile-reader-bar button:disabled{opacity:.42}
+ .mobile-reader-bar button:focus-visible{outline:3px solid #bd9551;outline-offset:-3px}
+ .mobile-reader-bar span{display:block;font-size:11px;font-weight:500;color:#617a67}
+ .cover h1{font-size:clamp(25px,6vw,33px)}
+ .cover p{font-size:13px;line-height:1.75}
+ .cover{padding:28px 17px 25px}
+ .cover a{min-height:45px;display:inline-flex;align-items:center}
+ .story-shell{padding-left:12px;padding-right:12px}
+ .episode-overview{margin:9px 0;gap:4px}
+ .episode-overview a{min-height:44px;display:flex;align-items:center;justify-content:center;font-size:11px}
+ .nav-buttons .btn{min-height:50px;white-space:normal}
+ .reconnect{line-height:1.75;padding:12px 15px;font-size:12px}
+ .reader-tools{position:static}
+ .story-atmosphere{padding:17px}
+ .figure svg{max-height:none;min-width:0}
+ .scene-art svg{max-height:none}
+ .chapter-glossary summary{min-height:48px}
+}
+@media(max-width:400px){
+ header.top{padding:11px 14px}
+ header.top small{display:none}
+ .toplinks{gap:10px}
+ .toplinks a{font-size:12px}
+ .story-shell{padding-left:9px;padding-right:9px}
+ .story-card{padding:20px 16px}
+ .chapter-body p{font-size:15.5px;line-height:2.08}
+ .deeper-reading p{font-size:15.5px}
+ .nav-buttons{gap:7px}
+ .nav-buttons .btn{font-size:12px}
+ .mobile-reader-bar button{font-size:11.5px}
+}
