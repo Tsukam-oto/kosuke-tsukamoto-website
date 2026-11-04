@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#183f35">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="description" content="知の図書館の特集。音楽理論・ギリシャ神話・心理学を、音と図解、原典・研究資料で体験しながら理解します。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' data:; object-src 'none'; base-uri 'none'">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="./specials.css">
+<title>知の特集｜見て、聴いて、根拠までたどる</title>
+<script defer src="./specials-data.js"></script>
+<script defer src="./specials.js"></script>
+</head>
+<body>
+<header class="site-header">
+<a href="./" class="back">知の図書館</a>
+<span>知の特集 <small>— STORIES WITH SOURCES</small></span>
+<a class="header-source" href="./research.html">資料の収集状況 ↗</a>
+</header>
+<main>
+<section class="site-intro">
+<p class="eyebrow">SPECIAL STORIES / EDITORIAL EXPERIMENT</p>
+<h1>驚きには、<wbr>根拠がある。</h1>
+<p>不思議だと思う。耳で試す。原典を読む。研究の限界も知る。<br>一つの問いを、図と体験で深くたどる「知の図書館」の特集です。</p>
+<div class="intro-facts"><span>3つの特集</span><span>すべての論点に出典を明示</span><span>スマホ対応</span></div>
+</section>
+<nav class="story-switcher" id="story-switcher" aria-label="特集を選ぶ">
+<a href="#piano" class="current" data-story="piano"><span class="switch-number">01</span>音楽の不思議</a>
+<a href="#chaos" data-story="chaos"><span class="switch-number">02</span>神話の謎</a>
+<a href="#alliance" data-story="alliance"><span class="switch-number">03</span>人間と心理</a>
+</nav>
+<div class="reading-area">
+<article id="story" aria-live="polite" aria-label="選択した特集">
+<div class="loading">特集を読み込んでいます。</div>
+</article>
+<aside class="evidence-policy" aria-label="編集基準">
+<h2>この図書館の編集ルール</h2>
+<p>面白い表現と、事実の扱いは別に考えます。</p>
+<ol>
+<li>数値には<strong>計算方法・研究元</strong>を付ける</li>
+<li>神話は<strong>原典の記述と史実</strong>を分ける</li>
+<li>研究は<strong>相関・因果・解釈</strong>を分ける</li>
+<li>未読の論文や自動収集資料を<strong>検証済みにしない</strong></li>
+</ol>
+<a href="./quality.html">根拠の確認状況を見る ↗</a>
+</aside>
+</div>
+<section class="new-discoveries" aria-labelledby="discovery-heading">
+<div class="section-header"><div><span class="eyebrow">DISCOVERED, NOT YET VERIFIED</span><h2 id="discovery-heading">次に深掘りする資料の種</h2></div><a href="./research.html">収集した資料一覧 ↗</a></div>
+<p>以下は外部データベースから自動収集した<strong>書誌・作品情報</strong>です。タイトルが面白くても、内容の確認や記事化はまだ完了していません。</p>
+<div id="fresh-sources" class="source-suggestions" aria-live="polite"><div class="loading">収集データを確認しています。</div></div>
+<p id="fresh-at" class="small-note"></p>
+</section>
+</main>
+<footer><a href="./">知の図書館へ戻る</a><a href="./music-library.html">音楽の図書館</a><a href="./myth-series.html">ギリシャ神話連載</a><span>出典を見せ、解釈の留保も伝える学習ページです。個人の学習記録は取得しません。</span></footer>
+<div id="toast" role="status" aria-live="polite"></div>
+</body></html>
