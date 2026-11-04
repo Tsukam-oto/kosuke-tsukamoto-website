@@ -24,6 +24,12 @@
 <section class="auth" id="auth-status" role="status" aria-live="polite">ログイン状態を確認しています。</section>
 <section id="private-app" hidden>
  <div class="stats" aria-label="編集候補の記録状況"><div><strong id="total-count">0</strong><span>非公開の記録</span></div><div><strong id="candidate-count">0</strong><span>記事候補</span></div><div><strong id="published-count">0</strong><span>公開後の記録</span></div></div>
+ <section class="quick-panel" aria-labelledby="quick-title">
+  <div><h2 id="quick-title">まずは一言だけ残す</h2><p>記事を考えながら書く必要はありません。仕事や創作でAIを試して気づいたことを、そのまま短く記録できます。</p></div>
+  <div class="quick-controls"><textarea id="quick-text" maxlength="2000" rows="2" placeholder="例：鑑賞授業の構成をAIと考えた。比較する音源の選び方はよかったが、学習指導要領の根拠確認が足りなかった。"></textarea>
+  <button type="button" class="primary" id="quick-save">一言メモを保存</button></div>
+  <small>一言メモは「AI活用・ICT」の素材として本人専用クラウドに保存され、後から分類・追記できます。</small>
+ </section>
  <div class="columns">
   <section class="writing-panel" aria-labelledby="editor-title">
    <div class="panel-head"><h2 id="editor-title">実践を残す</h2><button class="text-button" type="button" id="new-entry">新しく記録</button></div>
