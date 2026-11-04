@@ -295,7 +295,7 @@ async function loadMasterCandidates(){
  try{
   const [a,b]=await Promise.all([
    client().from('lyric_strata_match_candidates').select('id,entry_id,work_id,method,evidence,evidence_count,score,review_status,algorithm_version').eq('user_id',user.id).limit(2000),
-   client().from('lyric_master_works').select('id,title,sky,source_name,source_page_start,verification_status,original_book_index,credited_author,authorship_status').eq('user_id',user.id).limit(500)
+   client().from('lyric_master_works').select('id,title,sky,source_name,source_page_start,source_review_note,verification_status,original_book_index,credited_author,authorship_status').eq('user_id',user.id).limit(500)
   ]);
   if(a.error)throw a.error;if(b.error)throw b.error;
   masterCandidates=a.data||[];
@@ -671,16 +671,38 @@ async function runCompare(){
  }catch(e){if(serial===compareSerial){output.innerHTML='<p class="notice">本文を取得できませんでした：'+esc(e.message||e)+'</p>';}}
 }
 
+function sourceAuditPanel(){
+ if(!user)return '<p class="muted">原本校正の記録は本人ログイン後に表示されます。</p>';
+ const audited=[...masterWorks.values()].filter(w=>w.sky==='rap'&&(w.source_review_note||'').includes('PDF一次照合2026-11-05'));
+ if(!audited.length)return '<p class="muted">PDF原本の照合記録はまだ読み込まれていません。</p>';
+ const flagged=audited.filter(w=>w.source_review_note.includes('差異あり ['))
+  .sort((a,b)=>(a.original_book_index??999)-(b.original_book_index??999));
+ const ok=audited.length-flagged.length;
+ return '<section class="source-audit"><h2>PDF原本の校正記録</h2>'+
+  '<p>木乃伊の歌詞集について、保存本文とPDFの文字層を照合した一次監査です。'+
+  '空白・改行・全半角の差を除いて一致した資料は '+ok+' / '+audited.length+' 件、'+
+  '文字抽出上の差異がある資料は '+flagged.length+' 件です。文字層の差異は印刷原本の誤字と同義ではありません。</p>'+
+  '<details><summary>要確認の'+flagged.length+'作品を表示</summary>'+
+  '<ol>'+flagged.map(w=>{
+   const audit=(w.source_review_note||'').split('PDF一次照合2026-11-05：').at(-1);
+   return '<li><strong>'+esc(w.title)+'</strong>'+
+    '<span>収録順 '+String((w.original_book_index??-1)+1)+' ／ PDF '+esc(w.source_page_start??'?')+'ページ</span>'+
+    '<p>'+esc(audit||'確認が必要です。')+'</p></li>';
+  }).join('')+'</ol></details>'+
+  '<p class="muted">原文を上書きせず、修正候補とPDF文字抽出特有の誤りを区別して保存しています。'+
+  '一次照合の一致は、改行・印刷上の字形をすべて目視確認した意味ではありません。</p></section>';
+}
 function renderCross(){
  const root=$('crossOutput');if(!root)return;
  const topicSet=[...new Set(crossReadings.map(x=>x.topic))].sort((a,b)=>a.localeCompare(b,'ja'));
  root.innerHTML='<div class="cross-intro"><strong>原文から、作品の外へ。</strong><p>個別の歌詞・未発表メモ・完成作品の読みを比較します。同じ言葉が残る場合、違う答えになる場合、互いに問いを投げかける場合を分けています。エッセイや年表を唯一の基準にはしません。</p></div>'+
- '<div id="readingPathsOutput"></div><div id="deepWorkOutput"></div>'+ '<div class="cross-toolbar"><label class="field"><span>問いから探す</span><select id="crossTopic"><option value="all">すべての問い（'+crossReadings.length+'組）</option>'+
+ '<div id="sourceAuditOutput"></div><div id="readingPathsOutput"></div><div id="deepWorkOutput"></div>'+ '<div class="cross-toolbar"><label class="field"><span>問いから探す</span><select id="crossTopic"><option value="all">すべての問い（'+crossReadings.length+'組）</option>'+
  topicSet.map(t=>'<option value="'+esc(t)+'" '+(crossTopic===t?'selected':'')+'>'+esc(t)+'（'+crossReadings.filter(x=>x.topic===t).length+'）</option>').join('')+
  '</select></label><label class="field"><span>言葉・作品名・問い</span><input id="crossQuery" type="search" placeholder="例：朝、頑張れ、日常" value="'+esc(crossTerm)+'"></label></div>'+
  '<details class="cross-compare-lab"><summary>好きな二作品を原文ごと並べる（全資料から選択）</summary><div id="compareLab"></div></details>'+
  '<div id="crossResults" aria-live="polite"></div>';
  renderCompareLab();
+ if($('sourceAuditOutput'))$('sourceAuditOutput').innerHTML=sourceAuditPanel();
  renderReadingPaths();
  renderDeepWorkReadings();
  renderCrossRows();
