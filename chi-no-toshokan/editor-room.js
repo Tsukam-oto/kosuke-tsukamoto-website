@@ -149,7 +149,7 @@ async function saveQuick(){
  if(!client||!user||busy){status('ログイン後に記録できます。',true);return}
  const text=$('quick-text').value.trim();
  if(text.length<4){status('まず気づきを一言入力してください。',true);return}
- const head=(text.split(/[。！？!?\\n]/)[0]||text).slice(0,75);
+ const head=(text.split(/[。！？!?\n]/)[0]||text).slice(0,75);
  const now=new Date().toISOString();
  const row={id:PREFIX+(window.crypto?.randomUUID?.()||Date.now()+'-'+Math.random().toString(36).slice(2)),
   user_id:user.id,kind:'note',
