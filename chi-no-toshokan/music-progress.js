@@ -146,7 +146,10 @@ window.MUSIC_PROGRESS=(()=>{
    if(!owner){phase='guest';error='ログイン状態を確認できないため、この端末だけに保存します。';emit()}
   }
  }
- swapOwner('');
+ // Keep controls inactive while checking login. Otherwise an early tap could be
+ // written to the guest namespace and appear to disappear when the owner loads.
+ entries=diskRead('');
+ phase='checking';emit();
  start();
  return {state,subscribe,set,retry,start};
 })();
