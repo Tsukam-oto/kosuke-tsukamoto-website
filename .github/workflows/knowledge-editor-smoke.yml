@@ -1,0 +1,24 @@
+name: Knowledge Library editorial room smoke
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'chi-no-toshokan/editor-room.*'
+      - '.github/workflows/knowledge-editor-smoke.yml'
+  pull_request:
+    paths:
+      - 'chi-no-toshokan/editor-room.*'
+      - '.github/workflows/knowledge-editor-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  editor-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate private editor UI, source filtering and note prompts
+        run: node chi-no-toshokan/editor-room.test.cjs
