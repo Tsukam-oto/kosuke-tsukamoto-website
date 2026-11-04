@@ -1,0 +1,53 @@
+/* v1.7.2 | one-song discovery and personally managed listening queues. */
+.listen-pick{
+ background:linear-gradient(120deg,#204a3c,#3b6252);
+ color:#fdfcf2;border-radius:17px;padding:22px 25px;
+ margin:18px 0 22px;box-shadow:0 11px 30px #1a3d3521;
+}
+.pick-caption{font-size:11px;font-weight:800;color:#dfc68b;letter-spacing:.12em}
+.listen-pick h3{font-size:23px;line-height:1.5;margin:8px 0 2px}
+.listen-pick .pick-name{font-size:16px;font-weight:800;line-height:1.6;margin:5px 0}
+.listen-pick .pick-desc{font-size:14px;line-height:1.85;color:#e5eee4;margin:5px 0 13px}
+.listen-pick .pick-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:17px}
+.listen-pick .btn{background:#f8f0db;color:#1e4535;border-color:#e8d8ac;min-height:44px}
+.listen-pick .btn.alt{background:transparent;color:white;border:1px solid #a1bcab}
+.listen-pick small{display:block;font-size:11px;color:#ccded0;margin-top:12px}
+.listen-collection{background:#fffdf7;border:1px solid #d6e2d5;border-radius:15px;padding:17px 18px;margin:20px 0 17px}
+.listen-collection-head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.listen-collection-head strong{font-size:16px}
+.listen-collection-head span{font-size:12px;color:#526c5c}
+.listen-collection-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:12px}
+.listen-collection-tabs button{border:1px solid #cadac9;background:#f3f6ee;color:#42644d;font-size:12px;font-weight:700;min-height:45px;border-radius:9px;padding:8px 6px;white-space:normal}
+.listen-collection-tabs button[aria-pressed=true]{background:#275c44;color:#fff;border-color:#275c44}
+.listen-sync{font-size:11px;line-height:1.7;color:#648069;margin:11px 0 0;overflow-wrap:anywhere}
+.listen-assist{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap;margin-top:5px}
+.listen-assist a{font-size:11px;color:#477358;display:inline-flex;align-items:center;min-height:34px}
+.listen-assist button{border:1px solid #bccebd;color:#275641;background:#f0f5ef;border-radius:8px;padding:7px 10px;min-height:43px;font-size:12px;font-weight:700}
+.listen-assist [hidden]{display:none!important}
+.listen-actions{padding:2px 22px 14px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.listen-actions button{min-width:0;min-height:44px;border:1px solid #c9d9ca;background:#f5f8f2;color:#376049;border-radius:9px;padding:8px;font-size:12px;font-weight:700;line-height:1.5}
+.listen-actions button[aria-pressed=true]{background:#e4eee4;border:1px solid #7da78b;color:#23533d}
+.listen-actions button:disabled{opacity:.52}
+.listen-actions button:focus-visible,.listen-collection-tabs button:focus-visible{outline:3px solid #b89955;outline-offset:1px}
+@media(max-width:700px){
+ .listen-pick{padding:19px 18px;margin:15px 0 18px;border-radius:14px}
+ .listen-pick h3{font-size:22px}
+ .listen-pick .pick-name{font-size:16px}
+ .listen-pick .pick-desc{font-size:14px}
+ .listen-pick .pick-actions{display:grid;grid-template-columns:1fr;gap:7px}
+ .listen-pick .pick-actions .btn{display:flex;width:100%;justify-content:center;align-items:center;min-height:47px;text-align:center}
+ .listen-collection{padding:14px 13px;margin:13px 0}
+ .listen-collection-head strong{font-size:15px}
+ .listen-collection-head span{font-size:12px}
+ .listen-collection-tabs{gap:6px}
+ .listen-collection-tabs button{font-size:12px;min-height:47px;padding:7px 2px}
+ .listen-assist{flex-direction:column;align-items:flex-start}
+ .listen-assist a{min-height:40px;font-size:12px}
+ .listen-actions{padding:0 17px 15px;gap:7px}
+ .listen-actions button{min-height:48px;font-size:12px}
+}
+@media(max-width:360px){
+ .listen-pick{padding:17px 14px}
+ .listen-collection-tabs button{font-size:11px}
+ .listen-actions button{font-size:11px}
+}
