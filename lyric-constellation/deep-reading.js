@@ -137,7 +137,7 @@ function transitionClues(stanzas){
   {re:/^だけど/,word:'だけど'}, {re:/^しかし/,word:'しかし'},
   {re:/^でも(?!の)/,word:'でも'}, {re:/^なのに/,word:'なのに'},
   {re:/^一方で/,word:'一方で'}, {re:/けれど[、。．.!！?？\s]*$/,word:'けれど'},
-  {re:/^それなのに/,word:'それなのに'}, {re:/^それなのに/,word:'それなのに'}
+  {re:/^それなのに/,word:'それなのに'}
  ];
  const out=[];
  for(const s of stanzas)for(let i=0;i<s.lines.length;i++){
