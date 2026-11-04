@@ -97,6 +97,8 @@ function updateProgress(){
  if(count)count.textContent='あとで聴く '+st.later+'曲 ／ 聴いた '+st.done+'曲';
  const retry=dom('listen-retry');
  if(retry)retry.hidden=!(st.phase==='error'&&st.owner);
+ const guestImport=dom('listen-import-guest');
+ if(guestImport){guestImport.hidden=!(st.owner&&st.guestAvailable>0);guestImport.textContent='未ログイン時の記録 '+(st.guestAvailable||0)+'件を取り込む'}
  const pick=dom('daily-pick');
  if(pick)pick.innerHTML=pickMarkup();
  document.querySelectorAll('[data-list-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.listFilter===listFilter)));
@@ -118,7 +120,7 @@ function worksUI(){
  '<button type="button" data-list-filter="later" aria-pressed="'+(listFilter==='later')+'">あとで聴く</button>'+
  '<button type="button" data-list-filter="done" aria-pressed="'+(listFilter==='done')+'">聴いた曲</button></div>'+
  '<p class="listen-sync" id="listen-sync" role="status">保存先を確認中…</p>'+
- '<div class="listen-assist"><a href="./">ログイン・設定は図書館本体から ↗</a><button type="button" id="listen-retry" data-list-retry hidden>クラウドに再同期</button></div>'+
+ '<div class="listen-assist"><a href="./">ログイン・設定は図書館本体から ↗</a><button type="button" id="listen-retry" data-list-retry hidden>クラウドに再同期</button><button type="button" id="listen-import-guest" data-guest-import hidden>未ログインの記録を取り込む</button></div>'+
  '</section>'+
  '<div class="search-row"><input class="music-search" id="music-search" type="search" enterkeyhint="search" placeholder="曲名・作曲家・演奏者で検索" value="'+esc(query)+'" aria-label="作品や作曲家を検索"></div>'+
  '<div class="filter" role="group" aria-label="聴き方を絞り込む">'+moodLabels.map(m=>'<button type="button" data-filter="'+esc(m)+'" aria-pressed="'+(filter===m)+'">'+esc(m)+'</button>').join('')+'</div>'+
@@ -215,6 +217,8 @@ document.addEventListener('click',e=>{
  const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===f)));updateWorks();return}
  const list=e.target.closest('[data-list-filter]');if(list){listFilter=list.dataset.listFilter;updateWorks();return}
  const retry=e.target.closest('[data-list-retry]');if(retry){window.MUSIC_PROGRESS?.retry();return}
+ const guest=e.target.closest('[data-guest-import]');
+ if(guest){const imported=window.MUSIC_PROGRESS?.importGuest();toast(imported?'未ログイン時の記録を取り込みました。同期を確認してください。':'取り込みできませんでした。');return}
  const mark=e.target.closest('[data-track-id][data-track-status]');
  if(mark){
   const st=progressState(),id=mark.dataset.trackId,target=mark.dataset.trackStatus;
