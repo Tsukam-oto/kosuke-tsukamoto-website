@@ -55,10 +55,40 @@
  .embedded .grid{grid-template-columns:1fr}
  .embedded .note-list{max-height:290px}
 }
+
+/* v2.0: Evidence is computed in the browser, never published in HTML source. */
+.reading-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:8px 0 20px}
+.reading-metrics>span{border:1px solid #e3dce6;background:#f8f4f7;border-radius:10px;padding:13px 9px;min-width:0}
+.reading-metrics strong{display:block;color:#51455d;font:normal 24px/1.3 Georgia,serif}
+.reading-metrics small{display:block;font-size:10px;color:#817888;line-height:1.6}
+.reading-pair-card{border-bottom:1px solid #e8e1ea;padding:18px 0}
+.reading-pair-top{display:flex;align-items:center;justify-content:space-between;gap:9px;flex-wrap:wrap}
+.reading-pair-card>.btn{font-size:11px;margin-top:10px}
+.reading-expanded{margin-top:16px;padding:18px;background:#fcfbf9;border:1px solid #e2dce4;border-radius:14px}
+.reading-expanded h3{font-size:16px;margin:0 0 5px}
+.reading-expanded h4{font-size:12px;color:#5c5263;margin:8px 0 11px}
+.reading-meta-pair{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+.reading-meta-pair>div{border-radius:11px;padding:11px;background:#f4f0f5;min-width:0;display:flex;flex-direction:column;gap:3px}
+.reading-meta-pair b{font-size:10px;color:#6a586e}
+.reading-meta-pair strong{font-size:12px;overflow-wrap:anywhere}
+.reading-meta-pair small{font-size:10px;color:#7e7582;line-height:1.6}
+.reading-evidence{border-top:1px solid #e9e3e9;margin:15px 0;padding-top:12px}
+.reading-unchanged{font-size:12px;line-height:1.8;border-radius:7px;padding:7px 10px;background:#f5f1e8;margin:6px 0;overflow-wrap:anywhere}
+.reading-change{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin:11px 0}
+.reading-compare-column{min-width:0;border:1px solid #ede6ed;border-radius:9px;padding:9px;background:#fff}
+.reading-compare-column h4{font-size:10px;margin:0 0 8px}
+.reading-compare-lines p{font-size:11px;line-height:1.75;margin:0 0 6px;overflow-wrap:anywhere}
+.reading-source-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.reading-source-actions button{font-size:10px;padding:10px 12px}
+.reading-raw{border-top:1px solid #eee7ee;margin-top:10px;padding-top:10px}
+.reading-raw summary{cursor:pointer;font-size:11px;color:#5d5271;font-weight:750}
+.reading-raw pre{white-space:pre-wrap;overflow-wrap:anywhere;max-height:430px;overflow:auto;font-size:12px;line-height:1.9;background:#f6f3f0;border-radius:9px;padding:12px}
+@media(max-width:760px){.reading-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.reading-metrics strong{font-size:22px}.reading-expanded{padding:11px}.reading-meta-pair,.reading-change{grid-template-columns:1fr}.reading-pair-card{padding:14px 0}}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script defer src="./reading-engine.js"></script>
 <script defer src="./app.js"></script>
 </head><body>
 <div class="layout">
@@ -69,7 +99,7 @@
 <button type="button" data-view="import">日付付きで回収</button>
 <button type="button" data-view="discovery">作品とのつながり</button>
 </div>
-<div class="top"><span>PERSONAL WRITING ARCHIVE / v1.1</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
+<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.0</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
 <div class="toolbar"><input id="search" class="search" type="search" placeholder="言葉・作品名を探す" aria-label="検索"><select id="skyFilter" class="filter" aria-label="創作名義"><option value="all">すべての名義</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option><option value="unassigned">未分類</option></select><button class="btn dark" data-view="import">＋ 回収する</button></div>
@@ -78,7 +108,7 @@
 <div class="importgrid"><section class="step"><h2>01　Macの「メモ」を回収</h2><p>専用の書き出しファイルをMacで実行し、<strong>歌詞メモのフォルダだけ</strong>を選びます。作成日・更新日を保持したJSONがダウンロードフォルダにできます。元のメモは変更しません。</p><p><button class="btn dark" type="button" id="downloadMacZip">Mac用・修正版ZIPをダウンロード</button></p><p class="mini">ZIPを解凍し、01_これだけダブルクリック.command を右クリック→開く。Appleメモへのアクセスを許可してください。</p><input type="file" id="noteFile" accept=".json,.md,.txt,application/json,text/plain"><div><button id="importFile" class="btn dark">ファイルを読み込む</button></div><p id="importReport" class="muted"></p><p class="hint">「余白」の原稿は対象外。メモ作成日は、必ずしも歌詞を書き始めた日とは限りません。</p></section>
 <section class="step"><h2>02　コピーした言葉を保存</h2><p>Appleメモ以外でも使えます。日付が分かる場合だけ入力してください。</p><form id="manualForm"><div class="field"><label for="manualTitle">仮タイトル</label><input id="manualTitle" placeholder="例：冬のメモ" maxlength="320" required></div><div class="field"><label for="manualBody">原文（改行を保持）</label><textarea id="manualBody" placeholder="自分が書いた言葉をそのまま貼り付ける" required></textarea></div><div class="field"><label for="manualDate">記録日（分かる場合のみ）</label><input id="manualDate" type="date"></div><div class="field"><label for="manualSky">名義</label><select id="manualSky"><option value="unassigned">未分類</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option></select></div><button type="submit" class="btn dark">原文を記録する</button></form></section></div>
 <div class="notice">取り込み後、まずはこのブラウザ内に保管されます。本人アカウントでログインし、内容を確認してから「クラウドに保存」を押してください。原文をGitHubや公開サイトにアップロードする必要はありません。</div></div>
-<div id="view-discovery" class="hidden"><div class="eyebrow">TRACES & ECHOES</div><h1 class="heading">どこかで、<span>生きている言葉。</span></h1><p class="lead">これまで集めたメモと作品台帳を照合しました。<br>歌詞原文の一致とタイトルの一致を分けて表示し、最終的な関係はご自身で確認できます。</p><div class="panel" id="discoveryOutput"></div></div>
+<div id="view-discovery" class="hidden"><div class="eyebrow">TRACES & ECHOES</div><h1 class="heading">どこかで、<span>生きている言葉。</span></h1><p class="lead">メモの全文から、同題稿・共通する行・似た表現を読み比べます。<br>完成作品との照合結果も確認でき、採用や改稿の経緯はご本人が判断できます。</p><div class="panel" id="discoveryOutput"></div></div>
 <footer class="bottom">初期状態は空です。自分で読み込んだ原稿だけを管理します。原文の出典・日時は書き換えず、分類はいつでも変更できます。<br><a href="../lyric-constellation/">歌詞の星座</a>と連携するための独立した地層DBです。</footer>
 </main></div>
 <div id="toast" class="toast" role="status"></div>
