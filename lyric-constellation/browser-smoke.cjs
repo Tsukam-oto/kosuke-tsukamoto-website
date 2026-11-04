@@ -166,6 +166,67 @@ async function runPrivateCatalogScenario(browser,base,{mobile}){
  }finally{await context.close()}
 }
 
+
+/* Mummy essay research smoke: synthetic owner-only essay and song, never real user contents. */
+async function runMummyResearchScenario(browser,base,{mobile}){
+ const context=await browser.newContext({
+  viewport:mobile?{width:390,height:844}:{width:1365,height:900},
+  isMobile:mobile,hasTouch:mobile
+ });
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
+ try{
+  await page.goto(base+'/lyric-constellation/#mummy-research',{waitUntil:'domcontentloaded'});
+  assert.match(await page.locator('#screen').innerText(),/本人専用の研究室/);
+  assert.equal(await page.locator('#screen .mummy-essay').count(),0,'private essay hidden without login');
+  const report=await page.evaluate(()=>{
+   const sourceText='音楽はここで終わる。\n楽譜はまだ開かれていない本だ。\nそれでも私は演奏する。';
+   const lyric='昨日の生活\n音楽をまだ聴きたい\nその先を考える';
+   rapResearchSource={id:'essay-fixture',title:'検証用エッセイ',date_label:'2022-08',original_text:sourceText};
+   rapResearchPassages=[{source_id:'essay-fixture',section_key:'test',heading:'音楽の問い',
+    evidence_a:'音楽はここで終わる。',evidence_b:'それでも私は演奏する。',
+    interpretation:'暫定解釈',alternative:'別の読み',inquiry:'どう考えられますか。'}];
+   rapResearchConnections=[{source_id:'essay-fixture',work_id:'fictional-rap-fixture',
+    heading:'作品の対話',essay_evidence:'音楽はここで終わる。',
+    lyric_evidence:'音楽をまだ聴きたい',interpretation:'観察上のつながり',alternative:'異なる場面の言葉'}];
+   masterReadingWorks=[{id:'master-fictional-rap-fixture',title:'検証楽曲',sky:'rap',
+    sourceSystem:'lyric_master',sourceStatus:'unverified_pdf_extract',collection:'架空歌詞集',lyrics:lyric}];
+   rapResearchStatus='ready';sky='rap';view='research';render();
+   return {works:masterReadingWorks.length,essayChars:rapResearchSource.original_text.length};
+  });
+  assert.equal(report.works,1);
+  assert.match(await page.locator('#screen').innerText(),/検証用エッセイ/);
+  assert.equal(await page.locator('.mummy-reading-card').count(),1);
+  assert.equal(await page.locator('.mummy-connection').count(),1);
+  const fold=page.locator('.mummy-essay');
+  await fold.locator('summary').click();
+  assert.match(await fold.locator('pre').innerText(),/音楽はここで終わる/);
+  await page.locator('[data-mummy-theme="daily"]').click();
+  assert.equal(await page.locator('.mummy-work-row').count(),1);
+  await page.locator('#mummySearch').fill('見当たらない語');
+  assert.equal(await page.locator('.mummy-work-row').count(),0);
+  await page.locator('#mummySearch').fill('');
+  assert.equal(await page.locator('.mummy-work-row').count(),1);
+  await page.locator('.mummy-work-row [data-open]').click();
+  assert.match(await page.locator('#drawer').innerText(),/検証楽曲/);
+  await page.locator('#drawer #closeDrawer').click();
+  const secure=await page.evaluate(()=>{
+   const stored=JSON.stringify(localStorage);
+   masterReadingWorks=[];cloudUser=null;clearMummyResearch();render();
+   return {stored:stored.includes('検証用エッセイ'),
+    visible:document.getElementById('screen').textContent.includes('検証用エッセイ'),
+    cached:window.MummyResearchView.getState().works.length};
+  });
+  assert.equal(secure.stored,false,'no essay in localStorage');
+  assert.equal(secure.visible,false,'no essay after signout');
+  assert.equal(secure.cached,0,'no private lyric remains in research UI cache');
+  assert.equal(errors.length,0,errors.join(' / '));
+  console.log('PASS Mummy research '+(mobile?'mobile':'desktop')+
+    ': locked route, synthetic essay, 1 cited comparison, search and logout privacy');
+ }finally{await context.close()}
+}
+
 (async()=>{
  let server,browser;
  try{
@@ -177,6 +238,8 @@ async function runPrivateCatalogScenario(browser,base,{mobile}){
   await runScenario(browser,base,{mobile:true});
   await runPrivateCatalogScenario(browser,base,{mobile:false});
   await runPrivateCatalogScenario(browser,base,{mobile:true});
+  await runMummyResearchScenario(browser,base,{mobile:false});
+  await runMummyResearchScenario(browser,base,{mobile:true});
  } finally {
   if(browser)await browser.close();
   if(server)await new Promise(resolve=>server.close(resolve));
