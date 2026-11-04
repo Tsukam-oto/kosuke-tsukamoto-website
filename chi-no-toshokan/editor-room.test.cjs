@@ -54,6 +54,7 @@ const source=src.replace(/\ninit\(\);\nwindow\.EDITOR_DEBUG=/,'\nwindow.EDITOR_D
 check('test runner removes only automatic auth initialization',source!==src);
 vm.runInNewContext(source,{window:win,document:doc,navigator,URL,Date,Math,setTimeout,clearTimeout,console},{timeout:5000});
 check('editorial prompt exists',typeof win.EDITOR_DEBUG.makePrompt==='function');
+create('filter').handlers.input({target:{value:''}});
 check('outcome display is conservative',create('format-outcomes').innerHTML.includes('比較には不足'));
 check('new manuscript controls initialized',!!create('format').innerHTML&&!!create('article-range').textContent);
 create('article-body').value='業務改善でAIを使いました。これはまだ実証していません。';
