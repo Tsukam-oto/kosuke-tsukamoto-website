@@ -24,6 +24,7 @@ OUTPUT = BASE / "research-candidates.json"
 ALLOWED = {
     "api.crossref.org", "api.openalex.org",
     "musicbrainz.org", "collectionapi.metmuseum.org",
+    "www.ebi.ac.uk",
 }
 AGENT = "ChiNoToshokanEvidenceDiscovery/1.0 (https://kosuke-tsukamoto-website.pages.dev/chi-no-toshokan/)"
 RESEARCH_NOTE = (
@@ -162,6 +163,43 @@ def openalex_items(topic, metadata):
     return result
 
 
+def europe_pmc_items(topic, metadata):
+    """PubMed/Europe PMC indexed research metadata; no abstract or copyrighted text."""
+    result = []
+    for item in (metadata.get("resultList") or {}).get("result", [])[:3]:
+        doi = doi_key(item.get("doi"))
+        pmid = str(item.get("pmid") or "")
+        if doi:
+            key = "doi:" + doi
+            url = "https://doi.org/" + urllib.parse.quote(doi, safe="/-._;():")
+        elif re.fullmatch(r"\d{4,12}", pmid):
+            key, url = "pmid:" + pmid, "https://pubmed.ncbi.nlm.nih.gov/" + pmid + "/"
+        else:
+            continue
+        title = clean_text(item.get("title"))
+        if not title:
+            continue
+        types = ((item.get("pubTypeList") or {}).get("pubType") or [])[:8]
+        publication_types = [clean_text(t, 90) for t in types if isinstance(t, str)]
+        year = item.get("pubYear")
+        try:
+            year = int(year)
+        except (ValueError, TypeError):
+            year = None
+        result.append(common(
+            "research-metadata", key, title, url, topic, "Europe PMC",
+            year=year,
+            authors=[clean_text(item.get("authorString"), 180)] if item.get("authorString") else [],
+            publication=clean_text(((item.get("journalInfo") or {}).get("journal") or {}).get("title")),
+            recordType="indexed-publication",
+            doi=doi, pmid=pmid if re.fullmatch(r"\d{4,12}", pmid) else "",
+            publicationTypes=publication_types,
+            abstractAvailable=bool(item.get("abstractText")),
+            note="公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+        ))
+    return result
+
+
 def musicbrainz_items(topic, metadata):
     result = []
     for item in metadata.get("works", [])[:2]:
@@ -286,6 +324,16 @@ def main():
                 record("OpenAlex", topic,
                        "https://api.openalex.org/works?" + urllib.parse.urlencode(qs),
                        openalex_items)
+            if topic["area"] == "心理・臨床" or topic["id"] == "music-emotion":
+                # Europe PMC search returns biomedical/clinical indexes and article types.
+                # We explicitly do not save the abstract text in the published ledger.
+                query = urllib.parse.urlencode({
+                    "query": topic["query"], "format": "json",
+                    "resultType": "core", "pageSize": "3",
+                })
+                record("Europe PMC", topic,
+                       "https://www.ebi.ac.uk/europepmc/webservices/rest/search?" + query,
+                       europe_pmc_items)
             time.sleep(.2)
         for item in cfg.get("musicbrainz", []):
             topic = {"id": item["topicId"], "area": "音楽作品データ"}
