@@ -331,7 +331,7 @@ const clamp=(a,min,max)=>Math.max(min,Math.min(max,a));
 const safeId=()=>`u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
 let db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};let localWorks=[];
 let masterReadingWorks=[],masterPendingWorks=[],masterReadStatus='signed_out';
-let rapResearchSource=null,rapResearchPassages=[],rapResearchConnections=[],rapResearchStatus='signed_out';
+let rapResearchSource=null,rapResearchPassages=[],rapResearchConnections=[],rapSongReadings=[],rapSongDialogues=[],rapResearchStatus='signed_out';
 let sky='choir',view='constellation',selected=null,term='',query='',visibility='all',order='new',editing=null,pairIds=[];
 function cleanWork(w){if(!w||typeof w!=='object')return null;const title=String(w.title||'').trim().slice(0,140),lyrics=String(w.lyrics??w.text??'').slice(0,120000);if(!title||!lyrics.trim())return null;return {id:String(w.id||safeId()).slice(0,90),title,lyrics,year:Number(w.year)||null,credit:String(w.credit||'').slice(0,250),kind:String(w.kind||'その他').slice(0,70),tags:Array.isArray(w.tags)?w.tags.map(t=>String(t).slice(0,30)).slice(0,30):[],sky:resolveSky(w),origin:'private',updatedAt:String(w.updatedAt||new Date().toISOString())};}
 
@@ -630,7 +630,7 @@ function masterReadNotice(){
  return '<div class="notice">本人専用アーカイブ：原文 '+loaded.length+'件'+(pending.length?' ／ 原文待ち '+pending.length+'件：'+pending.map(x=>'《'+esc(x.title)+'》').join('・'):'')+
  '。PDF抽出の歌詞は未校正であり、完成・公開を意味しません。共作の意図・権利は断定しません。</div>';
 }
-function viewRapResearch(){return skySwitch()+header('木乃伊を、読む。','エッセイと168作品の原文から、作品に繰り返し現れる問いを検討する。')+window.MummyResearchView.build({status:rapResearchStatus,source:rapResearchSource,passages:rapResearchPassages,connections:rapResearchConnections,works:masterReadingWorks});}
+function viewRapResearch(){return skySwitch()+header('木乃伊の歌詞を、一曲ずつ。','一つの作品をほかの作品の説明に使わず、原文から独立して読み解く。')+window.MummyResearchView.build({status:rapResearchStatus,source:rapResearchSource,passages:rapResearchPassages,connections:rapResearchConnections,works:masterReadingWorks,songReadings:rapSongReadings,songDialogues:rapSongDialogues});}
 function viewWorks(){const all=sortWorks(works().filter(w=>(visibility==='all'||(visibility==='official'?w.origin==='official':w.origin==='private'))&&(!query||norm(w.title+' '+w.lyrics+' '+w.credit).includes(norm(query)))));return header('作品を読む。',sky==='rap'?'木乃伊名義の原文と断片だけを表示します。合唱・詩は別の空です。':'公開歌詞11篇を原文・作者表記付きで収録。木乃伊のリリックとは分けています。')+`<div class="panel"><div class="control-row"><input class="search" id="searchWorks" type="search" placeholder="作品名・歌詞・作者から検索" value="${esc(query)}"><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filterWorks" class="search" style="width:auto"><option value="all" ${visibility==='all'?'selected':''}>すべて</option><option value="official" ${visibility==='official'?'selected':''}>公開作品のみ</option><option value="private" ${visibility==='private'?'selected':''}>非公開のみ</option></select><select id="sortWorks" class="search" style="width:auto"><option value="new" ${order==='new'?'selected':''}>新しい順</option><option value="old" ${order==='old'?'selected':''}>古い順</option><option value="az" ${order==='az'?'selected':''}>作品名順</option></select></div></div><div class="notice">公式公開版の原文は読み取り専用。作品を開いて「作品を深く読む」を選ぶと、問い・反復・人称・別解を原文の行番号とともに確認できます。分析結果は推測として示し、原文を書き換えません。</div></div>${masterReadNotice()}${readingReviewDashboard()}<div class="section-top"><h2>収録作品 <span class="small-muted">${all.length}篇</span></h2><button class="btn sm" id="addWorkSmall">＋ 作品を追加</button></div><div class="works-list">${all.map(w=>`<button class="work-card ${w.origin==='private'?'private':''}" data-open="${esc(w.id)}"><span class="eyebrow">${w.year||'—'} / ${w.origin==='official'?'PUBLISHED':w.sourceSystem==='lyric_master'?'PRIVATE SOURCE':'PRIVATE'}</span><strong>《${esc(w.title)}》</strong><small>${esc(w.credit||'作者表記なし')}</small>${w.sourceSystem==='lyric_master'?'<small class="master-provenance">'+esc(w.sourceStatus==='unverified_pdf_extract'?'PDF抽出・未校正':'作者原本')+'</small>':''}<div class="tags">${formatTags(w)}</div></button>`).join('')}</div>${all.length?'':'<div class="empty">該当する作品がありません。</div>'}`}
 function findInText(text,word){const idx=norm(text).indexOf(norm(word));if(idx<0)return '';const arr=text.split('\n');let at=0;for(let i=0;i<arr.length;i++){if(norm(arr[i]).includes(norm(word))){return arr.slice(Math.max(0,i-1),Math.min(arr.length,i+2)).join('\n').trim()}}return ''}
 function highlight(text,word){if(!word)return esc(text);const a=String(text),na=norm(a),nb=norm(word);let idx=na.indexOf(nb);if(idx<0)return esc(a);if(na.length!==a.length)return esc(a);let out='',start=0;while(idx>=0){out+=esc(a.slice(start,idx))+'<mark>'+esc(a.slice(idx,idx+word.length))+'</mark>';start=idx+word.length;idx=na.indexOf(nb,start)}return out+esc(a.slice(start));}
@@ -764,6 +764,8 @@ function mergeImported(d){const source=Array.isArray(d)?d:Array.isArray(d.userWo
 function migrateOld(){let restored=0;for(const key of ['three_observatories_release_v1','three_observatory_proto_v01']){try{const d=JSON.parse(localStorage.getItem(key));if(d&&Array.isArray(d.works)){const o=mergeImported(d);restored+=o.added}}catch(e){}}render();toast(restored?`旧データから${restored}作品を取り込みました。`:'引き継げる旧データが見つかりませんでした。旧版のJSONも読み込めます。')}
 function compare(a,b){const A=getWork(a),B=getWork(b);if(!A||!B)return;const comm=tokens(A).filter(x=>tokens(B).includes(x));selected=a;term=comm[0]||'';const panel=`<div class="drawer-top"><span class="eyebrow">COMPARE / 2篇を読む</span><button class="close" id="closeDrawer">×</button></div><h2 style="font-size:22px">《${esc(A.title)}》<br>と《${esc(B.title)}》</h2><p class="desc">共通する表記：${comm.length}種類</p><div class="word-cloud">${comm.map(w=>`<button class="word" data-term="${esc(w)}">${esc(w)}</button>`).join('')}</div><div class="term-results" style="grid-template-columns:1fr;margin-top:22px">${[A,B].map(w=>`<div class="term-result"><h3>${esc(w.title)}</h3><div class="poem-text" style="white-space:pre-line;line-height:1.9;font-size:12px">${highlight(w.lyrics.slice(0,1700),term)}</div></div>`).join('')}</div><p class="notice">共通する語を読んで、作品の内容がどう異なるかをご自身で確かめられます。</p>`;$('#drawer').innerHTML=panel;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');}
 document.addEventListener('click',async e=>{const target=e.target.closest('button,[data-open],[data-term],[data-compare]');if(!target)return;if(target.matches('[data-sky]')){switchSky(target.dataset.sky);return}if(target.matches('[data-view]')){go(target.dataset.view);return}
+if(target.hasAttribute('data-mummy-mode')){window.MummyResearchView.chooseMode(target.dataset.mummyMode);render();return}
+if(target.hasAttribute('data-mummy-select')){window.MummyResearchView.selectWork(target.dataset.mummySelect);const pane=document.getElementById('mummySelectedReading');if(pane){pane.innerHTML=window.MummyResearchView.selection();pane.scrollIntoView({block:'start',behavior:'smooth'});}return}
 if(target.hasAttribute('data-mummy-theme')){window.MummyResearchView.chooseTheme(target.dataset.mummyTheme);render();return}
 if(target.hasAttribute('data-mummy-more')){window.MummyResearchView.more();const el=document.getElementById('mummyResearchList');if(el)el.innerHTML=window.MummyResearchView.list();return}
 if(target.hasAttribute('data-reading-more')){
@@ -853,6 +855,7 @@ async function loadMasterReadingCorpus(user,epoch){
    found.push({
     id:'master-'+r.id,title:r.title,lyrics:v.literal_text,sky:targetSky,
     origin:'private',sourceSystem:'lyric_master',sourceStatus:v.text_status,
+    sourceVersionNo:v.version_no,originalBookIndex:r.original_book_index,
     sourceRef:v.source_ref||'',sourceReviewStatus:r.verification_status,
     authorReviewNote:r.source_review_note||'',authorshipStatus:r.authorship_status||'',
     sourcePages:[r.source_page_start,r.source_page_end],sourceBook:r.source_name||'',
@@ -879,31 +882,38 @@ async function loadMummyResearch(user,epoch){
  if(!user?.id||!cloudClient)return;
  rapResearchStatus='loading';
  try{
-  const [a,b,c]=await Promise.all([
+  const [a,b,c,d,e]=await Promise.all([
    cloudClient.from('lyric_research_sources').select('id,source_key,title,author_credit,date_label,date_precision,original_text,provenance,verification_status')
     .eq('user_id',user.id).eq('source_key','essay:2022-08:sakui-musa').limit(1),
    cloudClient.from('lyric_research_passages').select('id,source_id,section_key,heading,evidence_a,evidence_b,interpretation,alternative,inquiry,assessment_status')
     .eq('user_id',user.id).order('created_at',{ascending:true}).limit(100),
    cloudClient.from('lyric_research_connections').select('id,source_id,work_id,theme_key,heading,interpretation,alternative,essay_evidence,lyric_evidence,lyric_line,assessment_status')
-    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(200)
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(200),
+   cloudClient.from('lyric_song_readings').select('id,work_id,reading_key,heading,evidence_a,evidence_b,observation,interpretation,alternative,inquiry,source_version_no,assessment_status')
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(1000),
+   cloudClient.from('lyric_song_dialogues').select('id,work_a_id,work_b_id,dialogue_key,heading,evidence_a,evidence_b,interpretation,alternative,inquiry,version_a,version_b,assessment_status')
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(1000)
   ]);
   if(a.error)throw a.error;
   if(b.error)throw b.error;
   if(c.error)throw c.error;
+  if(d.error)throw d.error;
+  if(e.error)throw e.error;
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
   rapResearchSource=a.data?.[0]||null;
   rapResearchPassages=(b.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
   rapResearchConnections=(c.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
+  rapSongReadings=d.data||[];rapSongDialogues=e.data||[];
   rapResearchStatus='ready';
   render();
  }catch(err){
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
-  rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];
+  rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];
   rapResearchStatus='error';console.warn('owner-only rap research load failed',err);render();
  }
 }
 function clearMummyResearch(){
- rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];
+ rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];
  rapResearchStatus='signed_out';window.MummyResearchView?.reset?.();
 }
 

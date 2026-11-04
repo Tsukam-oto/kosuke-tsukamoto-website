@@ -178,7 +178,7 @@ async function runMummyResearchScenario(browser,base,{mobile}){
  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
  try{
   await page.goto(base+'/lyric-constellation/#mummy-research',{waitUntil:'domcontentloaded'});
-  assert.match(await page.locator('#screen').innerText(),/本人専用の研究室/);
+  assert.match(await page.locator('#screen').innerText(),/本人専用の精読室/);
   assert.equal(await page.locator('#screen .mummy-essay').count(),0,'private essay hidden without login');
   const report=await page.evaluate(()=>{
    const sourceText='音楽はここで終わる。\n楽譜はまだ開かれていない本だ。\nそれでも私は演奏する。';
@@ -191,14 +191,37 @@ async function runMummyResearchScenario(browser,base,{mobile}){
     heading:'作品の対話',essay_evidence:'音楽はここで終わる。',
     lyric_evidence:'音楽をまだ聴きたい',interpretation:'観察上のつながり',alternative:'異なる場面の言葉'}];
    masterReadingWorks=[{id:'master-fictional-rap-fixture',title:'検証楽曲',sky:'rap',
-    sourceSystem:'lyric_master',sourceStatus:'unverified_pdf_extract',collection:'架空歌詞集',lyrics:lyric}];
+    sourceSystem:'lyric_master',sourceStatus:'unverified_pdf_extract',collection:'架空歌詞集',
+    lyrics:lyric,sourceVersionNo:1,originalBookIndex:0},
+    {id:'master-fictional-rap-2',title:'検証楽曲2',sky:'rap',
+    sourceSystem:'lyric_master',sourceStatus:'unverified_pdf_extract',collection:'架空歌詞集',
+    lyrics:'友達と歌う\n歌って生きていく',sourceVersionNo:1,originalBookIndex:1}];
+   rapSongReadings=[{id:'reading-1',work_id:'fictional-rap-fixture',source_version_no:1,
+    heading:'検証楽曲の独立精読',evidence_a:'昨日の生活',evidence_b:'音楽をまだ聴きたい',
+    observation:'生活と歌を並べる',interpretation:'独立した解釈',alternative:'別の解釈',
+    inquiry:'なぜでしょうか。'}];
+   rapSongDialogues=[{id:'dialogue-1',work_a_id:'fictional-rap-fixture',work_b_id:'fictional-rap-2',
+    version_a:1,version_b:1,heading:'検証用の楽曲間比較',
+    evidence_a:'音楽をまだ聴きたい',evidence_b:'友達と歌う',
+    interpretation:'楽曲間の語り',alternative:'似ているとは限らない',inquiry:'どう違いますか。'}];
    rapResearchStatus='ready';sky='rap';view='research';render();
    return {works:masterReadingWorks.length,essayChars:rapResearchSource.original_text.length};
   });
-  assert.equal(report.works,1);
-  assert.match(await page.locator('#screen').innerText(),/検証用エッセイ/);
-  assert.equal(await page.locator('.mummy-reading-card').count(),1);
-  assert.equal(await page.locator('.mummy-connection').count(),1);
+  assert.equal(report.works,2);
+  assert.match(await page.locator('#screen').innerText(),/検証楽曲/);
+  assert.equal(await page.locator('.mummy-stats b').nth(1).innerText(),'1','only 1 of 2 songs deeply read');
+  assert.equal(await page.locator('.mummy-connections .mummy-connection').count(),1);
+  const order=await page.locator('#screen').evaluate(el=>[el.innerHTML.indexOf('168作品から選ぶ'),el.innerHTML.indexOf('エッセイ《')]);
+  assert.ok(order[0]>=0&&order[1]>order[0],'songs before essay');
+  await page.locator('[data-mummy-mode="studied"]').click();
+  assert.equal(await page.locator('.mummy-work-row').count(),1);
+  await page.locator('[data-mummy-mode="awaiting"]').click();
+  assert.equal(await page.locator('.mummy-work-row').count(),1);
+  await page.locator('[data-mummy-mode="all"]').click();
+  await page.locator('.mummy-work-row').filter({hasText:'検証楽曲'}).first().locator('[data-mummy-select]').click();
+  assert.match(await page.locator('#mummySelectedReading').innerText(),/検証楽曲の独立精読/);
+  assert.match(await page.locator('#mummySelectedReading').innerText(),/別の解釈/);
+  const other=page.locator('.mummy-other-doc');await other.locator('summary').first().click();
   const fold=page.locator('.mummy-essay');
   await fold.locator('summary').click();
   assert.match(await fold.locator('pre').innerText(),/音楽はここで終わる/);
@@ -222,8 +245,8 @@ async function runMummyResearchScenario(browser,base,{mobile}){
   assert.equal(secure.visible,false,'no essay after signout');
   assert.equal(secure.cached,0,'no private lyric remains in research UI cache');
   assert.equal(errors.length,0,errors.join(' / '));
-  console.log('PASS Mummy research '+(mobile?'mobile':'desktop')+
-    ': locked route, synthetic essay, 1 cited comparison, search and logout privacy');
+  console.log('PASS Mummy song-first '+(mobile?'mobile':'desktop')+
+    ': locked route, independent song reading, 1 song dialogue, optional essay, filters and logout privacy');
  }finally{await context.close()}
 }
 
