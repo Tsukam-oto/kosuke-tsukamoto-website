@@ -12,7 +12,7 @@ function sourceCard(s){
  const pieces=[s.year||'',s.publication||'',authors].filter(Boolean).map(esc);
  const image=safeImage(s.imageUrl,s.imageRights);
  const info=s.titleMatchesSearch?'題名に検索語が含まれます（関連性は未確認）':'題名と検索語の一致は未確認';
- return '<article class="source"><div class="tag">'+esc(s.sourceType)+'</div><h4>'+esc(s.title)+'</h4>'+
+ return '<article class="source"><div class="tag">'+esc(s.sourceType)+' ／ '+esc(s.reviewStatus||'本文未照合')+'</div><h4>'+esc(s.title)+'</h4>'+
  '<div class="meta">'+pieces.join(' · ')+'</div><div class="meta">情報提供元：'+esc((s.providers||[]).join(' / '))+'</div>'+
  '<div class="meta">'+esc(s.publicationTypeHint)+'</div><div class="warn">'+esc(info)+'</div>'+
  (image?'<img src="'+esc(image)+'" loading="lazy" decoding="async" alt="'+esc(s.title)+'（The Met公開画像）">':'')+
