@@ -20,7 +20,7 @@ const runtime=new Function('db','corpus','engine','doc','messages','getSaveOK','
  'const save=()=>{recordSave();return getSaveOK()};',
  'const toast=x=>messages.push(x),confirm=()=>true;',
  helpers,
- 'return {readingReviewKey,cleanReadingReviews,readingReviewForm,readingReviewDashboard,saveReadingReview,clearReadingReview,getReadingReview};'
+ 'return {readingReviewKey,readingTextMarker,reviewIsChecked,cleanReadingReviews,readingReviewForm,readingReviewDashboard,saveReadingReview,clearReadingReview,getReadingReview};'
 ].join('\n'))(db,corpus,engine,doc,messages,()=>saveOK,()=>savedCalls++,esc);
 assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'));
 const spring=corpus.find(w=>w.title==='春にあふれて'),morning=corpus.find(w=>w.title==='朝になったら');
@@ -36,12 +36,25 @@ const fake={
  '.author-review-save-state':{textContent:''},
  '.author-review-actions':{append(b){clearButton=b;}}
 };
-const holder={querySelector:q=>q==='[data-clear-reading]'?clearButton?{remove(){clearButton=null}}:null:fake[q]};
+const holder={dataset:{sourceTag:runtime.readingTextMarker(spring,'dialogue',d1.otherId)},querySelector:q=>q==='[data-clear-reading]'?clearButton?{remove(){clearButton=null}}:null:fake[q]};
 runtime.saveReadingReview(key,holder);
 assert.equal(db.readingReviews[key].stance,'different');
 assert.equal(db.readingReviews[key].comment,'当時は別の意図で書きました。');
 assert.equal(db.notes.retained,'existing notes');
 assert.ok(runtime.readingReviewDashboard().includes('1 / 22テーマ'));
+assert.ok(runtime.reviewIsChecked(spring,'dialogue',d1.title,d1.otherId));
+assert.ok(runtime.reviewIsChecked(morning,'dialogue',d2.title,d2.otherId));
+const originalLyric=spring.lyrics;
+spring.lyrics+='\n追加した一行';
+assert.ok(!runtime.reviewIsChecked(morning,'dialogue',d2.title,d2.otherId),'edited lyrics must invalidate old review');
+assert.ok(runtime.readingReviewForm(spring,'dialogue',d1.title,d1.otherId).includes('歌詞原文が更新されました'));
+assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'));
+spring.lyrics=originalLyric;
+assert.ok(runtime.readingReviewDashboard().includes('1 / 22テーマ'));
+const oldStance=db.readingReviews[key].stance;
+db.readingReviews[key].stance='pending';
+assert.ok(runtime.readingReviewDashboard().includes('0 / 22テーマ'),'pending is not verified');
+db.readingReviews[key].stance=oldStance;
 assert.ok(runtime.readingReviewForm(morning,'dialogue',d2.title,d2.otherId).includes('当時は別の意図で書きました。'));
 const stored=JSON.stringify(db.readingReviews[key]);saveOK=false;
 fake['[data-reading-comment]'].value='Failed write';
@@ -57,6 +70,9 @@ const bad=runtime.cleanReadingReviews({
 assert.equal(Object.keys(bad).length,1);
 assert.equal(bad['reading-v1|hypothesis|test|x'].stance,'pending');
 assert.equal(bad['reading-v1|hypothesis|test|x'].comment.length,5000);
+assert.equal(bad['reading-v1|hypothesis|test|x'].sourceTag,null);
+const preserved=runtime.cleanReadingReviews({[key]:{stance:'near',comment:'old note with no marker'}});
+assert.equal(preserved[key].comment,'old note with no marker');
 const stateSource=html.slice(html.indexOf('function statePayload(d){'),html.indexOf('function setCloudStatus(',html.indexOf('function statePayload(d){')));
 const stateFn=new Function('cleanWork','cleanReadingReviews',stateSource+'return statePayload;')(x=>x,runtime.cleanReadingReviews);
 const cloud=stateFn(db);
@@ -89,6 +105,8 @@ for(const w of corpus){
  assert.ok(drawer.innerHTML.includes('本人の視点'),w.title+' needs author review controls');
  assert.ok(drawer.innerHTML.includes('異なる作品が対話するところ'));
  assert.ok(drawer.innerHTML.includes('原文の根拠'));
+ assert.ok(drawer.innerHTML.includes('この解釈をもう一度考える箇所'));
+ assert.ok(drawer.innerHTML.includes('data-source-tag='));
 }
 assert.ok(!html.includes('当時は別の意図で書きました。'));
-console.log('author review v3: 22 distinct topics, 11 reading views, cloud migration, review-only backup import, safe saves and restoration passed');
+console.log('author review v4: verified/pending/obsolete status, 22 topics, cross-work source signatures, 11 reading views, cloud migration and backup imports passed');
