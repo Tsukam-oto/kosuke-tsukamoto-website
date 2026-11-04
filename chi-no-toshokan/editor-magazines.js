@@ -1,6 +1,20 @@
 /* マガジンは読者に提供する価値で分ける。AIと教材は制作過程・使用ガイドで区別。 */
 window.EDITOR_MAGAZINES=Object.freeze({
- version:1,
+ version:2,
+ // 仮説的な編集分量。note公式が保証した最適文字数ではありません。
+ formats:[
+  {id:"short",name:"短編｜一つの気づき",min:800,max:1200,readRate:500,description:"短い発見、具体的な失敗、ひとつの問い。無理に増やさない"},
+  {id:"standard",name:"標準｜実践と読み物",min:1500,max:2500,readRate:500,description:"仕事や創作の出来事と発見を読ませる"},
+  {id:"deep",name:"特集｜資料と考察",min:3000,max:5000,readRate:500,description:"資料の照合と具体例が揃う場合だけ長くする"}
+ ],
+ editorialPrinciples:[
+  "読みやすさと本人らしい思考の動きを両立する。会話をそのまま掲載せず、重複と前提不足を編集する。",
+  "毎回『結論→3つのポイント→まとめ』にしない。記事の問いに合った導入と展開を選ぶ。",
+  "本人が語っていない感情、成果、創作意図、他人の反応は絶対に捏造しない。",
+  "体験・資料・見解を区別し、未確認の点を未確認のまま示す。",
+  "見出し画像、導入、段落、音読での推敲を重視する。字数より内容を優先する。",
+  "同じ話を複数マガジンに水増しして投稿しない。読者別に独立した価値がある記事だけを作る。"
+ ],
  defaultMagazine:"ai-work",
  magazines:[
   {id:"ai-work",name:"AIと仕事をつくる",short:"AI活用・改善記録",kind:"workflow",weeklyGoal:2,
