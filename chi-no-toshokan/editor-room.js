@@ -16,7 +16,7 @@ const MAG_BY_ID=Object.fromEntries(MAGAZINES.map(m=>[m.id,m]));
 const autoMagazine=kind=>({workflow:'ai-work',education:'music-education',composition:'composing',research:'knowledge'}[kind]||'ai-work');
 let magazineUserEdited=false,formatUserEdited=false;
 const preferredFormat=magazine=>magazine==='knowledge'?'deep':magazine==='tools'?'short':'standard';
-const countChars=txt=>Array.from(String(txt||'').replace(/\\s/g,'')).length;
+const countChars=txt=>Array.from(String(txt||'').replace(/\s/g,'')).length;
 function readingStatus(){
  const input=$('article-body').value.trim(),num=countChars(input),f=FORMAT_BY_ID[$('format').value]||FORMATS[1];
  $('article-count').textContent=num.toLocaleString('ja-JP')+'字';
@@ -27,16 +27,97 @@ function readingStatus(){
  if(!input){$('editor-lint').innerHTML='<span class="lint-neutral">原稿を貼り付けると、段落と表現について確認候補を表示します。</span>';return}
  if(f&&num<f.min)messages.push('短めの原稿です。必要な背景や具体例が欠けていないか確認してください。短いこと自体は問題ではありません。');
  if(f&&num>f.max)messages.push('長めの原稿です。一つの記事に複数の主題が混在していないか確認してください。');
- const paras=input.split(/\\n\\s*\\n|\\n/).map(x=>x.trim()).filter(Boolean);
+ const paras=input.split(/\n\s*\n|\n/).map(x=>x.trim()).filter(Boolean);
  const huge=paras.filter(p=>countChars(p)>350);
  if(huge.length)messages.push('350字を超える長い段落が'+huge.length+'箇所あります。スマホで読んだときの区切りを確認してください。');
  const canned=['いかがでしたでしょうか','この記事では、.*について解説します','結論から言うと'];
  const found=canned.filter(pattern=>new RegExp(pattern).test(input));
  if(found.length)messages.push('定型的に聞こえる表現が見つかりました。本人の語り口として自然か見直してください。');
- if(num>1800&&!/^#{1,4}\\s|^【.+】/m.test(input))messages.push('長い記事のため、小見出しがあると読みやすくなる可能性があります。');
+ if(num>1800&&!/^#{1,4}\s|^【.+】/m.test(input))messages.push('長い記事のため、小見出しがあると読みやすくなる可能性があります。');
  messages.push('自動判定では、事実の正確性・転載の権利・本人の経験の真偽は確認できません。');
  $('editor-lint').innerHTML=messages.map(m=>'<p>'+esc(m)+'</p>').join('');
 }
+const packageTool=window.EDITOR_NOTE_PACKAGE||null;
+function coverRender(){
+ if(!packageTool)return;
+ const canvas=$('note-cover');
+ if(!canvas||typeof canvas.getContext!=='function')return;
+ try{
+  packageTool.cover(canvas,$('title').value.trim()||'ここに記事タイトル',$('magazine').selectedOptions?.[0]?.textContent||'知の図書館',$('magazine').value);
+ }catch(e){$('note-toc').textContent='見出し画像の表示ができませんでした：'+String(e.message||e)}
+}
+function updateNotePackage(){
+ if(!packageTool)return;
+ const content=$('article-body').value||'',hs=packageTool.headings(content);
+ const visuals=packageTool.visualPlan(content,$('magazine').value,$('format').value);
+ $('note-toc').innerHTML=hs.length?'<ol>'+hs.map(h=>'<li class="'+(h.level===3?'subheading':'')+'">'+esc(h.text)+'</li>').join('')+'</ol>':
+ '<p>原稿に「## 大見出し」「### 小見出し」を入れると、ここに構成案が表示されます。短編には目次がなくても構いません。</p>';
+ $('note-visuals').innerHTML=visuals.length?visuals.map(v=>
+  '<p><strong>'+esc(v.type)+'</strong>｜「'+esc(v.after)+'」の後<br>'+esc(v.description)+'<br><small>'+esc(v.status)+'</small></p>').join(''):
+  '<p>現状では本文中の画像は不要、または見出し・本文が不足しています。飾るための画像は無理に挿入しません。</p>';
+ const preview=content.split(/\r?\n/).slice(0,125).map(line=>{
+  const trimmed=line.trim();if(!trimmed)return '<div class="preview-gap"></div>';
+  const heading=trimmed.match(/^#{2,3}\s+(.+)$/);
+  if(heading)return heading[0].startsWith('###')?'<h4>'+esc(heading[1])+'</h4>':'<h3>'+esc(heading[1])+'</h3>';
+  return '<p>'+esc(trimmed)+'</p>';
+ }).join('');
+ $('note-preview').innerHTML='<h2>'+esc($('title').value.trim()||'記事のタイトル')+'</h2>'+
+  (content?preview+'<p class="preview-notice">'+(content.split(/\r?\n/).length>125?'※続きは省略されています。':'※投稿時に実際のnote画面で最終確認してください。')+'</p>':
+   '<p class="preview-notice">原稿を書くと、ここに読みやすさのプレビューが表示されます。</p>');
+ coverRender();
+}
+async function downloadNoteCover(){
+ if(!packageTool)return;
+ coverRender();
+ const canvas=$('note-cover');
+ if(!canvas||typeof canvas.toBlob!=='function'){status('この環境では画像を書き出せません。',true);return}
+ try{
+  const blob=await new Promise((resolve,reject)=>canvas.toBlob(b=>b?resolve(b):reject(new Error('PNG出力に失敗しました')),'image/png'));
+  if(!blob.type.includes('png'))throw new Error('PNG形式ではありません');
+  const url=URL.createObjectURL(blob),a=document.createElement('a');
+  a.href=url;
+  a.download='note-cover-'+new Date().toLocaleDateString('sv-SE',{timeZone:'Asia/Tokyo'})+'.png';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),3500);
+  status('1280×670pxの見出し画像PNGを書き出しました。noteへのアップロードは手動で行ってください。');
+ }catch(e){status('画像を保存できませんでした：'+(e.message||String(e)),true)}
+}
+async function copyNotePlan(){
+ if(!packageTool)return;
+ const p=formPayload();
+ const hs=packageTool.headings(p.articleBody),visuals=packageTool.visualPlan(p.articleBody,p.magazine,p.format);
+ const text=[
+  '【note 投稿準備｜公開前の確認用】','マガジン：'+(MAG_BY_ID[p.magazine]?.name||''),'タイトル：'+p.title,
+  '',
+  '【投稿の順序】','1. 本文をコピーしてnoteのエディタへ貼り付ける。',
+  '2. 下記の見出しをnoteの「大見出し」「小見出し」に設定する。',
+  '3. 目次が必要な記事では、noteの「＋」→「目次」を挿入する。',
+  '4. 保存した1280×670pxのPNGを記事の見出し画像へ設定する。',
+  '5. 必要な本文図解だけを、権利と内容の正確性を確認して挿入する。',
+  '6. プレビューで表示・リンク・本文・出典を確認してから公開する。',
+  '',
+  '【見出し構成】',...(hs.length?hs.map(h=>(h.level===3?'  小見出し：':'大見出し：')+h.text):['見出しなし（短編ならそのまま可）']),
+  '',
+  '【本文図解候補】',...(visuals.length?visuals.map(v=>v.after+' の後に '+v.type+'：'+v.description):['図解は無理に追加しない']),
+  '',
+  '【公開前の確認】','本人が経験した事実と推測の区別／学校の個人情報／原文・図版・譜例の権利／出典／noteでの最終表示',
+  '※ここで生成した目次と画像案は、noteの投稿画面に自動で挿入されません。'
+ ].join('\n');
+ try{await navigator.clipboard.writeText(text);status('note投稿手順と画像案をコピーしました。')}
+ catch(_e){window.prompt('投稿手順をコピーしてください。',text)}
+}
+function initNotePackage(){
+ if(!packageTool)return;
+ $('title').addEventListener('input',updateNotePackage);
+ $('magazine').addEventListener('change',updateNotePackage);
+ $('format').addEventListener('change',updateNotePackage);
+ $('article-body').addEventListener('input',updateNotePackage);
+ $('refresh-cover').addEventListener('click',coverRender);
+ $('download-cover').addEventListener('click',downloadNoteCover);
+ $('copy-note-plan').addEventListener('click',copyNotePlan);
+ if(document.fonts?.ready)document.fonts.ready.then(coverRender).catch(()=>{});
+ updateNotePackage();
+}
+
 function initFormats(){
  $('format').innerHTML=FORMATS.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.name)+'</option>').join('');
  $('format').value=preferredFormat($('magazine').value);
@@ -137,7 +218,7 @@ function formPayload(){
 function cleanForm(){
  $('editor-form').reset();$('record-id').value='';activeId='';$('stage').value='seed';$('delete-entry').hidden=true;
  magazineUserEdited=false;formatUserEdited=false;$('magazine').value=autoMagazine($('kind').value);
- $('format').value=preferredFormat($('magazine').value);magazineAdvice();readingStatus();
+ $('format').value=preferredFormat($('magazine').value);magazineAdvice();readingStatus();updateNotePackage();
  drawList();$('title').focus();
 }
 function loadForm(row){
@@ -145,7 +226,7 @@ function loadForm(row){
  const p=normalize(row.payload);activeId=row.id;$('record-id').value=row.id;
  $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;
  $('format').value=p.format;formatUserEdited=true;$('article-body').value=p.articleBody;
- magazineAdvice();readingStatus();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
+ magazineAdvice();readingStatus();$('title').value=p.title;updateNotePackage();$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
  $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
  for(const id of ['impressions7','pv7','likes7'])$(id).value=p[id]??'';
@@ -324,7 +405,7 @@ async function init(){
   user=data.user;$('private-app').hidden=false;await refresh();await loadResearchIdeas();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
-initMagazineControls();initFormats();
+initMagazineControls();initFormats();initNotePackage();
 $('research-ideas').addEventListener('click',e=>{const el=e.target.closest('[data-idea]');if(el)selectResearchIdea(el.dataset.idea)});
 $('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
