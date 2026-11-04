@@ -47,3 +47,16 @@
 .editor-lint p{margin:6px 0;padding-left:11px;border-left:2px solid #d3c1a5}
 .editor-lint .lint-neutral{display:block;color:#718472;padding:4px 0}
 @media(max-width:690px){.draft-section{padding:14px 0}.draft-counters{align-items:stretch}.draft-counters>*{font-size:11px}.draft-counters strong{font-size:15px}#article-body{font-size:16px}}
+
+/* Optional note analytics: 7-day snapshot, never presented as automatic tracking. */
+.tracking-details{border:1px solid #dce7dc;border-radius:12px;background:#f8faf7;padding:3px 13px 12px;margin-top:13px}
+.tracking-details summary{cursor:pointer;min-height:45px;display:flex;align-items:center;font-weight:700;color:#345f45;font-size:13px}
+.metrics-inputs,.format-outcomes{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin:11px 0}
+.metrics-inputs label{font-size:11.5px;line-height:1.7}
+.metrics-inputs input{display:block;width:100%;padding:10px 7px;min-height:45px;border:1px solid #d0dcd0;border-radius:8px;margin-top:4px;background:#fff}
+.outcome-card{padding:12px;border:1px solid #dbe8d9;border-radius:11px;background:#f3f8f0;display:flex;flex-direction:column;gap:6px;min-width:0}
+.outcome-card strong{font-size:13px;color:#315f42;line-height:1.5}
+.outcome-card span{font-size:11px;color:#526e58}
+.outcome-card b{font-size:15px;color:#284c36;line-height:1.5}
+.outcome-card small{font-size:10.5px;color:#698070;line-height:1.7}
+@media(max-width:690px){.metrics-inputs{grid-template-columns:1fr}.format-outcomes{grid-template-columns:1fr}.outcome-card{padding:13px}}
