@@ -11,7 +11,7 @@ let crossReadings=[],crossLoadError='',crossTopic='all',crossTerm='',crossLimit=
 let crossOpenSerial=0;
 let readingPaths=[],readingPathsLoadError='',selectedReadingPath='morning-promise';
 let readingChallenges=[],readingChallengesLoadError='';
-let deepWorkReadings=[],deepWorkError='',selectedDeepWork='';
+let deepWorkReadings=[],deepWorkError='',selectedDeepWork='',deepWorkOrder=[];
 let compareLeft='',compareRight='',compareSerial=0,songReadingRecords=[];
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -463,11 +463,28 @@ function renderDeepWorkReadings(){
  const items=deepWorkReadings.map(r=>{
   const w=r.work_id?masterWorks.get(r.work_id):null;
   const n=r.entry_id?data.find(x=>x.id===r.entry_id):null;
-  return {r,w,n,title:w?.title||n?.title,label:w?(w.sky==='rap'?'木乃伊':'合唱曲・詩'):'創作メモ'};
- }).filter(x=>x.w||x.n).sort((a,b)=>a.label.localeCompare(b.label,'ja')||a.title.localeCompare(b.title,'ja'));
+  return {r,w,n,title:w?.title||n?.title,
+   label:w?(w.sky==='rap'?'木乃伊':w.sky==='choir'?'合唱曲':'個人作品'):'創作メモ',
+   sortGroup:w?(w.sky==='rap'?0:w.sky==='choir'?1:2):3};
+ }).filter(x=>x.w||x.n).sort((a,b)=>a.sortGroup-b.sortGroup||
+  (a.sortGroup===0?(a.w.original_book_index??999)-(b.w.original_book_index??999):a.title.localeCompare(b.title,'ja')));
  if(!items.length){box.innerHTML='';return;}
  if(!items.some(x=>x.r.reading_key===selectedDeepWork))selectedDeepWork=items[0].r.reading_key;
- const {r,w,n,label}=items.find(x=>x.r.reading_key===selectedDeepWork);
+ deepWorkOrder=items.map(x=>x.r.reading_key);
+ const pos=deepWorkOrder.indexOf(selectedDeepWork);
+ const readByGroup=items.reduce((acc,x)=>{const k=x.w?.sky||'note';acc[k]=(acc[k]||0)+1;return acc;},{});
+ const rapTotal=[...masterWorks.values()].filter(w=>w.sky==='rap').length;
+ const collectionTotal=[...masterWorks.values()].filter(w=>w.sky==='choir'||w.sky==='personal').length;
+ const groups=[['木乃伊',items.filter(x=>x.sortGroup===0)],
+  ['合唱曲',items.filter(x=>x.sortGroup===1)],
+  ['個人作品',items.filter(x=>x.sortGroup===2)],
+  ['創作メモ',items.filter(x=>x.sortGroup===3)]];
+ const selectOptions=groups.filter(x=>x[1].length).map(([group,rows])=>
+  '<optgroup label="'+esc(group)+'">'+rows.map(x=>
+   '<option value="'+esc(x.r.reading_key)+'"'+(selectedDeepWork===x.r.reading_key?' selected':'')+'>'+
+   esc(x.w?.sky==='rap'&&Number.isInteger(x.w.original_book_index)?
+     '収録順 '+(x.w.original_book_index+1)+'｜'+x.title:x.title)+'</option>').join('')+'</optgroup>').join('');
+ const {r,w,n,label}=items[pos];
  const sections=[['冒頭',r.opening_observation],['転換点',r.turning_point],
  ['結末に残ること',r.resolution_or_nonresolution],['言葉の構造',r.formal_mechanism],
  ['語り手と宛先',r.voice_and_address],['異なる読み',r.alternative_reading],
@@ -481,9 +498,15 @@ function renderDeepWorkReadings(){
  :'<button class="btn" data-cross-note="'+esc(n.source_id)+'" type="button">元メモの全文へ</button>';
  box.innerHTML='<section class="deep-work"><div class="deep-work-intro"><h2>一作品を、最後まで読む。</h2>'+
  '<p>作品内の展開・語り手・結末を読み、解釈への反論も検討します。本人未確認の仮説です。</p></div>'+
- '<label class="field"><span>二巡目の個別精読（'+items.length+'資料）</span><select id="deepWorkSelect">'+
- items.map(x=>'<option value="'+esc(x.r.reading_key)+'"'+(selectedDeepWork===x.r.reading_key?' selected':'')+'>'+esc(x.label+'｜'+x.title)+'</option>').join('')+
- '</select></label><article class="deep-work-detail"><p class="muted">'+esc(label)+(w?' · 原文 v'+esc(r.source_version_no||'?'):' · Appleメモ原文')+'</p>'+
+ '<div class="deep-work-coverage"><span>木乃伊の収録項目 <b>'+String(readByGroup.rap||0)+' / '+rapTotal+'</b></span>'+
+ '<span>合唱・個人作品 <b>'+String((readByGroup.choir||0)+(readByGroup.personal||0))+' / '+collectionTotal+'</b></span>'+
+ '<span>創作メモの二巡目 <b>'+String(readByGroup.note||0)+'件</b></span></div>'+
+ '<div class="deep-work-navigator"><label class="field"><span>二巡目の精読を選ぶ（'+items.length+'資料）</span>'+
+ '<select id="deepWorkSelect">'+selectOptions+'</select></label>'+
+ '<div class="deep-work-move"><button class="btn" type="button" data-deep-step="-1"'+(pos===0?' disabled':'')+'>前の作品</button>'+
+ '<span aria-live="polite">'+String(pos+1)+' / '+String(items.length)+'</span>'+
+ '<button class="btn" type="button" data-deep-step="1"'+(pos===items.length-1?' disabled':'')+'>次の作品</button></div></div>'+
+ '<article class="deep-work-detail"><p class="muted">'+esc(label)+(w?' · 原文 v'+esc(r.source_version_no||'?'):' · Appleメモ原文')+'</p>'+
  '<h3>'+esc(r.title)+'</h3><div class="deep-work-parts">'+
  sections.map(([label,text])=>'<section><h4>'+esc(label)+'</h4><p>'+esc(text)+'</p></section>').join('')+
  '</div><h4>本文の根拠</h4><div class="deep-work-quotes">'+quotes+'</div>'+
@@ -736,12 +759,17 @@ async function authSubmit(e){
 async function authClick(){
  if(!user){authModal(true);return;}
  if(!confirm('ログアウトしますか？ この端末に残した原文は削除されません。'))return;
- try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';crossReadings=[];crossLoadError='';readingPaths=[];readingPathsLoadError='';readingChallenges=[];readingChallengesLoadError='';deepWorkReadings=[];deepWorkError='';songReadingRecords=[];compareLeft='';compareRight='';++compareSerial;closeCrossSource();if($('compareOutput'))$('compareOutput').replaceChildren();if($('crossOutput'))$('crossOutput').replaceChildren();render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
+ try{const {error}=await client().auth.signOut();if(error)throw error;user=null;masterCandidates=[];masterWorks=new Map();matchLoadError='';draftReadings=[];draftReadingLoadError='';crossReadings=[];crossLoadError='';readingPaths=[];readingPathsLoadError='';readingChallenges=[];readingChallengesLoadError='';deepWorkReadings=[];deepWorkError='';deepWorkOrder=[];songReadingRecords=[];compareLeft='';compareRight='';++compareSerial;closeCrossSource();if($('compareOutput'))$('compareOutput').replaceChildren();if($('crossOutput'))$('crossOutput').replaceChildren();render();toast('ログアウトしました。端末に残る原文は必要に応じJSONバックアップし、共有端末では削除してください。');}catch(e){toast(e.message);}
 }
 async function initSession(){
  try{const {data:r,error}=await client().auth.getSession();if(error)throw error;if(r.session?.user){user=r.session.user;await cloudLoad();}else render();}catch(e){render();console.warn('Auth unavailable',e);}
 }
 document.addEventListener('click',e=>{
+ const deepNav=e.target.closest('button[data-deep-step]');
+ if(deepNav&&user){const n=deepWorkOrder.indexOf(selectedDeepWork)+Number(deepNav.dataset.deepStep);
+  if(n>=0&&n<deepWorkOrder.length){selectedDeepWork=deepWorkOrder[n];renderDeepWorkReadings();}
+  return;
+ }
  const pathSwitch=e.target.closest('button[data-read-path]');if(pathSwitch){selectedReadingPath=pathSwitch.dataset.readPath;renderReadingPaths();return;}
  const crossNote=e.target.closest('[data-cross-note]');if(crossNote){current=crossNote.dataset.crossNote;go('strata');return;}
  const crossWork=e.target.closest('[data-cross-work]');if(crossWork){openCrossWork(crossWork.dataset.crossWork);return;}
