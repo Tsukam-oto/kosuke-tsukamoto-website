@@ -92,6 +92,18 @@ function initMagazineControls(){
 
 let client=null,user=null,records=[],activeId='',query='',filter='all',busy=false;
 const status=(text,error=false)=>{$('auth-status').innerHTML=esc(text);$('auth-status').classList.toggle('error',error)};
+const metricValue=v=>(v===null||v===undefined||v==='')?null:(Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=100000000?Number(v):null);
+function formatOutcomes(){
+ const entries=records.filter(r=>r.payload?.stage==='published'&&Number.isInteger(r.payload?.pv7)&&r.payload.pv7>=0);
+ const median=vals=>{const a=vals.slice().sort((x,y)=>x-y),n=a.length;return n%2?a[Math.floor(n/2)]:(a[n/2-1]+a[n/2])/2};
+ $('format-outcomes').innerHTML=FORMATS.map(f=>{
+  const values=entries.filter(r=>(r.payload?.format||'standard')===f.id).map(r=>r.payload.pv7);
+  return '<div class="outcome-card"><strong>'+esc(f.name)+'</strong>'+
+   '<span>7日間PVを記録済み：'+values.length+'本</span>'+
+   '<b>'+(values.length>=3?'PV中央値 '+median(values).toLocaleString('ja-JP'):'比較には不足')+'</b>'+
+   '<small>'+(values.length>=3?'小規模な記録の記述統計です。形式の効果を証明しません。':'最低3本の記録で参考値を表示します。安定した傾向の判断にはさらに多くの記録が必要です。')+'</small></div>';
+ }).join('');
+}
 function normalize(payload){
  const p=payload||{};
  return {entryType:'editor-work',version:1,
@@ -99,6 +111,10 @@ function normalize(payload){
   magazine:MAG_BY_ID[p.magazine]?p.magazine:autoMagazine(p.kind),
   format:FORMAT_BY_ID[p.format]?p.format:preferredFormat(p.magazine||autoMagazine(p.kind)),
   articleBody:String(p.articleBody||'').slice(0,40000),
+  publishedChars:Number.isInteger(p.publishedChars)&&p.publishedChars>=0?p.publishedChars:null,
+  impressions7:metricValue(p.impressions7),
+  pv7:metricValue(p.pv7),
+  likes7:metricValue(p.likes7),
   title:String(p.title||'').slice(0,150),
   problem:String(p.problem||'').slice(0,5000),
   aiMethod:String(p.aiMethod||'').slice(0,7000),
@@ -115,7 +131,8 @@ function formPayload(){
  return normalize({kind:$('kind').value,magazine:$('magazine').value,
   format:$('format').value,articleBody:$('article-body').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
   aiMethod:$('ai-method').value.trim(),result:$('result').value.trim(),lesson:$('lesson').value.trim(),
-  sources:$('sources').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim()});
+  sources:$('sources').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim(),
+  impressions7:$('impressions7').value,pv7:$('pv7').value,likes7:$('likes7').value});
 }
 function cleanForm(){
  $('editor-form').reset();$('record-id').value='';activeId='';$('stage').value='seed';$('delete-entry').hidden=true;
@@ -131,6 +148,7 @@ function loadForm(row){
  magazineAdvice();readingStatus();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
  $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
+ for(const id of ['impressions7','pv7','likes7'])$(id).value=p[id]??'';
  $('delete-entry').hidden=false;drawList();
  if(window.matchMedia?.('(max-width:770px)').matches)$('editor-title').scrollIntoView({block:'start',behavior:'auto'});
 }
@@ -138,7 +156,7 @@ function drawList(){
  $('total-count').textContent=records.length;
  $('candidate-count').textContent=records.filter(x=>['candidate','draft'].includes(x.payload?.stage)).length;
  $('published-count').textContent=records.filter(x=>x.payload?.stage==='published').length;
- drawMagazines();
+ drawMagazines();formatOutcomes();
  const matching=records.filter(x=>{
   const p=x.payload||{};
   return (filter==='all'||p.stage===filter)&&(!query||[p.title,p.problem,p.aiMethod,p.result,p.lesson].join(' ').toLocaleLowerCase('ja').includes(query));
@@ -179,6 +197,7 @@ async function save(e){
  const owner=user.id,id=old?.id||PREFIX+(window.crypto?.randomUUID?.()||Date.now()+'-'+Math.random().toString(36).slice(2));
  const now=new Date(Math.max(Date.now(),old?.updated_at?Date.parse(old.updated_at)+1:0)).toISOString();
  form.createdAt=old?.payload?.createdAt||now;form.updatedAt=now;
+ form.publishedChars=old?.payload?.publishedChars??(form.stage==='published'?countChars(form.articleBody):null);
  setDisabled(true);status('クラウドに保存しています。');
  try{
   if(old){
