@@ -9,12 +9,55 @@ const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const fields=['kind','title','problem','ai-method','result','lesson','sources','stage','public-url'];
 const names={education:'音楽教育',workflow:'AI活用・ICT',composition:'作曲・創作',research:'知識探究'};
 const stageNames={seed:'記録・素材',candidate:'記事化候補',draft:'原稿確認中',published:'公開後の記録'};
+const MAGAZINES=window.EDITOR_MAGAZINES?.magazines||[];
+const MAG_BY_ID=Object.fromEntries(MAGAZINES.map(m=>[m.id,m]));
+const autoMagazine=kind=>({workflow:'ai-work',education:'music-education',composition:'composing',research:'knowledge'}[kind]||'ai-work');
+let magazineUserEdited=false;
+function magazineAdvice(){
+ const m=MAG_BY_ID[$('magazine').value];
+ $('magazine-advice').textContent=m?'読者への約束：'+m.promise+'。注意：'+m.not+'。':'公開するマガジンを選択してください。';
+}
+function drawMagazines(){
+ $('magazine-list').innerHTML=MAGAZINES.map((m,i)=>{
+  const n=records.filter(r=>(r.payload?.magazine||autoMagazine(r.payload?.kind))===m.id).length;
+  return '<article class="magazine-card"><strong>'+String(i+1).padStart(2,'0')+'｜'+esc(m.name)+'</strong><p>'+esc(m.promise)+'</p><small>週7本に移行した場合の配分：'+m.weeklyGoal+'本／週 ｜ 実践記録：'+n+'件</small></article>';
+ }).join('');
+ const all=window.EDITOR_MAGAZINES?.weeklyPlan||[];
+ $('weekly-table').innerHTML=all.map(d=>'<div class="weekly-item"><strong>'+esc(d.day)+'曜</strong><span>'+esc(MAG_BY_ID[d.magazine]?.name||'')+'</span><small>'+esc(d.format)+' ／ '+esc(d.size)+'</small></div>').join('');
+}
+function renderCadence(){
+ const drafts=Math.max(0,Math.min(28,Number($('drafts-per-week').value)||0));
+ const percent=Math.max(0,Math.min(100,Number($('ready-percent').value)||0));
+ const minutes=Math.max(0,Math.min(120,Number($('minutes-per-day').value)||0));
+ $('draft-value').textContent=drafts;
+ $('ready-value').textContent=percent;
+ $('minutes-value').textContent=minutes;
+ const qualified=Math.floor(drafts*percent/100);
+ const timeCapacity=Math.floor(minutes*7/25);
+ const estimated=Math.min(qualified,timeCapacity);
+ const daily=(estimated/7).toFixed(2);
+ $('cadence-output').innerHTML='<strong>条件を仮定した公開可能本数：'+estimated+'本／週（平均 '+daily+'本／日）</strong>'+
+ '<span>'+(estimated>=7?'毎日1本の計画に届く見込みです。ただし実際の根拠確認・投稿・在庫確認が必要です。':
+ estimated>=4?'開始目標の週4本に届く見込みです。毎日投稿には未達です。':
+ '週4本の開始目標にも足りないため、初稿・根拠・確認時間を見直す必要があります。')+'</span>'+
+ '<small>試算：確認を通る初稿 '+qualified+'本、確認時間による上限 '+timeCapacity+'本／週。現在の自動執筆実績や公開確定件数ではありません。</small>';
+}
+function initMagazineControls(){
+ $('magazine').innerHTML=MAGAZINES.map(m=>'<option value="'+esc(m.id)+'">'+esc(m.name)+'</option>').join('');
+ $('magazine').value=autoMagazine($('kind').value);magazineAdvice();
+ drawMagazines();renderCadence();
+ for(const id of ['drafts-per-week','ready-percent','minutes-per-day'])$(id).addEventListener('input',renderCadence);
+ $('kind').addEventListener('change',()=>{if(!magazineUserEdited)$('magazine').value=autoMagazine($('kind').value);magazineAdvice()});
+ $('magazine').addEventListener('change',()=>{magazineUserEdited=true;magazineAdvice()});
+}
+
 let client=null,user=null,records=[],activeId='',query='',filter='all',busy=false;
 const status=(text,error=false)=>{$('auth-status').innerHTML=esc(text);$('auth-status').classList.toggle('error',error)};
 function normalize(payload){
  const p=payload||{};
  return {entryType:'editor-work',version:1,
   kind:names[p.kind]?p.kind:'education',
+  magazine:MAG_BY_ID[p.magazine]?p.magazine:autoMagazine(p.kind),
   title:String(p.title||'').slice(0,150),
   problem:String(p.problem||'').slice(0,5000),
   aiMethod:String(p.aiMethod||'').slice(0,7000),
@@ -28,18 +71,19 @@ function normalize(payload){
  };
 }
 function formPayload(){
- return normalize({kind:$('kind').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
+ return normalize({kind:$('kind').value,magazine:$('magazine').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
   aiMethod:$('ai-method').value.trim(),result:$('result').value.trim(),lesson:$('lesson').value.trim(),
   sources:$('sources').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim()});
 }
 function cleanForm(){
  $('editor-form').reset();$('record-id').value='';activeId='';$('stage').value='seed';$('delete-entry').hidden=true;
+ magazineUserEdited=false;$('magazine').value=autoMagazine($('kind').value);magazineAdvice();
  drawList();$('title').focus();
 }
 function loadForm(row){
  if(!row)return;
  const p=normalize(row.payload);activeId=row.id;$('record-id').value=row.id;
- $('kind').value=p.kind;$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
+ $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;magazineAdvice();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
  $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
  $('delete-entry').hidden=false;drawList();
@@ -49,6 +93,7 @@ function drawList(){
  $('total-count').textContent=records.length;
  $('candidate-count').textContent=records.filter(x=>['candidate','draft'].includes(x.payload?.stage)).length;
  $('published-count').textContent=records.filter(x=>x.payload?.stage==='published').length;
+ drawMagazines();
  const matching=records.filter(x=>{
   const p=x.payload||{};
   return (filter==='all'||p.stage===filter)&&(!query||[p.title,p.problem,p.aiMethod,p.result,p.lesson].join(' ').toLocaleLowerCase('ja').includes(query));
@@ -57,7 +102,7 @@ function drawList(){
   const p=r.payload||{},date=new Date(r.updated_at||'');
   const stamp=Number.isNaN(date.getTime())?'':date.toLocaleDateString('ja-JP',{timeZone:'Asia/Tokyo'});
   return '<button class="entry '+(activeId===r.id?'active':'')+'" data-record="'+esc(r.id)+'" type="button">'+
-   '<strong>'+esc(p.title)+'</strong><small>'+esc(names[p.kind]||'')+' · '+esc(stageNames[p.stage]||'')+' · '+esc(stamp)+'</small>'+
+   '<strong>'+esc(p.title)+'</strong><small>'+esc(MAG_BY_ID[p.magazine]?.name||names[p.kind]||'')+' · '+esc(stageNames[p.stage]||'')+' · '+esc(stamp)+'</small>'+
    '<p>'+esc(String(p.problem||p.aiMethod||p.result||'').slice(0,90))+'</p></button>';
  }).join(''):'<p class="empty">記録がありません。仕事や創作で試したことを一件ずつ残してください。</p>';
 }
@@ -122,9 +167,15 @@ async function remove(){
  finally{setDisabled(false)}
 }
 function editorialPrompt(p){
+ const magazine=MAG_BY_ID[p.magazine||autoMagazine(p.kind)];
  return [
   'あなたは「音楽科教員・作曲家」の本人名義noteを担当するリサーチャー兼編集者です。',
   '次の実践記録を基に、読み応えのあるnote記事の下書きを作成してください。',
+  '対象マガジン：'+(magazine?.name||'未指定'),
+  '読者像：'+(magazine?.readers||'音楽・教育・創作に関心がある人'),
+  '記事が届ける価値：'+(magazine?.promise||'具体的で再現できる学び'),
+  '記事で避けること：'+(magazine?.not||'根拠のない宣伝や捏造'),
+  '掲載前の追加確認：'+(magazine?.checks||[]).join('／'),
   '【必須条件】本人の体験、検証済み事実、推測、一般論を混同しない。資料がない主張は断定しない。実際に行っていない実践・成果・発言は創作しない。',
   '学校の内部資料、生徒・保護者の個人情報、未許可の画像や音源などを含めない。該当する可能性がある箇所は削除候補として警告を出す。',
   '記事は2,000〜3,000字を目安に、課題→試行→結果→限界→再利用できる工夫の順で構成する。広告的・過剰な成功談にしない。',
@@ -176,6 +227,7 @@ async function init(){
   user=data.user;$('private-app').hidden=false;await refresh();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
+initMagazineControls();
 $('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
 $('new-entry').addEventListener('click',cleanForm);
