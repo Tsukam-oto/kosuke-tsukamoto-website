@@ -215,7 +215,7 @@ function connections(){const all=works(),df=wordDF(),n=all.length,arr=[],sets=al
 function formatTags(w){const arr=tokens(w).filter(x=>x.length>=2).slice(0,3);return arr.length?arr.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>未分類</span>'}
 function summary(){const all=works(),conn=connections(),df=wordDF();return {all,conn,df,nwords:df.size,lines:all.reduce((s,w)=>s+w.lyrics.split('\n').filter(Boolean).length,0),private:db.userWorks.length};}
 function toast(message){const x=$('#toast');x.textContent=message;x.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>x.classList.remove('show'),3000)}
-function go(to){if(to==='strata')closeWork();view=to;query='';visibility='all';window.scrollTo({top:0,behavior:'instant'});render()}
+function go(to){if(to==='strata')closeWork();view=to;query='';visibility='all';try{const target=location.pathname+location.search+(to==='strata'?'#strata':'');history.replaceState(null,'',target)}catch{}window.scrollTo({top:0,behavior:'instant'});render()}
 function header(title,sub){const out=title==='書いた言葉は、星座になる。'?'<span class="headline-segment">書いた言葉は、</span><span class="headline-segment">星座になる。</span>':esc(title);return `<h1 class="heading">${out}</h1><p class="lede">${esc(sub)}</p>`}
 function switchSky(next){if(next!=='rap'&&next!=='choir')return;sky=next;term='';query='';visibility='all';selected=works()[0]?.id||null;try{localStorage.setItem(SKY_PREF,sky)}catch{}closeWork();render();window.scrollTo({top:0,behavior:'instant'})}
 function skySwitch(){return `<div class="sky-switch" role="group" aria-label="創作名義と星座の切替"><button data-sky="choir" class="${sky==='choir'?'active':''}" aria-pressed="${sky==='choir'}"><strong>✧ 合唱・詩の空</strong><small>束元康介</small></button><button data-sky="rap" class="${sky==='rap'?'active rap-selected':''}" aria-pressed="${sky==='rap'}"><strong>✦ 木乃伊の空</strong><small>ラップ／余白</small></button></div><div class="sky-help">${sky==='rap'?'木乃伊のリリックだけを読みます。合唱作品との共通語やつながりは集計しません。':'合唱・詩の作品だけを読みます。木乃伊の星座とは分けて表示します。'}</div>`}
@@ -288,7 +288,7 @@ $('#importFile').addEventListener('change',async e=>{const file=e.target.files[0
 $('#textFile').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>500000)throw Error('テキストが大きすぎます');openEditor(null,false,await f.text());$('#titleF').value=f.name.replace(/\.txt$/i,'')}catch(err){toast(err.message)}e.target.value=''});
 document.addEventListener('input',e=>{if(e.target.id==='searchWorks'){const pos=e.target.selectionStart;query=e.target.value;const old=document.activeElement;render();const x=$('#searchWorks');if(x){x.focus();x.setSelectionRange(pos,pos)}}});
 document.addEventListener('change',e=>{if(e.target.id==='filterWorks'){visibility=e.target.value;render()}if(e.target.id==='sortWorks'){order=e.target.value;render()}});
-load();try{sky=localStorage.getItem(SKY_PREF)==='rap'?'rap':'choir'}catch{}selected=works()[0]?.id||null;render();
+load();try{sky=localStorage.getItem(SKY_PREF)==='rap'?'rap':'choir'}catch{}selected=works()[0]?.id||null;if(location.hash==='#strata')view='strata';render();
 </script>
 
 <script>
