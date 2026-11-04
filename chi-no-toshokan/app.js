@@ -1,4 +1,4 @@
-/* 知の図書館 v1.5.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.6.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -158,6 +158,12 @@ function renderHome(){
  const pendingQuestions=Object.values(records.question).filter(q=>q.payload?.status!=='resolved' && q.payload?.text).sort((a,b)=>(b.payload?.createdAt||'').localeCompare(a.payload?.createdAt||'')).slice(0,2);
  return `<div class="kicker">WELCOME TO YOUR LIBRARY</div><h1 class="page-title">世界には、まだ知らないことがある。</h1><p class="page-description">新しい問いから始まり、思いがけない分野へつながっていく。今日も一つ、扉を開いてみませんか。</p>
  <section class="hero"><div class="hero-content"><div class="kicker">TODAY'S DISCOVERY — ${esc(today())}</div><div class="topic-name">${esc(t.domain)}</div><h2>${esc(t.title)}</h2><p>${esc(t.hook)}<br>${esc(t.summary)}</p><div class="hero-actions"><button class="btn btn-light" data-open="${esc(t.id)}">このテーマを探究する　↗</button><button class="btn btn-outline" style="color:#f2f4ec;border-color:#7f9c8f" data-nav="encounter">違う世界をのぞく</button></div></div></section>
+ <section class="panel" style="margin:20px 0 24px;background:linear-gradient(115deg,#f1eee3,#e9f0e7);border-color:#cdd9cb" aria-labelledby="myth-series-title">
+  <div class="kicker">SERIES · 全10話</div>
+  <h2 id="myth-series-title" style="margin:6px 0 9px;font-size:22px">ギリシャ神話を、最初から読む。</h2>
+  <p style="max-width:680px;margin:0 0 14px">カオスからゼウス、神々と人間、英雄、『オデュッセイア』へ。順番に読む連載です。前の話に戻ったり、続きから再開したりできます。</p>
+  <a class="btn btn-soft" href="./myth-series.html" style="display:inline-block;text-decoration:none">連載を読む・続きから再開 ↗</a>
+ </section>
  <section class="stats" aria-label="学びの記録"><div class="stat"><b>${TOPICS.length}</b><small>用意された探究の入口</small></div><div class="stat"><b>${allVisitedCount()}</b><small>学んだテーマ</small></div><div class="stat"><b>${savedCount()}</b><small>私の蔵書</small></div><div class="stat"><b>${questionsCount()}</b><small>未解決の疑問</small></div></section>
  <div class="two-col"><section class="panel"><div class="panel-title">読みかけの探究</div>${seen.length?seen.map((v,i)=>{const t=BY_ID[v.payload.topicId];if(!t)return '';return `<div class="resume-row"><div class="resume-index">${i+1}</div><div class="resume-text"><strong>${esc(t.title)}</strong><small>${esc(t.domain)} ・ ${esc(formatted(v.payload.lastVisited))} ・ ${Number(v.payload.readIndex||0)} / ${t.sections?.length||0} 節</small></div><button class="link-btn" data-open="${esc(t.id)}">再開 ↗</button></div>`}).join(''):'<div class="empty"><b>最初の一冊を開きましょう</b>以前のギリシャ神話の学びから再開することもできます。<br><button class="mini-link" data-open="zeus-titans">ゼウスとティタン神族の続きへ ↗</button><br>※ 過去のチャット内容は自動で蔵書に取り込まれていません。</div>'}</section>
  <section class="panel"><div class="panel-title">あなたへの招待状</div><p>これまでの興味から、あえて少し離れた場所へ。</p><div style="border-top:1px solid var(--line);padding-top:14px"><span class="badge gold">未知との遭遇</span><h3 style="font-size:19px;margin:12px 0">知っている世界の外側へ</h3><p>ジャンルを指定しなくても、知らなかった分野が現れます。</p><button class="btn btn-soft" data-nav="encounter">偶然の一冊をめくる　↗</button></div></section></div>
@@ -183,6 +189,7 @@ function renderArticle(){
  const t=BY_ID[selectedId]; if(!t)return renderHome(); const b=book(t.id)||{};const v=visit(t.id)||{};const questions=Object.values(records.question).filter(q=>q.payload?.topicId===t.id);
  return `<div class="article-layout"><div class="kicker"><button class="link-btn" data-nav="library">← 本棚に戻る</button></div>
  <div class="reader-layout"><article class="article"><header class="article-head"><div class="kicker">${esc(t.domain)}　／　EXPLORATION</div><h1>${esc(t.title)}</h1><p class="article-hook">${esc(t.hook)}</p><div class="actions"><button class="btn ${book(t.id)?'btn-soft':''}" data-action="bookmark" data-id="${esc(t.id)}">${book(t.id)?'✓ 蔵書に保存済み':'＋ 私の蔵書に保存'}</button><button class="btn btn-outline" data-action="favorite" data-id="${esc(t.id)}">${b.favorite?'★ お気に入り':'☆ お気に入り'}</button><button class="btn btn-outline" data-action="add-question" data-id="${esc(t.id)}">？ 疑問を残す</button></div></header>
+ ${['zeus-titans','homer-history','bronze-collapse','oral-epic'].includes(t.id)?'<div class="panel" style="margin-bottom:17px;background:#f1eee3"><b>連載で読みたい方へ</b><p style="margin:6px 0 11px;font-size:13px">神話は原初の世界から『オデュッセイア』へ、順番に読むこともできます。</p><a href="./myth-series.html" class="btn btn-soft" style="display:inline-block;text-decoration:none">第1話から読む・続きを読む ↗</a></div>':''}
  <p class="reader-lead">${esc(t.summary)}</p>
  ${renderEvidenceClaims(t)}
  ${(t.sections||[]).map(([title,body],i)=>`<section class="reading-section" id="section-${i}"><div class="kicker">CHAPTER ${String(i+1).padStart(2,'0')}</div><h2>${esc(title)}</h2><p>${esc(body)}</p>${renderSectionEvidence(t,i)}<div style="margin-top:12px"><button class="link-btn" data-action="progress" data-id="${esc(t.id)}" data-index="${i+1}">${Number(v.readIndex||0)>i?'✓ 読了':'ここまで読んだ　✓'}</button></div></section>`).join('')}
