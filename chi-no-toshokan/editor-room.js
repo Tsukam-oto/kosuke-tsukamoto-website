@@ -155,7 +155,7 @@ async function init(){
   });
   const {data,error}=await client.auth.getUser();
   if(error&&!String(error.message||'').toLowerCase().includes('session'))throw error;
-  if(!data?.user){status('未ログインです。<a href="./#settings">知の図書館でログインしてください</a>。');return}
+  if(!data?.user){status('未ログインです。画面上部の「知の図書館」からログインしてください。');return}
   user=data.user;$('private-app').hidden=false;await refresh();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
