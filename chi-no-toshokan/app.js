@@ -1,4 +1,4 @@
-/* 知の図書館 v1.7.2 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.8.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -97,6 +97,33 @@ function renderTopicCard(t,index=0){
  <span class="category">${esc(t.domain)}</span>${getEditorialMark(t.id)}<h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p>
  <div class="card-foot"><span>${saved?'<span class="badge gold">蔵書に登録</span>':read?'<span class="badge">閲覧済み</span>':'約3分の探究'}</span><button data-open="${esc(t.id)}">探究する　↗</button></div></article>`;
 }
+const WEEKLY=window.KNOWLEDGE_WEEKLY||null;
+function weekdayInfo(date=today()){
+ if(!WEEKLY||!Array.isArray(WEEKLY.days))return null;
+ return WEEKLY.days[WEEKLY.weekday(date)]||null;
+}
+function weeklyCandidates(date=today()){
+ const info=weekdayInfo(date);
+ if(!info)return TOPICS.slice();
+ const match=(info.topicIds||[]).map(id=>BY_ID[id]).filter(Boolean);
+ return match.length?match:TOPICS.slice();
+}
+function pickWeeklyTopic(candidates,key){
+ if(!candidates.length)return TOPICS[0];
+ return candidates[hashCode(key)%candidates.length];
+}
+function weekdayShelfMarkup(active){
+ if(!WEEKLY||!Array.isArray(WEEKLY.days))return '';
+ const dayIndex=WEEKLY.weekday(today()),current=WEEKLY.days[dayIndex];
+ const strip=Array.from({length:7},(_,offset)=>{
+  const i=(dayIndex+offset)%7,day=WEEKLY.days[i];
+  const candidates=(day.topicIds||[]).map(id=>BY_ID[id]).filter(Boolean);
+  const example=offset===0?active:pickWeeklyTopic(candidates,today()+':shelf:'+i);
+  const isToday=offset===0;
+  return '<button type="button" class="weekday-card '+(isToday?'today':'')+'" data-open="'+esc(example?.id||active.id)+'" '+(isToday?'aria-current="date"':'')+'><small>'+esc(day.day)+'曜日'+(isToday?' · 今日':'')+'</small><strong>'+esc(day.short)+'</strong><span>記事を読む ↗</span></button>';
+ }).join('');
+ return '<section class="weekday-shelf" aria-labelledby="weekday-shelf-title"><div class="weekday-shelf-heading"><div><div class="kicker">YOUR SEVEN DAYS</div><h2 id="weekday-shelf-title">曜日ごとに、違う世界の扉を。</h2></div><span class="weekday-shelf-now">'+esc(current.day)+'曜日：'+esc(current.label)+'</span></div><p class="weekday-shelf-description">'+esc(current.description)+'。曜日の枠を越えた発見も大切にします。</p><div class="weekday-scroll" aria-label="今日から7日間のテーマ">'+strip+'</div><p class="weekday-shelf-footnote">※ 18:30の通知とは曜日のテーマを共有しますが、取り上げる問い・記事はそれぞれ独立して選ばれます。</p></section>';
+}
 let dailyChoice={key:'',topicId:''};
 function makeDailyTopic(){
  const key=`knowledge-library:daily:${currentUser?.id||'visitor'}:${today()}`;
@@ -110,9 +137,10 @@ function makeDailyTopic(){
  let stored='';
  try{stored=localStorage.getItem(key)||''}catch{}
  if(BY_ID[stored]){dailyChoice={key,topicId:stored};return BY_ID[stored]}
- const unread=TOPICS.filter(t=>!isSeen(t.id));
- const base=unread.length?unread:TOPICS.slice().sort((a,b)=>(visit(a.id)?.lastVisited||'').localeCompare(visit(b.id)?.lastVisited||''));
- const chosen=base[hashCode(key)%base.length];
+ const pool=weeklyCandidates();
+ const unread=pool.filter(t=>!isSeen(t.id));
+ const base=unread.length?unread:pool.slice().sort((a,b)=>(visit(a.id)?.lastVisited||'').localeCompare(visit(b.id)?.lastVisited||''));
+ const chosen=pickWeeklyTopic(base,key);
  // 初期の認証確認中に選んだ候補は確定しない。読み込み後に既読を考慮する。
  if(cloudStatus!=='loading'){
   dailyChoice={key,topicId:chosen.id};
@@ -157,7 +185,8 @@ function renderHome(){
  const recs=homeRecommendations(t.id);
  const pendingQuestions=Object.values(records.question).filter(q=>q.payload?.status!=='resolved' && q.payload?.text).sort((a,b)=>(b.payload?.createdAt||'').localeCompare(a.payload?.createdAt||'')).slice(0,2);
  return `<div class="kicker">WELCOME TO YOUR LIBRARY</div><h1 class="page-title">世界には、まだ知らないことがある。</h1><p class="page-description">新しい問いから始まり、思いがけない分野へつながっていく。今日も一つ、扉を開いてみませんか。</p>
- <section class="hero"><div class="hero-content"><div class="kicker">TODAY'S DISCOVERY — ${esc(today())}</div><div class="topic-name">${esc(t.domain)}</div><h2>${esc(t.title)}</h2><p>${esc(t.hook)}<br>${esc(t.summary)}</p><div class="hero-actions"><button class="btn btn-light" data-open="${esc(t.id)}">このテーマを探究する　↗</button><button class="btn btn-outline" style="color:#f2f4ec;border-color:#7f9c8f" data-nav="encounter">違う世界をのぞく</button></div></div></section>
+ <section class="hero"><div class="hero-content"><div class="kicker">TODAY'S DISCOVERY — ${esc(today())} ${weekdayInfo()?'｜'+esc(weekdayInfo().label):''}</div><div class="topic-name">${esc(t.domain)}</div><h2>${esc(t.title)}</h2><p>${esc(t.hook)}<br>${esc(t.summary)}</p><div class="hero-actions"><button class="btn btn-light" data-open="${esc(t.id)}">このテーマを探究する　↗</button><button class="btn btn-outline" style="color:#f2f4ec;border-color:#7f9c8f" data-nav="encounter">違う世界をのぞく</button></div></div></section>
+ ${weekdayShelfMarkup(t)}
  <section class="panel" style="margin:20px 0 24px;background:linear-gradient(115deg,#e7f0e9,#f2efe5);border-color:#cdd9cb" aria-labelledby="music-library-title">
   <div class="kicker">MUSIC DISCOVERY · 聴く／知る／つくる</div>
   <h2 id="music-library-title" style="margin:6px 0 9px;font-size:22px">音楽を聴いて、音楽の仕組みを発見する。</h2>
@@ -502,9 +531,10 @@ async function initCloud(){
 function chooseSharedDaily(groups,owner){
  const key=`knowledge-library:daily:${owner}:${today()}`;
  const visited=new Set(Object.values(groups.visit).map(r=>r.payload?.topicId).filter(Boolean));
- const unread=TOPICS.filter(t=>!visited.has(t.id)&&!sessionSeen.has(t.id));
- const base=unread.length?unread:TOPICS.slice().sort((a,b)=>(groups.visit['visit:'+a.id]?.payload?.lastVisited||'').localeCompare(groups.visit['visit:'+b.id]?.payload?.lastVisited||''));
- return base[hashCode(key)%base.length]?.id||TOPICS[0]?.id;
+ const pool=weeklyCandidates();
+ const unread=pool.filter(t=>!visited.has(t.id)&&!sessionSeen.has(t.id));
+ const base=unread.length?unread:pool.slice().sort((a,b)=>(groups.visit['visit:'+a.id]?.payload?.lastVisited||'').localeCompare(groups.visit['visit:'+b.id]?.payload?.lastVisited||''));
+ return pickWeeklyTopic(base,key)?.id||TOPICS[0]?.id;
 }
 async function ensureSharedDaily(groups,owner){
  if(!TOPICS.length)return;
