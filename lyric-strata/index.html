@@ -28,7 +28,35 @@
 @media(max-width:760px){.candidate-summary{gap:6px}.candidate-summary>div{padding:10px 8px}.candidate-summary strong{font-size:20px}.candidate-summary small{font-size:9px}.match-card{padding:15px 0}.match-titles{display:block}.match-titles span{margin:0 7px}.match-actions .btn{font-size:10px;padding:9px 11px}}
 
 .stats{grid-template-columns:repeat(4,minmax(0,1fr))}.match-stat{text-align:left;cursor:pointer}.match-stat:hover{border-color:#baacbf;background:#f8f4fa}@media(max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* Embedded within lyric-constellation, keeping its independent auth/data/session. */
+.embedded .nav{display:none!important}
+.embedded .navfoot,.embedded .mark{display:none!important}
+.embedded .layout{display:block!important;min-height:0;padding:0}
+.embedded .content{padding:18px 18px 28px!important;max-width:none;width:100%}
+.embedded .top{margin:0 0 15px}
+.embedded .bottom{display:none}
+.embedded .heading{font-size:clamp(24px,3vw,33px);line-height:1.5}
+.embedded .lead{font-size:12px}
+.embedded .note-list{max-height:530px}
+.embed-tools{display:none;gap:8px;flex-wrap:wrap;margin:0 0 19px;padding-bottom:12px;border-bottom:1px solid #e1d9e2}
+.embedded .embed-tools{display:flex}
+.embed-tools button{background:#fff;border:1px solid #ded4e2;color:#594f65;border-radius:10px;font-size:11px;padding:10px 12px;font-weight:800;line-height:1.3}
+.embed-tools button.active{background:#62536e;color:white;border-color:#62536e}
+@media(max-width:760px){
+ .embedded .content{padding:12px 10px 24px!important}
+ .embedded .top{display:flex;flex-wrap:wrap;margin-bottom:13px}
+ .embedded .top .authrow{gap:5px}
+ .embedded .top .btn{font-size:10px;padding:7px 8px}
+ .embedded .embed-tools{gap:6px;margin-bottom:13px}
+ .embedded .embed-tools button{font-size:10px;flex:1;padding:9px 5px}
+ .embedded .heading{font-size:26px}
+ .embedded .stats{margin:15px 0 22px}
+ .embedded .grid{grid-template-columns:1fr}
+ .embedded .note-list{max-height:290px}
+}
 </style>
+<script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script defer src="./app.js"></script>
@@ -36,6 +64,11 @@
 <div class="layout">
 <aside class="nav"><div class="mark">KOTOBA NO CHISŌ<small>書き残した言葉と、その記録の日付を。</small></div><nav class="navlinks" aria-label="ナビゲーション"><button class="active" data-view="strata">言葉の地層</button><button data-view="import">日付付きで回収</button><button data-view="discovery">作品とのつながり</button><a href="../lyric-constellation/">歌詞の星座へ</a></nav><div class="navfoot">原文はそのまま。<br>採用・未使用は後から判断。<br>「余白」は取り込みません。</div></aside>
 <main class="content">
+<div class="embed-tools" aria-label="言葉の地層の画面切替">
+<button type="button" class="active" data-view="strata">メモ一覧</button>
+<button type="button" data-view="import">日付付きで回収</button>
+<button type="button" data-view="discovery">作品とのつながり</button>
+</div>
 <div class="top"><span>PERSONAL WRITING ARCHIVE / v1.1</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
