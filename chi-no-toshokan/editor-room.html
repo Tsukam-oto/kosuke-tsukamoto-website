@@ -45,6 +45,11 @@
  <p class="small-note">試算では1本あたり25分（事実・権利・個人情報チェックと投稿操作の合計）を仮定します。専門記事はさらに時間が必要です。</p>
  </details>
  <details class="cadence-details"><summary>毎日1本の場合の曜日別ローテーション</summary><div class="weekly-table" id="weekly-table"></div><p class="small-note">これは7本/週に移行した場合の例です。初期目標は4本/週。5マガジンを毎日それぞれ更新する計画ではありません。</p></details>
+ <details class="cadence-details"><summary>記事の長さ別｜公開7日間の反応を比較</summary>
+ <p>noteのダッシュボードで公開後7日間にそろえた数値を手入力し、形式別に比較します。現在はnoteからの自動取得ではありません。</p>
+ <div id="format-outcomes" class="format-outcomes"></div>
+ <p class="small-note">記事の主題・公開日時・流入元でも差が生まれます。記事数が少ない場合、最適な字数と断定しません。</p>
+ </details>
  </section>
  <div class="columns">
   <section class="writing-panel" aria-labelledby="editor-title">
@@ -76,6 +81,15 @@
     <label for="stage">編集上の段階</label>
     <select id="stage"><option value="seed">記録・素材</option><option value="candidate">記事化候補</option><option value="draft">原稿確認中</option><option value="published">公開後の記録</option></select>
     <label for="public-url">公開済み記事URL（任意）</label><input id="public-url" type="url" maxlength="500" placeholder="公開したときだけ記入">
+    <details class="tracking-details"><summary>公開後7日間の反応を記録（任意）</summary>
+     <p class="small-note">noteダッシュボードから、公開後7日間の数字をそろえて記入してください。空欄は未取得として扱います。</p>
+     <div class="metrics-inputs">
+      <label for="impressions7">インプレッション<input id="impressions7" type="number" min="0" max="100000000" step="1" placeholder="未取得"></label>
+      <label for="pv7">ページビュー<input id="pv7" type="number" min="0" max="100000000" step="1" placeholder="未取得"></label>
+      <label for="likes7">スキ<input id="likes7" type="number" min="0" max="100000000" step="1" placeholder="未取得"></label>
+     </div>
+     <p class="small-note">PVは読了人数ではありません。スキも読後の満足度そのものを測るものではありません。</p>
+    </details>
     <div class="form-actions"><button type="submit" class="primary" id="save-entry">非公開で保存する</button><button type="button" id="copy-brief" class="secondary">AI記事化ブリーフをコピー</button></div>
     <div class="form-actions secondary-actions"><button type="button" id="delete-entry" class="danger" hidden>この記録を削除</button><button type="button" id="reload">クラウドから再読込</button></div>
    </form>
