@@ -30,3 +30,4 @@ jobs:
           node lyric-strata/reading-paths.test.cjs
           node lyric-strata/deep-work.test.cjs
           node lyric-strata/deep-work-navigation.test.cjs
+          node lyric-strata/related-constellation.test.cjs
