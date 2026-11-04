@@ -71,3 +71,26 @@
 .research-idea small{font-size:11px;color:#647868}
 .research-idea button{margin-top:auto;align-self:flex-start;padding:7px 11px;min-height:44px;border:1px solid #c2d9c5;background:#ebf4eb;border-radius:8px;color:#285a40;font-size:11px;font-weight:700}
 @media(max-width:690px){.research-ideas{grid-template-columns:1fr}.research-inbox{padding:8px 12px 14px}.research-idea{padding:13px}.research-idea button{width:100%}}
+
+/* note publication kit - cover canvas, contents, visual placements and stress-free preview */
+.note-package{margin:16px 0;padding:10px 14px;border:1px solid #d7e4d8;background:#f8faf7;border-radius:12px}
+.note-package summary{cursor:pointer;color:#245941;font-weight:800;min-height:46px;display:flex;align-items:center;font-size:14px;line-height:1.7}
+.note-package h4{color:#254b35;margin:12px 0 7px;font-size:14px}
+.note-package-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:start}
+#note-cover{display:block;width:100%;height:auto;aspect-ratio:1280/670;border-radius:11px;border:1px solid #d2dad2;background:#24483b}
+.note-package .form-actions{margin-top:8px}
+.note-package .form-actions button{min-height:45px;padding:8px 9px}
+.note-toc,.note-visuals{background:#fff;border:1px solid #d8e4d9;border-radius:10px;padding:11px 14px;color:#405f49;font-size:12px;line-height:1.9}
+.note-toc ol{margin:0;padding-left:22px}
+.note-toc li.subheading{margin-left:12px;color:#68806b}
+.note-toc p,.note-visuals p{margin:0 0 6px}
+.note-visuals p+p{border-top:1px solid #e4ece5;padding-top:8px}
+.note-visuals small{font-size:11px;color:#997f5c}
+.note-preview{max-width:640px;max-height:470px;overflow-y:auto;overscroll-behavior:contain;margin:auto;border:1px solid #d9e3da;background:white;border-radius:10px;padding:23px 22px;font:15px/1.95 "Zen Kaku Gothic New",sans-serif;color:#252d28;overflow-wrap:anywhere}
+.note-preview h2{font-size:21px;line-height:1.5;margin:0 0 20px}
+.note-preview h3{font-size:18px;line-height:1.6;margin:26px 0 10px}
+.note-preview h4{font-size:16px;margin:23px 0 8px}
+.note-preview p{margin:0 0 15px;white-space:pre-wrap}
+.note-preview .preview-gap{height:10px}
+.note-preview .preview-notice{font-size:11px;color:#829186;margin-top:19px}
+@media(max-width:770px){.note-package{padding:10px 11px}.note-package-grid{grid-template-columns:1fr;gap:9px}.note-preview{padding:18px 15px;max-height:420px}.note-package .form-actions button{flex:1 1 100%;}}
