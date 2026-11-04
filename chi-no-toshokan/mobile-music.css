@@ -1,0 +1,85 @@
+/* v1.7.1 | one-thumb music exploration for phones, with full-width Apple links. */
+.starter-link{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 16px;margin-top:19px;border-radius:10px;background:#f5e5c4;color:#183a31;text-decoration:none;font-size:13px;font-weight:800;min-height:46px}
+.search-row{margin:18px 0 9px}
+.music-search{display:block;width:100%;min-height:48px;border:1px solid #cbd9cf;border-radius:12px;background:#fffefa;color:#243d32;padding:10px 14px;font-size:16px;outline-offset:2px}
+#content{scroll-margin-top:14px;min-width:0}
+.music-search:focus-visible{outline:3px solid #ae905c}
+@media(max-width:700px){
+ body{-webkit-tap-highlight-color:transparent}
+ .page{padding:12px 13px calc(143px + env(safe-area-inset-bottom));overflow-x:clip}
+ .masthead{padding:24px 20px;min-height:0;border-radius:16px}
+ .masthead h1{font-size:clamp(25px,6.3vw,31px);line-height:1.48}
+ .masthead p{font-size:13.5px;line-height:1.8}
+ .masthead-art{display:none}
+ .top{padding:13px 14px;gap:7px}
+ .topright{gap:12px}
+ .top a{min-height:42px;display:inline-flex;align-items:center}
+ .notice{padding:13px 15px;gap:8px;margin:12px 0;line-height:1.75}
+ .notice div{font-size:12px}
+ .notice a{white-space:normal;font-size:12px;min-height:44px;display:flex;align-items:center}
+ .tabs{
+  position:fixed;z-index:60;left:0;right:0;bottom:0;
+  margin:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:5px;padding:7px 8px calc(8px + env(safe-area-inset-bottom));
+  background:#fffcf6;border-top:1px solid #d6e0d5;
+  box-shadow:0 -8px 25px #1a35271e;
+ }
+ .tab{
+  min-width:0;min-height:57px;padding:7px 4px;
+  border-radius:10px;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:2px;
+  font-size:12px;line-height:1.35;touch-action:manipulation;
+ }
+ .tab span{display:block;font-size:19px;line-height:1;margin:0}
+ .tab:focus-visible{outline-offset:-3px}
+ .section-head{margin:20px 0 14px;align-items:flex-start}
+ .section-head h2{font-size:22px;line-height:1.45}
+ .section-head p{font-size:13.5px;line-height:1.8}
+ .search-row{margin:14px 0 7px}
+ .filter{
+  display:flex;flex-wrap:nowrap;overflow-x:auto;
+  overscroll-behavior-x:contain;scroll-snap-type:x proximity;
+  padding:4px 0 12px;margin:5px -3px 8px;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:thin;scrollbar-color:#b7c5b9 transparent;
+ }
+ .filter button{
+  flex:0 0 auto;min-height:44px;padding:9px 15px;
+  white-space:nowrap;scroll-snap-align:start;font-size:13px;
+ }
+ .grid,.theory-grid,.composer-grid{grid-template-columns:minmax(0,1fr);gap:14px}
+ .work-top{padding:19px 17px 11px}
+ .work h3{font-size:19px;line-height:1.55}
+ .work .one-line{font-size:14px;line-height:1.85}
+ .performer{padding:12px 17px;font-size:13px;line-height:1.7}
+ .work-mid{padding:15px 17px 12px}
+ .work-mid h4{font-size:13px}
+ .work-mid ul{font-size:14px;line-height:1.85}
+ .work-foot{padding:13px 17px;flex-direction:column;align-items:stretch;gap:11px}
+ .work-foot .time{font-size:12px}
+ .work-foot .btn{display:flex;width:100%;min-height:50px;align-items:center;justify-content:center;font-size:14px;text-align:center}
+ .work-trail{padding:2px 17px 17px}
+ .work-trail a{display:block;min-height:44px;padding:10px 0;font-size:13px;line-height:1.6}
+ .interactive{padding:17px 15px}
+ .interactive-head h3{font-size:20px}
+ .interactive-head p{font-size:14px}
+ .ear-grid{grid-template-columns:minmax(0,1fr)}
+ .ear-box{padding:16px 13px}
+ .ear-box button{min-height:46px;font-size:13px;flex:1 1 auto}
+ .ear-box .range{min-height:40px;touch-action:pan-y}
+ .key-visual{gap:1px}
+ .key-visual span{min-width:0;font-size:9px;height:43px}
+ .theory-card,.composer-card{padding:20px 17px}
+ .theory-card h3,.composer-card h3{font-size:19px}
+ .theory-card p,.composer-card p{font-size:14px;line-height:1.95}
+ .theory-foot .btn{min-height:46px;display:flex;align-items:center;justify-content:center;flex:1 1 100%;text-align:center}
+ .bottomguide{padding:20px 17px;margin:25px 0 15px}
+ .bottomguide h2{font-size:20px}
+ footer{padding:21px 2px calc(34px + env(safe-area-inset-bottom))}
+ .toast{bottom:calc(88px + env(safe-area-inset-bottom));max-width:calc(100vw - 30px);text-align:center}
+}
+@media(max-width:360px){
+ .tab{font-size:11px}
+ .key-visual span{font-size:8px}
+ .topright a{font-size:11px}
+}
