@@ -10,12 +10,51 @@ const fields=['kind','title','problem','ai-method','result','lesson','sources','
 const names={education:'音楽教育',workflow:'AI活用・ICT',composition:'作曲・創作',research:'知識探究'};
 const stageNames={seed:'記録・素材',candidate:'記事化候補',draft:'原稿確認中',published:'公開後の記録'};
 const MAGAZINES=window.EDITOR_MAGAZINES?.magazines||[];
+const FORMATS=window.EDITOR_MAGAZINES?.formats||[];
+const FORMAT_BY_ID=Object.fromEntries(FORMATS.map(f=>[f.id,f]));
 const MAG_BY_ID=Object.fromEntries(MAGAZINES.map(m=>[m.id,m]));
 const autoMagazine=kind=>({workflow:'ai-work',education:'music-education',composition:'composing',research:'knowledge'}[kind]||'ai-work');
-let magazineUserEdited=false;
+let magazineUserEdited=false,formatUserEdited=false;
+const preferredFormat=magazine=>magazine==='knowledge'?'deep':magazine==='tools'?'short':'standard';
+const countChars=txt=>Array.from(String(txt||'').replace(/\\s/g,'')).length;
+function readingStatus(){
+ const input=$('article-body').value.trim(),num=countChars(input),f=FORMAT_BY_ID[$('format').value]||FORMATS[1];
+ $('article-count').textContent=num.toLocaleString('ja-JP')+'字';
+ $('reading-time').textContent=num?'想定読書時間：約'+Math.max(1,Math.ceil(num/(f?.readRate||500)))+'分（仮定値）':'推定読書時間：未計測';
+ $('article-range').textContent=f?(f.min+'〜'+f.max+'字が目安'):'';
+ $('format-advice').textContent=f?(f.description+'。字数の強制はしません。'):'';
+ const messages=[];
+ if(!input){$('editor-lint').innerHTML='<span class="lint-neutral">原稿を貼り付けると、段落と表現について確認候補を表示します。</span>';return}
+ if(f&&num<f.min)messages.push('短めの原稿です。必要な背景や具体例が欠けていないか確認してください。短いこと自体は問題ではありません。');
+ if(f&&num>f.max)messages.push('長めの原稿です。一つの記事に複数の主題が混在していないか確認してください。');
+ const paras=input.split(/\\n\\s*\\n|\\n/).map(x=>x.trim()).filter(Boolean);
+ const huge=paras.filter(p=>countChars(p)>350);
+ if(huge.length)messages.push('350字を超える長い段落が'+huge.length+'箇所あります。スマホで読んだときの区切りを確認してください。');
+ const canned=['いかがでしたでしょうか','この記事では、.*について解説します','結論から言うと'];
+ const found=canned.filter(pattern=>new RegExp(pattern).test(input));
+ if(found.length)messages.push('定型的に聞こえる表現が見つかりました。本人の語り口として自然か見直してください。');
+ if(num>1800&&!/^#{1,4}\\s|^【.+】/m.test(input))messages.push('長い記事のため、小見出しがあると読みやすくなる可能性があります。');
+ messages.push('自動判定では、事実の正確性・転載の権利・本人の経験の真偽は確認できません。');
+ $('editor-lint').innerHTML=messages.map(m=>'<p>'+esc(m)+'</p>').join('');
+}
+function initFormats(){
+ $('format').innerHTML=FORMATS.map(f=>'<option value="'+esc(f.id)+'">'+esc(f.name)+'</option>').join('');
+ $('format').value=preferredFormat($('magazine').value);
+ $('format').addEventListener('change',()=>{formatUserEdited=true;readingStatus()});
+ $('article-body').addEventListener('input',readingStatus);
+ $('copy-article').addEventListener('click',async()=>{
+  const text=$('article-body').value.trim();
+  if(!text){status('コピーする本文がありません。',true);return}
+  try{await navigator.clipboard.writeText(text);status('原稿本文をコピーしました。公開前に出典・権利・本人の経験を確認してください。')}
+  catch(_e){window.prompt('原稿本文をコピーしてください。',text)}
+ });
+ readingStatus();
+}
+
 function magazineAdvice(){
  const m=MAG_BY_ID[$('magazine').value];
  $('magazine-advice').textContent=m?'読者への約束：'+m.promise+'。注意：'+m.not+'。':'公開するマガジンを選択してください。';
+ if(!formatUserEdited&&$('format')?.options?.length){$('format').value=preferredFormat($('magazine').value);readingStatus()}
 }
 function drawMagazines(){
  $('magazine-list').innerHTML=MAGAZINES.map((m,i)=>{
@@ -58,6 +97,8 @@ function normalize(payload){
  return {entryType:'editor-work',version:1,
   kind:names[p.kind]?p.kind:'education',
   magazine:MAG_BY_ID[p.magazine]?p.magazine:autoMagazine(p.kind),
+  format:FORMAT_BY_ID[p.format]?p.format:preferredFormat(p.magazine||autoMagazine(p.kind)),
+  articleBody:String(p.articleBody||'').slice(0,40000),
   title:String(p.title||'').slice(0,150),
   problem:String(p.problem||'').slice(0,5000),
   aiMethod:String(p.aiMethod||'').slice(0,7000),
@@ -71,19 +112,23 @@ function normalize(payload){
  };
 }
 function formPayload(){
- return normalize({kind:$('kind').value,magazine:$('magazine').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
+ return normalize({kind:$('kind').value,magazine:$('magazine').value,
+  format:$('format').value,articleBody:$('article-body').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
   aiMethod:$('ai-method').value.trim(),result:$('result').value.trim(),lesson:$('lesson').value.trim(),
   sources:$('sources').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim()});
 }
 function cleanForm(){
  $('editor-form').reset();$('record-id').value='';activeId='';$('stage').value='seed';$('delete-entry').hidden=true;
- magazineUserEdited=false;$('magazine').value=autoMagazine($('kind').value);magazineAdvice();
+ magazineUserEdited=false;formatUserEdited=false;$('magazine').value=autoMagazine($('kind').value);
+ $('format').value=preferredFormat($('magazine').value);magazineAdvice();readingStatus();
  drawList();$('title').focus();
 }
 function loadForm(row){
  if(!row)return;
  const p=normalize(row.payload);activeId=row.id;$('record-id').value=row.id;
- $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;magazineAdvice();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
+ $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;
+ $('format').value=p.format;formatUserEdited=true;$('article-body').value=p.articleBody;
+ magazineAdvice();readingStatus();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
  $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
  $('delete-entry').hidden=false;drawList();
@@ -178,7 +223,11 @@ function editorialPrompt(p){
   '掲載前の追加確認：'+(magazine?.checks||[]).join('／'),
   '【必須条件】本人の体験、検証済み事実、推測、一般論を混同しない。資料がない主張は断定しない。実際に行っていない実践・成果・発言は創作しない。',
   '学校の内部資料、生徒・保護者の個人情報、未許可の画像や音源などを含めない。該当する可能性がある箇所は削除候補として警告を出す。',
-  '記事は2,000〜3,000字を目安に、課題→試行→結果→限界→再利用できる工夫の順で構成する。広告的・過剰な成功談にしない。',
+  '記事は '+(FORMAT_BY_ID[p.format||preferredFormat(p.magazine||autoMagazine(p.kind))]?.min||1500)+'〜'+(FORMAT_BY_ID[p.format||preferredFormat(p.magazine||autoMagazine(p.kind))]?.max||2500)+'字を初稿の目安とする。字数を満たすために水増しはしない。',
+  '【読みやすさ】最初に読者が続きを読みたくなる具体的な問いや情景を置く。展開は自然な文章を中心にし、適切な段落と見出しで読みやすくする。',
+  '【AIらしい文章の回避】毎回同じ結論先出し構成、3つのポイントへの機械的整理、過剰な見出し、空疎な抽象語、不自然な称賛や均一な箇条書きを避ける。',
+  '【本人の思考】会話をそのまま記事にせず、本人の疑問、迷い、工夫と判断が伝わる順番に編集する。本人の実際の語り口を不必要に均質化しない。',
+  '【編集】独立した読者に前提を説明する。主題を一つに絞り、話題に関係のない脱線や重複は削る。勝手に「成功した」ことにしない。',
   '参考文献がある場合は本文との対応を確認し、確認できない箇所には「要出典・要確認」と印を付ける。',
   '出力：①記事タイトル案3つ ②記事本文 ③出典・事実確認チェックリスト ④短いSNS紹介案 ⑤教材や制作物としての展開可能性。',
   '',
@@ -187,6 +236,7 @@ function editorialPrompt(p){
   '出発点：'+(p.problem||'未記入'),'AIに任せたこと・使い方：'+(p.aiMethod||'未記入'),
   '結果・失敗・未確認事項：'+(p.result||'未記入'),'再現できる工夫：'+(p.lesson||'未記入'),
   '参考資料：'+(p.sources||'未記入'),
+  '既存の未承認下書き（ある場合は素材として扱い、事実確認する）：'+(p.articleBody||'なし'),
  ].join('\n');
 }
 async function copyBrief(){
@@ -227,7 +277,7 @@ async function init(){
   user=data.user;$('private-app').hidden=false;await refresh();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
-initMagazineControls();
+initMagazineControls();initFormats();
 $('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
 $('new-entry').addEventListener('click',cleanForm);
