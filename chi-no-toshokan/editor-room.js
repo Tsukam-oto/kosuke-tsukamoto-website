@@ -145,6 +145,23 @@ async function copyBrief(){
  try{await navigator.clipboard.writeText(prompt);status('記事化ブリーフをコピーしました。ChatGPTに貼り付けて原稿の作成を依頼できます。');}
  catch(_e){window.prompt('コピーできませんでした。次の文章を選択してコピーしてください。',prompt);status('記事化ブリーフを用意しました。');}
 }
+async function saveQuick(){
+ if(!client||!user||busy){status('ログイン後に記録できます。',true);return}
+ const text=$('quick-text').value.trim();
+ if(text.length<4){status('まず気づきを一言入力してください。',true);return}
+ const head=(text.split(/[。！？!?\\n]/)[0]||text).slice(0,75);
+ const now=new Date().toISOString();
+ const row={id:PREFIX+(window.crypto?.randomUUID?.()||Date.now()+'-'+Math.random().toString(36).slice(2)),
+  user_id:user.id,kind:'note',
+  payload:normalize({kind:'workflow',title:head,problem:text,stage:'seed',createdAt:now,updatedAt:now}),
+  created_at:now,updated_at:now};
+ setDisabled(true);$('quick-save').disabled=true;status('一言メモをクラウドに保存しています。');
+ try{
+  const {error}=await client.from(TABLE).insert(row);if(error)throw error;
+  $('quick-text').value='';await refresh();status('一言メモを保存しました。あとから編集して記事化候補へ進められます。');
+ }catch(e){status('一言メモを保存できませんでした：'+(e.message||String(e))+'。入力は消さずに残しています。',true)}
+ finally{setDisabled(false);$('quick-save').disabled=false}
+}
 async function init(){
  try{
   const mod=await import(IMPORT);
@@ -159,6 +176,7 @@ async function init(){
   user=data.user;$('private-app').hidden=false;await refresh();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
+$('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
 $('new-entry').addEventListener('click',cleanForm);
 $('copy-brief').addEventListener('click',copyBrief);
