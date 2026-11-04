@@ -10,6 +10,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./myth-series.css">
 <link rel="stylesheet" href="./myth-illustrated.css">
+<link rel="stylesheet" href="./mobile-myth.css">
 <script defer src="./myth-series-data.js"></script>
 <script defer src="./myth-series-extra.js"></script>
 <script defer src="./myth-reader-enhancer.js"></script>
@@ -26,7 +27,7 @@
 <div class="chapters-head">目次｜全10話</div>
 <div class="status" id="progress-status">読書の記録を読み込み中…</div>
 <div class="progress-line" role="progressbar" aria-label="読書完了率" aria-valuemin="0" aria-valuemax="10" aria-valuenow="0" id="progressbar"><span id="progress-fill"></span></div>
-<div id="toc" class="toc-scroll"></div>
+<details id="toc-disclosure" class="toc-disclosure" open><summary>各話の目次を開く <span aria-hidden="true">⌄</span></summary><div id="toc" class="toc-scroll"></div></details>
 </aside>
 <main class="read-area" id="main">
 <div class="reconnect" id="sync-status" role="status" aria-live="polite">読書記録の保存先を確認しています…</div>
@@ -35,4 +36,9 @@
 <p class="end">この連載は神話の複数の伝承から順序を編集した読み物です。神々の出来事を歴史年表に置き換えていません。</p>
 </main>
 </div>
+<nav class="mobile-reader-bar" aria-label="スマートフォン用の読書操作">
+ <button type="button" id="reader-prev" data-action="previous">← 前の話</button>
+ <button type="button" id="reader-toc" data-action="open-toc">目次 <span id="reader-counter">1 / 10</span></button>
+ <button type="button" id="reader-next" data-action="next">読了して次へ →</button>
+</nav>
 </body></html>
