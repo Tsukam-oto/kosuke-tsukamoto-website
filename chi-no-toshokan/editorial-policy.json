@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "rulebookVersion": "1.0",
+  "rulebookVersion": "1.1",
   "lastUpdated": "2026-11-04",
   "authoritativeSource": "Google Docs",
   "rulebookUrl": "https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit",
@@ -153,5 +153,35 @@
     "noSecretsInRepository": true,
     "disableAutoPublicWhenRulebookMismatch": true,
     "authRequiredToReadPrivateDrafts": true
+  },
+  "evidenceGate": {
+    "required": true,
+    "status": "active_rules_draft_publication_blocked",
+    "sourcePresenceIsNotFactVerification": true,
+    "verifyEachFactualClaim": true,
+    "requiredFields": [
+      "claim",
+      "documentTitle",
+      "institutionOrAuthor",
+      "sourceUrl",
+      "pageOrSection",
+      "sourceExcerptOrFaithfulParaphrase",
+      "accessedAt",
+      "verificationStatus"
+    ],
+    "allowedValues": [
+      "confirmed",
+      "partial",
+      "interpretation",
+      "contradictory",
+      "unverified"
+    ],
+    "blockIf": [
+      "contradictory",
+      "unverified"
+    ],
+    "researchMetadataNeverSufficient": true,
+    "articleReadyOnlyAfterEveryClaimVerified": true,
+    "visualsAlsoRequireRightsAndAccuracy": true
   }
 }
