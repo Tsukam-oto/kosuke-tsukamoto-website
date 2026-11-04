@@ -29,7 +29,7 @@ sandbox.__cases=[
 ];
 vm.runInContext('user={id:"test"};readingPaths=[__fixture];readingChallenges=__cases;masterWorks=new Map([["song1",{id:"song1",title:"架空の歌",sky:"choir"}]]);data=[{id:"draft1",source_id:"draft1",title:"架空のメモ",original_text:"これは架空の長い原文の引用です"}];selectedReadingPath="morning-promise";globalThis.__logged=readingPathsPanel();user=null;globalThis.__loggedOut=readingPathsPanel();',sandbox,{timeout:5000});
 const logged=sandbox.__logged;
-assert.match(logged,/読みの中心/);
+assert.match(logged,/歌詞の書き方・構造/);
 assert.match(logged,/反例後の仮説/);
 assert.match(logged,/初回の仮説と照らし合わせる/);
 assert.equal((logged.match(/class="reading-challenge"/g)||[]).length,2);
