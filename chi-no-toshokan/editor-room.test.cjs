@@ -14,6 +14,8 @@ let checks=0; const check=(title,ok)=>{assert.ok(ok,title);checks++};
 check('rulebook linked only in auth-gated area',html.indexOf('103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA')>html.indexOf('id="private-app" hidden'));
 check('rulebook reference and published policies are grounded',editorialPolicy.rulebookUrl==='https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit'&&editorialPolicy.schemaVersion===1);
 check('unattended auto-publication cannot run',editorialPolicy.unattended_publication===false&&editorialPolicy.mode==='private_drafts_only');
+check('source presence never counts as claim verification',editorialPolicy.rulebookVersion==='1.1'&&editorialPolicy.evidenceGate.required&&editorialPolicy.evidenceGate.verifyEachFactualClaim&&editorialPolicy.evidenceGate.blockIf.includes('unverified'));
+check('editor explains evidence hold',html.includes('編集ルールブック v1.1')&&html.includes('未検証の原稿は公開しません'));
 check('private data excluded from automatic source policy',editorialPolicy.sourcePolicy.prohibitedWithoutApproval.includes('entire ChatGPT conversation archive'));
 check('five policy magazine definitions exist',editorialPolicy.magazines.length===5);
 check('mobile viewport',html.includes('viewport-fit=cover'));
