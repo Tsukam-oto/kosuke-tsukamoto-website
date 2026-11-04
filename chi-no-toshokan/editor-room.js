@@ -90,7 +90,7 @@ function initMagazineControls(){
  $('magazine').addEventListener('change',()=>{magazineUserEdited=true;magazineAdvice()});
 }
 
-let client=null,user=null,records=[],activeId='',query='',filter='all',busy=false;
+let client=null,user=null,records=[],activeId='',query='',filter='all',busy=false,researchIdeas=[];
 const status=(text,error=false)=>{$('auth-status').innerHTML=esc(text);$('auth-status').classList.toggle('error',error)};
 const metricValue=v=>(v===null||v===undefined||v==='')?null:(Number.isInteger(Number(v))&&Number(v)>=0&&Number(v)<=100000000?Number(v):null);
 function formatOutcomes(){
@@ -282,21 +282,50 @@ async function saveQuick(){
  }catch(e){status('一言メモを保存できませんでした：'+(e.message||String(e))+'。入力は消さずに残しています。',true)}
  finally{setDisabled(false);$('quick-save').disabled=false}
 }
+async function loadResearchIdeas(){
+ if(!user)return;
+ const container=$('research-ideas');container.textContent='公開用の研究準備票を確認しています。';
+ try{
+  const response=await fetch('./research-dossiers.json',{cache:'no-store'});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json();
+  if(!Array.isArray(data.dossiers))throw new Error('調査票データが見つかりません。');
+  researchIdeas=data.dossiers.filter(x=>x&&typeof x.id==='string'&&typeof x.question==='string')
+   .filter(x=>Number(x.sourceCount||0)>0).slice(0,10);
+  if(!researchIdeas.length){container.textContent='現在、文献候補のある題材がありません。';return}
+  container.innerHTML=researchIdeas.map(item=>'<div class="research-idea"><strong>'+esc(item.question)+'</strong>'+
+   '<small>'+esc(item.area||'')+' ／ 書誌候補 '+Number(item.sourceCount||0)+'件・本文未照合</small>'+
+   '<button type="button" data-idea="'+esc(item.id)+'">記事素材にする</button></div>').join('');
+ }catch(e){container.textContent='研究準備票を読み込めませんでした。後で再読込してください。 '+(e.message||e)}
+}
+function selectResearchIdea(id){
+ const item=researchIdeas.find(x=>x.id===id);if(!item)return;
+ if(($('title').value||$('article-body').value)&&!window.confirm('現在編集中の未保存入力が消える可能性があります。研究テーマに切り替えますか？'))return;
+ cleanForm();
+ $('kind').value='research';$('magazine').value='knowledge';magazineUserEdited=true;
+ $('format').value='deep';formatUserEdited=true;magazineAdvice();readingStatus();
+ $('title').value=item.question.slice(0,150);
+ $('problem').value='研究の問い：'+item.question+'。文献候補はあるが、論文・原典本文と主張は未照合。';
+ $('sources').value='知の図書館の研究準備票（文献候補、未照合）：./research-dossiers.html　テーマID：'+item.id;
+ $('stage').value='candidate';
+ status('研究準備票から記事候補を作りました。資料の原文照合を行うまでは公開に進めないでください。');
+}
 async function init(){
  try{
   const mod=await import(IMPORT);
   client=mod.createClient(URL_SUPABASE,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
   client.auth.onAuthStateChange((event,session)=>{
    if(event==='SIGNED_OUT'){user=null;records=[];activeId='';$('private-app').hidden=true;status('ログインしていません。知の図書館からログインしてください。')}
-   if(event==='SIGNED_IN'&&session?.user&&user?.id!==session.user.id){user=session.user;$('private-app').hidden=false;setTimeout(refresh,0)}
+   if(event==='SIGNED_IN'&&session?.user&&user?.id!==session.user.id){user=session.user;$('private-app').hidden=false;setTimeout(()=>{refresh();loadResearchIdeas()},0)}
   });
   const {data,error}=await client.auth.getUser();
   if(error&&!String(error.message||'').toLowerCase().includes('session'))throw error;
   if(!data?.user){status('未ログインです。画面上部の「知の図書館」からログインしてください。');return}
-  user=data.user;$('private-app').hidden=false;await refresh();
+  user=data.user;$('private-app').hidden=false;await refresh();await loadResearchIdeas();
  }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
 }
 initMagazineControls();initFormats();
+$('research-ideas').addEventListener('click',e=>{const el=e.target.closest('[data-idea]');if(el)selectResearchIdea(el.dataset.idea)});
 $('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
 $('new-entry').addEventListener('click',cleanForm);
