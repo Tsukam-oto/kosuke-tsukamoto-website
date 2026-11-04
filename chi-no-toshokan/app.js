@@ -1,4 +1,4 @@
-/* 知の図書館 v1.8.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.9.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -227,6 +227,7 @@ function renderArticle(){
  <div class="reader-layout"><article class="article"><header class="article-head"><div class="kicker">${esc(t.domain)}　／　EXPLORATION</div><h1>${esc(t.title)}</h1><p class="article-hook">${esc(t.hook)}</p><div class="actions"><button class="btn ${book(t.id)?'btn-soft':''}" data-action="bookmark" data-id="${esc(t.id)}">${book(t.id)?'✓ 蔵書に保存済み':'＋ 私の蔵書に保存'}</button><button class="btn btn-outline" data-action="favorite" data-id="${esc(t.id)}">${b.favorite?'★ お気に入り':'☆ お気に入り'}</button><button class="btn btn-outline" data-action="add-question" data-id="${esc(t.id)}">？ 疑問を残す</button></div></header>
  ${['zeus-titans','homer-history','bronze-collapse','oral-epic'].includes(t.id)?'<div class="panel" style="margin-bottom:17px;background:#f1eee3"><b>連載で読みたい方へ</b><p style="margin:6px 0 11px;font-size:13px">神話は原初の世界から『オデュッセイア』へ、順番に読むこともできます。</p><a href="./myth-series.html" class="btn btn-soft" style="display:inline-block;text-decoration:none">第1話から読む・続きを読む ↗</a></div>':''}
  <p class="reader-lead">${esc(t.summary)}</p>
+ ${t.domain.includes('臨床')?'<aside class="clinical-note" aria-label="臨床心理学の記事を読む前に"><strong>臨床心理学の記事について</strong><p>ここで扱うのは研究や心理療法の一般的な解説です。個人の状態の診断、治療の選択、専門職による支援の代わりにはなりません。</p></aside>':''}
  ${renderEvidenceClaims(t)}
  ${(t.sections||[]).map(([title,body],i)=>`<section class="reading-section" id="section-${i}"><div class="kicker">CHAPTER ${String(i+1).padStart(2,'0')}</div><h2>${esc(title)}</h2><p>${esc(body)}</p>${renderSectionEvidence(t,i)}<div style="margin-top:12px"><button class="link-btn" data-action="progress" data-id="${esc(t.id)}" data-index="${i+1}">${Number(v.readIndex||0)>i?'✓ 読了':'ここまで読んだ　✓'}</button></div></section>`).join('')}
  <aside class="fact-box"><h3>確かめておきたいこと</h3><ul>${(t.facts||[]).map(f=>`<li>${esc(f)}</li>`).join('')}</ul></aside>
