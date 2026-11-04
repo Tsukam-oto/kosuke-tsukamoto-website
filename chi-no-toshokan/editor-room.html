@@ -12,6 +12,7 @@
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./editor-room.css">
 <title>知の図書館｜AI実践と発信の編集室</title>
+<script defer src="./editor-magazines.js"></script>
 <script defer src="./editor-room.js"></script>
 </head><body>
 <header class="header"><a href="./" class="brand">◈ 知の図書館</a><span>編集室｜本人専用</span><a href="./research-dossiers.html">研究の調査票</a></header>
@@ -30,6 +31,21 @@
   <button type="button" class="primary" id="quick-save">一言メモを保存</button></div>
   <small>一言メモは「AI活用・ICT」の素材として本人専用クラウドに保存され、後から分類・追記できます。</small>
  </section>
+ <section class="magazine-panel" aria-labelledby="magazine-title">
+ <div class="panel-head"><h2 id="magazine-title">5つのマガジンと投稿計画</h2><span class="small-note">公開作業は本人が確認</span></div>
+ <div id="magazine-list" class="magazine-list"></div>
+ <details class="cadence-details"><summary>毎日どれくらい投稿できる？｜見込みを試算する</summary>
+ <p>AIの原稿生成本数、根拠確認で通過する割合、本人の確認時間を仮定した試算です。現在の自動生成実績ではありません。</p>
+ <div class="cadence-inputs">
+  <label for="drafts-per-week">AIが作成する初稿（週） <strong id="draft-value">10</strong>本<input id="drafts-per-week" type="range" min="0" max="28" step="1" value="10"></label>
+  <label for="ready-percent">公開に向けた確認を通過する割合 <strong id="ready-value">50</strong>%<input id="ready-percent" type="range" min="0" max="100" step="5" value="50"></label>
+  <label for="minutes-per-day">本人が確認・投稿に使える時間（1日） <strong id="minutes-value">30</strong>分<input id="minutes-per-day" type="range" min="0" max="120" step="5" value="30"></label>
+ </div>
+ <div id="cadence-output" class="cadence-output" aria-live="polite"></div>
+ <p class="small-note">試算では1本あたり25分（事実・権利・個人情報チェックと投稿操作の合計）を仮定します。専門記事はさらに時間が必要です。</p>
+ </details>
+ <details class="cadence-details"><summary>毎日1本の場合の曜日別ローテーション</summary><div class="weekly-table" id="weekly-table"></div><p class="small-note">これは7本/週に移行した場合の例です。初期目標は4本/週。5マガジンを毎日それぞれ更新する計画ではありません。</p></details>
+ </section>
  <div class="columns">
   <section class="writing-panel" aria-labelledby="editor-title">
    <div class="panel-head"><h2 id="editor-title">実践を残す</h2><button class="text-button" type="button" id="new-entry">新しく記録</button></div>
@@ -37,6 +53,9 @@
     <input type="hidden" id="record-id">
     <label for="kind">どの活動から生まれた記録ですか</label>
     <select id="kind"><option value="education">音楽教育・授業研究</option><option value="workflow">AI活用・ICT・校務改善</option><option value="composition">作曲・編曲・録音</option><option value="research">知の図書館・知識探究</option></select>
+    <label for="magazine">掲載を検討するマガジン</label>
+    <select id="magazine" aria-label="掲載先マガジン"></select>
+    <div id="magazine-advice" class="magazine-advice" aria-live="polite"></div>
     <label for="title">テーマ</label><input id="title" required maxlength="150" placeholder="例：鑑賞授業の準備をAIとどう改善したか">
     <label for="problem">出発点：何に困った／何を実現したかったか</label><textarea id="problem" rows="3" maxlength="5000" placeholder="個人情報や学校の内部文書は貼り付けず、課題を一般化して記録"></textarea>
     <label for="ai-method">AIをどう使ったか：指示、役割分担、試行</label><textarea id="ai-method" rows="4" maxlength="7000" placeholder="どんな依頼・確認・修正を行ったか。成功した指示だけでなく試行錯誤も"></textarea>
