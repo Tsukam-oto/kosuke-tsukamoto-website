@@ -10,7 +10,7 @@ const lesson=Object.fromEntries(T.map(x=>[x.id,x]));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const validApple=url=>/^https:\/\/classical\.music\.apple\.com\/jp\/album\/[0-9]+$/.test(url);
 const dom=id=>document.getElementById(id);
-let tab='works',filter='すべて',query='',audioCtx=null,lastRenderedTab=null;
+let tab='works',filter='すべて',query='',audioCtx=null,lastRenderedTab=null,listFilter='all';
 const moodLabels=['すべて','静かに集中','構造を聴く','音色を楽しむ','声と合唱','刺激を受ける','響きを味わう'];
 const intervalNames=['同度','短2度','長2度','短3度','長3度','完全4度','増4度・減5度','完全5度','短6度','長6度','短7度','長7度','オクターヴ'];
 let semis=7,earFlag='平均律';
@@ -39,31 +39,91 @@ function route(){
 function heading(title,desc,n){
  return '<div class="section-head"><div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p></div><div class="stats">'+n+' 件</div></div>';
 }
+function progressState(){
+ return window.MUSIC_PROGRESS?.state?.()||{phase:'checking',entries:{},later:0,done:0,owner:false,error:''};
+}
+function todayPick(){
+ const state=progressState();
+ const pending=W.filter(w=>state.entries[w.id]?.status==='later')
+   .sort((a,b)=>(state.entries[b.id]?.at||'').localeCompare(state.entries[a.id]?.at||''));
+ if(pending.length)return {work:pending[0],resume:true};
+ const d=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Tokyo',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+ let hash=13;for(const ch of d){hash=(hash*31+ch.charCodeAt(0))>>>0}
+ const picks=W.filter(w=>['bachcello','beethoven5','chopinnocturne','mozartrequiem','ravelbolero','partmirror','reich18'].includes(w.id));
+ return {work:(picks.length?picks:W)[hash%(picks.length||W.length)],resume:false};
+}
+function pickMarkup(){
+ if(!W.length)return '';
+ const pick=todayPick(),w=pick.work;
+ return '<section class="listen-pick" aria-label="今日の1曲">'+
+ '<div class="pick-caption">'+(pick.resume?'MY LISTENING · 続きから':'TODAY\'S LISTENING · 今日の1曲')+'</div>'+
+ '<h3>'+esc(pick.resume?'聴きたい曲から再開':'今日は、まず一曲から。')+'</h3>'+
+ '<p class="pick-name">'+esc(w.title)+'</p>'+
+ '<p class="pick-desc">'+esc(w.focus[0])+'</p>'+
+ '<div class="pick-actions"><a class="btn" href="'+esc(w.url)+'" target="_blank" rel="noopener noreferrer">この録音を聴く ↗</a><a class="btn alt" href="#work/'+encodeURIComponent(w.id)+'">聴きどころを確認する ↗</a></div>'+
+ '<small>目安：'+esc(w.minutes)+'。全部聴かなくても、冒頭数分から始められます。</small></section>';
+}
 function trackMarkup(w){
  const c=people[w.composer];
- const focus=(w.focus||[]).map(s=>'<li>'+esc(s)+'</li>').join('');
+ const focus=(w.focus||[]).map(t=>'<li>'+esc(t)+'</li>').join('');
  const url=validApple(w.url)?w.url:'https://classical.music.apple.com/jp';
+ const state=progressState(),status=state.entries[w.id]?.status||'none';
+ const disabled=state.phase==='checking'?' disabled title="保存先を確認中"':'';
+ const later=status==='later',done=status==='done';
  return '<article class="work" id="item-'+esc(w.id)+'"><div class="work-top"><div class="work-eyebrow">'+esc(w.era)+' / '+esc(w.genre)+'</div><h3>'+esc(w.title)+'</h3><div class="composer-name">'+esc(c?.name||w.composer)+'</div><p class="one-line">'+esc(w.note)+'</p></div>'+
  '<div class="performer"><strong>今回選んだ録音</strong><div>'+esc(w.performers)+'</div><div>'+esc(w.album)+'</div></div>'+
  '<div class="work-mid"><h4>耳を澄ませたいところ</h4><ul>'+focus+'</ul></div>'+
  '<div class="work-foot"><span class="time">聴き始め：'+esc(w.opening)+'<br>'+esc(w.minutes)+'</span><a href="'+esc(url)+'" target="_blank" rel="noopener noreferrer" class="btn" aria-label="'+esc(w.title)+'をApple Music Classicalで聴く">Apple Music Classicalで聴く ↗</a></div>'+
+ '<div class="listen-actions" role="group" aria-label="'+esc(w.title)+'の聴取記録"><button type="button" data-track-id="'+esc(w.id)+'" data-track-status="later" aria-pressed="'+later+'"'+disabled+'>'+(later?'✓ あとで聴くに保存済み':'＋ あとで聴く')+'</button>'+
+ '<button type="button" data-track-id="'+esc(w.id)+'" data-track-status="done" aria-pressed="'+done+'"'+disabled+'>'+(done?'✓ 聴いた記録あり':'✓ 聴いたと記録')+'</button></div>'+
  '<div class="work-trail">'+(lesson[w.theory]?'<a href="#theory/'+encodeURIComponent(w.theory)+'">この曲につながる理論：'+esc(lesson[w.theory].category)+' ↗</a>':'')+'</div></article>';
 }
 function matchingWorks(){
- return W.filter(w=>(filter==='すべて'||w.mood===filter)&&(!query||(w.title+' '+w.performers+' '+w.note+' '+w.genre+' '+people[w.composer]?.name).toLocaleLowerCase('ja').includes(query.toLocaleLowerCase('ja'))));
+ const st=progressState();
+ return W.filter(w=>(filter==='すべて'||w.mood===filter)
+  &&(listFilter==='all'||st.entries[w.id]?.status===listFilter)
+  &&(!query||(w.title+' '+w.performers+' '+w.note+' '+w.genre+' '+people[w.composer]?.name).toLocaleLowerCase('ja').includes(query.toLocaleLowerCase('ja'))));
+}
+function progressLabel(st){
+ if(st.phase==='checking')return '保存先を確認中…';
+ if(st.phase==='guest')return 'この端末だけに保存｜別端末への同期には図書館からログイン';
+ if(st.phase==='syncing')return 'クラウドへ同期中…';
+ if(st.phase==='error')return '通信エラー：端末には保存済み。再同期してください。';
+ return 'クラウドに同期済み｜同じアカウントで別端末からも確認できます';
+}
+function updateProgress(){
+ const st=progressState(),label=dom('listen-sync'),count=dom('listen-count');
+ if(label)label.textContent=progressLabel(st)+(st.error?' '+st.error:'');
+ if(count)count.textContent='あとで聴く '+st.later+'曲 ／ 聴いた '+st.done+'曲';
+ const retry=dom('listen-retry');
+ if(retry)retry.hidden=!(st.phase==='error'&&st.owner);
+ const pick=dom('daily-pick');
+ if(pick)pick.innerHTML=pickMarkup();
+ document.querySelectorAll('[data-list-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.listFilter===listFilter)));
 }
 function updateWorks(){
  const el=dom('works-list');if(!el)return;
  const data=matchingWorks();
- el.innerHTML=data.length?data.map(trackMarkup).join(''):'<div class="empty">条件に合う作品がありません。絞り込みを変更してください。</div>';
- dom('work-count').textContent=data.length+' / '+W.length+'作品';
+ el.innerHTML=data.length?data.map(trackMarkup).join(''):'<div class="empty">該当する作品がありません。検索や絞り込みを変更してください。</div>';
+ const count=dom('work-count');if(count)count.textContent=data.length+' / '+W.length+'作品';
+ updateProgress();
 }
 function worksUI(){
- return heading('今日は何を聴きますか？','曲を知るだけでなく、どこに耳を向けると面白いのかまで案内します。',W.length)+
+ return heading('今日は何を聴きますか？','気になる一曲を選び、聴きどころと作曲技法を行き来できます。',W.length)+
+ '<div id="daily-pick">'+pickMarkup()+'</div>'+
+ '<section class="listen-collection" aria-label="自分の聴取リスト">'+
+ '<div class="listen-collection-head"><strong>私の聴取リスト</strong><span id="listen-count">あとで聴く 0曲 ／ 聴いた 0曲</span></div>'+
+ '<div class="listen-collection-tabs" role="group" aria-label="聴取記録で絞り込む">'+
+ '<button type="button" data-list-filter="all" aria-pressed="'+(listFilter==='all')+'">全作品</button>'+
+ '<button type="button" data-list-filter="later" aria-pressed="'+(listFilter==='later')+'">あとで聴く</button>'+
+ '<button type="button" data-list-filter="done" aria-pressed="'+(listFilter==='done')+'">聴いた曲</button></div>'+
+ '<p class="listen-sync" id="listen-sync" role="status">保存先を確認中…</p>'+
+ '<div class="listen-assist"><a href="./">ログイン・設定は図書館本体から ↗</a><button type="button" id="listen-retry" data-list-retry hidden>クラウドに再同期</button></div>'+
+ '</section>'+
  '<div class="search-row"><input class="music-search" id="music-search" type="search" enterkeyhint="search" placeholder="曲名・作曲家・演奏者で検索" value="'+esc(query)+'" aria-label="作品や作曲家を検索"></div>'+
  '<div class="filter" role="group" aria-label="聴き方を絞り込む">'+moodLabels.map(m=>'<button type="button" data-filter="'+esc(m)+'" aria-pressed="'+(filter===m)+'">'+esc(m)+'</button>').join('')+'</div>'+
  '<p id="work-count" class="stats" aria-live="polite"></p><div class="grid" id="works-list"></div>'+
- '<p class="ear-warning">※ 表示されるリンクは特定の録音が含まれるApple Music Classicalのアルバムページです。曲ごとにトラックを選択してください。再生可能な範囲はApple側の契約・地域・環境によります。</p>';
+ '<p class="ear-warning">※ 録音の再生はApple Music Classical側で行います。「聴いた」はご自身で付ける記録で、再生履歴を自動取得したものではありません。</p>';
 }
 function circle(){
  const keys=['C','G','D','A','E','B','F♯','D♭','A♭','E♭','B♭','F'];
@@ -153,6 +213,17 @@ function audioAction(kind){
 document.addEventListener('click',e=>{
  const b=e.target.closest('[data-tab]');if(b){location.hash=b.dataset.tab;return}
  const f=e.target.closest('[data-filter]');if(f){filter=f.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===f)));updateWorks();return}
+ const list=e.target.closest('[data-list-filter]');if(list){listFilter=list.dataset.listFilter;updateWorks();return}
+ const retry=e.target.closest('[data-list-retry]');if(retry){window.MUSIC_PROGRESS?.retry();return}
+ const mark=e.target.closest('[data-track-id][data-track-status]');
+ if(mark){
+  const st=progressState(),id=mark.dataset.trackId,target=mark.dataset.trackStatus;
+  if(st.phase==='checking'){toast('保存先を確認しています。');return}
+  const next=st.entries[id]?.status===target?'none':target;
+  const stored=window.MUSIC_PROGRESS?.set(id,next);
+  if(stored)toast(next==='later'?'あとで聴くに保存しました':next==='done'?'聴いた曲に記録しました':'記録を解除しました');
+  return;
+ }
  const a=e.target.closest('[data-audio]');if(a){audioAction(a.dataset.audio)}
 });
 document.addEventListener('input',e=>{
@@ -161,5 +232,6 @@ document.addEventListener('input',e=>{
 });
 window.addEventListener('hashchange',route);
 route();
-window.MUSIC_LIBRARY_DEBUG={counts:{works:W.length,composers:P.length,theory:T.length},validRecordings:W.every(w=>validApple(w.url)&&!!people[w.composer]&&!!lesson[w.theory]),state:()=>({tab,filter,query})};
+window.MUSIC_PROGRESS?.subscribe(()=>{if(tab==='works')updateWorks()});
+window.MUSIC_LIBRARY_DEBUG={counts:{works:W.length,composers:P.length,theory:T.length},validRecordings:W.every(w=>validApple(w.url)&&!!people[w.composer]&&!!lesson[w.theory]),state:()=>({tab,filter,query,listFilter})};
 })();
