@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "rulebookVersion": "1.1",
+  "rulebookVersion": "1.4",
   "lastUpdated": "2026-11-04",
   "authoritativeSource": "Google Docs",
   "rulebookUrl": "https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit",
   "mode": "private_drafts_only",
   "unattended_publication": false,
-  "statement": "通常時の操作をゼロに近づける。完全無人投稿できると偽らない。品質や権利が不明なら投稿しない。",
+  "statement": "本人が気になりAIと調べた問いを、原資料の該当箇所に照らし、実名で誠実に共有する。主張が未照合なら公開しない。実装されていない自動検証を稼働中と扱わない。",
   "sourcePolicy": {
     "allowed": [
       "explicitly approved public-safe editorial records",
@@ -86,7 +86,11 @@
       "uncertainty",
       "verified observations",
       "natural Japanese style",
-      "readability"
+      "readability",
+      "the author’s evidenced curiosity and original questions",
+      "plain, natural first-person tone only for actual author statements",
+      "AI-assisted research with source-checked facts",
+      "transparent correction record when factual errors are found"
     ],
     "avoid": [
       "fake successes",
@@ -94,7 +98,10 @@
       "fabricated teacher or student reactions",
       "every-article same three points",
       "padding for character count",
-      "misleading clickbait"
+      "misleading clickbait",
+      "invented personal curiosity, personal reactions, or first-hand experiences",
+      "predictable AI-style summaries and inflated headlines",
+      "presenting source links as proof without checking supporting passages"
     ],
     "factCheck": "Every claim tied to credible source or tagged as unverified; research metadata alone does not prove claims."
   },
@@ -109,7 +116,12 @@
       "unknown image/audio/sheet music rights",
       "unapproved unpublished creative intent",
       "broken deployment",
-      "no official publisher integration"
+      "no official publisher integration",
+      "insufficiently evidenced author interest",
+      "claim-by-claim citations incomplete",
+      "source text inaccessible or abstract-only for claims beyond the abstract",
+      "unavailable correction contact or inaccurate publication claims",
+      "rulebook mismatch or verification engine untested"
     ],
     "publishedRequiresPublicUrl": true
   },
@@ -144,7 +156,9 @@
       "automatic AI image generation",
       "autonomous validation of source text",
       "official personal note publishing",
-      "note engagement auto-fetch"
+      "note engagement auto-fetch",
+      "verified auto-publishing gate based on external source passages",
+      "reviewed and authorized correction-contact workflow"
     ]
   },
   "safeguards": {
@@ -167,7 +181,10 @@
       "pageOrSection",
       "sourceExcerptOrFaithfulParaphrase",
       "accessedAt",
-      "verificationStatus"
+      "verificationStatus",
+      "sourceAccessLevel",
+      "factualOrInterpretive",
+      "claimLevelPassageLocation"
     ],
     "allowedValues": [
       "confirmed",
@@ -182,6 +199,40 @@
     ],
     "researchMetadataNeverSufficient": true,
     "articleReadyOnlyAfterEveryClaimVerified": true,
-    "visualsAlsoRequireRightsAndAccuracy": true
+    "visualsAlsoRequireRightsAndAccuracy": true,
+    "pilotRun": "30 unpublished exploratory drafts; 5 source-mapped expanded drafts; publication remains blocked",
+    "autonomousClaimVerificationOperational": false,
+    "humanAndSourceReviewStillRequired": true
+  },
+  "editorialIdentity": {
+    "publicByline": "the real-name author; never impersonate a researcher",
+    "stance": "share questions the author actually pursued and things learned with AI after source-level verification",
+    "correctionNotice": "Invite factual corrections with evidence; investigate, correct, and log changes",
+    "correctionNoticeRequiresWorkingChannel": true,
+    "noInventedFirstPersonExperiences": true,
+    "noMandatoryAIDisclosureFormula": true
+  },
+  "topicSelection": {
+    "priority": [
+      "user-evidenced personal curiosity",
+      "adjacent topics with separate relevance review",
+      "AI suggestions requiring author interest confirmation"
+    ],
+    "authorInterestRequiredForPublication": true,
+    "teachingTopicAloneIsNotInterestEvidence": true,
+    "authorExcludedTopics": [
+      "Beethoven Symphony No.5 lesson article",
+      "Schubert Erlkönig lesson article"
+    ],
+    "archivedExcludedDraftsMustNotBePublished": true
+  },
+  "aiUseExperience": {
+    "permittedSubjects": [
+      "actual work-process experiments",
+      "verified software or GAS trials",
+      "AI-assisted research and learning when documented"
+    ],
+    "prohibitPublicAIImageGenerationShowcase": true,
+    "useOnlyVerifiedActualAchievements": true
   }
 }
