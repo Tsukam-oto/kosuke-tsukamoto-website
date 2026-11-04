@@ -1,0 +1,57 @@
+/* マガジンは読者に提供する価値で分ける。AIと教材は制作過程・使用ガイドで区別。 */
+window.EDITOR_MAGAZINES=Object.freeze({
+ version:1,
+ defaultMagazine:"ai-work",
+ magazines:[
+  {id:"ai-work",name:"AIと仕事をつくる",short:"AI活用・改善記録",kind:"workflow",weeklyGoal:2,
+   promise:"実際の課題→AIへの指示→試行→検証→限界を、他の人が追試できる形で伝える",
+   not:"AIツールの宣伝だけ、成功したという根拠のない体験談",
+   readers:"AIで授業や日々の仕事を改善したい人",
+   sample:"AIとGASを開発したとき、何をAIに任せ、何を自分で検証したか",
+   checks:["実際の試行と構想を区別する","効果を定量化できない場合は体感と明示する","学校内部データを含めない"]},
+  {id:"music-education",name:"音楽の授業をつくる",short:"授業研究・教育実践",kind:"education",weeklyGoal:2,
+   promise:"授業の問い、教材、学習者の活動、評価まで教育的な筋道を示す",
+   not:"一般論だけの指導案、実際には行っていない授業の成功談",
+   readers:"音楽科教員・音楽教育を学ぶ人",
+   sample:"《魔王》を物語として聴く授業で、何を問いかけるか",
+   checks:["指導要領・原典の該当範囲を確認","架空の生徒反応は書かない","歌詞・楽譜・音源の権利を確認"]},
+  {id:"composing",name:"曲が生まれるまで",short:"作曲・編曲・制作",kind:"composition",weeklyGoal:1,
+   promise:"音楽家の判断・迷い・工夫に焦点を当て、作品と制作過程を丁寧につなぐ",
+   not:"本人が語っていない創作意図、AIが勝手に補った体験",
+   readers:"作曲・音楽制作に関心のある人",
+   sample:"合唱曲からバンド編成へ編曲するとき、残すものと変えるもの",
+   checks:["本人の発言・制作記録を優先する","未発表作品の情報を承認なく公開しない","公開音源の使用権を確認"]},
+  {id:"knowledge",name:"知の図書館から",short:"調べて深める読み物",kind:"research",weeklyGoal:1,
+   promise:"ひとつの問いを原典と研究で深め、何が分かり何が不明かまで伝える",
+   not:"検索結果や書誌情報だけから結論を作る",
+   readers:"音楽理論・歴史・神話・科学を探究したい人",
+   sample:"ベートーヴェンの《第5番》で動機はどのように発展するか",
+   checks:["論点ごとの一次資料・学術文献を照合する","異説・不確かさを明示する","図版の権利と引用量を確認"]},
+  {id:"tools",name:"教材とツールの制作室",short:"完成教材・ツールの使用案内",kind:"workflow",weeklyGoal:1,
+   promise:"完成した教材・アプリ・テンプレートの使い方、制約、再現手順を示す",
+   not:"使えない試作品の完成宣言、学校アカウントに依存したツールの販売",
+   readers:"授業で実用的な教材・ICTツールを使いたい人",
+   sample:"Web鑑賞教材の使い方と導入前に確認すべきこと",
+   checks:["学校の環境に依存せず動作するか確認","配布するコード・素材の利用権を確認","販売には別途兼業・権利確認が必要"]}
+ ],
+ weeklyPlan:[
+  {day:"月",magazine:"ai-work",format:"実践ログ",size:"中",minutes:20},
+  {day:"火",magazine:"music-education",format:"授業研究",size:"中",minutes:30},
+  {day:"水",magazine:"knowledge",format:"根拠付きの読み物",size:"長",minutes:45},
+  {day:"木",magazine:"ai-work",format:"失敗と改善",size:"短",minutes:15},
+  {day:"金",magazine:"composing",format:"制作記録",size:"中",minutes:25},
+  {day:"土",magazine:"music-education",format:"実践・教材案",size:"中",minutes:30},
+  {day:"日",magazine:"tools",format:"完成品の使い方",size:"短",minutes:20}
+ ],
+ rollout:[
+  {stage:"開始1か月",count:4,note:"週4本で記事品質と承認負荷を測定。各マガジンを均等更新する必要はありません。"},
+  {stage:"安定後",count:7,note:"完成原稿の在庫、資料確認、無理のない確認時間が確保できれば毎日1本。"},
+  {stage:"拡大時",count:10,note:"一部を短い実践ログに。記事の重複・品質低下があれば直ちに減らす。"}
+ ],
+ policy:{
+  machineDrafts:"作成ペースは原資料・LLM API・編集作業の量に依存し、プラン購入だけでは自動生成されません。",
+  publication:"note個人アカウントへの投稿は当面本人が操作する。予約投稿機能の有無はプランで異なります。",
+  privacy:"学校・生徒・保護者の情報を収集・投入しない。公開向けに分離した記録のみ記事へ展開する。",
+  verification:"知の図書館の調査票は未照合。本文確認前に確定的な根拠として引用しない。"
+ }
+});
