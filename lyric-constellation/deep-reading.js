@@ -4,9 +4,9 @@
 (function(root){
 'use strict';
 const WORDS=[
- {label:'一人称（単数）',keys:['僕','私','わたし','ぼく']},
- {label:'一人称（複数）',keys:['僕ら','僕たち','私たち','わたしたち','ぼくら']},
- {label:'二人称',keys:['あなた','君','きみ']}
+ {label:'一人称（単数）',keys:['僕','私','わたし','ぼく','俺','おれ']},
+ {label:'一人称（複数）',keys:['僕ら','僕たち','私たち','わたしたち','ぼくら','俺ら','俺たち']},
+ {label:'二人称',keys:['あなた','君','きみ','お前','あんた']}
 ];
 const MOTIFS=[
  {id:'time',label:'時間・季節',keys:['朝','夜','明日','今日','昨日','春','夏','秋','冬','季節']},
@@ -64,7 +64,7 @@ function countOccurrences(text,needle){
  let i=0,n=0;while((i=text.indexOf(needle,i))!==-1){i+=needle.length;n++}return n;
 }
 function pronounReading(lines){
- const re=/(僕たち|私たち|わたしたち|僕ら|ぼくら|あなた|わたし|ぼく|僕|私|君|きみ)/g;
+ const re=/(僕たち|私たち|わたしたち|俺たち|俺ら|僕ら|ぼくら|あなた|わたし|あんた|お前|ぼく|おれ|僕|私|君|きみ|俺)/g;
  const classified=new Map(WORDS.map(w=>[w.label,{label:w.label,count:0,examples:[]}]));
  for(const line of lines){
   re.lastIndex=0;let m;
@@ -289,12 +289,12 @@ function dialogueRead(work,others){
  return out;
 }
 function crossRead(work,others){
- if(work.origin!=='official')return [];
+ if(work.origin!=='official'&&work.sourceSystem!=='lyric_master')return [];
  const lines=splitLines(work.lyrics);
  const keys=new Set(lines.flatMap(x=>MOTIFS.flatMap(m=>m.keys.filter(k=>x.text.includes(k)))));
  const out=[];
  for(const other of (others||[])){
-  if(!other||other.id===work.id||other.origin!=='official'||other.sky!==work.sky)continue;
+  if(!other||other.id===work.id||other.sky!==work.sky||(work.origin==='official'?other.origin!=='official':other.sourceSystem!=='lyric_master'))continue;
   const otherLines=splitLines(other.lyrics);
   const rich=MOTIFS.filter(m=>m.id!=='relation').map(m=>{
    const hits=m.keys.filter(k=>keys.has(k)&&otherLines.some(x=>x.text.includes(k)));
