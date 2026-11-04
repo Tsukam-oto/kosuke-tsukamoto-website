@@ -10,7 +10,7 @@ const lesson=Object.fromEntries(T.map(x=>[x.id,x]));
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
 const validApple=url=>/^https:\/\/classical\.music\.apple\.com\/jp\/album\/[0-9]+$/.test(url);
 const dom=id=>document.getElementById(id);
-let tab='works',filter='すべて',query='',audioCtx=null;
+let tab='works',filter='すべて',query='',audioCtx=null,lastRenderedTab=null;
 const moodLabels=['すべて','静かに集中','構造を聴く','音色を楽しむ','声と合唱','刺激を受ける','響きを味わう'];
 const intervalNames=['同度','短2度','長2度','短3度','長3度','完全4度','増4度・減5度','完全5度','短6度','長6度','短7度','長7度','オクターヴ'];
 let semis=7,earFlag='平均律';
@@ -22,6 +22,7 @@ function tabOfHash(){
  return ['works','composers','theory'].includes(s)?s:'works';
 }
 function route(){
+ const previous=lastRenderedTab;
  tab=tabOfHash();
  document.querySelectorAll('[data-tab]').forEach(btn=>{
   const active=btn.dataset.tab===tab;
@@ -29,9 +30,11 @@ function route(){
   if(active)btn.setAttribute('aria-current','page');else btn.removeAttribute('aria-current');
  });
  render();
+ lastRenderedTab=tab;
  const hash=decodeURIComponent(location.hash.slice(1)||'');
  const id=hash.split('/')[1],node=dom('item-'+id);
  if(node){node.scrollIntoView({block:'center',behavior:'auto'});node.style.outline='2px solid #b99958';setTimeout(()=>{node.style.outline=''},1800)}
+ else if(previous && previous!==tab){dom('content')?.scrollIntoView({block:'start',behavior:'auto'})}
 }
 function heading(title,desc,n){
  return '<div class="section-head"><div><h2>'+esc(title)+'</h2><p>'+esc(desc)+'</p></div><div class="stats">'+n+' 件</div></div>';
@@ -57,8 +60,8 @@ function updateWorks(){
 }
 function worksUI(){
  return heading('今日は何を聴きますか？','曲を知るだけでなく、どこに耳を向けると面白いのかまで案内します。',W.length)+
- '<div class="filter" role="group" aria-label="聴き方を絞り込む">'+moodLabels.map(m=>'<button type="button" data-filter="'+esc(m)+'" aria-pressed="'+(filter===m)+'">'+esc(m)+'</button>').join('')+
- '<input class="search" id="music-search" type="search" placeholder="作品・作曲家・演奏者を検索" value="'+esc(query)+'" aria-label="作品や作曲家を検索"></div>'+
+ '<div class="search-row"><input class="music-search" id="music-search" type="search" enterkeyhint="search" placeholder="曲名・作曲家・演奏者で検索" value="'+esc(query)+'" aria-label="作品や作曲家を検索"></div>'+
+ '<div class="filter" role="group" aria-label="聴き方を絞り込む">'+moodLabels.map(m=>'<button type="button" data-filter="'+esc(m)+'" aria-pressed="'+(filter===m)+'">'+esc(m)+'</button>').join('')+'</div>'+
  '<p id="work-count" class="stats" aria-live="polite"></p><div class="grid" id="works-list"></div>'+
  '<p class="ear-warning">※ 表示されるリンクは特定の録音が含まれるApple Music Classicalのアルバムページです。曲ごとにトラックを選択してください。再生可能な範囲はApple側の契約・地域・環境によります。</p>';
 }
