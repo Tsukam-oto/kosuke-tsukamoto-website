@@ -1,0 +1,53 @@
+name: Knowledge Library · verified-source intake
+on:
+  workflow_dispatch:
+  schedule:
+    # 12:19 JST on Mondays and Thursdays; GitHub schedules use UTC.
+    - cron: '19 3 * * 1,4'
+  push:
+    branches: [main]
+    paths:
+      - 'chi-no-toshokan/research/**'
+      - '.github/workflows/knowledge-evidence-collector.yml'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: knowledge-evidence-collection
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    steps:
+      - name: Check out the latest library
+        uses: actions/checkout@v4
+
+      - name: Prepare Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Test provenance and public-domain safety gates
+        run: python -m unittest discover -s chi-no-toshokan/research -p 'test_*.py' -v
+
+      - name: Collect candidate metadata (not verified article claims)
+        env:
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          RESEARCH_CONTACT_EMAIL: ${{ vars.RESEARCH_CONTACT_EMAIL }}
+        run: python chi-no-toshokan/research/collect.py
+
+      - name: Publish only the public candidate ledger
+        run: |
+          git config user.name "knowledge-library-research-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add chi-no-toshokan/research-candidates.json
+          if ! git diff --cached --quiet; then
+            git commit -m "Refresh unverified research source candidates [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          else
+            echo "Candidate ledger unchanged"
+          fi
