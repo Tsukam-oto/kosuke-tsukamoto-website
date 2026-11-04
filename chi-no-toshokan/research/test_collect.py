@@ -17,6 +17,14 @@ class DiscoveryTests(unittest.TestCase):
         for area in areas:
             self.assertEqual(sum(t["area"] == area for t in selected), 2)
 
+    def test_weekly_runs_look_at_different_topics(self):
+        seeds = json.loads(c.SEEDS.read_text(encoding="utf-8"))
+        datetime = __import__("datetime").datetime
+        monday = {x["id"] for x in c.selected_topics(seeds["topics"], datetime(2026, 11, 2))}
+        thursday = {x["id"] for x in c.selected_topics(seeds["topics"], datetime(2026, 11, 5))}
+        self.assertNotEqual(monday, thursday)
+        self.assertEqual(len(monday), len(thursday))
+
     def test_doi_sanitizing(self):
         self.assertEqual(c.doi_key("https://doi.org/10.1000/ABC"), "10.1000/abc")
         self.assertEqual(c.doi_key("javascript:alert(1)"), "")
