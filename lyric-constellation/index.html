@@ -255,6 +255,7 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 
 .master-provenance{font-size:10px;color:#745d41;background:#f7efe2;border-radius:6px;padding:4px 6px;display:inline-block;margin-top:3px}
 .master-source-warning{border:1px solid #e4d8c4;background:#fcf8f0;color:#735c3c;border-radius:10px;padding:11px 12px;font-size:11px;line-height:1.9;margin:12px 0}
+.reading-journal-more{grid-column:1/-1;display:flex;justify-content:center;margin:8px}.reading-journal-more .btn{min-width:220px}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
@@ -441,8 +442,8 @@ function refreshAuthorReviewCounts(){
  if(shown)shown.textContent=st.saved+' / '+st.total;
  // Keep journal counts and filters accurate after saving, without closing the expanded panel.
  const journal=document.getElementById('readingJournal');
- if(journal&&sky==='choir'){
-  const rows=readingJournalRows(works().filter(x=>x.origin==='official'));
+ if(journal){
+  const rows=readingJournalRows(works().filter(x=>x.origin==='official'||x.sourceSystem==='lyric_master'));
   const summary=journal.querySelector('summary > small');
   if(summary)summary.textContent='本人確認 '+rows.filter(x=>x.checked).length+' / '+rows.length+'テーマ';
   const wrap=document.createElement('div');wrap.innerHTML=readingJournalSummary(rows);
@@ -454,12 +455,12 @@ function refreshAuthorReviewCounts(){
 }
 
 /* v5: one reading journal for the 14 interpretations and 8 cross-work dialogues. */
-let readingJournalFilter='needs';
+let readingJournalFilter='needs',readingJournalLimit=36;
 const readingJournalFilters={needs:'要確認',all:'すべて',different:'異なる読み',verified:'確認済み'};
 function readingJournalRows(corpus){
  const uniq=new Map();
  for(const w of corpus){
-  const report=window.LyricCloseReading.analyze(w,corpus);
+  const report=window.LyricCloseReading.analyze(w,w.sourceSystem==='lyric_master'?[]:corpus);
   for(const r of report.readings){
    const key=readingReviewKey(w,'hypothesis',r.heading);
    if(!uniq.has(key))uniq.set(key,{key,w,heading:r.heading,kind:'hypothesis',otherId:'',reference:r.evidence[0]||null});
@@ -484,7 +485,8 @@ function readingJournalList(rows,mode){
  const pr={stale:0,pending:1,new:2,verified:3};
  const ordered=found.slice().sort((a,b)=>pr[a.state]-pr[b.state]||a.w.title.localeCompare(b.w.title,'ja')||a.heading.localeCompare(b.heading,'ja'));
  if(!ordered.length)return '<p class="reading-journal-empty">この条件に該当するテーマはありません。</p>';
- return ordered.map(r=>'<article class="reading-journal-item"><div class="reading-journal-top">'+
+ const visible=ordered.slice(0,readingJournalLimit);
+ return visible.map(r=>'<article class="reading-journal-item"><div class="reading-journal-top">'+
   '<span class="reading-journal-status status-'+r.state+'">'+esc(r.stateName)+'</span><small>'+
   esc(r.kind==='dialogue'?'作品間の対話':'作品内の精読')+'</small></div>'+
   '<h4>'+esc(r.heading)+'</h4><div class="reading-journal-work">《'+esc(r.w.title)+'》'+
@@ -492,7 +494,8 @@ function readingJournalList(rows,mode){
   (r.reference?'<div class="reading-journal-quote"><small>L'+r.reference.line+'</small>'+esc(r.reference.text)+'</div>':'')+
   (r.state==='verified'?'<p class="reading-journal-stance">本人の判断：'+esc(readingStances[r.stance]||'確認済み')+'</p>':'')+
   (r.comment?'<p class="reading-journal-comment">本人メモ：'+esc(r.comment.slice(0,110))+(r.comment.length>110?'…':'')+'</p>':'')+
-  '<button class="btn sm" data-open-reading="'+esc(r.w.id)+'" data-reading-topic="'+esc(r.key)+'">この解釈と原文を読む</button></article>').join('');
+  '<button class="btn sm" data-open-reading="'+esc(r.w.id)+'" data-reading-topic="'+esc(r.key)+'">この解釈と原文を読む</button></article>').join('')+
+ (ordered.length>readingJournalLimit?'<div class="reading-journal-more"><button class="btn sm" type="button" data-reading-more="true">続きのテーマを表示（残り '+(ordered.length-readingJournalLimit)+'件）</button></div>':'');
 }
 function readingJournalSummary(rows){
  const counts={all:rows.length,needs:rows.filter(r=>!r.checked).length,verified:rows.filter(r=>r.checked).length,
@@ -506,11 +509,13 @@ function readingJournalSummary(rows){
 }
 
 function readingReviewDashboard(){
- if(sky!=='choir'||!window.LyricCloseReading?.analyze)return '';
- const corpus=works().filter(w=>w.origin==='official'),rows=readingJournalRows(corpus);
+ if(!window.LyricCloseReading?.analyze)return '';
+ const corpus=works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master');
+ if(!corpus.length)return '';
+ const rows=readingJournalRows(corpus);
  return '<details class="reading-dashboard" id="readingJournal"><summary><span class="eyebrow">READING JOURNAL / 作者の検証</span>'+
  '<strong>精読を、自分の記録にする</strong><small>本人確認 '+rows.filter(r=>r.checked).length+' / '+rows.length+'テーマ</small></summary>'+
- '<p class="desc">解釈をテーマごとに読み返せます。未確認・判断保留・歌詞の改訂後に再確認したいものを優先します。作者自身の意図と読み手の解釈は別々に扱います。</p>'+
+ '<p class="desc">'+(sky==='rap'?'木乃伊の歌詞全文から、根拠のある問いを作成しています。PDF抽出のため未校正です。個々の曲の完成状態や制作意図は断定しません。':'解釈をテーマごとに読み返せます。')+' 未確認・判断保留・原文の改訂後に再確認したいものを優先します。</p>'+
  readingJournalSummary(rows)+
  '<p class="desc">「異なる読み」は、意図と異なる解釈と、意図とは別に成立する解釈です。作品間の対話は双方で共通の1テーマ。件数は評価点ではありません。</p></details>';
 }
@@ -752,11 +757,17 @@ function mergeImported(d){const source=Array.isArray(d)?d:Array.isArray(d.userWo
 function migrateOld(){let restored=0;for(const key of ['three_observatories_release_v1','three_observatory_proto_v01']){try{const d=JSON.parse(localStorage.getItem(key));if(d&&Array.isArray(d.works)){const o=mergeImported(d);restored+=o.added}}catch(e){}}render();toast(restored?`旧データから${restored}作品を取り込みました。`:'引き継げる旧データが見つかりませんでした。旧版のJSONも読み込めます。')}
 function compare(a,b){const A=getWork(a),B=getWork(b);if(!A||!B)return;const comm=tokens(A).filter(x=>tokens(B).includes(x));selected=a;term=comm[0]||'';const panel=`<div class="drawer-top"><span class="eyebrow">COMPARE / 2篇を読む</span><button class="close" id="closeDrawer">×</button></div><h2 style="font-size:22px">《${esc(A.title)}》<br>と《${esc(B.title)}》</h2><p class="desc">共通する表記：${comm.length}種類</p><div class="word-cloud">${comm.map(w=>`<button class="word" data-term="${esc(w)}">${esc(w)}</button>`).join('')}</div><div class="term-results" style="grid-template-columns:1fr;margin-top:22px">${[A,B].map(w=>`<div class="term-result"><h3>${esc(w.title)}</h3><div class="poem-text" style="white-space:pre-line;line-height:1.9;font-size:12px">${highlight(w.lyrics.slice(0,1700),term)}</div></div>`).join('')}</div><p class="notice">共通する語を読んで、作品の内容がどう異なるかをご自身で確かめられます。</p>`;$('#drawer').innerHTML=panel;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');}
 document.addEventListener('click',async e=>{const target=e.target.closest('button,[data-open],[data-term],[data-compare]');if(!target)return;if(target.matches('[data-sky]')){switchSky(target.dataset.sky);return}if(target.matches('[data-view]')){go(target.dataset.view);return}
+if(target.hasAttribute('data-reading-more')){
+ readingJournalLimit+=36;
+ const journal=target.closest('.reading-dashboard');if(journal){const rows=readingJournalRows(works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master'));const list=journal.querySelector('#readingJournalItems');if(list)list.innerHTML=readingJournalList(rows,readingJournalFilter);}
+ return;
+}
 if(target.hasAttribute('data-reading-filter')){
  readingJournalFilter=target.dataset.readingFilter;
+ readingJournalLimit=36;
  const journal=target.closest('.reading-dashboard');
  if(journal){
-  const rows=readingJournalRows(works().filter(w=>w.origin==='official'));
+  const rows=readingJournalRows(works().filter(w=>w.origin==='official'||w.sourceSystem==='lyric_master'));
   const wrap=document.createElement('div');wrap.innerHTML=readingJournalSummary(rows);
   const list=journal.querySelector('#readingJournalItems');
   if(list)list.innerHTML=wrap.querySelector('#readingJournalItems').innerHTML;
