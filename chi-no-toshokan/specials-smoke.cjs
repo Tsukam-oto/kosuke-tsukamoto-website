@@ -27,15 +27,16 @@ async function main(){
    await page.locator('[data-audio="pure"]').click();
    await page.locator('[data-story="chaos"]').click();
    await page.locator('#story .story-layout').waitFor();
-   assert.match(await page.locator('#story h2').first().textContent(),/カオス/);
+   await page.waitForFunction(()=>document.querySelector('#story h2')?.textContent.includes('カオス'),{timeout:5000});
    await page.locator('[data-guess="0"]').click();
    assert.ok(await page.locator('#quiz-reveal').isVisible());
    await page.locator('[data-story="alliance"]').click();
-   assert.match(await page.locator('#story h2').first().textContent(),/心理療法/);
+   await page.waitForFunction(()=>document.querySelector('#story h2')?.textContent.includes('心理療法'),{timeout:5000});
    assert.match(await page.locator('.number-highlight').textContent(),/\.278/);
    await page.locator('#fresh-sources .candidate').first().waitFor({timeout:10000});
    assert.ok((await page.locator('#fresh-sources .candidate').count())>=1);
    await page.locator('[data-story="piano"]').click();
+   await page.waitForFunction(()=>document.querySelector('#story h2')?.textContent.includes('5度'),{timeout:5000});
    await page.screenshot({path:'/tmp/chi-no-toshokan-smoke/specials-'+width+'.png',fullPage:true});
    assert.deepEqual(errors,[],'Uncaught browser JS exceptions at '+width);
    outcomes.push({width,overflow:0,sourceCards:await page.locator('.candidate').count(),chapterCount:3,jsErrors:errors.length});
