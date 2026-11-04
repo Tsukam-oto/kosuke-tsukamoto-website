@@ -226,6 +226,17 @@
 .deep-work-detail>.muted:last-child{font-size:10px;line-height:1.7;margin:16px 0 0}
 @media(max-width:680px){.deep-work-detail{padding:14px}.deep-work-parts,.deep-work-quotes{grid-template-columns:1fr}.deep-work-parts section:first-child,.deep-work-parts section:nth-child(3){grid-column:span 1}}
 
+
+.deep-work-coverage{display:flex;gap:9px;flex-wrap:wrap;margin:3px 0 16px}
+.deep-work-coverage span{display:flex;gap:8px;align-items:baseline;background:#f8f5f8;border:1px solid #e8e1e9;border-radius:9px;padding:8px 11px;font-size:11px;color:#746c78}
+.deep-work-coverage b{font-size:14px;color:#3a3040;font-variant-numeric:tabular-nums}
+.deep-work-navigator{display:flex;align-items:end;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+.deep-work-navigator>.field{flex:1 1 260px;min-width:0;margin:0}
+.deep-work-navigator>.field select{min-height:42px;padding:10px;width:100%;max-width:100%;font-size:12px}
+.deep-work-move{display:flex;align-items:center;gap:10px;min-height:42px}
+.deep-work-move span{font-size:12px;font-variant-numeric:tabular-nums;color:#7c7180;white-space:nowrap}
+.deep-work-move button:disabled{opacity:.4;cursor:not-allowed}
+@media(max-width:680px){.deep-work-navigator{align-items:stretch;flex-direction:column}.deep-work-navigator>.field{flex:auto}.deep-work-move{justify-content:space-between}}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -243,7 +254,7 @@
 <button type="button" data-view="discovery">作品とのつながり</button>
 <button type="button" data-view="cross">作品を横断して読む</button>
 </div>
-<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.5</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
+<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.6</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><div class="stat"><b id="countReadings">—</b><small>原文に沿った初回精読</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
 <div class="toolbar"><input id="search" class="search" type="search" placeholder="言葉・作品名を探す" aria-label="検索"><select id="skyFilter" class="filter" aria-label="創作名義"><option value="all">すべての名義</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option><option value="unassigned">未分類</option></select><button class="btn dark" data-view="import">＋ 回収する</button></div>
