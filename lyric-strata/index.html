@@ -237,6 +237,17 @@
 .deep-work-move span{font-size:12px;font-variant-numeric:tabular-nums;color:#7c7180;white-space:nowrap}
 .deep-work-move button:disabled{opacity:.4;cursor:not-allowed}
 @media(max-width:680px){.deep-work-navigator{align-items:stretch;flex-direction:column}.deep-work-navigator>.field{flex:auto}.deep-work-move{justify-content:space-between}}
+
+.deep-related{border:1px solid #ded4e2;border-radius:13px;background:#fdfbfe;padding:15px 18px;margin:22px 0}
+.deep-related>summary{cursor:pointer;font-weight:800;font-size:13px;line-height:1.8;color:#4a3c57}
+.deep-related[open]>summary{margin-bottom:10px}
+.deep-related-card{background:#fff;border-top:1px solid #e8e1e9;padding:16px 0}
+.deep-related-card h4{margin:5px 0 11px;font-size:13px;line-height:1.6}
+.deep-related-card p{font-size:12px;line-height:1.85;margin:8px 0}
+.deep-related-topic{font-size:10px!important;font-weight:750;color:#74627b}
+.deep-related-quotes{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.deep-related-quotes blockquote{border-left:3px solid #bca9c1;padding:9px 11px;margin:0;background:#f7f4f8;font-size:11px;line-height:1.7;overflow-wrap:anywhere;white-space:pre-wrap}
+@media(max-width:680px){.deep-related{padding:12px}.deep-related-quotes{grid-template-columns:1fr}}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
