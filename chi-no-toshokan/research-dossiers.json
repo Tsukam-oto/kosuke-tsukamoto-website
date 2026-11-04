@@ -1,0 +1,2015 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": "2026-11-04T10:39:35+00:00",
+  "scope": "事実検証前の編集用調査票／自動公開記事ではありません",
+  "policy": "検索・書誌データから作る調査計画です。論文や原典の本文は自動照合していないため、記事の結論を含まず、資料の信頼度を採点しません。",
+  "counts": {
+    "topics": 20,
+    "topicsWithSources": 12,
+    "sourcesLinked": 50,
+    "verifiedClaims": 0,
+    "readyToPublish": 0,
+    "areas": {
+      "音楽": 6,
+      "心理・臨床": 5,
+      "神話・歴史": 5,
+      "科学・社会": 4
+    }
+  },
+  "dossiers": [
+    {
+      "id": "notation",
+      "question": "なぜ音楽を楽譜に書くようになったのか",
+      "area": "音楽",
+      "searchQuery": "Guido Arezzo medieval musical notation",
+      "relatedPage": "./#article/notation",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 4,
+      "sources": [
+        {
+          "id": "doi:10.17758/uruae23.ua0524404",
+          "title": "Guido d-Arezzo-s Musical Notation and Their Significance in the Development of Musical Pedagogy through Interactive Digital Technologies in the Digital Age",
+          "url": "https://doi.org/10.17758/uruae23.ua0524404",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2024,
+          "publication": "International Conference Proceedings IASET-24, WCBES-24, IABW2M-24, IEMSSH-24 &amp; IMESH-24 May 13-15, 2024 Istanbul (Turkiye)",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.30958/ajt.12-4-1",
+          "title": "Resonant Connections: The Stroke Rods of Badia Tedalda and the Musical Legacy of Guido d’Arezzo",
+          "url": "https://doi.org/10.30958/ajt.12-4-1",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Mark Konewko"
+          ],
+          "year": 2026,
+          "publication": "Athens Journal of Tourism",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.15385/jmo.2012.3.1.4",
+          "title": "Guido of Arezzo and His Influence on Music Learning",
+          "url": "https://doi.org/10.15385/jmo.2012.3.1.4",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref",
+            "OpenAlex"
+          ],
+          "authors": [
+            "Anna Reisenweaver"
+          ],
+          "year": 2012,
+          "publication": "Musical Offerings",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/gmo/9781561592630.article.11968",
+          "title": "Guido of Arezzo",
+          "url": "https://doi.org/10.1093/gmo/9781561592630.article.11968",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Claude V. Palisca"
+          ],
+          "year": 2001,
+          "publication": "Oxford Music Online",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "temperament",
+      "question": "音律はなぜ複数あるのか",
+      "area": "音楽",
+      "searchQuery": "history equal temperament musical tuning systems",
+      "relatedPage": "./#article/temperament",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 3,
+      "sources": [
+        {
+          "id": "doi:10.3840/003269",
+          "title": "Pythagorean, Meantone, and Equal Temperament Musical Scales",
+          "url": "https://doi.org/10.3840/003269",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2008,
+          "publication": "Wolfram Demonstrations Project",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.2307/3356776",
+          "title": "Easy Rule for Tuning Organs and Harmoniums in Equal Temperament",
+          "url": "https://doi.org/10.2307/3356776",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Alexander J. Ellis"
+          ],
+          "year": 1879,
+          "publication": "The Musical Times and Singing Class Circular",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.5406/j.ctvpj7j1r.17",
+          "title": "Twelve-Step Equal Temperament",
+          "url": "https://doi.org/10.5406/j.ctvpj7j1r.17",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2019,
+          "publication": "The Arithmetic of Listening",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "beethoven5",
+      "question": "ベートーヴェン第5番を動機と形式から聴く",
+      "area": "音楽",
+      "searchQuery": "Beethoven fifth symphony motivic development",
+      "relatedPage": "./music-library.html#work/beethoven5",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 2,
+      "sources": [
+        {
+          "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
+          "title": "Symphony no. 5",
+          "url": "https://musicbrainz.org/work/bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
+          "kind": "music-work-metadata",
+          "providers": [
+            "MusicBrainz"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "音楽作品目録（録音の一致は未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。"
+        },
+        {
+          "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
+          "title": "Symphony no. 5",
+          "url": "https://musicbrainz.org/work/adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
+          "kind": "music-work-metadata",
+          "providers": [
+            "MusicBrainz"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "音楽作品目録（録音の一致は未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。"
+        }
+      ],
+      "warnings": [
+        "作品目録と、特定の演奏・録音の照合は別に必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "ravelbolero",
+      "question": "ラヴェル《ボレロ》の音色はどう変わるのか",
+      "area": "音楽",
+      "searchQuery": "Ravel Bolero orchestration timbre",
+      "relatedPage": "./music-library.html#work/ravelbolero",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 2,
+      "sources": [
+        {
+          "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
+          "title": "Ravel",
+          "url": "https://musicbrainz.org/work/005f669d-00d1-4b64-b7ea-dca40e57c32f",
+          "kind": "music-work-metadata",
+          "providers": [
+            "MusicBrainz"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "音楽作品目録（録音の一致は未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。"
+        },
+        {
+          "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
+          "title": "Boléro",
+          "url": "https://musicbrainz.org/work/487527b9-a525-33f4-b948-ea41b9a2672f",
+          "kind": "music-work-metadata",
+          "providers": [
+            "MusicBrainz"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "音楽作品目録（録音の一致は未確認）",
+          "titleMatchesSearch": false,
+          "titleMatchCount": 0,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。"
+        }
+      ],
+      "warnings": [
+        "作品目録と、特定の演奏・録音の照合は別に必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "bachcello",
+      "question": "バッハの無伴奏作品の構造を聴く",
+      "area": "音楽",
+      "searchQuery": "Bach cello suites historically informed performance",
+      "relatedPage": "./music-library.html#work/bachcello",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "music-emotion",
+      "question": "音楽が感情を動かすのはなぜか",
+      "area": "音楽",
+      "searchQuery": "music emotion expectancy neuropsychology review",
+      "relatedPage": "./music-library.html",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "作品の正式名称・作曲者・版・成立年代を一次資料や信頼できる作品目録で確認する",
+        "音楽理論の用語が譜例・実際の演奏に当てはまるか検証する",
+        "楽譜・音源・図版の権利状態と、作品と録音の違いを確認する",
+        "一つの演奏解釈を唯一の正解として紹介していないか点検する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "adler",
+      "question": "アドラー心理学の発想と現代研究",
+      "area": "心理・臨床",
+      "searchQuery": "Adlerian psychology psychotherapy review",
+      "relatedPage": "",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 6,
+      "sources": [
+        {
+          "id": "doi:10.1353/jip.2019.0006",
+          "title": "Adlerian Psychotherapy: A Resource for Practitioners and Students",
+          "url": "https://doi.org/10.1353/jip.2019.0006",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Leigh Johnson-Migalski",
+            "David Tuan Vo"
+          ],
+          "year": 2019,
+          "publication": "The Journal of Individual Psychology",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.4324/9781315820262-8",
+          "title": "Adlerian family counselling and family psychotherapy",
+          "url": "https://doi.org/10.4324/9781315820262-8",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2014,
+          "publication": "Adlerian Psychotherapy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.4324/9781315820262-7",
+          "title": "Adlerian counselling and psychotherapy today",
+          "url": "https://doi.org/10.4324/9781315820262-7",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2014,
+          "publication": "Adlerian Psychotherapy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1097/md.0000000000041315",
+          "title": "Effectiveness of psychotherapy for Hwa-Byung: A systematic review of interventional studies.",
+          "url": "https://doi.org/10.1097/md.0000000000041315",
+          "kind": "research-metadata",
+          "providers": [
+            "Europe PMC"
+          ],
+          "authors": [
+            "Kwon CY, Lee B."
+          ],
+          "year": 2025,
+          "publication": "Medicine",
+          "publicationTypeHint": "文献索引の種別：システマティックレビュー",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。"
+        },
+        {
+          "id": "doi:10.4324/9781315820262-6",
+          "title": "Classical Adlerian Psychology",
+          "url": "https://doi.org/10.4324/9781315820262-6",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2014,
+          "publication": "Adlerian Psychotherapy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "openalex:W2966849946",
+          "title": "From China to South Korea: Two Perspectives on Adlerian Psychology in Asia",
+          "url": "https://openalex.org/W2966849946",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Sun Shu-fang",
+            "James Robert Bitter"
+          ],
+          "year": 2012,
+          "publication": "Digital Commons - East Tennessee State University (East Tennessee State University)",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原論文の研究設計、対象者、比較群、サンプル数を確認する",
+        "レビューの種類・バイアス評価・対象研究の重複を確認する",
+        "相関と因果、臨床的効果と理論的主張を区別する",
+        "反証・再現性・文化圏による違い・適用限界を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "therapeutic-alliance",
+      "question": "心理療法で治療関係は何を意味するか",
+      "area": "心理・臨床",
+      "searchQuery": "therapeutic alliance psychotherapy meta analysis",
+      "relatedPage": "",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 6,
+      "sources": [
+        {
+          "id": "doi:10.1037/pst0000534.supp",
+          "title": "Supplemental Material for The Relationship Between Interpersonal Problems and Therapeutic Alliance in Psychotherapy: A Three-Level Mixed-Effects Meta-Analysis",
+          "url": "https://doi.org/10.1037/pst0000534.supp",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2024,
+          "publication": "Psychotherapy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1037/a0022425.supp",
+          "title": "Supplemental Material for The Relationship Between Adult Attachment Style and Therapeutic Alliance in Individual Psychotherapy: A Meta-Analytic Review",
+          "url": "https://doi.org/10.1037/a0022425.supp",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2011,
+          "publication": "Psychotherapy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1037/a0021175.supp",
+          "title": "Supplemental Material for DROPOUT AND THERAPEUTIC ALLIANCE: A META-ANALYSIS OF ADULT INDIVIDUAL PSYCHOTHERAPY",
+          "url": "https://doi.org/10.1037/a0021175.supp",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2010,
+          "publication": "Psychotherapy: Theory, Research, Practice, Training",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1631/jzus.b2500701",
+          "title": "Therapeutic alliance across delivery modalities: a systematic narrative review of alliance strength and outcome prediction in face-to-face, online, and blended psychotherapy.",
+          "url": "https://doi.org/10.1631/jzus.b2500701",
+          "kind": "research-metadata",
+          "providers": [
+            "Europe PMC"
+          ],
+          "authors": [
+            "Zhou X, Huang H, Bi R, Verdeli L, Lyu H."
+          ],
+          "year": 2026,
+          "publication": "Journal of Zhejiang University. Science. B",
+          "publicationTypeHint": "文献索引の種別：システマティックレビュー",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。"
+        },
+        {
+          "id": "doi:10.1002/jclp.70192",
+          "title": "Alliance Ruptures and Psychotherapy Outcomes: A Multilevel Meta-Analysis of Their Association.",
+          "url": "https://doi.org/10.1002/jclp.70192",
+          "kind": "research-metadata",
+          "providers": [
+            "Europe PMC"
+          ],
+          "authors": [
+            "Babl A, Gómez Penedo JM, Nimphy C, Keßel M, Crainic C, Boendermaker N, Eubanks CF."
+          ],
+          "year": 2026,
+          "publication": "Journal of clinical psychology",
+          "publicationTypeHint": "文献索引の種別：メタ分析",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。"
+        },
+        {
+          "id": "doi:10.3389/fpsyg.2026.1897870",
+          "title": "Sudden gains and early response in routine outpatient psychotherapy: a study protocol for predicting symptom change.",
+          "url": "https://doi.org/10.3389/fpsyg.2026.1897870",
+          "kind": "research-metadata",
+          "providers": [
+            "Europe PMC"
+          ],
+          "authors": [
+            "Claus L, Raulfs F, Goltermann J, Driessen M, Steuwe C."
+          ],
+          "year": 2026,
+          "publication": "Frontiers in psychology",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。"
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原論文の研究設計、対象者、比較群、サンプル数を確認する",
+        "レビューの種類・バイアス評価・対象研究の重複を確認する",
+        "相関と因果、臨床的効果と理論的主張を区別する",
+        "反証・再現性・文化圏による違い・適用限界を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "care",
+      "question": "臨床心理学におけるケアの考え方",
+      "area": "心理・臨床",
+      "searchQuery": "psychotherapy care therapeutic process qualitative",
+      "relatedPage": "",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原論文の研究設計、対象者、比較群、サンプル数を確認する",
+        "レビューの種類・バイアス評価・対象研究の重複を確認する",
+        "相関と因果、臨床的効果と理論的主張を区別する",
+        "反証・再現性・文化圏による違い・適用限界を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "habit-formation",
+      "question": "習慣はどう形成・維持されるのか",
+      "area": "心理・臨床",
+      "searchQuery": "habit formation behavior change longitudinal review",
+      "relatedPage": "",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原論文の研究設計、対象者、比較群、サンプル数を確認する",
+        "レビューの種類・バイアス評価・対象研究の重複を確認する",
+        "相関と因果、臨床的効果と理論的主張を区別する",
+        "反証・再現性・文化圏による違い・適用限界を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "memory",
+      "question": "記憶は保存されたままなのか",
+      "area": "心理・臨床",
+      "searchQuery": "memory reconsolidation human systematic review",
+      "relatedPage": "./#article/memory",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原論文の研究設計、対象者、比較群、サンプル数を確認する",
+        "レビューの種類・バイアス評価・対象研究の重複を確認する",
+        "相関と因果、臨床的効果と理論的主張を区別する",
+        "反証・再現性・文化圏による違い・適用限界を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "odyssey-xenia",
+      "question": "『オデュッセイア』の客人歓待と社会",
+      "area": "神話・歴史",
+      "searchQuery": "Homer Odyssey xenia hospitality",
+      "relatedPage": "./myth-series.html#chapter/odyssey",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 6,
+      "sources": [
+        {
+          "id": "anchor:odyssey-xenia",
+          "title": "Homer, Odyssey, Book VI (translated text)",
+          "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
+          "kind": "curated-reference-path",
+          "providers": [
+            "事前登録リンク"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "原典への登録済み入口（本文未照合）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "原典の参照先",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。"
+        },
+        {
+          "id": "doi:10.1093/oseo/instance.00280567",
+          "title": "Odyssey",
+          "url": "https://doi.org/10.1093/oseo/instance.00280567",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Homer"
+          ],
+          "year": 2018,
+          "publication": "Oxford World's Classics: Homer: The Odyssey",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/oseo/instance.00280463",
+          "title": "Odyssey",
+          "url": "https://doi.org/10.1093/oseo/instance.00280463",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Homer"
+          ],
+          "year": 2018,
+          "publication": "Homer: Odyssey, Book 1",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.4102/lit.v37i1.1250",
+          "title": "‘Treppie does not like guests’: Xenia in Marlene van Niekerk’s Triomf",
+          "url": "https://doi.org/10.4102/lit.v37i1.1250",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Marius Crous"
+          ],
+          "year": 2016,
+          "publication": "Literator",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1353/hel.2010.a406972",
+          "title": "Helen's Hands: Weaving for Kleos in the Odyssey",
+          "url": "https://doi.org/10.1353/hel.2010.a406972",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Melissa Mueller"
+          ],
+          "year": 2010,
+          "publication": "Helios",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/oseo/instance.00280596",
+          "title": "Odyssey",
+          "url": "https://doi.org/10.1093/oseo/instance.00280596",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Homer"
+          ],
+          "year": 1980,
+          "publication": "Oxford World's Classics: Homer: The Odyssey",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原典のどの章・行・翻訳に当たるかを確認する",
+        "異なる時代や地域の伝承・異伝を区別する",
+        "神話中の出来事と考古学的・文献史的事実を混同していないか確認する",
+        "図版の制作年代と物語の舞台年代が異なることを確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "zeus-titans",
+      "question": "『神統記』の神々の世代交代",
+      "area": "神話・歴史",
+      "searchQuery": "Hesiod Theogony divine succession mythology",
+      "relatedPage": "./#article/zeus-titans",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 5,
+      "sources": [
+        {
+          "id": "anchor:zeus-titans",
+          "title": "Hesiod, Theogony (translated text)",
+          "url": "https://www.theoi.com/Text/HesiodTheogony.html",
+          "kind": "curated-reference-path",
+          "providers": [
+            "事前登録リンク"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "原典への登録済み入口（本文未照合）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "原典の参照先",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。"
+        },
+        {
+          "id": "doi:10.1093/actrade/9780199538317.book.1",
+          "title": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+          "url": "https://doi.org/10.1093/actrade/9780199538317.book.1",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Hesiod"
+          ],
+          "year": 2008,
+          "publication": "",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/oseo/instance.00296190",
+          "title": "Theogony",
+          "url": "https://doi.org/10.1093/oseo/instance.00296190",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2008,
+          "publication": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/oseo/instance.00296191",
+          "title": "Works and Days",
+          "url": "https://doi.org/10.1093/oseo/instance.00296191",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2008,
+          "publication": "Oxford World's Classics: Hesiod: Theogony and Works and Days",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": false,
+          "titleMatchCount": 0,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "met:247308",
+          "title": "Terracotta pelike (jar)",
+          "url": "https://www.metmuseum.org/art/collection/search/247308",
+          "kind": "museum-object",
+          "providers": [
+            "The Met"
+          ],
+          "authors": [],
+          "year": null,
+          "publication": "",
+          "publicationTypeHint": "美術館の収蔵品情報（画像の権利は別に確認）",
+          "titleMatchesSearch": false,
+          "titleMatchCount": 0,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "https://images.metmuseum.org/CRDImages/gr/web-large/DP161808.jpg",
+          "imageRights": "Met Open Access / CC0",
+          "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。"
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原典のどの章・行・翻訳に当たるかを確認する",
+        "異なる時代や地域の伝承・異伝を区別する",
+        "神話中の出来事と考古学的・文献史的事実を混同していないか確認する",
+        "図版の制作年代と物語の舞台年代が異なることを確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "bronze-collapse",
+      "question": "青銅器時代の終焉はなぜ起こったのか",
+      "area": "神話・歴史",
+      "searchQuery": "Late Bronze Age collapse Mediterranean archaeology",
+      "relatedPage": "./#article/bronze-collapse",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原典のどの章・行・翻訳に当たるかを確認する",
+        "異なる時代や地域の伝承・異伝を区別する",
+        "神話中の出来事と考古学的・文献史的事実を混同していないか確認する",
+        "図版の制作年代と物語の舞台年代が異なることを確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "oral-epic",
+      "question": "叙事詩は口承でどう受け継がれたのか",
+      "area": "神話・歴史",
+      "searchQuery": "Homeric oral formulaic epic composition",
+      "relatedPage": "./#article/oral-epic",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原典のどの章・行・翻訳に当たるかを確認する",
+        "異なる時代や地域の伝承・異伝を区別する",
+        "神話中の出来事と考古学的・文献史的事実を混同していないか確認する",
+        "図版の制作年代と物語の舞台年代が異なることを確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "ancient-writing",
+      "question": "線文字Bとギリシャ文字の歴史",
+      "area": "神話・歴史",
+      "searchQuery": "Linear B Greek alphabet archaeological history",
+      "relatedPage": "./myth-series.html#chapter/history",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 0,
+      "sources": [],
+      "warnings": [
+        "独立した資料候補が不足しています。追加の探索が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "原典のどの章・行・翻訳に当たるかを確認する",
+        "異なる時代や地域の伝承・異伝を区別する",
+        "神話中の出来事と考古学的・文献史的事実を混同していないか確認する",
+        "図版の制作年代と物語の舞台年代が異なることを確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "roman-concrete",
+      "question": "古代ローマのコンクリートはなぜ長持ちするのか",
+      "area": "科学・社会",
+      "searchQuery": "Roman concrete self healing lime clasts research",
+      "relatedPage": "./#article/concrete",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 5,
+      "sources": [
+        {
+          "id": "doi:10.1038/s41578-023-00539-z",
+          "title": "Self-healing Roman concrete",
+          "url": "https://doi.org/10.1038/s41578-023-00539-z",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Charlotte Allard"
+          ],
+          "year": 2023,
+          "publication": "Nature Reviews Materials",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.5703/1288284317973",
+          "title": "Activation of self-healing in pozzolanic natural hydraulic lime-based self-compacting concrete under cyclic compression",
+          "url": "https://doi.org/10.5703/1288284317973",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Ángel De La Rosa",
+            "Gonzalo Ruiz"
+          ],
+          "year": null,
+          "publication": "Proceedings of the C3 Symposium 2025",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1680/macr.2007.59.2.97",
+          "title": "Development of high-volume low-lime and high-lime fly-ash-incorporated self-consolidating concrete",
+          "url": "https://doi.org/10.1680/macr.2007.59.2.97",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "M. Şahmaran",
+            "Ö. Yaman",
+            "M. Tokyay"
+          ],
+          "year": 2007,
+          "publication": "Magazine of Concrete Research",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.56578/jche030205",
+          "title": "Evolving Durability Strategies in Concrete Structures from the Roman Era to Today",
+          "url": "https://doi.org/10.56578/jche030205",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Luca Piancastelli",
+            "Enrico C Lorenzini"
+          ],
+          "year": 2025,
+          "publication": "Journal of Civil and Hydraulic Engineering",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1126/sciadv.add1602",
+          "title": "Hot mixing: Mechanistic insights into the durability of ancient Roman concrete",
+          "url": "https://doi.org/10.1126/sciadv.add1602",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Linda M. Seymour",
+            "Janille Maria Maragh",
+            "Paolo Sabatini"
+          ],
+          "year": 2023,
+          "publication": "Science Advances",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "一次研究と解説記事を分け、測定・観測の方法を確認する",
+        "結果の不確実性・検証範囲・反対の報告を確認する",
+        "研究成果が一般化できる対象・時代・地域を確認する",
+        "数値・図表・画像の出典と利用条件を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "exoplanets",
+      "question": "太陽系外惑星はどう発見されるのか",
+      "area": "科学・社会",
+      "searchQuery": "exoplanet transit detection observational astronomy",
+      "relatedPage": "./#article/astronomy",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 3,
+      "sources": [
+        {
+          "id": "doi:10.1016/j.ascom.2024.100816",
+          "title": "Synthetic light curves of exoplanet transit using nanosatellite data",
+          "url": "https://doi.org/10.1016/j.ascom.2024.100816",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "A. Fuentes",
+            "M. Solar"
+          ],
+          "year": 2024,
+          "publication": "Astronomy and Computing",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1038/s41550-020-01210-1",
+          "title": "Earth as a transit exoplanet",
+          "url": "https://doi.org/10.1038/s41550-020-01210-1",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "May Chiao"
+          ],
+          "year": 2020,
+          "publication": "Nature Astronomy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1016/j.newast.2009.09.001",
+          "title": "Exoplanet Transit Database. Reduction and processing of the photometric data of exoplanet transits",
+          "url": "https://doi.org/10.1016/j.newast.2009.09.001",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Stanislav Poddaný",
+            "Luboš Brát",
+            "Ondřej Pejcha"
+          ],
+          "year": 2010,
+          "publication": "New Astronomy",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "一次研究と解説記事を分け、測定・観測の方法を確認する",
+        "結果の不確実性・検証範囲・反対の報告を確認する",
+        "研究成果が一般化できる対象・時代・地域を確認する",
+        "数値・図表・画像の出典と利用条件を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "microbiome",
+      "question": "発酵食品と腸内微生物の研究",
+      "area": "科学・社会",
+      "searchQuery": "fermented foods microbiome health review",
+      "relatedPage": "./#article/fermentation",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 5,
+      "sources": [
+        {
+          "id": "doi:10.1186/s42779-026-00328-3",
+          "title": "Traditional fermented foods, indigenous knowledge systems, and gut microbiome health among tribal communities of Tripura, India: an integrative review",
+          "url": "https://doi.org/10.1186/s42779-026-00328-3",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Manabendra Debnath"
+          ],
+          "year": 2026,
+          "publication": "Journal of Ethnic Foods",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1016/j.micpath.2025.107718",
+          "title": "Comprehensive review of food Archaeome: Exploring the understudied microbiome and health benefits of fermented foods",
+          "url": "https://doi.org/10.1016/j.micpath.2025.107718",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Ramalakshmi Alaguthevar",
+            "Amol Vishwas Pawale",
+            "Balakrishnan Murugesan"
+          ],
+          "year": 2025,
+          "publication": "Microbial Pathogenesis",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.3390/nu14071527",
+          "title": "Fermented Foods, Health and the Gut Microbiome",
+          "url": "https://doi.org/10.3390/nu14071527",
+          "kind": "research-metadata",
+          "providers": [
+            "OpenAlex"
+          ],
+          "authors": [
+            "Natasha Leeuwendaal",
+            "Catherine Stanton",
+            "Paul William O’Toole"
+          ],
+          "year": 2022,
+          "publication": "Nutrients",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 4,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1016/b978-0-323-98341-9.00018-9",
+          "title": "Fermented foods and gut microbiome: a focus on African Indigenous fermented foods",
+          "url": "https://doi.org/10.1016/b978-0-323-98341-9.00018-9",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Beatrice Mofoluwaso Fasogbon",
+            "Oluwaseun Hannah Ademuyiwa",
+            "Oluwafemi Ayodeji Adebo"
+          ],
+          "year": 2023,
+          "publication": "Indigenous Fermented Foods for the Tropics",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 3,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1201/b18279-8",
+          "title": "Diet, Microbiome, and Human Health",
+          "url": "https://doi.org/10.1201/b18279-8",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [],
+          "year": 2015,
+          "publication": "Health Benefits of Fermented Foods and Beverages",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "一次研究と解説記事を分け、測定・観測の方法を確認する",
+        "結果の不確実性・検証範囲・反対の報告を確認する",
+        "研究成果が一般化できる対象・時代・地域を確認する",
+        "数値・図表・画像の出典と利用条件を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    },
+    {
+      "id": "city",
+      "question": "都市と社会はどう発展してきたのか",
+      "area": "科学・社会",
+      "searchQuery": "urban history archaeology resilience cities",
+      "relatedPage": "./#article/city",
+      "editorialStage": "記事化準備・自動整理",
+      "readyToPublish": false,
+      "verifiedClaims": 0,
+      "sourceCount": 3,
+      "sources": [
+        {
+          "id": "doi:10.1484/j.jua.5.131730",
+          "title": "Embattled Cities: The Urban Reinvention of History – Editorial",
+          "url": "https://doi.org/10.1484/j.jua.5.131730",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Rubina Raja",
+            "Søren M. Sindbæk"
+          ],
+          "year": 2022,
+          "publication": "Journal of Urban Archaeology",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 2,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1484/j.jua.5.137197",
+          "title": "Placing Space, Shaping Cities, and Making History in the Ancient Classical World",
+          "url": "https://doi.org/10.1484/j.jua.5.137197",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Rubina Raja",
+            "Søren Sindbæk"
+          ],
+          "year": 2024,
+          "publication": "Journal of Urban Archaeology",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": true,
+          "titleMatchCount": 1,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        },
+        {
+          "id": "doi:10.1093/oso/9780190498900.003.0013",
+          "title": "Spatial Representation of Vienna’s Street-Level Environment",
+          "url": "https://doi.org/10.1093/oso/9780190498900.003.0013",
+          "kind": "research-metadata",
+          "providers": [
+            "Crossref"
+          ],
+          "authors": [
+            "Angelika Psenner"
+          ],
+          "year": 2020,
+          "publication": "Digital Cities",
+          "publicationTypeHint": "研究書誌（研究デザイン未確認）",
+          "titleMatchesSearch": false,
+          "titleMatchCount": 0,
+          "reviewStatus": "本文未照合",
+          "sourceType": "研究・作品・収蔵品のメタデータ",
+          "imageUrl": "",
+          "imageRights": "",
+          "note": ""
+        }
+      ],
+      "warnings": [
+        "書誌情報だけでは研究結果を判断できません。本文・方法・結果の確認が必要です。"
+      ],
+      "reviewChecks": [
+        "資料の本文または原典該当箇所に到達して確認する",
+        "個別の主張ごとに、裏づける出典と留保条件を対応づける",
+        "一次研究と解説記事を分け、測定・観測の方法を確認する",
+        "結果の不確実性・検証範囲・反対の報告を確認する",
+        "研究成果が一般化できる対象・時代・地域を確認する",
+        "数値・図表・画像の出典と利用条件を確認する"
+      ],
+      "storyboard": [
+        {
+          "section": "入口の問い",
+          "status": "題材のみ（本文未作成）"
+        },
+        {
+          "section": "原典・研究で確認できたこと",
+          "status": "本文照合が必要"
+        },
+        {
+          "section": "争点・異説・不確かさ",
+          "status": "反証・限界の検討が必要"
+        },
+        {
+          "section": "図・楽譜・年代・音源",
+          "status": "資料と利用権限の確認が必要"
+        },
+        {
+          "section": "次に考えたい問い",
+          "status": "編集時に作成"
+        }
+      ]
+    }
+  ]
+}
