@@ -42,6 +42,9 @@ jobs:
       - name: Create research preparation sheets from collected metadata
         run: python chi-no-toshokan/research/build_dossiers.py
 
+      - name: Block unverifiable or unauthorized output before publishing
+        run: python chi-no-toshokan/research/validate_public.py
+
       - name: Publish only the candidate ledger and unverified research sheets
         env:
           GH_TOKEN: ${{ github.token }}
