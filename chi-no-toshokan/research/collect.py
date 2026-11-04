@@ -211,11 +211,13 @@ def selected_topics(topics, at):
     groups = {}
     for t in topics:
         groups.setdefault(t["area"], []).append(t)
-    week = at.isocalendar().week
+    # Mon/Tue/Wed and Thu/Fri/Sat/Sun use distinct topic windows.
+    # This keeps the two weekly runs varied without over-requesting APIs.
+    cycle = at.isocalendar().week * 2 + int(at.weekday() >= 3)
     selected = []
     for area in sorted(groups):
         pool = groups[area]
-        start = (week * 2) % len(pool)
+        start = (cycle * 2) % len(pool)
         selected.extend(pool[(start + j) % len(pool)] for j in range(min(2, len(pool))))
     return selected
 
