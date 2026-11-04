@@ -184,6 +184,7 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 .deep-transition{grid-template-columns:1fr;gap:5px}
 .deep-details>summary strong{font-size:15px}
 }
+.deep-quickmetrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:16px 0}.deep-quickmetrics span{padding:9px 8px;border-radius:10px;background:#f3f5f7;border:1px solid #e6e9ed;min-width:0}.deep-quickmetrics b{display:block;font:normal 22px/1.3 Georgia,serif;color:#314968}.deep-quickmetrics small{display:block;font-size:9px;color:#6f7b8d;line-height:1.5}.deep-details>summary:hover strong{text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:4px}@media(max-width:760px){.deep-quickmetrics{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
@@ -389,7 +390,7 @@ function deepStanzaFlow(a){
    '<div class="deep-two-col">'+deepColumn('初めの登場',m.first?[m.first]:[],'—',false)+
    deepColumn('後の登場',m.last?[m.last]:[],'—',false)+'</div></div>'
  ).join('');
- return '<details class="deep-section deep-details" open><summary><span class="eyebrow">02 / STANZA MOVEMENT</span><strong>段落を追って、言葉の動きを読む</strong><small>'+a.stanzas.length+'段落</small></summary>'+
+ return '<details class="deep-section deep-details"><summary><span class="eyebrow">02 / STANZA MOVEMENT</span><strong>段落を追って、言葉の動きを読む</strong><small>'+a.stanzas.length+'段落</small></summary>'+
   '<p class="desc">改行のまとまりをそのまま段落として扱い、各段落の冒頭と結末を並べます。色の付いた語群は文字列による索引であり、その段落の意味を確定しません。</p>'+
   '<div class="deep-stanzas">'+entries+'</div>'+
   (journey?'<h4 class="deep-minor">複数の段落にまたがる語群</h4>'+journey:'')+
@@ -421,6 +422,7 @@ function openDeepReading(id){
  const a=window.LyricCloseReading.analyze(w,works());
  const intro='<div class="deep-intro"><div class="eyebrow">CLOSE READING / 読みの仮説</div><h2>《'+esc(w.title)+'》を読み解く</h2>'+
  '<p>言葉の出現を数えるだけでなく、<strong>どの位置に置かれ、前後で何が変わるか</strong>を読みます。観察・仮説・別の読みを区別します。</p>'+
+ '<div class="deep-quickmetrics"><span><b>'+a.stanzas.length+'</b><small>段落</small></span><span><b>'+a.variants.length+'</b><small>似た形で再登場する行</small></span><span><b>'+a.transitions.length+'</b><small>接続表現の手がかり</small></span><span><b>'+a.readings.length+'</b><small>根拠付きの読みの仮説</small></span></div>'+ 
  '<div class="deep-actions"><button class="btn sm" data-open="'+esc(w.id)+'">原文を読む</button></div></div>';
  const structure='<section class="deep-section"><div class="eyebrow">01 / STRUCTURE</div><h3>冒頭と結末の距離</h3>'+
  '<div class="deep-two-col">'+deepColumn('冒頭',a.opening,'冒頭なし',false)+deepColumn('結末',a.ending,'結末なし',false)+'</div>'+
