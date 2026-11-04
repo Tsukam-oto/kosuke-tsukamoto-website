@@ -36,7 +36,9 @@ class DossierTests(unittest.TestCase):
         doc = b.build(self.seed, self.record)
         first = doc["dossiers"][0]["sources"][0]
         self.assertIn("ランダム化比較試験", first["publicationTypeHint"])
-        self.assertNotIn("信頼度", json.dumps(doc, ensure_ascii=False))
+        self.assertNotIn("confidenceScore", json.dumps(doc, ensure_ascii=False))
+        self.assertNotIn("reliabilityLevel", json.dumps(doc, ensure_ascii=False))
+        self.assertFalse(doc["dossiers"][0]["readyToPublish"])
 
     def test_low_title_relevance_is_visible(self):
         doc = b.build(self.seed, self.record)
