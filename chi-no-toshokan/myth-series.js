@@ -65,6 +65,10 @@ function render(){
  if(cloud==='guest')status='未ログイン：進捗はこの端末だけに保存します。別端末での同期には図書館からログインしてください。';
  if(cloud==='error')status='クラウドを確認できません。進捗は端末内に残っています。 '+syncMessage;
  dom('sync-status').textContent=status;
+ const prev=dom('reader-prev'),next=dom('reader-next'),counter=dom('reader-counter');
+ if(prev)prev.disabled=current===0;
+ if(next){next.disabled=current===chapters.length-1&&marked;next.textContent=current===chapters.length-1?(marked?'✓ 全話読了':'この話を読了する'):'読了して次へ →'}
+ if(counter)counter.textContent=(current+1)+' / '+chapters.length;
  window.MYTH_ENHANCER?.afterRender(ch);
 }
 async function fetchRemote(){
@@ -115,8 +119,17 @@ function finish(){
  queueSync();
 }
 document.addEventListener('click',e=>{
- const toc=e.target.closest('[data-open]');if(toc){onGo(Number(toc.dataset.open));return}
+ const toc=e.target.closest('[data-open]');
+ if(toc){
+  onGo(Number(toc.dataset.open));
+  if(window.matchMedia?.('(max-width:850px)')?.matches){const menu=dom('toc-disclosure');if(menu)menu.open=false}
+  return;
+ }
  const act=e.target.closest('[data-action]')?.dataset.action;
+ if(act==='open-toc'){
+  const menu=dom('toc-disclosure');if(menu){menu.open=true;menu.scrollIntoView({behavior:'auto',block:'start'})}
+  return;
+ }
  if(act==='previous')onGo(current-1);
  if(act==='next')finish();
 });
@@ -141,6 +154,7 @@ async function init(){
  }catch(e){cloud='error';syncMessage=String(e.message||e);render()}
 }
 if(!chapters.length){dom('sync-status').textContent='連載データを読み込めませんでした。';return}
+if(window.matchMedia?.('(max-width:850px)')?.matches){const menu=dom('toc-disclosure');if(menu)menu.open=false}
 const initial=getHash();current=initial===-1?Math.max(0,chapters.findIndex(c=>c.id===progress.lastRead)):initial;
 render();init();
 window.MYTH_BOOK_DEBUG={count:chapters.length,getState:()=>({cloud,owner:!!owner,current,completed:[...progress.completed]}),chapterIds:chapters.map(c=>c.id)};
