@@ -2,9 +2,9 @@
 const assert=require('node:assert/strict');
 const X=require('./cross-compare.js');
 assert.equal(X.normalized(' 「少し、ずつ」 '),'少しずつ');
-assert.deepEqual(X.inspect('一行目\n\n二行目'),{lineCount:2,characters:9,opening:[{line:1,text:'一行目'},{line:3,text:'二行目'}],ending:[{line:1,text:'一行目'},{line:3,text:'二行目'}]});
-const a='架空の主人公がここで歌っている\n同じ表現を残したいよ\n同じ表現を残したいよ\nありがとう';
-const b='別の主人公がここにいる\n同じ表現を残したいよ\nまた新しい朝';
+assert.deepEqual(X.inspect('一行目\n\n二行目'),{lineCount:2,characters:8,opening:[{line:1,text:'一行目'},{line:3,text:'二行目'}],ending:[{line:1,text:'一行目'},{line:3,text:'二行目'}]});
+const a='架空の主人公がここで歌っている\n同じ表現を未来まで残しておきたいよ\n同じ表現を未来まで残しておきたいよ\nありがとう';
+const b='別の主人公がここにいる\n同じ表現を未来まで残しておきたいよ\nまた新しい朝';
 const r=X.compare(a,b);
 assert.equal(r.sharedCount,1,'count each repeated exact line once');
 assert.equal(r.shared[0].leftLine,2);
