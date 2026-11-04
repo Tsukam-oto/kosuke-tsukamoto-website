@@ -1,4 +1,4 @@
-/* 知の図書館 v1.4.1 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.5.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -67,10 +67,34 @@ function readRoute(){
 function sectionTitle(title,action='',text='すべて見る'){
  return `<div class="section-head"><h2>${esc(title)}</h2><span class="rule"></span>${action?`<button class="link-btn" data-nav="${action}">${esc(text)}　↗</button>`:''}</div>`;
 }
+const EVIDENCE=window.KNOWLEDGE_EVIDENCE||{};
+const EDUCATION_VISUALS=window.KNOWLEDGE_VISUALS||{render:()=>'',bindAction:()=>false,bindInput:()=>false};
+function getEditorialMark(id){const e=EVIDENCE[id];return e?`<span class="evidence-mark checked">主張を${(e.claims||[]).length}点照合</span>`:'<span class="evidence-mark pending">各記述の照合は未完了</span>'}
+function sourceById(e,id){return (e.sources||[]).find(s=>s.id===id)}
+function evidenceAnchor(source){return `<a href="${esc(source.url)}" rel="noopener noreferrer" target="_blank" class="evidence-source-link"><span>${esc(source.kind)}</span>${esc(source.title)} ↗</a>`}
+function renderEvidenceClaims(t){
+ const e=EVIDENCE[t.id];
+ if(!e)return `<section class="evidence-overview pending" aria-label="根拠の検証状態"><div class="evidence-caption">EDITORIAL STATUS</div><h2>参考資料あり・記述ごとの照合は未完了</h2><p>この記事の参考資料へのリンクは、各文の根拠を個別に検証したことを意味しません。重要な内容は資料元に当たってご確認ください。<strong>低い確信度と断定する表示ではなく、照合作業の進捗を示しています。</strong></p></section>`;
+ return `<section class="evidence-overview" aria-label="根拠の照合状況"><div class="evidence-caption">EVIDENCE CHECK · ${esc(e.reviewedAt)}</div><h2>資料と照合した論点 <span class="evidence-count">${e.claims.length}件</span></h2><p>${esc(e.overview)}</p><p class="evidence-disclaimer">注：以下の論点について資料を照合しています。この記事の全文章を検証済みという意味ではありません。</p></section>
+ ${EDUCATION_VISUALS.render(e.visual)}
+ <section class="claim-board" aria-label="主張ごとの根拠"><div class="section-head"><h2>何が分かっていて、何が議論中か</h2></div>
+ ${(e.claims||[]).map((c,i)=>{const names={source:'資料から確認',interpretation:'研究上の解釈',debate:'議論・留保'};return `<article class="evidence-claim"><div class="claim-top"><span class="claim-id">${String(i+1).padStart(2,'0')}</span><span class="claim-type ${esc(c.kind)}">${esc(names[c.kind]||'研究上の論点')}</span></div><h3>${esc(c.title)}</h3><p>${esc(c.detail)}</p><div class="claim-citations">${(c.sources||[]).map(id=>sourceById(e,id)).filter(Boolean).map(x=>evidenceAnchor(x)).join('')}</div></article>`}).join('')}</section>`;
+}
+function renderSectionEvidence(t,index){
+ const e=EVIDENCE[t.id];if(!e)return '';
+ const claims=(e.claims||[]).filter(c=>c.section===index);
+ if(!claims.length)return '';
+ const ids=[...new Set(claims.flatMap(c=>c.sources||[]))];
+ return `<div class="section-sources"><span>この節に関係する資料</span>${ids.map(id=>sourceById(e,id)).filter(Boolean).map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">${esc(x.title)} ↗</a>`).join('')}</div>`;
+}
+function renderArticleSources(t){
+ const e=EVIDENCE[t.id];const curated=e?.sources||[];
+ return `${sectionTitle('参考文献・資料を確認する')}<div class="source-list">${curated.map(source=>`<div class="source-item evidence-source-card"><div><small>${esc(source.kind)} · 照合した論点あり</small><a href="${esc(source.url)}" rel="noopener noreferrer" target="_blank">${esc(source.title)} ↗</a><p>${esc(source.note)}</p></div></div>`).join('')}${(t.sources||[]).filter(([,name,url])=>!curated.some(s=>s.url===url)).map(([type,name,url])=>`<a class="source-item" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><span>${esc(type)}／既存の参考資料</span><strong style="font-size:12px">${esc(name)} ↗</strong></a>`).join('')}</div>${(e?.figures||[]).length?`<div class="evidence-figures"><h3>実際の資料・図版を見る</h3>${e.figures.map(f=>`<a href="${esc(f.url)}" target="_blank" rel="noopener noreferrer" class="figure-link"><strong>${esc(f.title)} ↗</strong><span>${esc(f.credit)}</span></a>`).join('')}</div>`:''}`;
+}
 function renderTopicCard(t,index=0){
  const saved=!!book(t.id),read=isSeen(t.id);
  return `<article class="topic-card"><div class="card-number" aria-hidden="true">${String(index+1).padStart(2,'0')}</div>
- <span class="category">${esc(t.domain)}</span><h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p>
+ <span class="category">${esc(t.domain)}</span>${getEditorialMark(t.id)}<h3>${esc(t.title)}</h3><p>${esc(t.hook)}</p>
  <div class="card-foot"><span>${saved?'<span class="badge gold">蔵書に登録</span>':read?'<span class="badge">閲覧済み</span>':'約3分の探究'}</span><button data-open="${esc(t.id)}">探究する　↗</button></div></article>`;
 }
 let dailyChoice={key:'',topicId:''};
@@ -160,10 +184,11 @@ function renderArticle(){
  return `<div class="article-layout"><div class="kicker"><button class="link-btn" data-nav="library">← 本棚に戻る</button></div>
  <div class="reader-layout"><article class="article"><header class="article-head"><div class="kicker">${esc(t.domain)}　／　EXPLORATION</div><h1>${esc(t.title)}</h1><p class="article-hook">${esc(t.hook)}</p><div class="actions"><button class="btn ${book(t.id)?'btn-soft':''}" data-action="bookmark" data-id="${esc(t.id)}">${book(t.id)?'✓ 蔵書に保存済み':'＋ 私の蔵書に保存'}</button><button class="btn btn-outline" data-action="favorite" data-id="${esc(t.id)}">${b.favorite?'★ お気に入り':'☆ お気に入り'}</button><button class="btn btn-outline" data-action="add-question" data-id="${esc(t.id)}">？ 疑問を残す</button></div></header>
  <p class="reader-lead">${esc(t.summary)}</p>
- ${(t.sections||[]).map(([title,body],i)=>`<section class="reading-section" id="section-${i}"><div class="kicker">CHAPTER ${String(i+1).padStart(2,'0')}</div><h2>${esc(title)}</h2><p>${esc(body)}</p><div style="margin-top:12px"><button class="link-btn" data-action="progress" data-id="${esc(t.id)}" data-index="${i+1}">${Number(v.readIndex||0)>i?'✓ 読了':'ここまで読んだ　✓'}</button></div></section>`).join('')}
+ ${renderEvidenceClaims(t)}
+ ${(t.sections||[]).map(([title,body],i)=>`<section class="reading-section" id="section-${i}"><div class="kicker">CHAPTER ${String(i+1).padStart(2,'0')}</div><h2>${esc(title)}</h2><p>${esc(body)}</p>${renderSectionEvidence(t,i)}<div style="margin-top:12px"><button class="link-btn" data-action="progress" data-id="${esc(t.id)}" data-index="${i+1}">${Number(v.readIndex||0)>i?'✓ 読了':'ここまで読んだ　✓'}</button></div></section>`).join('')}
  <aside class="fact-box"><h3>確かめておきたいこと</h3><ul>${(t.facts||[]).map(f=>`<li>${esc(f)}</li>`).join('')}</ul></aside>
  ${sectionTitle('次に生まれる疑問')}<div class="panel">${(t.questions||[]).map(q=>`<button class="mini-link" data-action="prefill-question" data-id="${esc(t.id)}" data-q="${esc(q)}">？ ${esc(q)}　＋</button>`).join('')}</div>
- ${sectionTitle('資料に当たる')}<div class="source-list">${(t.sources||[]).map(([type,name,url])=>`<a class="source-item" href="${esc(url)}" target="_blank" rel="noopener noreferrer"><span>${esc(type)}</span><strong style="font-size:12px">${esc(name)} ↗</strong></a>`).join('')}</div>
+ ${renderArticleSources(t)}
  <div class="editorial">この記事は学びの入口として編集した要約です。参考資料がすべての記述を逐語的に裏付けているわけではありません。学説が分かれる事項は、提示した資料や原典を確認してください。</div>
  ${sectionTitle('つながる知識')}<div class="related-grid">${(t.related||[]).filter(id=>BY_ID[id]).map(id=>`<button class="related-item" data-open="${esc(id)}"><small>${esc(BY_ID[id].domain)}</small>${esc(BY_ID[id].title)}　↗</button>`).join('')}</div>
  </article><aside class="reader-tools"><div class="panel"><div class="panel-title">探究のしおり</div><p class="small">${Number(v.readIndex||0)} / ${t.sections.length} 節まで読了</p><div class="progress-dots">${t.sections.map((_,i)=>`<div class="progress-dot ${i<Number(v.readIndex||0)?'active':''}"></div>`).join('')}</div>${Number(v.readIndex||0)>0&&Number(v.readIndex||0)<t.sections.length?`<button class="btn btn-soft" data-action="resume-section" data-index="${v.readIndex}">続きを読む ↘</button>`:''}<label for="understanding">理解度</label><select id="understanding" class="select" style="width:100%" data-action="understanding"><option value="0" ${!b.understanding?'selected':''}>これから学ぶ</option><option value="1" ${b.understanding===1?'selected':''}>入口がわかった</option><option value="2" ${b.understanding===2?'selected':''}>説明できそう</option><option value="3" ${b.understanding===3?'selected':''}>深く理解した</option></select></div>
@@ -518,6 +543,7 @@ async function importData(file){if(!needAuth())return;if(file.size>15*1024*1024)
  }await loadCloud();notice(`${count} 件を復元しました。`)}catch(e){notice('復元失敗: '+(e.message||e),true)}}
 async function handleClick(ev){
  const nav=ev.target.closest('[data-nav]');if(nav){ev.preventDefault();navigate(nav.dataset.nav);return}
+ if(EDUCATION_VISUALS.bindAction(ev.target))return;
  const opening=ev.target.closest('[data-open]');if(opening){ev.preventDefault();await openArticle(opening.dataset.open);return}
  const graph=ev.target.closest('[data-graph-id]');if(graph){if(graph.dataset.dragged)return;mapFocus=graph.dataset.graphId;render();return}
  const mode=ev.target.closest('[data-mode]');if(mode){encounterMode=mode.dataset.mode;currentEncounter=null;lastEncounterIds=[];render();return}
@@ -592,7 +618,7 @@ function attachGraphInteractions(){const svg=document.getElementById('graphSvg')
 }
 function handleChange(ev){if(ev.target.id==='shelfSearch'){const input=ev.target;librarySearch=input.value;const start=input.selectionStart;render();const newInput=document.getElementById('shelfSearch');newInput?.focus();newInput?.setSelectionRange(start,start)}
  if(ev.target.id==='understanding'){if(!needAuth())return;const t=BY_ID[selectedId];if(!t)return;const p=deep(book(t.id))||{topicId:t.id,addedAt:new Date().toISOString(),favorite:false,ownSummary:'',notes:''};p.understanding=Number(ev.target.value);save('book',t.id,p)}}
-function bindEvents(){document.addEventListener('click',handleClick);document.addEventListener('input',e=>{if(e.target.id==='shelfSearch')handleChange(e);if(e.target.id==='threadSearch'){threadSearch=e.target.value;const pos=e.target.selectionStart;render();const el=document.getElementById('threadSearch');el?.focus();el?.setSelectionRange(pos,pos)}if(e.target.id==='exportSearch'){exportSearch=e.target.value;const pos=e.target.selectionStart;renderDialog();const el=document.getElementById('exportSearch');el?.focus();el?.setSelectionRange(pos,pos)}});document.addEventListener('change',e=>{if(e.target.id==='understanding')handleChange(e);if(e.target.id==='importFile'&&e.target.files[0])importData(e.target.files[0]);if(e.target.id==='conversationExportFile'&&e.target.files[0])loadConversationsFile(e.target.files[0])});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dialog)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.closest('[data-graph-id]')){e.preventDefault();mapFocus=e.target.closest('[data-graph-id]').dataset.graphId;render()}});window.addEventListener('popstate',()=>{readRoute();render()});window.addEventListener('hashchange',()=>{readRoute();render()});}
+function bindEvents(){document.addEventListener('click',handleClick);document.addEventListener('input',e=>{if(EDUCATION_VISUALS.bindInput(e.target))return;if(e.target.id==='shelfSearch')handleChange(e);if(e.target.id==='threadSearch'){threadSearch=e.target.value;const pos=e.target.selectionStart;render();const el=document.getElementById('threadSearch');el?.focus();el?.setSelectionRange(pos,pos)}if(e.target.id==='exportSearch'){exportSearch=e.target.value;const pos=e.target.selectionStart;renderDialog();const el=document.getElementById('exportSearch');el?.focus();el?.setSelectionRange(pos,pos)}});document.addEventListener('change',e=>{if(e.target.id==='understanding')handleChange(e);if(e.target.id==='importFile'&&e.target.files[0])importData(e.target.files[0]);if(e.target.id==='conversationExportFile'&&e.target.files[0])loadConversationsFile(e.target.files[0])});document.addEventListener('keydown',e=>{if(e.key==='Escape'&&dialog)closeModal();if((e.key==='Enter'||e.key===' ')&&e.target.closest('[data-graph-id]')){e.preventDefault();mapFocus=e.target.closest('[data-graph-id]').dataset.graphId;render()}});window.addEventListener('popstate',()=>{readRoute();render()});window.addEventListener('hashchange',()=>{readRoute();render()});}
 const oldRender=render;render=function(){oldRender();if(view==='map')attachGraphInteractions()};
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&currentUser&&cloudStatus==='ready'&&Date.now()-lastCloudRefresh>30000&&writeQueues.size===0)loadCloud()});
  window.addEventListener('beforeunload',e=>{if(writeQueues.size){e.preventDefault();e.returnValue='';}});
