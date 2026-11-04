@@ -112,11 +112,33 @@
 .cross-source-modal pre{padding:20px;border-radius:12px;background:#f8f6f8;white-space:pre-wrap;overflow-wrap:anywhere;font:13px/2 system-ui,sans-serif;max-height:63vh;overflow:auto}
 .cross-source-modal .cross-modal-head{display:flex;align-items:start;justify-content:space-between;gap:15px}
 @media(max-width:680px){.cross-grid{grid-template-columns:1fr}.cross-card{padding:14px}.cross-reading{grid-template-columns:1fr;row-gap:4px}.cross-reading dt{margin-top:9px}.cross-intro{padding:14px}.cross-source-modal{padding:12px}.cross-source-modal pre{padding:13px}}
+
+.cross-compare-lab{border:1px solid #d7ccdc;background:#fdfbfd;border-radius:14px;margin:17px 0 21px;padding:15px}
+.cross-compare-lab>summary{font-size:13px;font-weight:800;cursor:pointer;line-height:1.8;outline-offset:4px}
+.cross-compare-lab[open]>summary{margin-bottom:16px}
+.compare-pickers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.compare-pickers .field{min-width:0}.compare-pickers select{font-size:12px;max-width:100%;min-width:0}
+.compare-match{padding:14px;margin:19px 0 12px;border:1px solid #e6e0e5;border-radius:12px;background:#fff}
+.compare-match strong{font-size:13px}
+.compare-match-lines{display:grid;gap:6px}
+.compare-match-lines p{padding:8px 10px;background:#f9f6f9;font-size:12px;line-height:1.9;margin:0}
+.compare-match-lines small{font-size:10px;color:#8b8090;display:block}
+.compare-source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:15px}
+.compare-text-card{border:1px solid #e3dce5;background:#fff;padding:16px;border-radius:13px;min-width:0}
+.compare-text-card h3{font-size:15px;overflow-wrap:anywhere}
+.compare-text-card pre{font-size:12px;line-height:1.9;background:#f8f6f8;border-radius:9px;padding:13px;white-space:pre-wrap;overflow-wrap:anywhere;max-height:510px;overflow:auto}
+.compare-text-card details{margin-top:12px;font-size:12px}
+.compare-text-card summary{cursor:pointer;font-weight:700}
+.compare-reading{padding-top:12px;margin-top:12px;border-top:1px solid #eee}
+.compare-reading strong{font-size:12px}
+.compare-reading p{font-size:11px;line-height:1.8}
+@media(max-width:700px){.compare-pickers,.compare-source-grid{grid-template-columns:1fr}.cross-compare-lab{padding:12px}}
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script defer src="./reading-engine.js"></script>
+<script defer src="./cross-compare.js"></script>
 <script defer src="./app.js"></script>
 </head><body>
 <div class="layout">
