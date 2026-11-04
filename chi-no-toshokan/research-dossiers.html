@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1a4033"><meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="description" content="知の図書館：20分野別の研究準備票。論文、原典、音楽目録、美術館資料を自動整理し、記事化までに必要な検証を見える化。">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; img-src 'self' https://images.metmuseum.org data:; base-uri 'none'; object-src 'none'">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<title>調査ノート｜知の図書館</title>
+<style>
+:root{--bg:#f7f8f3;--paper:#fffefa;--green:#204a3b;--green2:#337156;--ink:#20392e;--sub:#5b7060;--line:#d7e1d6;--gold:#a48956}
+*{box-sizing:border-box}
+body{font:15px/1.85 'Zen Kaku Gothic New',system-ui,sans-serif;margin:0;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}a{color:#2b624c;text-underline-offset:3px}button,input,select{font:inherit}button{cursor:pointer}
+a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #bc9450;outline-offset:2px}
+.top{background:#17392f;color:#fff;padding:14px max(17px,calc((100vw - 1030px)/2));display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}.top a{color:#fff;font-weight:700;text-decoration:none}.top span{font-size:12px;color:#d6e6d9}
+.wrap{max-width:1070px;padding:25px 19px 80px;margin:auto}.kicker{font-size:11px;color:#94774e;font-weight:800;letter-spacing:.1em}.hero h1{font-size:clamp(27px,4vw,41px);line-height:1.45;margin:9px 0 11px;letter-spacing:-.02em}.hero p{max-width:790px;color:#4f6958;font-size:15px;line-height:1.9}
+.policy{padding:17px 20px;border-left:4px solid #4d7c5d;border-radius:0 12px 12px 0;background:#e8efe7;font-size:13px;margin:20px 0}.policy strong{display:block;margin-bottom:3px;font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:25px 0 23px}.stat{border:1px solid var(--line);background:var(--paper);border-radius:13px;padding:16px}.stat b{font-size:29px;display:block;line-height:1.35;font-variant-numeric:tabular-nums}.stat small{font-size:11px;color:var(--sub)}
+.breadcrumbs{display:flex;gap:10px;flex-wrap:wrap;font-size:12px;margin-bottom:25px}.breadcrumbs a{padding:7px 12px;border-radius:9px;background:#e8eee7;text-decoration:none;font-weight:700}
+.toolbar{display:grid;grid-template-columns:2fr 1fr 1fr;gap:9px;margin:23px 0 12px}.toolbar input,.toolbar select{min-width:0;min-height:47px;padding:10px 12px;border:1px solid #cbd8ca;border-radius:10px;background:#fff;font-size:15px}
+.count{font-size:12px;color:var(--sub);margin:8px 0 16px}
+.list{display:grid;gap:13px}.sheet{background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;box-shadow:0 5px 18px #142c2010}
+.sheet>summary{cursor:pointer;list-style:none;display:flex;align-items:center;gap:13px;padding:18px 19px;min-height:77px}.sheet>summary::-webkit-details-marker{display:none}.sheet>summary:hover{background:#f5f7f1}
+.sheet .num{background:#ebf0e6;border-radius:10px;color:#607c64;font-weight:800;font-size:15px;display:grid;place-items:center;width:39px;height:39px;flex-shrink:0}
+.sheet-heading{min-width:0;flex:1}.sheet-heading strong{display:block;font-size:16px;line-height:1.55;overflow-wrap:anywhere}.sheet-heading span{display:block;font-size:11px;color:var(--sub)}
+.sheet-flag{font-size:11px;white-space:nowrap;color:#6f684e;border:1px solid #dad1b7;border-radius:30px;padding:5px 9px}.chev{font-size:18px;color:#547761}.sheet[open] .chev{transform:rotate(180deg)}
+.sheet-body{padding:5px 21px 25px;border-top:1px solid var(--line)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:15px 0}
+.info section{padding:13px 15px;background:#f3f6ee;border-radius:11px}.info h3{font-size:13px;margin:0 0 6px}.info p,.info li{font-size:12px;line-height:1.85;margin:0 0 5px;color:#4f6956}.info ul{margin:0;padding-left:17px}
+.h3{font-size:15px;margin:21px 0 11px}.sourcegrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.source{border:1px solid var(--line);border-radius:12px;padding:14px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.source .meta{font-size:11px;color:#6b7f70;line-height:1.7}.source h4{font-size:14px;line-height:1.55;margin:2px 0;overflow-wrap:anywhere}.source p{font-size:11.5px;color:#55705e;margin:4px 0}.source a{font-size:12px;font-weight:800;min-height:44px;display:flex;align-items:center;margin-top:auto;overflow-wrap:anywhere}
+.source .tag{color:#89683d;font-size:11px;font-weight:800}.source .warn{color:#996d3d;font-size:11px}.source img{max-height:170px;width:100%;object-fit:contain;background:#f3f3ef;border-radius:8px}
+.next-step{background:#f6f2e7;border-left:3px solid #b49a64;padding:14px 17px;font-size:12px;color:#5e5e4d;margin:18px 0}
+.empty{padding:25px;border:1px dashed var(--line);background:#fff;border-radius:13px;color:var(--sub);font-size:13px}
+footer{margin-top:32px;border-top:1px solid var(--line);padding:19px 0;font-size:12px;color:var(--sub)}
+@media(max-width:690px){.wrap{padding:17px 12px calc(50px + env(safe-area-inset-bottom))}.stats{gap:7px}.stat{padding:11px}.stat b{font-size:24px}.toolbar{grid-template-columns:1fr 1fr}.toolbar input{grid-column:1/-1}.info,.sourcegrid{grid-template-columns:1fr}.sheet>summary{padding:15px 12px;gap:9px}.sheet .num{width:34px;height:34px}.sheet-heading strong{font-size:15px}.sheet-flag{font-size:10px}.sheet-body{padding:8px 14px 19px}.policy{padding:14px 15px}.source{padding:14px}.source h4{font-size:15px}}
+</style>
+<script defer src="./research-dossiers.js"></script>
+</head><body>
+<header class="top"><a href="./">知の図書館</a><span>自動収集から記事の準備へ</span></header>
+<main class="wrap">
+<section class="hero"><div class="kicker">RESEARCH PREPARATION / ARTICLE PIPELINE</div>
+<h1>記事を書く前に、<wbr>何を確かめるか。</h1>
+<p>20テーマの研究準備票を自動生成します。候補文献・原典・作品情報と、読み解く前に必要な確認事項を一緒に表示します。スマートフォンでも一つずつ調査できます。</p></section>
+<div class="policy"><strong>ここにあるのは記事本文ではありません。</strong>書誌情報や検索結果から推定して結論を書くことはしません。一次資料の該当箇所、研究方法、相反する知見を確かめるまでは、全件「記事化準備」と表示します。</div>
+<div class="stats"><div class="stat"><b id="topic-count">—</b><small>用意した調査テーマ</small></div><div class="stat"><b id="source-count">—</b><small>調査票に対応づけた資料</small></div><div class="stat"><b id="review-count">—</b><small>主張の検証完了件数</small></div></div>
+<div class="breadcrumbs"><a href="./research.html">収集資料の一覧</a><a href="./quality.html">検証済み記事の状況</a><a href="./">図書館へ戻る</a></div>
+<h2 style="font-size:21px;margin:0">テーマ別の調査票</h2>
+<div class="toolbar"><input type="search" id="search" placeholder="音楽・心理学・神話・タイトルで検索" aria-label="調査テーマを検索"><select id="area" aria-label="分野で絞り込む"><option value="all">すべての分野</option></select><select id="coverage" aria-label="資料数で絞り込む"><option value="all">すべての資料状況</option><option value="ready">候補が2件以上</option><option value="few">候補が1件以下</option></select></div>
+<div class="count" id="found" role="status" aria-live="polite">調査票を読み込んでいます。</div><div class="list" id="sheets"></div>
+<footer><strong>編集方針：</strong> 自動で集めた資料は記事の根拠とは別管理。公開する主張の検証・出典の一致・画像の利用権限を確認してから記事へ反映します。最新の更新日時と候補が少ないテーマを画面から把握できます。</footer>
+</main></body></html>
