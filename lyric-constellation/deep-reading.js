@@ -104,6 +104,57 @@ function curated(work,lines){
   return evidence.every(Boolean)?{heading:item.heading,hypothesis:item.thesis,alternative:item.other,evidence}:null;
  }).filter(Boolean);
 }
+
+/* Literary dialogues: interpretations are tentative and each citation must be in both public originals. */
+const DIALOGUES=[
+ {a:'朝になったら',b:'春にあふれて',title:'励ましは、いつ届くのか',
+  aWords:['きっとうまくいくから','僕ら笑えているから'],bWords:['「きっと大丈夫」','嘘に聞こえる'],
+  reading:'希望を言い切る場面と、前向きな言葉を受け取れない場面が対照的です。',
+  alternative:'語り手や状況が違うため、作者の考えが変わった証拠とは限りません。'},
+ {a:'春にあふれて',b:'無題（2026年3月18日）',title:'安易な慰めへの警戒と、それでも選ぶ言葉',
+  aWords:['「怖がらなくてもいいよ」って','あなたは誰なの'],bWords:['耳触りがいい言葉は','「頑張れ」'],
+  reading:'安易な慰めを問い直す態度は重なりますが、言葉を拒む場面と、責任を引き受けて選ぶ場面があります。',
+  alternative:'双方とも相手への距離の取り方を描いており、相反する思想とは限りません。'},
+ {a:'願い',b:'出会い',title:'音楽に収まりきらないもの',
+  aWords:['言葉にならないものばかり','音楽になったら良い'],bWords:['楽譜の中に収まりきらない','人と人との間で'],
+  reading:'言葉や楽譜という器に収まりきらないものを、音楽の側に見ています。',
+  alternative:'「願い」は将来への祈り、「出会い」は今ある関係の描写であり、同じ意味とは限りません。'},
+ {a:'あなたと',b:'これから',title:'ありふれた言葉が、特別になるとき',
+  aWords:['ここで良かった','ありがとう'],bWords:['ありふれた言葉','言葉になる前の'],
+  reading:'別れの場面で言葉の難しさに向き合いながら、相手との関係を通して意味を持たせています。',
+  alternative:'卒業という共通の状況に由来する表現かもしれず、直接の改稿関係は示しません。'},
+ {a:'ただなか',b:'All around you',title:'日常は安らぎなのか、息苦しさなのか',
+  aWords:['ありふれた毎日','幸せのただなかで'],bWords:['苦しいような','救われるような'],
+  reading:'日常を抱きしめる表現と、日常に救いと苦しさが同居する表現を比較できます。',
+  alternative:'語り手の人生段階や、その日の心境の違いを描いただけとも読めます。'},
+ {a:'夏を吸い込んで',b:'朝になったら',title:'一人では見られない未来',
+  aWords:['あなたがいたから。','明日の僕らが、'],bWords:['1人じゃないと気づいたのは','僕らを待っているから'],
+  reading:'未来への期待を、自分だけの努力でなく、誰かとの関係から描く点が響き合います。',
+  alternative:'共同体の歌として主語を広げる構造であり、個人の経験をそのまま語ったとは限りません。'},
+ {a:'晴れ渡る空',b:'春にあふれて',title:'自分らしくいられる世界を願う',
+  aWords:['優しいあなたが','優しくいられる'],bWords:['あなたがあなたで','わたしがわたしで'],
+  reading:'努力や成功を求めるよりも、相手が自分として存在できる条件に関心が向いています。',
+  alternative:'その条件を実現する責任まで歌詞が描ききっているかは、別に考える必要があります。'},
+ {a:'これから',b:'出会い',title:'言葉や譜面の外側にある関係',
+  aWords:['言葉になる前の','今の気持ちを'],bWords:['楽譜の中に収まりきらない','音楽は色を'],
+  reading:'書かれた言葉や記譜だけでは言い表しきれない感情を、作品の中に置いています。',
+  alternative:'一方は送別の言葉、もう一方は音楽そのものについての表現で、対象は異なります。'}
+];
+function dialogueRead(work,others){
+ if(work.origin!=='official')return [];
+ const byTitle=new Map((others||[]).filter(w=>w&&w.origin==='official'&&w.sky===work.sky).map(w=>[w.title,w]));
+ const out=[],current=splitLines(work.lyrics);
+ for(const d of DIALOGUES){
+  if(d.a!==work.title&&d.b!==work.title)continue;
+  const otherName=d.a===work.title?d.b:d.a,other=byTitle.get(otherName);
+  if(!other||other.id===work.id)continue;
+  const myWords=d.a===work.title?d.aWords:d.bWords,otherWords=d.a===work.title?d.bWords:d.aWords;
+  const their=splitLines(other.lyrics),here=myWords.map(x=>evidenceFor(current,x)),there=otherWords.map(x=>evidenceFor(their,x));
+  if(!here.every(Boolean)||!there.every(Boolean))continue;
+  out.push({title:d.title,otherTitle:other.title,otherId:other.id,reading:d.reading,alternative:d.alternative,here,there});
+ }
+ return out;
+}
 function crossRead(work,others){
  if(work.origin!=='official')return [];
  const lines=splitLines(work.lyrics);
@@ -128,7 +179,7 @@ function analyze(work,others=[]){
   opening:lines.slice(0,3),ending:lines.slice(-3),
   pronouns:pronounReading(lines),questions:questionLines(lines),
   repeats:repeats(lines),motifs:motifs(lines),
-  readings:curated(work,lines),cross:crossRead(work,others),
+  readings:curated(work,lines),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
   caution:'人称やモチーフは表記に基づく観察です。意味、語り手、制作意図、創作年代を自動確定しません。'};
 }
 root.LyricCloseReading={version:'close-reading-1.0',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines};
