@@ -5,6 +5,7 @@ const CLOUD_URL="https://nroyxwozdxwnrqyierjx.supabase.co", CLOUD_PUBLIC_KEY="sb
 const STORE='lyric_strata_local_v1', MAX_NOTE=250000;
 let data=[], current=null, view='strata', cloud=null, user=null, syncing=false;
 let masterCandidates=[],masterWorks=new Map(),matchLoadError='';
+let readingReportCache=null, readingFocus=-1, readingShow=20;
 const $=id=>document.getElementById(id);
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const newId=()=>window.crypto?.randomUUID?.()||('local-'+Date.now()+'-'+Math.random().toString(36).slice(2));
@@ -40,7 +41,7 @@ function addBatch(records){
   if(exists.has(sourceKey(x))){duplicates++;continue;}
   data.push(x);exists.add(sourceKey(x));added++;
  }
- if(added)save();
+ if(added){readingReportCache=null;save();}
  current=data[data.length-1]?.source_id||current;
  render();
  return {added,duplicates,invalid};
@@ -156,20 +157,68 @@ async function importFile(){
   if(result.added)go('strata');
  }catch(e){$('importReport').textContent=e.message;toast('取り込みエラー：'+e.message);}
 }
-function wordCandidates(a,b){
- const seen=new Set(),match=[];
- const txt=a.original_text.replace(/\s+/g,'').slice(0,7000);
- const other=b.original_text.replace(/\s+/g,'').slice(0,7000);
- for(let n=10;n>=5;n--){
-  for(let i=0;i+n<=txt.length&&match.length<3;i++){
-   const phrase=txt.slice(i,i+n);
-   if(!/^[\p{L}\p{N}]+$/u.test(phrase)||seen.has(phrase)||other.indexOf(phrase)<0)continue;
-   if(match.some(x=>x.includes(phrase)))continue;
-   seen.add(phrase);match.push(phrase);
-  }
-  if(match.length>=3)break;
- }
- return match;
+
+function readingReport(){
+ if(!window.StrataReadingV2)return null;
+ // The original text and created date are immutable after import; local classification can change.
+ const signature=data.map(e=>(e.source_id||e.id)+'/'+e.sky+'/'+e.original_text.length+'/'+String(e.original_text).slice(-16)).join('|');
+ if(!readingReportCache||readingReportCache.signature!==signature)
+   readingReportCache={signature,result:window.StrataReadingV2.scan(data)};
+ return readingReportCache.result;
+}
+function dateDetail(e){
+ const created=e.source_created_local?e.source_created_local.replace('T',' ').slice(0,16):'不明';
+ const modified=e.source_modified_local?e.source_modified_local.replace('T',' ').slice(0,16):'不明';
+ return 'メモ作成：'+created+' ／ 更新：'+modified;
+}
+function readingPairKey(e){return e.source_id||e.id;}
+function viewReadingDetail(pair){
+ const row=(label,val,empty)=>'<div class="reading-compare-column"><h4>'+label+'</h4>'+
+  (val.length?'<div class="reading-compare-lines">'+val.map(t=>'<p>'+esc(t)+'</p>').join('')+'</div>':
+   '<p class="muted">'+empty+'</p>')+'</div>';
+ const shared=pair.shared.length?
+  '<div class="reading-evidence"><h4>両方に残る表現 '+pair.sharedCount+'行</h4>'+
+  pair.shared.map(x=>'<div class="reading-unchanged">'+esc(x.a)+'</div>').join('')+'</div>':
+  '<p class="muted">同じ行が見つからなくても、同題稿の可能性は残ります。</p>';
+ const altered=pair.rephrased.length?
+  '<div class="reading-evidence"><h4>言い換え・修正の可能性がある行（自動候補）</h4>'+
+  pair.rephrased.map(x=>'<div class="reading-change">'+row('メモA', [x.a],'')+row('メモB',[x.b],'')+'</div>').join('')+'</div>':'';
+ return '<div class="reading-expanded"><h3>二つの記録を読み比べる</h3>'+
+  '<p class="muted">※ Appleメモの日時は記録上の日時です。ここではどちらが完成稿か、何が採用・削除されたかを断定しません。行の順番や文脈も原文で確認してください。</p>'+
+  '<div class="reading-meta-pair"><div><b>メモA</b><strong>'+esc(pair.a.title)+'</strong><small>'+esc(dateDetail(pair.a))+'</small></div>'+
+  '<div><b>メモB</b><strong>'+esc(pair.b.title)+'</strong><small>'+esc(dateDetail(pair.b))+'</small></div></div>'+
+  shared+altered+
+  '<div class="reading-evidence"><h4>片方にだけある行の例</h4><div class="reading-change">'+
+  row('メモAのみ（削除の意味ではありません）',pair.onlyA,'候補なし')+
+  row('メモBのみ（追加の意味ではありません）',pair.onlyB,'候補なし')+'</div></div>'+
+  '<div class="reading-source-actions"><button class="btn" data-note="'+esc(readingPairKey(pair.a))+'">メモAの原文を開く</button>'+
+  '<button class="btn" data-note="'+esc(readingPairKey(pair.b))+'">メモBの原文を開く</button></div>'+
+  '<details class="reading-raw"><summary>メモAの原文全文（改変なし）</summary><pre>'+esc(pair.a.original_text)+'</pre></details>'+
+  '<details class="reading-raw"><summary>メモBの原文全文（改変なし）</summary><pre>'+esc(pair.b.original_text)+'</pre></details>'+
+  '</div>';
+}
+function readingPairsView(){
+ const r=readingReport();
+ if(!r)return '<div class="candidate-notice">照合エンジンの読み込みに失敗しました。再読み込みしてください。</div>';
+ const found=r.candidates;
+ const metrics='<div class="reading-metrics"><span><strong>'+r.scanned+'</strong><small>比較したメモ</small></span>'+
+  '<span><strong>'+found.length+'</strong><small>原文の関連候補</small></span>'+
+  '<span><strong>'+r.notesWithCandidates+'</strong><small>候補のあるメモ</small></span>'+
+  '<span><strong>'+r.totalLines+'</strong><small>比較した有効行</small></span></div>';
+ const note='<p class="muted">74件などの登録メモを先頭70件で打ち切らず、全文から行・部分表現・同題の候補を比較します。共通語が短いだけでは関連づけず、似た表現は自動判定として区別します。意味や転用意図は判定しません。「候補なし」は「未使用」の意味ではありません。</p>'+
+  (r.capped.length?'<p class="candidate-notice">非常に長い記録については照合中の検索文字数が25,000字を超えたため、確認対象：'+esc(r.capped.join('／'))+'</p>':'');
+ if(!found.length)return metrics+'<p class="muted">一定以上の共通表現があるメモは見つかっていません。</p>'+note;
+ const cards=found.slice(0,readingShow).map((p,i)=>{
+  const active=i===readingFocus;
+  return '<article class="reading-pair-card"><div class="reading-pair-top"><span class="match-source '+(p.sameTitle?'':'weak')+'">'+esc(p.confidence)+'</span>'+
+   '<span class="muted">同じ行：'+p.sharedCount+' / 近い行：'+p.changedCount+'</span></div>'+
+   '<div class="match-titles"><strong>'+esc(p.a.title)+'</strong><span>と</span><strong>'+esc(p.b.title)+'</strong></div>'+
+   '<p class="muted">'+esc(displayDate(p.a))+' ／ '+esc(displayDate(p.b))+'</p>'+
+   (p.shared.length?'<div class="match-fragments">'+p.shared.slice(0,2).map(z=>'<span>'+esc(z.a)+'</span>').join('')+'</div>':'')+
+   '<button class="btn '+(active?'purple':'')+'" data-reading-open="'+i+'">'+(active?'比較を閉じる':'原文の違いを比較する')+'</button>'+
+   (active?viewReadingDetail(p):'')+'</article>';
+ }).join('');
+ return metrics+cards+(found.length>readingShow?'<button class="btn" id="readingMore">ほかの '+(found.length-readingShow)+'組も表示</button>':'')+note;
 }
 
 const candidateMethodNames={
@@ -237,18 +286,10 @@ async function reviewCandidate(id,decision){
  item.review_status=decision;renderDiscovery();toast('ご本人の判定を保存しました。メモの原文・作品DBは変更していません。');
 }
 function renderDiscovery(){
- const items=data.filter(e=>e.original_text.length>=6).slice(0,70), found=[];
- for(let i=0;i<items.length;i++)for(let j=i+1;j<items.length;j++){
-  if(items[i].sky!==items[j].sky)continue;
-  const phrases=wordCandidates(items[i],items[j]);
-  if(phrases.length)found.push({a:items[i],b:items[j],phrases});
- }
- found.sort((a,b)=>b.phrases[0].length-a.phrases[0].length);
- const info='<p class="muted">暫定的に最初の70件から5文字以上の連続一致を探します。名義が異なる原稿は結びません。AIが新しい歌詞を書き足すことはありません。</p>';
- if(!found.length){$('discoveryOutput').innerHTML='<h2>完成作品との照合</h2>'+workCandidateView()+'<h2 class="match-subhead">メモ同士の一致</h2><p class="muted">今の登録内容からは明確な一致が見つかっていません。</p>'+info;return;}
- $('discoveryOutput').innerHTML='<h2>完成作品との照合</h2>'+workCandidateView()+'<h2 class="match-subhead">メモ同士の一致</h2>'+
- found.slice(0,30).map(x=>'<div style="padding:12px 0;border-bottom:1px solid #ece5ec"><div><strong>'+esc(x.a.title)+'</strong> × <strong>'+esc(x.b.title)+'</strong></div><div class="links">'+x.phrases.map(p=>'<span>'+esc(p)+'</span>').join('')+'</div><div class="mini">'+esc(displayDate(x.a))+' ／ '+esc(displayDate(x.b))+'</div></div>').join('')+info;
+ $('discoveryOutput').innerHTML='<h2>メモ同士を読み解く</h2>'+readingPairsView()+
+ '<h2 class="match-subhead">完成作品の原文と照合</h2>'+workCandidateView();
 }
+
 function manualSubmit(e){
  e.preventDefault();const title=$('manualTitle').value.trim(),text=$('manualBody').value;
  if(!title||!text.trim()){toast('タイトルと本文を入力してください。');return;}
@@ -260,7 +301,7 @@ function manualSubmit(e){
 async function saveClassification(){
  const e=data.find(x=>x.source_id===current);if(!e)return;
  e.sky=$('editSky').value;e.classification=$('editClass').value;e.reviewer_note=$('editMemo').value.slice(0,8000);
- e.reviewed_at=new Date().toISOString();e.dirty=true;save();render();toast('分類を端末に保存しました。クラウドには「クラウドに保存」で反映します。');
+ e.reviewed_at=new Date().toISOString();e.dirty=true;readingReportCache=null;save();render();toast('分類を端末に保存しました。クラウドには「クラウドに保存」で反映します。');
 }
 function client(){
  if(cloud)return cloud;
@@ -279,7 +320,7 @@ async function cloudLoad(){
    if(!old){data.push({...row,synced:true,dirty:false});extra++;}
    else if(!old.dirty){Object.assign(old,row,{synced:true,dirty:false});}
   }
-  if(extra||remote?.length)save();
+  if(extra||remote?.length){readingReportCache=null;save();}
   await loadMasterCandidates();
   toast('クラウドから '+(remote?.length||0)+'件を確認、新規 '+extra+'件を追加しました。');
  }catch(e){toast('クラウド読み込み失敗：'+(e.message||e));}finally{syncing=false;render();}
@@ -327,13 +368,15 @@ async function initSession(){
 document.addEventListener('click',e=>{
  const note=e.target.closest('[data-note]');
  if(note){current=note.dataset.note;go('strata');return;}
+ const reading=e.target.closest('button[data-reading-open]');if(reading){const i=Number(reading.dataset.readingOpen);readingFocus=readingFocus===i?-1:i;renderDiscovery();return;}
+ if(e.target.id==='readingMore'){readingShow+=20;renderDiscovery();return;}
  const review=e.target.closest('button[data-candidate][data-decision]');if(review){reviewCandidate(review.dataset.candidate,review.dataset.decision);return;}
  const btn=e.target.closest('button[data-view]');
  if(btn){go(btn.dataset.view);return;}
  if(e.target.id==='saveClass'){saveClassification();return;}
 });
 document.addEventListener('DOMContentLoaded',()=>{
- read();current=data[0]?.source_id||null;
+ read();readingReportCache=null;current=data[0]?.source_id||null;
  $('search').addEventListener('input',renderList);
  $('skyFilter').addEventListener('change',renderList);
  $('manualForm').addEventListener('submit',manualSubmit);
