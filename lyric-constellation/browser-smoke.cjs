@@ -97,6 +97,75 @@ async function runScenario(browser,base,{mobile}){
    ': navigate → evidence → journal filters → direct topic → save → reload → restore → pending excluded');
  } finally {await context.close()}
 }
+
+/* Private-corpus browser test: all fictional records, mocked owner-scoped Supabase responses. */
+async function runPrivateCatalogScenario(browser,base,{mobile}){
+ const context=await browser.newContext({viewport:mobile?{width:390,height:844}:{width:1365,height:900},isMobile:mobile,hasTouch:mobile});
+ const page=await context.newPage(),errors=[];
+ page.on('pageerror',e=>errors.push(e.message));
+ await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
+ try{
+  await page.goto(base+'/lyric-constellation/',{waitUntil:'domcontentloaded'});
+  const probe=await page.evaluate(async()=>{
+   const catalog=[],texts=[];
+   for(let i=0;i<168;i++){
+    const id='fictional-rap-'+String(i).padStart(3,'0');
+    catalog.push({id,sky:'rap',title:'検証曲'+String(i+1).padStart(3,'0'),form:'song',
+      collection_title:'検証用の曲集',track_no:i+1,original_book_index:i,
+      verification_status:'source_text_present',authorship_status:'unknown',
+      source_review_note:'PDF原文校正待ち',source_page_start:i+2,source_page_end:i+2,source_name:'検証用PDF'});
+    const lyric='俺はまだ言葉を探している\n君はいつか帰ってくるのかな\n'+
+      '\n今日も窓から空を見た\nそれでも僕らは歌を続ける\n'+
+      '\n俺の歩く道は変わらない\n君が好きな朝が来るかもしれない\n'+
+      'どうして言葉が続くのだろう\nでも明日になれば違うかもしれない';
+    texts.push({work_id:id,version_no:1,literal_text:lyric,text_status:'unverified_pdf_extract',source_ref:'synthetic fixture'});
+   }
+   catalog.push({id:'fictional-personal',sky:'personal',title:'個人曲テスト',form:'song',collection_title:'本人原稿'});
+   texts.push({work_id:'fictional-personal',version_no:1,literal_text:'今日と明日の間に\n君と二人で歩く道\nいつかこの言葉を伝える\nここにいると伝える',text_status:'author_original'});
+   catalog.push({id:'fictional-awaiting',sky:'choir',title:'これからも',form:'song',collection_title:'原文待ち'});
+   const user={id:'synthetic-owner'};
+   const previous=cloudEpoch;cloudEpoch=previous+1;cloudUser=user;
+   cloudClient={from(table){return {
+    select(){return this},eq(){return this},
+    order(){return table==='lyric_master_works'?Promise.resolve({data:catalog,error:null}):this},
+    limit(){return Promise.resolve({data:texts,error:null})}
+   }}};
+   await loadMasterReadingCorpus(user,cloudEpoch);
+   return {loaded:masterReadingWorks.length,rap:masterReadingWorks.filter(w=>w.sky==='rap').length,
+    personal:masterReadingWorks.filter(w=>w.sky==='choir').length,pending:masterPendingWorks.length};
+  });
+  assert.equal(probe.loaded,169);assert.equal(probe.rap,168);assert.equal(probe.personal,1);assert.equal(probe.pending,1);
+  await page.locator('[data-sky="rap"]').first().click();
+  await page.locator('nav [data-view="works"]').click();
+  assert.equal(await page.locator('.work-card').count(),168);
+  assert.match(await page.locator('#screen').innerText(),/PDF抽出・未校正/);
+  const summary=page.locator('#readingJournal summary').first();
+  await summary.click();
+  const shown=await page.locator('#readingJournalItems .reading-journal-item').count();
+  assert.ok(shown>0&&shown<=36,'long rap journals are paged');
+  assert.ok(await page.locator('#readingJournal [data-reading-more]').count()===1);
+  const sourceCard=page.locator('.work-card').filter({hasText:'検証曲001'}).first();
+  await sourceCard.click();
+  assert.match(await page.locator('#drawer').innerText(),/未校正/);
+  assert.equal(await page.locator('#drawer [data-edit]').count(),0,'source cannot be edited in place');
+  assert.equal(await page.locator('#drawer [data-delete]').count(),0,'source cannot be deleted in place');
+  await page.locator('#drawer .deep-entry [data-deep-work]').click();
+  assert.match(await page.locator('#drawer').innerText(),/原文から考える問い/);
+  assert.match(await page.locator('#drawer').innerText(),/語り手と呼びかける相手/);
+  assert.equal(errors.length,0,errors.join(' / '));
+  const leak=await page.evaluate(()=>{
+   const text=JSON.stringify(localStorage);
+   masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='signed_out';cloudUser=null;render();
+   return {hasPrivate:document.querySelector('#screen')?.textContent.includes('検証曲001'),
+    stored:text.includes('検証曲001'),visible:works().length};
+  });
+  assert.equal(leak.hasPrivate,false);
+  assert.equal(leak.stored,false,'private master lyrics must not be cached in localStorage');
+  assert.equal(leak.visible,0,'private rap disappears after sign-out');
+  console.log('PASS private master '+(mobile?'mobile':'desktop')+': 168 rap songs, 1 personal, missing-text catalog, reading, owner-only clearing');
+ }finally{await context.close()}
+}
+
 (async()=>{
  let server,browser;
  try{
@@ -106,6 +175,8 @@ async function runScenario(browser,base,{mobile}){
   browser=await chromium.launch({headless:true});
   await runScenario(browser,base,{mobile:false});
   await runScenario(browser,base,{mobile:true});
+  await runPrivateCatalogScenario(browser,base,{mobile:false});
+  await runPrivateCatalogScenario(browser,base,{mobile:true});
  } finally {
   if(browser)await browser.close();
   if(server)await new Promise(resolve=>server.close(resolve));
