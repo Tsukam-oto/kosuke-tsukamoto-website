@@ -1,4 +1,4 @@
-/* 知の図書館 v1.6.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
+/* 知の図書館 v1.7.0 — ライブラリ表示は公開コンテンツ。個人データは認証後、RLS付きSupabaseにのみ保存。 */
 (() => {
 'use strict';
 const TOPICS = (window.KNOWLEDGE || []).filter(x=>x.id && x.title);
@@ -158,6 +158,12 @@ function renderHome(){
  const pendingQuestions=Object.values(records.question).filter(q=>q.payload?.status!=='resolved' && q.payload?.text).sort((a,b)=>(b.payload?.createdAt||'').localeCompare(a.payload?.createdAt||'')).slice(0,2);
  return `<div class="kicker">WELCOME TO YOUR LIBRARY</div><h1 class="page-title">世界には、まだ知らないことがある。</h1><p class="page-description">新しい問いから始まり、思いがけない分野へつながっていく。今日も一つ、扉を開いてみませんか。</p>
  <section class="hero"><div class="hero-content"><div class="kicker">TODAY'S DISCOVERY — ${esc(today())}</div><div class="topic-name">${esc(t.domain)}</div><h2>${esc(t.title)}</h2><p>${esc(t.hook)}<br>${esc(t.summary)}</p><div class="hero-actions"><button class="btn btn-light" data-open="${esc(t.id)}">このテーマを探究する　↗</button><button class="btn btn-outline" style="color:#f2f4ec;border-color:#7f9c8f" data-nav="encounter">違う世界をのぞく</button></div></div></section>
+ <section class="panel" style="margin:20px 0 24px;background:linear-gradient(115deg,#e7f0e9,#f2efe5);border-color:#cdd9cb" aria-labelledby="music-library-title">
+  <div class="kicker">MUSIC DISCOVERY · 聴く／知る／つくる</div>
+  <h2 id="music-library-title" style="margin:6px 0 9px;font-size:22px">音楽を聴いて、音楽の仕組みを発見する。</h2>
+  <p style="max-width:720px;margin:0 0 14px">ベートーヴェンやバッハからラヴェル、ライヒまで。作曲家を知り、曲の聴きどころを見つけ、音程・和声・形式・管弦楽法を耳で試せます。</p>
+  <a class="btn btn-soft" href="./music-library.html" style="display:inline-block;text-decoration:none">音楽の図書館を開く・おすすめを聴く ↗</a>
+ </section>
  <section class="panel" style="margin:20px 0 24px;background:linear-gradient(115deg,#f1eee3,#e9f0e7);border-color:#cdd9cb" aria-labelledby="myth-series-title">
   <div class="kicker">SERIES · 全10話</div>
   <h2 id="myth-series-title" style="margin:6px 0 9px;font-size:22px">ギリシャ神話を、最初から読む。</h2>
