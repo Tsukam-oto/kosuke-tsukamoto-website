@@ -1,5 +1,11 @@
 #!/bin/zsh
 set -e
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "Python 3 が見つかりません。日付付き書き出しを開始できませんでした。"
+  echo "この画面をChatGPTに送ってください。"
+  read "reply?Enterキーで閉じます: "
+  exit 1
+fi
 python3 - <<'PY'
 import json,subprocess,sys,datetime,pathlib,hashlib
 print('言葉の地層 | Appleメモの指定フォルダだけを書き出します。原本は変更しません。')
