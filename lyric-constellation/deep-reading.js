@@ -179,11 +179,62 @@ function evidenceSpan(lines,stanzas){
  return {stanzas:used,stanzaCount:used.length,note:used.length>1?'複数の段落に根拠があります':'同じ段落内の根拠です'};
 }
 
+
+/* Reconsideration evidence: independent passage within each public work. It complicates
+   an interpretation; it is not necessarily its logical negation or an author's intention. */
+const RECONSIDER={
+ 'All around you':{
+  '矛盾した願いを消さない':{frag:'せっかくひとりぼっちに',question:'相反する願いは、孤独への望みとどのように関係しているでしょうか。'},
+  '日常が救いにも負担にもなる':{frag:'早く帰りたかったのに',question:'「救われる」感覚と「帰りたい」感覚はどのように同居しているでしょうか。'}
+ },
+ '春にあふれて':{
+  '励ましの言葉を受け取れないとき':{frag:'そばで',question:'言葉を信用できない状況でも、「そばにいる」ことには別の意味があるでしょうか。'},
+  '相互に保たれる「あなた」と「わたし」':{frag:'うまく笑えないまま',question:'自分らしくなった先だけでなく、まだ難しい状態そのものをどう扱っているでしょうか。'}
+ },
+ '無題（2026年3月18日）':{
+  '励ましの危うさを知ったうえで伝える':{frag:'逃げ出してしまったり',question:'「頑張れ」を選ぶことと、頑張れない日を認めることは両立するでしょうか。'}
+ },
+ '夏を吸い込んで':{
+  '自分の言い訳を見つめる視点':{frag:'一人きりじゃ見られなかった',question:'「前を向く」のは自分の決意だけでなく、他者の存在による変化ではないでしょうか。'}
+ },
+ 'これから':{
+  '「ありふれた言葉」が特別になる':{frag:'言葉になるまでの気持ちを',question:'言葉にならない過程自体が、感謝の意味を支えているのでしょうか。'}
+ },
+ 'ただなか':{
+  '「なんでもない日」が変わる':{frag:'無くしたものばかり',question:'日常を特別だと感じることには、失ったものへのまなざしも含まれているでしょうか。'}
+ },
+ '晴れ渡る空':{
+  '何かを増やすより、何を持っているか':{frag:'簡単なようで',question:'すでにある価値を知ることは、誰にとっても簡単なのでしょうか。'}
+ },
+ 'あなたと':{
+  '「僕」と「私」を両方残す':{frag:'周りの人に救われていた',question:'共有される声でありながら、誰かに支えられた実感をどこまで個別の声として読めるでしょうか。'}
+ },
+ '朝になったら':{
+  '「僕」と「僕ら」の間に何があるか':{frag:'もっと頑張る僕だったら',question:'「僕ら」へ視野が広がる前の、自分ひとりへの要求をどう読めるでしょうか。'},
+  '反復する「帰り道」の意味':{frag:'不安が積もってる帰り道',question:'安心につながる帰り道は、不安だった帰り道の記憶を消しているでしょうか。'}
+ },
+ '出会い':{
+  '音楽は楽譜の中だけに存在しない':{frag:'別れをもっている',question:'音楽が人とのつながりを生むだけでなく、別れを含む点はどう影響するでしょうか。'}
+ },
+ '願い':{
+  '音楽の力を言い切らない':{frag:'そんな音楽に救われて',question:'音楽の力を断定しない一方、語り手自身の経験はどこまで確かなものでしょうか。'}
+ }
+};
+function reconsider(work,heading,lines,evidence){
+ const row=RECONSIDER[work.title]?.[heading];
+ if(!row)return null;
+ const passage=evidenceFor(lines,row.frag);
+ if(!passage)return null;
+ // Prefer additional material outside the three original supporting passages.
+ if(evidence.some(e=>e.line===passage.line))return null;
+ return {passage,question:row.question,kind:'解釈を再検討するための箇所'};
+}
+
 function curated(work,lines){
  if(work.origin!=='official')return [];
  return (EDITORIAL[work.title]||[]).map(item=>{
   const evidence=item.anchors.map(f=>evidenceFor(lines,f));
-  return evidence.every(Boolean)?{heading:item.heading,hypothesis:item.thesis,alternative:item.other,evidence}:null;
+  return evidence.every(Boolean)?{heading:item.heading,hypothesis:item.thesis,alternative:item.other,evidence,reconsider:reconsider(work,item.heading,lines,evidence)}:null;
  }).filter(Boolean);
 }
 
@@ -266,5 +317,5 @@ function analyze(work,others=[]){
   readings:curated(work,lines).map(r=>({...r,coverage:evidenceSpan(r.evidence,stanzas)})),dialogues:dialogueRead(work,others),cross:crossRead(work,others),
   caution:'人称やモチーフは表記に基づく観察です。意味、語り手、制作意図、創作年代を自動確定しません。'};
 }
-root.LyricCloseReading={version:'close-reading-2.0',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines,splitStanzas,variantRepetitions,transitionClues,motifJourney};
+root.LyricCloseReading={version:'close-reading-2.1',analyze,splitLines,evidenceFor,pronounReading,repeats,questionLines,splitStanzas,variantRepetitions,transitionClues,motifJourney};
 })(typeof window!=='undefined'?window:globalThis);
