@@ -7,7 +7,7 @@ window.MUSIC_PROGRESS=(()=>{
  const RECORD_ID='note:music-listening-v1';
  const allowed=new Set((window.MUSIC_LIBRARY_CATALOG?.works||[]).map(w=>w.id));
  const observers=new Set();
- let owner='',client=null,remote=null,phase='checking',error='',entries={},writes=Promise.resolve(),generation=0;
+ let owner='',client=null,remote=null,phase='checking',error='',entries={},writes=Promise.resolve(),generation=0,lastRefresh=0;
  const key=uid=>'knowledge-music-listening-v1:'+ (uid||'guest');
  const validState=new Set(['later','done','none']);
  const timestamp=t=>{const d=Date.parse(t||'');return Number.isFinite(d)?d:0};
@@ -122,8 +122,31 @@ window.MUSIC_PROGRESS=(()=>{
    queueSync();emit();return true;
   }catch(e){if(owner===uid&&generation===g){phase='error';error='再接続できませんでした。'+(e?.message||'');emit()}return false}
  }
+ async function refresh(){
+  if(!owner||!client||phase==='checking')return false;
+  if(Date.now()-lastRefresh<20000)return false;
+  lastRefresh=Date.now();
+  const uid=owner,g=generation;
+  try{
+   // Do not race a foreground refresh with writes already in progress.
+   await writes.catch(()=>{});
+   if(owner!==uid||generation!==g)return false;
+   const latest=await getRemote(uid);
+   if(owner!==uid||generation!==g)return false;
+   remote=latest;
+   entries=merge(latest?.payload?.entries,entries);
+   diskWrite();
+   phase='ready';error='';emit();
+   if(Object.keys(entries).length&&JSON.stringify(sanitize(latest?.payload?.entries))!==JSON.stringify(entries))queueSync();
+   return true;
+  }catch(e){
+   if(owner===uid&&generation===g){phase='error';error='再読込に失敗しました。端末内の記録を保持しています。';emit()}
+   return false;
+  }
+ }
  function swapOwner(uid){
   generation++;
+  lastRefresh=0;
   owner=uid||'';remote=null;entries=diskRead(owner);
   phase=owner?'checking':'guest';error='';emit();
  }
@@ -165,5 +188,8 @@ window.MUSIC_PROGRESS=(()=>{
  entries=diskRead('');
  phase='checking';emit();
  start();
- return {state,subscribe,set,retry,importGuest,start};
+ // iPhoneでApple Musicから戻ったときに、別端末の変更を取り込みます。
+ if(typeof document!=='undefined')document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')refresh()});
+ window.addEventListener?.('pageshow',event=>{if(event.persisted)refresh()});
+ return {state,subscribe,set,retry,importGuest,refresh,start};
 })();
