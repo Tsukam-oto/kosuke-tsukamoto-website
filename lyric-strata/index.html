@@ -133,6 +133,41 @@
 .compare-reading strong{font-size:12px}
 .compare-reading p{font-size:11px;line-height:1.8}
 @media(max-width:700px){.compare-pickers,.compare-source-grid{grid-template-columns:1fr}.cross-compare-lab{padding:12px}}
+
+.reading-paths{margin:20px 0 30px;border:1px solid #e1dbe5;border-radius:17px;background:#fff;overflow:hidden}
+.reading-paths-heading{padding:22px 24px 15px;background:#fdfbfc}
+.reading-paths-heading h2{font-size:20px;font-weight:750;line-height:1.6;margin:0;color:#33303d}
+.reading-paths-heading p{margin:8px 0 0;font-size:12px;line-height:1.95;color:#676170}
+.reading-path-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:14px 18px 18px;border-bottom:1px solid #ece7ed}
+.reading-path-tabs button{cursor:pointer;display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e6e0e9;border-radius:11px;padding:11px 13px;font-size:12px;font-weight:600;font-family:inherit;line-height:1.6;text-align:left;color:#56515d;min-width:0}
+.reading-path-tabs button span{font-size:10px;font-weight:700;color:#968c9d;flex-shrink:0}
+.reading-path-tabs button.active{background:#f5f1f6;border-color:#a996b2;color:#32283c}
+.reading-path-tabs button:focus-visible,.reading-path-evidence .btn:focus-visible{outline:2px solid #745b81;outline-offset:2px}
+.reading-path-active{padding:22px 24px 27px}
+.reading-path-brow{font-size:11px;font-weight:750;letter-spacing:.03em;color:#766a7e;margin:0 0 10px}
+.reading-path-active>h3{font-size:23px;font-weight:750;line-height:1.65;letter-spacing:-.025em;margin:0 0 10px}
+.reading-path-question{font-size:14px;line-height:1.9;color:#5d4a69;font-weight:600;margin:0 0 22px}
+.reading-path-body{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 24px;padding-bottom:20px;border-bottom:1px solid #e8e2e9}
+.reading-path-body section{min-width:0}
+.reading-path-body section:first-child{grid-column:span 2}
+.reading-path-body h4,.reading-path-evidence-title{font-size:12px;font-weight:800;margin:0 0 6px;color:#6f5b77}
+.reading-path-body p{margin:0;font-size:13px;line-height:2;color:#49434c;overflow-wrap:anywhere}
+.reading-path-counter{border-left:3px solid #bba7bf;padding-left:14px}
+.reading-path-evidence-title{font-size:14px;margin:22px 0 13px}
+.reading-path-sources{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.reading-path-evidence{border:1px solid #ebe5ec;border-radius:12px;padding:15px;background:#fcfafc;min-width:0;display:flex;flex-direction:column}
+.reading-path-source-head{display:flex;align-items:start;gap:7px;flex-wrap:wrap}
+.reading-path-source-head span{font-size:10px;color:#736479}
+.reading-path-source-head strong{font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.reading-path-evidence blockquote{border-left:3px solid #9d8ba4;padding:8px 0 8px 12px;margin:13px 0 11px;font-size:12px;line-height:1.85;color:#3e3345;white-space:pre-wrap;overflow-wrap:anywhere}
+.reading-path-evidence>p{font-size:11px;line-height:1.85;margin:0 0 14px;color:#5e5761;flex:1}
+.reading-path-evidence .btn{align-self:start;font-size:11px}
+.reading-path-next{border-top:1px solid #eae4eb;margin-top:20px;padding:17px 0 0}
+.reading-path-next strong{color:#62536e;font-size:12px}
+.reading-path-next p{margin:8px 0 0;font-size:14px;line-height:1.9;font-weight:600}
+.reading-path-note{color:#98909c;font-size:10px;line-height:1.8;margin:20px 0 0}
+@media(max-width:700px){.reading-paths-heading{padding:16px}.reading-path-tabs{padding:10px;grid-template-columns:1fr;gap:6px}.reading-path-active{padding:18px 13px}.reading-path-active>h3{font-size:20px}.reading-path-body,.reading-path-sources{grid-template-columns:1fr}.reading-path-body section:first-child{grid-column:span 1}}
+
 </style>
 <script>if(new URLSearchParams(location.search).get('embed')==='1')document.documentElement.classList.add('embedded');</script>
 <script defer src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -150,7 +185,7 @@
 <button type="button" data-view="discovery">作品とのつながり</button>
 <button type="button" data-view="cross">作品を横断して読む</button>
 </div>
-<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.2</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
+<div class="top"><span>PERSONAL WRITING ARCHIVE / v2.3</span><div class="authrow"><span id="syncStatus" class="chip">この端末内</span><button class="btn" id="authOpen">ログイン</button></div></div>
 <div id="view-strata"><div class="eyebrow">A PLACE FOR UNFINISHED WORDS</div><h1 class="heading"><span>埋もれた言葉を、</span><span>もう一度。</span></h1><p class="lead">メモに残る原文と、作成日・更新日を一緒に保存する。<br>作品に採用されたかどうかは、あとから読み比べて確かめる。</p>
 <div class="stats"><div class="stat"><b id="countAll">0</b><small>発掘した記録</small></div><div class="stat"><b id="countDated">0</b><small>作成日を保持</small></div><div class="stat"><b id="countUnknown">0</b><small>日時未確認</small></div><div class="stat"><b id="countReadings">—</b><small>原文に沿った初回精読</small></div><button class="stat match-stat" data-view="discovery"><b id="countMatches">—</b><small>作品との関連候補を見る</small></button></div>
 <div class="toolbar"><input id="search" class="search" type="search" placeholder="言葉・作品名を探す" aria-label="検索"><select id="skyFilter" class="filter" aria-label="創作名義"><option value="all">すべての名義</option><option value="choir">合唱・詩</option><option value="rap">木乃伊</option><option value="personal">個人作品</option><option value="unassigned">未分類</option></select><button class="btn dark" data-view="import">＋ 回収する</button></div>
