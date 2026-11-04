@@ -95,6 +95,30 @@ function render(){
  if(view==='discovery')renderDiscovery();
 }
 function go(to){view=to;render();window.scrollTo({top:0,behavior:'instant'});}
+
+async function downloadMacExporterZip(){
+  const button=$('downloadMacZip');
+  if(!button)return;
+  const label=button.textContent;button.disabled=true;button.textContent='ZIPを作成中…';
+  try{
+    if(!window.JSZip)throw Error('ZIP生成ライブラリを読み込めません。通信状況をご確認ください。');
+    const u=new URL('./Appleメモ_日付付き書き出し.command',location.href);
+    const response=await fetch(u,{cache:'no-store'});
+    if(!response.ok)throw Error('書き出し用ファイルを読み込めません（'+response.status+'）');
+    let command=await response.text();
+    if(!command.startsWith('#!/bin/zsh')||!command.includes('osascript'))throw Error('書き出し用ファイルの内容を確認できませんでした。');
+    const zip=new JSZip();
+    zip.file('01_これだけダブルクリック.command',command,{unixPermissions:0o755,createFolders:false});
+    const help='言葉の地層｜Mac メモ回収（修正版）\n\n1. ZIPを解凍します。\n2. 01_これだけダブルクリック.command を右クリック→開く。\n3. Appleメモの指定フォルダから、作成日・更新日・原文を読み取ります。\n4. ダウンロードフォルダのJSONを言葉の地層アプリの「日付付きで回収」に読み込んでください。\n\n原本は変更せず、「余白」は対象外です。ファイルはご本人のMacに保存されます。\n';
+    zip.file('README.txt',help,{unixPermissions:0o644,createFolders:false});
+    const blob=await zip.generateAsync({type:'blob',platform:'UNIX',compression:'DEFLATE',compressionOptions:{level:6}});
+    const href=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=href;a.download='lyric-strata-mac-exporter.zip';document.body.append(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(href),1500);
+    toast('実行権限付きのZIPを作成しました。解凍したファイルを右クリックして開いてください。');
+  }catch(err){toast('書き出しZIPの作成に失敗：'+(err.message||err));}
+  finally{button.disabled=false;button.textContent=label;}
+}
 function backup(){
  const payload={format:'lyric_strata_backup_v1',exported_at:new Date().toISOString(),entries:data};
  const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
@@ -245,6 +269,7 @@ document.addEventListener('DOMContentLoaded',()=>{
  $('skyFilter').addEventListener('change',renderList);
  $('manualForm').addEventListener('submit',manualSubmit);
  $('importFile').addEventListener('click',importFile);
+ $('downloadMacZip').addEventListener('click',downloadMacExporterZip);
  $('authOpen').addEventListener('click',authClick);
  $('authCancel').addEventListener('click',()=>authModal(false));
  $('authForm').addEventListener('submit',authSubmit);
