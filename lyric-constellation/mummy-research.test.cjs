@@ -75,7 +75,7 @@ assert.equal(V.getState().theme,'daily');
 assert.ok(V.list().includes('テスト曲1'));
 assert.ok(!V.list().includes('テスト曲2'));
 V.search('テスト曲2');
-assert.ok(V.list().includes('一致する文字列はありません'));
+assert.ok(V.list().includes('この条件に一致する作品はありません'));
 V.reset();
 assert.equal(V.getState().works.length,0,'logout must clear private corpus from view state');
 const escaped=V.build({status:'ready',source:{...essay,title:'<img src=x onerror=alert(1)>'},passages:[],connections:[],works});
