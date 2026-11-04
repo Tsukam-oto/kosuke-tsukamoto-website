@@ -1,0 +1,20 @@
+{
+  "id": "/lyric-strata/",
+  "name": "言葉の地層｜歌詞の星座",
+  "short_name": "言葉の地層",
+  "description": "日付と原文を残す個人用作詞アーカイブ",
+  "start_url": "/lyric-strata/",
+  "scope": "/lyric-strata/",
+  "display": "standalone",
+  "background_color": "#f7f4ee",
+  "theme_color": "#27283c",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
