@@ -308,7 +308,10 @@ function graphSVG(){
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
  var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,semanticEdges(all).filter(function(e){return e.authorDecision!=='rejected';}),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
+ var paths=normalizePaths(pathRows,all),memberships=membershipIndex(paths);
  var path=activePath(all),inPath=new Set(path?path.ids:[]),onJourney=new Set(state.journey?state.journey.ids:[]);
+ var endorsedIds=new Set();
+ if(state.mode!=='words')semanticEdges(all).forEach(function(e){if(e.authorDecision==='confirmed'){endorsedIds.add(e.a);endorsedIds.add(e.b);}});
  var available=new Set(nodes.map(function(w){return w.id;}));
  var filtered=edges.filter(function(e){return available.has(e.a)&&available.has(e.b);});
  var hot=related(filtered,picked?.id),chosenNeighbors=new Set(hot.map(function(e){return e.a===picked.id?e.b:e.a;}));
@@ -339,14 +342,14 @@ function graphSVG(){
   var p=geo.pos.get(w.id);if(!p)return '';
   var active=w.id===picked?.id,neighbor=chosenNeighbors.has(w.id),match=wanted.has(w.id);
   var onPath=inPath.has(w.id),inJourney=onJourney.has(w.id);
-  var endorsed=state.mode!=='words'&&related(semanticEdges(all).filter(function(e){return e.authorDecision==='confirmed';}),w.id).length>0;
+  var endorsed=endorsedIds.has(w.id),crossing=state.atlasOverlap&&(memberships.get(w.id)||[]).length>=2;
   var show=state.scope==='near'||active||onPath||inJourney||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
-  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(endorsed?' author-affirmed':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
+  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(endorsed?' author-affirmed':'')+(crossing?' constellation-crossing':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
   var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
   // hit bounding box into the empty sky, where the SVG background intercepts clicks.
-  return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/><circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
+  return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/>'+(crossing?'<circle class="semantic-overlap-ring" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?15:12)+'"/>':'')+'<circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
  }).join('');
  return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
@@ -395,7 +398,7 @@ function atlasPanel(){
   '<p class="semantic-atlas-empty">この曲には、まだ横断的な星座がありません。別の曲を選ぶか、すべての星座をお選びください。</p>';
  return '<section class="semantic-atlas" aria-label="星座図鑑"><div class="semantic-atlas-heading">'+
   '<div><span class="semantic-atlas-kicker">CONSTELLATION ATLAS</span><h2>星座図鑑</h2>'+
-  '<p>同じ星も、見方を変えると別の星座になります。31の読解テーマから、根拠のある道筋を探します。</p></div>'+
+  '<p>同じ星も、見方を変えると別の星座になります。多くの読解テーマから、根拠のある道筋を探します。</p></div>'+
   '<div class="semantic-atlas-stats"><strong>'+paths.length+'</strong><span>複数作品の星座</span><strong>'+sharedStars+'</strong><span>二つ以上に属する星</span></div></div>'+
   '<div class="semantic-atlas-toolbar"><div class="semantic-atlas-filters">'+chips+'</div>'+
   '<button type="button" data-atlas-overlap="'+(state.atlasOverlap?'hide':'show')+'" class="semantic-atlas-overlap-toggle'+(state.atlasOverlap?' active':'')+'">'+(state.atlasOverlap?'重なる星を強調中':'重なる星を強調')+'</button></div>'+
@@ -550,7 +553,7 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
