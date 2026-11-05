@@ -85,6 +85,38 @@ async function run(mobile){
    }}};
    await loadMasterReadingCorpus(cloudUser,epoch);
   });
+  const phraseAudit=await page.evaluate(()=>{
+    const old=masterReadingWorks;
+    masterReadingWorks=[
+      {id:'fixture-1',sky:'rap',title:'仮曲1',lyrics:'うまくいかないことを数えて\n日々の中で見つけたもの'},
+      {id:'fixture-2',sky:'rap',title:'仮曲2',lyrics:'うまくいかないこの夜に\n日々の中で見つけたもの'}
+    ];
+    const found=rapRepeatedPhrases().map(x=>x.text);
+    masterReadingWorks=old;
+    return found;
+  });
+  assert.deepEqual(phraseAudit,['日々の中で見つけたもの'],'partial 4–8-character n-grams must never become indexed words');
+  await page.locator('.nav button[data-view="words"]').click();
+  assert.equal(await page.locator('.word-workbench').count(),1,'word view uses a source-reading workbench');
+  assert.equal(await page.locator('.word-index-group').count(),4,'explicit complete expression groups, not auto-sliced chips');
+  assert.equal(await page.locator('.word-search-form').count(),1);
+  assert.equal(await page.locator('.word-cloud .word').count(),0,'old wall of arbitrary fragments is removed');
+  const currentColor=await page.locator('body').evaluate(el=>getComputedStyle(el).backgroundColor);
+  assert.equal(currentColor,'rgb(243, 247, 251)','rap page uses paper background, not purple');
+  const sidebarColor=await page.locator('.sidebar').evaluate(el=>getComputedStyle(el).backgroundColor);
+  assert.equal(sidebarColor,'rgb(12, 27, 48)','navigation uses deep navy contrast, not lavender');
+  await page.locator('#wordSearch').fill('音楽のある生活が続く');
+  await page.locator('#wordSearch').press('Enter');
+  assert.match(await page.locator('.word-current-term').innerText(),/168作品/,'only exact source hits are counted');
+  assert.equal(await page.locator('.word-source-card').count(),12,'results disclose gradually, not 168 cards');
+  await page.locator('#moreWordResults').click();
+  assert.equal(await page.locator('.word-source-card').count(),24,'further original passages remain accessible');
+  await page.locator('#wordSearch').fill('存在しない一節');
+  await page.locator('#findWord').click();
+  assert.equal(await page.locator('.word-source-card').count(),0,'a missing phrase cannot be fabricated');
+  assert.match(await page.locator('.word-no-hits').innerText(),/勝手に似た言葉/);
+  await page.locator('.nav button[data-view="constellation"]').click();
+  assert.equal(await page.locator('.semantic-star').count(),168,'starfield remains intact after word lookup');
   assert.equal(await page.locator('.semantic-star').count(),168,'all 168 songs must appear as stars');
   assert.match(await page.locator('.semantic-status').innerText(),/2組/,'links come from semantic data');
   assert.equal(await page.locator('.semantic-atlas-card').count(),2,'two thematic lenses initially visible');
