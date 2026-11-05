@@ -61,7 +61,7 @@ main{max-width:var(--max);margin:auto;padding:56px 28px 110px}.kicker{font-size:
 <section id="req">
 <p class="kicker">PREPARE A QUOTATION REQUEST</p>
 <h2>見積依頼の内容を整理する</h2>
-<p>学校事務室へ確認する内容をまとめるための補助フォームです。入力内容はこのページから送信されず、販売者側にも保存されません。</p>
+<p>学校事務室へ確認する内容をまとめるための補助フォームです。このページ自体では送信しません。「転記」を選ぶと同じタブ内で一時保持し、問い合わせ画面へ引き継いだ後に消去します。送信するかどうかは問い合わせ画面で選べます。</p>
 <div class="form">
 <div class="field-grid">
 <div class="field"><label for="org">学校・団体名（任意）</label><input id="org" autocomplete="organization" placeholder="例：〇〇市立〇〇中学校"></div>
@@ -71,8 +71,8 @@ main{max-width:var(--max);margin:auto;padding:56px 28px 110px}.kicker{font-size:
 </div>
 <div class="field"><label for="work">作品名（仮題でも可）</label><input id="work" placeholder="例：ファンファーレ 空"></div>
 <div class="field"><label for="message">見積依頼メモ（コピー用）</label><textarea id="message" readonly aria-label="入力内容を反映した見積依頼文"></textarea></div>
-<div class="actions"><button class="btn" type="button" id="copy">依頼内容をコピー</button><a class="btn secondary" href="/contact/">公式お問い合わせフォームへ</a><span id="copy-status" class="ok" role="status" aria-live="polite"></span></div>
-<p class="help">このメモは見積書ではありません。正式な見積書・取引条件は、販売開始後に個別に確認する必要があります。コピーした内容は、お問い合わせの際に利用できます。</p>
+<div class="actions"><button class="btn" type="button" id="transfer">問い合わせフォームに転記</button><button class="btn secondary" type="button" id="copy">内容だけコピー</button><span id="copy-status" class="ok" role="status" aria-live="polite"></span></div>
+<p class="help">このメモは見積書ではありません。正式な見積書・取引条件は、販売開始後に個別に確認する必要があります。「転記」または「コピー」した内容は、お問い合わせの際に利用できます。正式な見積りの受付・発注はまだ開始していません。</p>
 </div>
 </section>
 <section class="faq">
@@ -117,6 +117,10 @@ var lines=[
 ];el("message").value=lines.join("\n");el("copy-status").textContent="";
 }
 ids.forEach(function(id){el(id).addEventListener("input",update);el(id).addEventListener("change",update);});
+el("transfer").addEventListener("click",function(){
+try{sessionStorage.setItem("scorePurchaseDraftV1",JSON.stringify({message:el("message").value,organization:el("org").value.trim(),person:el("person").value.trim(),savedAt:Date.now()}));location.href="/contact/?score_purchase=1#contact";}
+catch(e){el("copy-status").textContent="転記できないブラウザーです。「内容だけコピー」をご利用ください。";}
+});
 el("copy").addEventListener("click",async function(){
 var v=el("message").value;
 try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(v);el("copy-status").textContent="コピーしました";return;}}catch(e){}
