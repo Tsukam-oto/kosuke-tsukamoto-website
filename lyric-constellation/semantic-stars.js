@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:false,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOpen:false,atlasOverlap:true,atlasNetworkOpen:false,atlasNetworkChoice:''};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:false,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOpen:false,controlsExpanded:false,mapZoom:'fit',atlasOverlap:true,atlasNetworkOpen:false,atlasNetworkChoice:''};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -391,22 +391,38 @@ function graphSVG(){
   // hit bounding box into the empty sky, where the SVG background intercepts clicks.
   return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/>'+(crossing?'<circle class="semantic-overlap-ring" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?15:12)+'"/>':'')+'<circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
  }).join('');
- return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
+ return '<svg class="semantic-stars-svg'+(state.mapZoom==='detail'?' detailed':'')+'" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
 renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,counts=authorCounts(all),items=allCollections(all),paths=normalizePaths(pathRows,all);
- var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
- var orphanCount=all.filter(function(w){return !linked.has(w.id);}).length;
  var options=['<option value="">すべての作品集</option>'].concat([...items].map(function(e){return '<option value="'+safe(e[0])+'"'+(state.collection===e[0]?' selected':'')+'>'+safe(e[0])+'（'+e[1]+'）</option>'; })).join('');
- var pathOptions=['<option value="">星座を選ぶ（テーマを横断して読む）</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
+ var pathOptions=['<option value="">読解テーマを選んでたどる</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
  var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):
- status==='ready'?'AIによる比較 '+n+'組。'+(reviewStatus==='loading'?'ご本人の記録を読み込み中…':reviewStatus==='error'?'ご本人の記録を取得できません：'+safe(reviewError):'ご本人がつながりを確認した思い '+counts.confirmed+'組。別の思いに見える線 '+counts.different+'組、違うと判断した線 '+counts.rejected+'組。'):'ログインすると精読でつながります';
- return '<div class="semantic-toolbar"><div class="semantic-toolbar-main"><div><strong>全作品の星空</strong><small>'+all.length+'の星が浮かびます。星を選んで原文と精読のつながりをたどれます。</small></div><div class="semantic-switches"><button type="button" data-semantic-mode="meaning" class="'+(state.mode==='meaning'?'active':'')+'">精読の線</button><button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">同じ一行の線</button></div></div>'+
- '<div class="semantic-intent-toolbar"><span>思いの見方</span><div class="semantic-switches"><button type="button" data-semantic-line-view="all" class="'+(state.lineView==='all'?'active':'')+'">精読から見つけた線</button><button type="button" data-semantic-line-view="confirmed" class="'+(state.lineView==='confirmed'?'active':'')+'">私が確かめた思い（'+counts.confirmed+'）</button></div><small>初期状態ではAIの読解仮説です。ご本人が確認した線だけが特別に光ります。</small></div>'+
- '<div class="semantic-layout-toolbar"><span>星の並び方</span><div class="semantic-switches"><button type="button" data-semantic-layout="album" class="'+(state.layout==='album'?'active':'')+'">作品集ごと</button><button type="button" data-semantic-layout="gravity" class="'+(state.layout==='gravity'?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>意味の星空</button></div><small>'+(state.layout==='gravity'?'精読の直接比較と星座の順路をもとに配置。線のない作品は外周に残します。':'収録作品集の位置関係です。')+'</small></div>'+
- '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
- '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
+ status==='ready'?'根拠を保存した作品間比較 '+n+'組。'+(reviewStatus==='loading'?'ご本人の記録を読み込み中…':reviewStatus==='error'?'ご本人の記録を取得できません：'+safe(reviewError):'本人確認済み '+counts.confirmed+'組。ほかの比較はAIの読解仮説です。'):'ログインすると非公開の精読を表示します。';
+ var advanced='<div class="semantic-intent-toolbar"><span>思いの確認</span><div class="semantic-switches"><button type="button" data-semantic-line-view="all" class="'+(state.lineView==='all'?'active':'')+'">すべての読解</button><button type="button" data-semantic-line-view="confirmed" class="'+(state.lineView==='confirmed'?'active':'')+'">本人確認済み（'+counts.confirmed+'）</button></div><small>読解仮説と、ご本人が確かめた解釈は分けて表示します。</small></div>'+
+ '<div class="semantic-layout-toolbar"><span>星の配置</span><div class="semantic-switches"><button type="button" data-semantic-layout="album" class="'+(state.layout==='album'?'active':'')+'">作品集別</button><button type="button" data-semantic-layout="gravity" class="'+(state.layout==='gravity'?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>読解の関係</button></div><small>位置は閲覧用で、作品の価値や思いを点数化したものではありません。</small></div>'+
+ '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">全作品</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">選んだ作品の近く</button></div>'+
+ '<select id="semanticCollection" aria-label="作品集を強調">'+options+'</select>'+
+ '<button type="button" data-semantic-action="next">次の作品へ</button>'+
+ '<button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>まだ直接比較していない作品</button>'+
+ '<button type="button" data-semantic-action="reset">選択を解除</button></div>';
+ return '<section class="semantic-toolbar" aria-label="星図の操作"><div class="semantic-toolbar-main"><div><strong>168の作品を、原文から読む</strong>'+
+ '<small>星＝作品 ／ 線＝精読から考えた関係。文字列の一致は別に表示します。</small></div>'+
+ '<div class="semantic-switches"><button type="button" data-semantic-mode="meaning" class="'+(state.mode==='meaning'?'active':'')+'">思いのつながり</button>'+
+ '<button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">同じ一行</button></div></div>'+
+ '<div class="semantic-primary-controls"><div class="semantic-quick-search">'+
+ '<label for="semanticStarSearch">作品名から探す</label><div><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'">'+
+ '<button type="button" data-semantic-action="search">探す</button></div></div>'+
+ '<div class="semantic-path-control"><label for="semanticPath">読みたい星座を選ぶ</label>'+
+ '<select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select></div></div>'+
+ '<div class="semantic-toolbar-bottom"><button type="button" class="semantic-details-toggle" data-semantic-action="settings-toggle" aria-expanded="'+state.controlsExpanded+'">'+
+ (state.controlsExpanded?'表示設定を閉じる':'表示設定を開く')+'</button>'+
+ '<button type="button" class="semantic-map-zoom" data-semantic-action="map-zoom" aria-pressed="'+(state.mapZoom==='detail')+'">'+
+ (state.mapZoom==='detail'?'星空を全体表示':'星空を拡大して見る')+'</button>'+
+ '<p class="semantic-status" aria-live="polite">'+info+'</p></div>'+
+ (state.controlsExpanded?'<div class="semantic-advanced-settings">'+advanced+'</div>':'')+
+ '</section>';
 }
 function atlasNetworkPanel(paths,all){
  if(!paths.length)return '';
