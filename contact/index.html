@@ -21,7 +21,7 @@
 </div>
 <div class="form-row">
 <div class="field"><label for="contact-org">所属・団体名 <span class="optional">（任意）</span></label><input autocomplete="organization" id="contact-org" name="organization" type="text"/></div>
-<div class="field"><label for="contact-category">お問い合わせ種別</label><select id="contact-category" name="category" required=""><option disabled="" selected="" value="">選択してください</option><option>作曲</option><option>作詞</option><option>校歌・団体歌</option><option>合唱作品</option><option>吹奏楽作品</option><option>指揮・音楽活動</option><option>教育・創作活動</option><option>その他</option></select></div>
+<div class="field"><label for="contact-category">お問い合わせ種別</label><select id="contact-category" name="category" required=""><option disabled="" selected="" value="">選択してください</option><option>作曲</option><option>作詞</option><option>校歌・団体歌</option><option>合唱作品</option><option>吹奏楽作品</option><option>指揮・音楽活動</option><option>教育・創作活動</option><option>楽譜購入・公費見積相談</option><option>その他</option></select></div>
 </div>
 <div class="field"><label for="contact-message">お問い合わせ内容</label><textarea id="contact-message" name="message" placeholder="ご相談内容やご希望などをご記入ください。" required=""></textarea></div>
 <p class="form-help">送信すると、Formspreeを通じて問い合わせ専用メールアドレスへ内容が届きます。</p>
@@ -29,4 +29,31 @@
 </form>
 </div>
 </div>
-</section></main><footer class="site-footer"><strong>束元康介 / KOSUKE TSUKAMOTO</strong><nav aria-label="フッターメニュー"><a href="/works/">作品集</a><a href="/music-education/">教育と創作</a><a href="/voice-box/">言葉を届ける</a><a href="/profile/">プロフィール</a><a href="/contact/">お問い合わせ</a></nav><small>© 2026 Kosuke Tsukamoto</small></footer></body></html>
+</section></main><footer class="site-footer"><strong>束元康介 / KOSUKE TSUKAMOTO</strong><nav aria-label="フッターメニュー"><a href="/works/">作品集</a><a href="/music-education/">教育と創作</a><a href="/voice-box/">言葉を届ける</a><a href="/profile/">プロフィール</a><a href="/contact/">お問い合わせ</a></nav><small>© 2026 Kosuke Tsukamoto</small></footer><script>
+(function(){
+"use strict";
+try {
+var query=new URLSearchParams(location.search);
+if(query.get("score_purchase")!=="1")return;
+var raw=sessionStorage.getItem("scorePurchaseDraftV1");
+sessionStorage.removeItem("scorePurchaseDraftV1");
+if(!raw)return;
+var data=JSON.parse(raw);
+if(!data||typeof data.savedAt!=="number"||Date.now()-data.savedAt>30*60*1000||Date.now()<data.savedAt)return;
+if(typeof data.message!=="string"||data.message.length>10000)return;
+var cat=document.getElementById("contact-category");
+var msg=document.getElementById("contact-message");
+var org=document.getElementById("contact-org");
+var name=document.getElementById("contact-name");
+if(!cat||!msg||!org||!name)return;
+cat.value="楽譜購入・公費見積相談";
+msg.value=data.message;
+if(typeof data.organization==="string"&&data.organization.length<300)org.value=data.organization;
+if(typeof data.person==="string"&&data.person.length<150)name.value=data.person;
+var help=document.createElement("p");
+help.textContent="楽譜購入についての事前相談文を転記しました。内容を確認してから送信してください。現在は販売準備中であり、正式な見積・注文受付ではありません。";
+help.style.cssText="padding:13px 15px;background:#f1eee5;border-left:3px solid #a48f64;font-size:13px;line-height:1.8;";
+cat.closest(".contact-form")?.insertBefore(help,cat.closest(".contact-form").firstChild);
+} catch(e) {}
+})();
+</script></body></html>
