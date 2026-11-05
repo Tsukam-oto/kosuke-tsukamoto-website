@@ -168,3 +168,27 @@ assert.equal(stars.atlasFiltered(atlasPaths,'collections','master-1').length,1,'
 assert.equal(stars.atlasFiltered(atlasPaths,'star','master-1').length,2,'selected-star view follows membership');
 assert.equal(stars.atlasFiltered(atlasPaths,'star','master-7').length,0,'no related path is manufactured');
 console.log('constellation atlas: shared-song overlaps, distinct thematic lenses and honest empty states');
+
+
+const mapDemo=stars.normalizePaths([
+ {thread_key:'rap-album-demo',title:'架空のアルバム読解',anchors:[
+  {kind:'work',source_id:'1'},{kind:'work',source_id:'2'}]},
+ {thread_key:'crossed',title:'重なる思い',guiding_question:'異なる歌でもつながる？',anchors:[
+  {kind:'work',source_id:'1'},{kind:'work',source_id:'4'},{kind:'work',source_id:'6'}]},
+ {thread_key:'remember',title:'記憶の思い',anchors:[
+  {kind:'work',source_id:'4'},{kind:'work',source_id:'6'}]},
+ {thread_key:'unique',title:'独立した思い',anchors:[
+  {kind:'work',source_id:'7'},{kind:'work',source_id:'8'}]}
+],works);
+const meta=stars.constellationNetwork(mapDemo);
+assert.equal(meta.nodes.length,4,'all distinct reading themes become map stars');
+assert.equal(meta.edges.length,2,'only pairs with an actually shared song connect');
+assert.equal(meta.edges[0].n,2);
+assert.deepEqual(Array.from(meta.edges[0].shared),['master-4','master-6']);
+assert.deepEqual(Array.from(meta.isolated),['unique'],'independent theme remains visibly isolated');
+assert.ok(meta.nodes.every(n=>n.x>0&&n.x<meta.width&&n.y>0&&n.y<meta.height),'every theme has a finite reachable position');
+assert.ok(meta.nodes.some(n=>n.kind==='collection')&&meta.nodes.some(n=>n.kind==='theme'),'theme and album lenses are distinct');
+const metaAgain=stars.constellationNetwork(mapDemo);
+assert.equal(meta.position.get('crossed').x,metaAgain.position.get('crossed').x,'constellation placement is stable');
+assert.equal(stars.constellationNetwork([]).nodes.length,0,'empty private data renders no stars');
+console.log('constellation meta-map: actual overlaps only, independent themes retained, accessible deterministic positions');
