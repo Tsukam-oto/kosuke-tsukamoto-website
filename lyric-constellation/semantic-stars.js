@@ -341,6 +341,21 @@ function journeyPanel(w,all){
  }
  return '<section class="semantic-journey-panel"><div class="eyebrow">STAR TO STAR / 星から星へ</div><h3>二曲のつながりを探す</h3>'+summary+btn+routeHtml+'</section>';
 }
+function authorReviewMarkup(e){
+ if(state.mode==='words'||!e.key||!records.some(function(r){return r.link_key===e.key;}))return '';
+ var judgment=judgmentsByKey.get(e.key),decision=judgment?.decision||'pending';
+ var note=judgment?.author_note||'',pending=reviewPending.has(e.key);
+ var choices=[['confirmed','この思いはつながる'],['different','別の思いに見える'],['rejected','この線は違う'],['pending','保留へ戻す']];
+ var buttons=choices.map(function(c){
+  return '<button type="button" data-author-decision="'+c[0]+'" class="'+(decision===c[0]?'selected':'')+'"'+(pending?' disabled':'')+'>'+safe(c[1])+'</button>';
+ }).join('');
+ return '<div class="semantic-author-review" data-author-review="'+safe(e.key)+'">'+
+ '<div class="semantic-author-review-heading"><strong>あなたが感じる「思い」のつながり</strong><span>'+safe(reviewChoiceLabel(decision))+'</span></div>'+
+ '<p>この比較をどう感じますか。AIの読解はそのまま残り、ご本人の判断だけを別に記録します。</p>'+
+ '<label>ご自身の言葉（任意）<textarea data-author-note maxlength="1500" rows="2" placeholder="この二曲の奥には、こんな思いがある…">'+safe(note)+'</textarea></label>'+
+ '<div class="semantic-author-choices">'+buttons+'</div>'+
+ '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
+}
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
  var available=userWorks(),w=available.find(function(x){return x.id===selected;})||available[0];if(!w)return '<div class="panel"><p class="desc">星を選ぶと、つながりの根拠が表示されます。非公開作品は本人ログイン後に読み込まれます。</p></div>';
@@ -363,7 +378,8 @@ selectedWorkCard=function(){
   var isLeft=e.a===w.id;
   var tag=e.kind==='counterpoint'?'対照':e.kind==='text_overlap'?'別版・再用':e.kind==='reframing'?'意味の変化':e.kind==='word'?'共通語':'共鳴・関係';
   var quote1=isLeft?e.left:e.right,quote2=isLeft?e.right:e.left;
-  return '<article class="semantic-related"><div class="semantic-related-head"><button type="button" data-star-focus="'+safe(other.id)+'">✦ '+safe(other.title)+'</button><small>'+tag+'</small></div><div class="semantic-related-theme">'+safe(e.topic||'作品のつながり')+'</div><p>'+safe(e.observation||'')+'</p><details><summary>なぜつながる？ 原文の根拠</summary>'+(quote1?'<blockquote>この曲：'+safe(quote1)+'</blockquote>':'')+(quote2?'<blockquote>相手の曲：'+safe(quote2)+'</blockquote>':'')+'<p>'+safe(e.interpretation||'')+'</p><p class="semantic-caution">これは精読による仮説です。作者が確認した制作意図ではありません。</p></details></article>';
+  return '<article class="semantic-related"><div class="semantic-related-head"><button type="button" data-star-focus="'+safe(other.id)+'">✦ '+safe(other.title)+'</button><small>'+tag+'</small></div><div class="semantic-related-theme">'+safe(e.topic||'作品のつながり')+'</div><p>'+safe(e.observation||'')+'</p><details><summary>なぜつながる？ 原文の根拠</summary>'+(quote1?'<blockquote>この曲：'+safe(quote1)+'</blockquote>':'')+(quote2?'<blockquote>相手の曲：'+safe(quote2)+'</blockquote>':'')+'<p>'+safe(e.interpretation||'')+'</p><p class="semantic-caution">これは精読による仮説です。作者が確認した制作意図ではありません。</p></details>'+
+ authorReviewMarkup(e)+'</article>';
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
