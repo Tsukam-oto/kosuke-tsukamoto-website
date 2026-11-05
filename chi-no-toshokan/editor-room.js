@@ -140,7 +140,7 @@ function magazineAdvice(){
 function drawMagazines(){
  $('magazine-list').innerHTML=MAGAZINES.map((m,i)=>{
   const n=records.filter(r=>(r.payload?.magazine||autoMagazine(r.payload?.kind))===m.id).length;
-  return '<article class="magazine-card"><strong>'+String(i+1).padStart(2,'0')+'｜'+esc(m.name)+'</strong><p>'+esc(m.promise)+'</p><small>週7本に移行した場合の配分：'+m.weeklyGoal+'本／週 ｜ 実践記録：'+n+'件</small></article>';
+  return '<article class="magazine-card"><strong>'+String(i+1).padStart(2,'0')+'｜'+esc(m.name)+'</strong><p>'+esc(m.promise)+'</p><small>旧分類で保存された実践記録：'+n+'件</small></article>';
  }).join('');
  const all=window.EDITOR_MAGAZINES?.weeklyPlan||[];
  $('weekly-table').innerHTML=all.map(d=>'<div class="weekly-item"><strong>'+esc(d.day)+'曜</strong><span>'+esc(MAG_BY_ID[d.magazine]?.name||'')+'</span><small>'+esc(d.format)+' ／ '+esc(d.size)+'</small></div>').join('');
@@ -155,12 +155,9 @@ function renderCadence(){
  const qualified=Math.floor(drafts*percent/100);
  const timeCapacity=Math.floor(minutes*7/25);
  const estimated=Math.min(qualified,timeCapacity);
- const daily=(estimated/7).toFixed(2);
- $('cadence-output').innerHTML='<strong>条件を仮定した公開可能本数：'+estimated+'本／週（平均 '+daily+'本／日）</strong>'+
- '<span>'+(estimated>=7?'毎日1本の計画に届く見込みです。ただし実際の根拠確認・投稿・在庫確認が必要です。':
- estimated>=4?'開始目標の週4本に届く見込みです。毎日投稿には未達です。':
- '週4本の開始目標にも足りないため、初稿・根拠・確認時間を見直す必要があります。')+'</span>'+
- '<small>試算：確認を通る初稿 '+qualified+'本、確認時間による上限 '+timeCapacity+'本／週。現在の自動執筆実績や公開確定件数ではありません。</small>';
+ $('cadence-output').innerHTML='<strong>旧モデルによる参考上限：'+estimated+'本／週（投稿ノルマではありません）</strong>'+
+ '<span>原稿の質、検証できる題材、本人の創作や生活を優先します。上限を目標にしないでください。</span>'+
+ '<small>仮定値：確認を通る初稿 '+qualified+'本、確認時間による上限 '+timeCapacity+'本／週。実際の自動執筆実績や公開確定件数ではありません。</small>';
 }
 function initMagazineControls(){
  $('magazine').innerHTML=MAGAZINES.map(m=>'<option value="'+esc(m.id)+'">'+esc(m.name)+'</option>').join('');
@@ -314,9 +311,9 @@ async function remove(){
 function editorialPrompt(p){
  const magazine=MAG_BY_ID[p.magazine||autoMagazine(p.kind)];
  return [
-  'あなたは「音楽科教員・作曲家」の本人名義noteを担当するリサーチャー兼編集者です。',
-  '次の実践記録を基に、読み応えのあるnote記事の下書きを作成してください。',
-  '対象マガジン：'+(magazine?.name||'未指定'),
+  'あなたは束元康介本人名義の発信を支援する調査担当・編集者です。音楽・作曲・作詞・創作・AI活用・日々の好奇心を、実際の体験と資料に基づいて編集してください。',
+  '次の記録から、本人が面白がって試したこと、使いにくさや改善の過程、完成物の価値が伝わる読みものを作成してください。AIの宣伝や時短ノウハウを毎回の結論にしないでください。',
+  '保存用の旧分類（新しいメディア名ではない）：'+(magazine?.name||'未指定'),
   '読者像：'+(magazine?.readers||'音楽・教育・創作に関心がある人'),
   '記事が届ける価値：'+(magazine?.promise||'具体的で再現できる学び'),
   '記事で避けること：'+(magazine?.not||'根拠のない宣伝や捏造'),
@@ -326,10 +323,10 @@ function editorialPrompt(p){
   '記事は '+(FORMAT_BY_ID[p.format||preferredFormat(p.magazine||autoMagazine(p.kind))]?.min||1500)+'〜'+(FORMAT_BY_ID[p.format||preferredFormat(p.magazine||autoMagazine(p.kind))]?.max||2500)+'字を初稿の目安とする。字数を満たすために水増しはしない。',
   '【読みやすさ】最初に読者が続きを読みたくなる具体的な問いや情景を置く。展開は自然な文章を中心にし、適切な段落と見出しで読みやすくする。',
   '【AIらしい文章の回避】毎回同じ結論先出し構成、3つのポイントへの機械的整理、過剰な見出し、空疎な抽象語、不自然な称賛や均一な箇条書きを避ける。',
-  '【本人の思考】会話をそのまま記事にせず、本人の疑問、迷い、工夫と判断が伝わる順番に編集する。本人の実際の語り口を不必要に均質化しない。',
-  '【編集】独立した読者に前提を説明する。主題を一つに絞り、話題に関係のない脱線や重複は削る。勝手に「成功した」ことにしない。',
+  '【本人の思考】AIとの会話から生まれた本人の疑問、使いにくかった点、工夫と判断を根拠に基づいて編集する。本人が言っていない感情・台詞・効果を捏造せず、語り口を均質化しない。',
+  '【編集】独立した読者に前提を説明する。主題を一つに絞り、実際の「変更前→困りごと→直した理由→変更後」を証拠で示す。実装済み・未検証・今後の構想を分け、成功を捏造しない。映画・歴史等の読みものを無理にAI活用記事にしない。',
   '参考文献がある場合は本文との対応を確認し、確認できない箇所には「要出典・要確認」と印を付ける。',
-  '出力：①記事タイトル案3つ ②記事本文 ③出典・事実確認チェックリスト ④短いSNS紹介案 ⑤教材や制作物としての展開可能性。',
+  '出力：①記事タイトル案3つ ②記事本文 ③確認済み事実と未確認事項の区別 ④実物の画面・作品・図解の使用案と権利確認 ⑤動画化に独立した価値があるか。販売案内は許可取得まで作らない。公開は本人の承認が必要。',
   '',
   '【実践記録】',
   '区分：'+(names[p.kind]||''),'テーマ：'+p.title,
