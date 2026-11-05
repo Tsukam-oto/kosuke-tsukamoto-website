@@ -79,6 +79,40 @@ async function run(mobile){
   });
   assert.equal(await page.locator('.semantic-star').count(),168,'all 168 songs must appear as stars');
   assert.match(await page.locator('.semantic-status').innerText(),/2組/,'links come from semantic data');
+  assert.equal(await page.locator('.semantic-discovery-card').count(),1,'show one comparison, not 210 stacked forms');
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\s*\/\s*2/);
+  const titlesBefore=await page.locator('.semantic-discovery-card h3').innerText();
+  await page.locator('[data-semantic-action="discovery-next"]').click();
+  assert.notEqual(await page.locator('.semantic-discovery-card h3').innerText(),titlesBefore,'skip moves to the next unreviewed thought without saving');
+  await page.locator('[data-discovery-filter="resonance"]').click();
+  assert.match(await page.locator('.semantic-discovery-card h3').innerText(),/日々の異なる見え方/);
+  const quoteBoxes=await page.locator('.semantic-discovery-pair>div').evaluateAll(nodes=>nodes.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y};}));
+  assert.equal(quoteBoxes.length,2);
+  if(mobile){assert.ok(quoteBoxes[1].y>quoteBoxes[0].y,'quotes stack vertically on iPhone');}
+  else{assert.ok(quoteBoxes[1].x>quoteBoxes[0].x,'quotes appear side by side on desktop');}
+  await page.locator('[data-discovery-filter="all"]').click();
+  await page.locator('[data-semantic-action="discovery-toggle"]').click();
+  assert.equal(await page.locator('.semantic-discovery-card').count(),0,'reading room can collapse without data loss');
+  await page.locator('[data-semantic-action="discovery-toggle"]').click();
+  assert.equal(await page.locator('.semantic-discovery-card').count(),1);
+  // A rejected write must never appear as an author-confirmed connection.
+  await page.evaluate(()=>{
+    const from=cloudClient.from;
+    window.__restoreFeelingWrite=()=>{cloudClient.from=from;};
+    cloudClient.from=function(table){
+      const query=from.call(cloudClient,table);
+      if(table==='lyric_author_link_judgments'){
+        query.upsert=()=>({select:()=>Promise.resolve({data:null,error:{message:'架空の保存拒否'}})});
+      }
+      return query;
+    };
+  });
+  await page.locator('.semantic-discovery-card [data-author-note]').fill('保存されない仮の言葉');
+  await page.locator('.semantic-discovery-card [data-author-decision="confirmed"]').click();
+  await page.waitForFunction(()=>document.querySelector('.semantic-discovery-card .semantic-review-feedback')?.textContent?.includes('架空の保存拒否'));
+  assert.equal(await page.locator('.semantic-link.author-confirmed').count(),0,'failed save never creates a gold connection');
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\s*\/\s*2/,'failed write does not advance progress');
+  await page.evaluate(()=>window.__restoreFeelingWrite());
   assert.equal(await page.locator('.semantic-link.focused').count(),2,'selected star highlights two evidence-backed lines');
   assert.match(await page.locator('.semantic-focus-panel').innerText(),/日々の異なる見え方/);
   const targetRelation=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'});
@@ -91,6 +125,8 @@ async function run(mobile){
   await review.locator('[data-author-decision="confirmed"]').click();
   assert.match(await page.locator('.semantic-status').innerText(),/確認した思い 1組/);
   assert.equal(await page.locator('.semantic-link.author-confirmed').count(),1,'only explicitly affirmed link receives gold');
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/1\s*\/\s*2/);
+  assert.ok(!(await page.locator('.semantic-discovery-card').innerText()).includes('日々の異なる見え方'),'confirmed card automatically leaves the reading queue');
   assert.equal(await page.locator('.semantic-star.author-affirmed').count(),2,'both endpoints of the affirmed feeling shine');
   assert.equal(await page.locator('.semantic-author-review script').count(),0,'owner note must remain inert text');
   await page.locator('[data-semantic-line-view="confirmed"]').click();
@@ -101,6 +137,8 @@ async function run(mobile){
   await secondRelation.locator('[data-author-decision="different"]').click();
   assert.equal(await page.locator('.semantic-link.author-different').count(),1);
   assert.match(await page.locator('.semantic-status').innerText(),/別の思いに見える線 1組/);
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/2\s*\/\s*2/);
+  assert.match(await page.locator('.semantic-discovery-empty').innerText(),/すべて判断を記録済み/);
   const savedNote=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'}).locator('[data-author-note]');
   assert.match(await savedNote.inputValue(),/この思いがつながる/,'saved author note returns on redraw');
   assert.equal(await page.locator('.semantic-stars-svg img').count(),0,'private title must not become an HTML image element');
