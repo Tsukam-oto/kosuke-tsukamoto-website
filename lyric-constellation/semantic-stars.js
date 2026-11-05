@@ -2,10 +2,10 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',scope:'all',collection:'',search:'',path:'',expanded:false,history:[]};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[]};
 var records=[],pathRows=[],status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
-var rawConnections,connectionCache={signature:'',links:[]};
+var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
 
 function cleanText(value){return String(value==null?'':value);}
 function safe(value){return cleanText(value).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
@@ -50,15 +50,86 @@ function normalizePaths(rows,all){
  var ids=new Set(all.filter(function(w){return w.sky==='rap';}).map(function(w){return w.id;}));
  return (Array.isArray(rows)?rows:[]).map(function(p){
   if(!p||!p.thread_key||!Array.isArray(p.anchors))return null;
-  var seen=new Set(),list=[];
+  var seen=new Set(),steps=[];
   p.anchors.forEach(function(a){
    if(a&&a.kind==='work'&&a.source_id){
     var id='master-'+a.source_id;
-    if(ids.has(id)&&!seen.has(id)){seen.add(id);list.push(id);}
+    if(ids.has(id)&&!seen.has(id)){
+     seen.add(id);steps.push({id:id,quote:cleanText(a.quote),observation:cleanText(a.observation),
+      technique:cleanText(a.technique)});
+    }
    }
   });
-  return list.length>=2?{id:cleanText(p.thread_key),title:cleanText(p.title||'名称未設定の星座'),question:cleanText(p.guiding_question),ids:list}:null;
+  return steps.length>=2?{id:cleanText(p.thread_key),title:cleanText(p.title||'名称未設定の星座'),
+   question:cleanText(p.guiding_question),hypothesis:cleanText(p.core_hypothesis),
+   alternative:cleanText(p.counterreading),limit:cleanText(p.inference_limit),
+   ids:steps.map(function(x){return x.id;}),steps:steps}:null;
  }).filter(Boolean).sort(function(a,b){return a.title.localeCompare(b.title,'ja');});
+}
+/* Deterministic force-directed layout. Coordinates reflect sourced links, NOT a claim
+ * of mathematical similarity or verified authorial intention. Unlinked works remain
+ * as clearly separate outer stars; no connections are invented. */
+function semanticPositions(all,links,paths){
+ var nodes=catalog(all),ids=new Set(nodes.map(function(w){return w.id;}));
+ var couples=[],seen=new Set(),degree=new Map(),width=1730,height=1260,cx=width/2,cy=height/2;
+ nodes.forEach(function(w){degree.set(w.id,0);});
+ function bond(a,b,weight,dist){
+  if(!ids.has(a)||!ids.has(b)||a===b)return;
+  var key=[a,b].sort().join('|')+'|'+dist;
+  if(seen.has(key))return;
+  seen.add(key);couples.push({a:a,b:b,weight:weight,d:dist});
+  degree.set(a,degree.get(a)+weight);degree.set(b,degree.get(b)+weight);
+ }
+ (links||[]).forEach(function(e){bond(e.a,e.b,1,118);});
+ (paths||[]).forEach(function(p){
+  for(var i=1;i<p.ids.length;i++)bond(p.ids[i-1],p.ids[i],.38,170);
+ });
+ var signature=nodes.map(function(w){return w.id;}).join(',')+'|'+couples.map(function(e){return e.a+':'+e.b+':'+e.d;}).join(';');
+ if(gravityCache.key===signature&&gravityCache.geo)return gravityCache.geo;
+ if(!couples.length)return makePositions(all);
+ var movable=nodes.filter(function(w){return degree.get(w.id)>0;});
+ var outside=nodes.filter(function(w){return degree.get(w.id)===0;});
+ var pos=new Map(),velocity=new Map(),tone=new Map(),indexed=new Map();
+ var groups=new Map();
+ nodes.forEach(function(w){var k=w.collection||'その他';if(!groups.has(k))groups.set(k,groups.size);tone.set(w.id,groups.get(k));});
+ movable.forEach(function(w,i){
+  var n=hash(w.id),ang=(n%65521)/65521*Math.PI*2,r=145+(hash('r'+w.id)%340);
+  pos.set(w.id,{x:cx+Math.cos(ang)*r,y:cy+Math.sin(ang)*r,group:tone.get(w.id)});
+  velocity.set(w.id,{x:0,y:0});indexed.set(w.id,i);
+ });
+ var edges=couples.filter(function(e){return indexed.has(e.a)&&indexed.has(e.b);})
+  .map(function(e){return {a:indexed.get(e.a),b:indexed.get(e.b),weight:e.weight,d:e.d};});
+ var arr=movable.map(function(w){return pos.get(w.id);});
+ var vel=movable.map(function(w){return velocity.get(w.id);});
+ for(var iter=0;iter<120;iter++){
+  for(var i=0;i<arr.length;i++){
+   var a=arr[i],v=vel[i];
+   for(var j=i+1;j<arr.length;j++){
+    var b=arr[j],bv=vel[j],dx=a.x-b.x,dy=a.y-b.y,d2=dx*dx+dy*dy+120;
+    var dist=Math.sqrt(d2),f=Math.min(3.7,13000/d2),fx=dx/dist*f,fy=dy/dist*f;
+    v.x+=fx;v.y+=fy;bv.x-=fx;bv.y-=fy;
+   }
+  }
+  edges.forEach(function(e){
+   var a=arr[e.a],b=arr[e.b],dx=b.x-a.x,dy=b.y-a.y;
+   var d=Math.sqrt(dx*dx+dy*dy)+.001,pull=Math.min(9,Math.max(-9,(d-e.d)*.0085*e.weight));
+   var fx=dx/d*pull,fy=dy/d*pull;
+   vel[e.a].x+=fx;vel[e.a].y+=fy;vel[e.b].x-=fx;vel[e.b].y-=fy;
+  });
+  for(var i=0;i<arr.length;i++){
+   var p=arr[i],v=vel[i];
+   v.x=(v.x+(cx-p.x)*.0018)*.71;v.y=(v.y+(cy-p.y)*.0018)*.71;
+   p.x=Math.min(width-116,Math.max(116,p.x+Math.max(-13,Math.min(13,v.x))));
+   p.y=Math.min(height-112,Math.max(112,p.y+Math.max(-13,Math.min(13,v.y))));
+  }
+ }
+ outside.forEach(function(w,i){
+  var angle=(i+.5)/outside.length*Math.PI*2-.6;
+  pos.set(w.id,{x:cx+Math.cos(angle)*(width/2-82),
+   y:cy+Math.sin(angle)*(height/2-78),group:tone.get(w.id),unlinked:true});
+ });
+ gravityCache={key:signature,geo:{pos:pos,labels:[],width:width,height:height,unlinked:outside.length}};
+ return gravityCache.geo;
 }
 function wordLinks(){
  return connections().slice(0,600).map(function(e){
@@ -94,7 +165,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
