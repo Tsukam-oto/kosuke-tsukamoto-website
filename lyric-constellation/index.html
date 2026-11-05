@@ -581,7 +581,7 @@ function words(){
 function tokens(w){const t=norm(w.lyrics);return words().filter(x=>t.includes(norm(x))).sort((a,b)=>b.length-a.length)}
 function occurrences(text,needle){if(!needle)return 0;const a=norm(text),b=norm(needle);let count=0,at=0;while((at=a.indexOf(b,at))!==-1){count++;at+=b.length}return count;}
 function wordDF(){const arr=works(),map=new Map();for(const word of words()){let df=0,ct=0;for(const w of arr){const n=occurrences(w.lyrics,word);if(n){df++;ct+=n}}if(df)map.set(word,{df,count:ct})}return map}
-function connections(){const all=works(),df=wordDF(),n=all.length,arr=[],sets=all.map(w=>new Set(tokens(w)));for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const b=sets[j],shared=[...sets[i]].filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
+function connections(){if(sky==='rap')return [];const all=works(),df=wordDF(),n=all.length,arr=[],sets=all.map(w=>new Set(tokens(w)));for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const b=sets[j],shared=[...sets[i]].filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
 function formatTags(w){const arr=tokens(w).filter(x=>x.length>=2).slice(0,3);return arr.length?arr.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>未分類</span>'}
 function summary(){const all=works(),conn=connections(),df=wordDF();return {all,conn,df,nwords:df.size,lines:all.reduce((s,w)=>s+w.lyrics.split('\n').filter(Boolean).length,0),private:db.userWorks.length};}
 function toast(message){const x=$('#toast');x.textContent=message;x.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>x.classList.remove('show'),3000)}
@@ -612,7 +612,29 @@ function rapDiscovery(){
   '<p class="rap-discovery-caveat">これは行単位の文字列一致です。意味のつながりは星座の精読で原文とともに検証します。</p>'+
   '</section>';
 }
-function viewConstellation(){const s=summary(),most=s.conn[0],a=most?getWork(most.a):null,b=most?getWork(most.b):null;return header(sky==='rap'?'木乃伊の作品と、そのつながり。':'書いた言葉は、星座になる。',sky==='rap'?'原文と精読を手がかりに、作品に繰り返し現れる思いをたどります。':'11篇の公開作品と、これから書く言葉。繰り返し現れる語を辿り、作品同士を読み直します。')+statStrip()+rapDiscovery()+(sky==='rap'&&!s.all.length?`<div class="rap-welcome"><strong>木乃伊の星座を、ここから。</strong><p>「余白 LYRIC NOTE」に記録した原文を取り込むか、リリックを新しく登録してください。元の記録は変更しません。</p><button id="importRap" class="btn primary">余白の原文を取り込む</button> <button id="addWorkSmall" class="btn">原文を登録</button></div>`:'')+`<div class="grid-2"><div><div class="dark-card"><div class="dark-head"><div><div class="eyebrow" style="color:#e1c894">CONSTELLATION / 言葉の連なり</div><h2>言葉で結ばれた作品</h2><p>星を選ぶと、作品と関連語が開きます。</p></div><span style="font:italic 18px Georgia,serif;color:#c7b187">${sky==='rap'&&s.all.length>40?'代表40 / 全'+s.all.length:s.all.length} stars</span></div><div class="constellation-scroll">${renderGraph()}</div><div class="dark-bottom"><span>● 星＝作品</span><span>― 線＝主な共通語のつながり</span>${sky==='rap'&&s.all.length>40?'<span>星図は代表40点。作品画面で全件を確認できます。</span>':''}<span>${term?'強調する言葉：':''}<b>${esc(term||'全体')}</b></span></div></div>${pills()}<div class="insight">この地図は歌詞の文字列一致に基づいています。似た意味の語の自動統合や、作品の思想の判定は行っていません。</div></div><div>${selectedWorkCard()}<div class="panel" style="margin-top:18px"><div class="eyebrow">OBSERVATION / 今回の発見</div><h2>最も言葉が重なる組</h2>${most?`<p style="font-weight:800">《${esc(a.title)}》 と 《${esc(b.title)}》</p><div class="word-cloud">${most.shared.slice(0,14).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><p class="notice">観察語が多く共起した組です。似た意味の作品だと断定するものではありません。</p><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}" style="margin-top:12px">並べて読み比べる</button>`:'<p>作品を追加すると、共通語が見つかります。</p>'}</div></div></div>`}
+function rapSelectedWorkCard(){
+ const w=getWork(selected)||works()[0];if(!w)return '<div class="panel rap-selected-work"><h2>作品を選んでください。</h2><p>本人ログイン後に、原文と精読を表示します。</p></div>';
+ return '<section class="panel rap-selected-work"><span class="eyebrow">SELECTED WORK / 選んだ作品</span>'+
+  '<h2>《'+esc(w.title)+'》</h2>'+
+  '<p>原文の言葉と、作品単位の精読を確かめられます。単に同じ単語を含むだけで、別作品と関係があるとは判断しません。</p>'+
+  '<div class="rap-selected-work-actions"><button type="button" class="btn primary" data-open="'+esc(w.id)+'">原文を読む</button>'+
+  '<button type="button" class="btn" data-deep-work="'+esc(w.id)+'">精読を開く</button></div></section>';
+}
+function viewRapConstellation(){
+ const all=works(),lines=all.reduce((n,w)=>n+w.lyrics.split('\n').filter(Boolean).length,0);
+ return header('木乃伊の作品と、そのつながり。','共通する単語ではなく、原文の根拠と読解をたどる星図です。')+
+  '<div class="rap-overview"><div><strong>'+all.length+'</strong><span>収録作品</span></div>'+
+  '<div><strong>'+lines+'</strong><span>原文の行数</span></div>'+
+  '<p>作品間の線は精読の仮説です。原文を確認し、異なる読みも残していきます。</p></div>'+
+  '<div class="grid-2 rap-stars-layout"><div><div class="dark-card">'+
+  '<div class="dark-head"><div><div class="eyebrow">LYRIC CONSTELLATION</div>'+
+  '<h2>作品を結ぶ星空</h2><p>星を選ぶと作品が開きます。つながる理由も原文から確認できます。</p></div></div>'+
+  '<div class="constellation-scroll">'+renderGraph()+'</div>'+
+  '<div class="dark-bottom"><span>星＝作品</span><span>線＝精読による関係の仮説</span>'+
+  '<span>確認済みの思いは、別の光り方で表示します。</span></div></div></div>'+
+  '<div>'+rapSelectedWorkCard()+'</div></div>'+rapDiscovery();
+}
+function viewConstellation(){if(sky==='rap')return viewRapConstellation();const s=summary(),most=s.conn[0],a=most?getWork(most.a):null,b=most?getWork(most.b):null;return header(sky==='rap'?'木乃伊の作品と、そのつながり。':'書いた言葉は、星座になる。',sky==='rap'?'原文と精読を手がかりに、作品に繰り返し現れる思いをたどります。':'11篇の公開作品と、これから書く言葉。繰り返し現れる語を辿り、作品同士を読み直します。')+statStrip()+rapDiscovery()+(sky==='rap'&&!s.all.length?`<div class="rap-welcome"><strong>木乃伊の星座を、ここから。</strong><p>「余白 LYRIC NOTE」に記録した原文を取り込むか、リリックを新しく登録してください。元の記録は変更しません。</p><button id="importRap" class="btn primary">余白の原文を取り込む</button> <button id="addWorkSmall" class="btn">原文を登録</button></div>`:'')+`<div class="grid-2"><div><div class="dark-card"><div class="dark-head"><div><div class="eyebrow" style="color:#e1c894">CONSTELLATION / 言葉の連なり</div><h2>言葉で結ばれた作品</h2><p>星を選ぶと、作品と関連語が開きます。</p></div><span style="font:italic 18px Georgia,serif;color:#c7b187">${sky==='rap'&&s.all.length>40?'代表40 / 全'+s.all.length:s.all.length} stars</span></div><div class="constellation-scroll">${renderGraph()}</div><div class="dark-bottom"><span>● 星＝作品</span><span>― 線＝主な共通語のつながり</span>${sky==='rap'&&s.all.length>40?'<span>星図は代表40点。作品画面で全件を確認できます。</span>':''}<span>${term?'強調する言葉：':''}<b>${esc(term||'全体')}</b></span></div></div>${pills()}<div class="insight">この地図は歌詞の文字列一致に基づいています。似た意味の語の自動統合や、作品の思想の判定は行っていません。</div></div><div>${selectedWorkCard()}<div class="panel" style="margin-top:18px"><div class="eyebrow">OBSERVATION / 今回の発見</div><h2>最も言葉が重なる組</h2>${most?`<p style="font-weight:800">《${esc(a.title)}》 と 《${esc(b.title)}》</p><div class="word-cloud">${most.shared.slice(0,14).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><p class="notice">観察語が多く共起した組です。似た意味の作品だと断定するものではありません。</p><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}" style="margin-top:12px">並べて読み比べる</button>`:'<p>作品を追加すると、共通語が見つかります。</p>'}</div></div></div>`}
 function sortWorks(list){return list.sort((a,b)=>order==='old'?(a.year||9999)-(b.year||9999):order==='az'?a.title.localeCompare(b.title,'ja'):(b.year||0)-(a.year||0))}
 function masterReadNotice(){
  if(sky==='rap'&&!cloudUser)return '<div class="notice">木乃伊の歌詞は非公開です。ご本人のアカウントでログインすると、原文を読み込めます。</div>';
