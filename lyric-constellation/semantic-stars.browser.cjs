@@ -50,8 +50,11 @@ async function run(mobile){
    relations.push({link_key:'bad',topic:'存在しない線',left_work_id:'fictional-000',right_work_id:'missing',
      evidence_left:'秘密',evidence_right:'秘密'});
    themes.push({thread_key:'synthetic-care',title:'暮らしの星座',guiding_question:'ともに生きる時間はどう変わるのか？',
-      anchors:[{kind:'work',source_id:'fictional-000'},{kind:'work',source_id:'fictional-050'},
-        {kind:'note',source_id:'private-draft'},{kind:'work',source_id:'fictional-095'}]});
+      core_hypothesis:'根拠から読む架空の星座仮説',counterreading:'別の読解もできる',inference_limit:'本人確認前の仮説',
+      anchors:[{kind:'work',source_id:'fictional-000',quote:'この歌は架空の歌詞です',observation:'第一の星の読み',technique:'語りの開始'},
+       {kind:'work',source_id:'fictional-050',quote:'二人の時間と明日',observation:'第二の星の読み',technique:'未来への転換'},
+       {kind:'note',source_id:'private-draft'},
+       {kind:'work',source_id:'fictional-095',quote:'音楽のある生活が続く',observation:'第三の星の読み',technique:'反復'}]});
     cloudEpoch++;cloudUser={id:uid};const epoch=cloudEpoch;
    cloudClient={from(table){return {select(){return this},eq(){return this},not(){return this},
     order(){return table==='lyric_master_works'?Promise.resolve({data:catalog,error:null}):this},
@@ -81,24 +84,41 @@ async function run(mobile){
   await page.locator('#semanticStarSearch').fill('検証曲121');
   await page.locator('[data-semantic-action="search"]').click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/);
+  await page.locator('[data-semantic-layout="gravity"]').click();
+  assert.equal(await page.locator('.semantic-star').count(),168,'meaning layout retains the whole catalog');
+  assert.equal(await page.locator('.semantic-star.no-relation').count(),165,'no invented lines for unrelated songs');
+  assert.match(await page.locator('[data-semantic-layout="gravity"]').getAttribute('class'),/active/);
+  const beforeCoord=await page.locator('.semantic-star[data-star-focus="master-fictional-000"] .semantic-star-core').getAttribute('cx');
   await page.locator('#semanticPath').selectOption('synthetic-care');
    assert.equal(await page.locator('.semantic-theme-route').count(),2,'guided path draws 2 dashed segments');
    assert.equal(await page.locator('.semantic-star.in-theme').count(),3,'3 source-backed songs light up');
    assert.match(await page.locator('.semantic-path-story').innerText(),/暮らしの星座/);
+   assert.match(await page.locator('.semantic-step-anchor').innerText(),/この歌は架空の歌詞です/);
+   assert.match(await page.locator('.semantic-step-anchor').innerText(),/第一の星の読み/);
+   await page.locator('.semantic-theme-explanation summary').click();
+   assert.match(await page.locator('.semantic-theme-explanation').innerText(),/根拠から読む架空の星座仮説/);
    assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/);
    await page.locator('.semantic-path-story [data-semantic-action="next"]').click();
    assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/,'guided next song follows stored path order');
+   assert.match(await page.locator('.semantic-step-anchor').innerText(),/第二の星の読み/);
+   await page.locator('.semantic-path-story [data-semantic-action="prev"]').click();
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/,'go back to previous source-backed song');
+   await page.locator('.semantic-path-story [data-semantic-action="next"]').click();
+   assert.equal(await page.locator('.semantic-star[data-star-focus="master-fictional-000"] .semantic-star-core').getAttribute('cx'),beforeCoord,'meaning positions are stable when choosing another star');
    await page.locator('[data-semantic-mode="words"]').click();
   assert.match(await page.locator('.semantic-toolbar').innerText(),/共通語の線/);
   await page.locator('[data-semantic-mode="meaning"]').click();
   await page.locator('[data-semantic-action="reset"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168);
   assert.equal(await page.locator('.semantic-theme-route').count(),0,'reset clears themed sky lines');
+  await page.locator('[data-semantic-action="unlinked"]').click();
+  assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲002/,'discover a truly unlinked song');
+  await page.locator('[data-semantic-action="reset"]').click();
    const after=await page.evaluate(()=>{
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();
    return {leak:document.getElementById('screen').textContent.includes('検証曲001'),
-    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座'),remaining:document.querySelectorAll('.semantic-star').length};
+    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),remaining:document.querySelectorAll('.semantic-star').length};
   });
   assert.equal(after.leak,false,'private star names vanish after logout');
   assert.equal(after.stored,false,'private star data is not stored in local storage');
