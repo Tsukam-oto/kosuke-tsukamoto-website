@@ -15,7 +15,7 @@ sandbox.works=[
 ];
 vm.runInContext('user={id:"owner"};masterWorks=new Map(works.map(w=>[w.id,w]));globalThis.ownerView=sourceAuditPanel();',sandbox,{timeout:5000});
 assert.match(sandbox.ownerView,/1 \/ 2/);
-assert.match(sandbox.ownerView,/要確認の1作品/);
+assert.match(sandbox.ownerView,/PDF一次監査で差異が見つかった1作品の処理履歴/);
 assert.match(sandbox.ownerView,/PDF 3ページ/);
 assert.match(sandbox.ownerView,/&lt;script&gt;/);
 assert.ok(!sandbox.ownerView.includes('<script>'),'Private notes must be HTML escaped');
