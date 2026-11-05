@@ -142,28 +142,11 @@ function drawMagazines(){
   const n=records.filter(r=>(r.payload?.magazine||autoMagazine(r.payload?.kind))===m.id).length;
   return '<article class="magazine-card"><strong>'+String(i+1).padStart(2,'0')+'｜'+esc(m.name)+'</strong><p>'+esc(m.promise)+'</p><small>旧分類で保存された実践記録：'+n+'件</small></article>';
  }).join('');
- const all=window.EDITOR_MAGAZINES?.weeklyPlan||[];
- $('weekly-table').innerHTML=all.map(d=>'<div class="weekly-item"><strong>'+esc(d.day)+'曜</strong><span>'+esc(MAG_BY_ID[d.magazine]?.name||'')+'</span><small>'+esc(d.format)+' ／ '+esc(d.size)+'</small></div>').join('');
-}
-function renderCadence(){
- const drafts=Math.max(0,Math.min(28,Number($('drafts-per-week').value)||0));
- const percent=Math.max(0,Math.min(100,Number($('ready-percent').value)||0));
- const minutes=Math.max(0,Math.min(120,Number($('minutes-per-day').value)||0));
- $('draft-value').textContent=drafts;
- $('ready-value').textContent=percent;
- $('minutes-value').textContent=minutes;
- const qualified=Math.floor(drafts*percent/100);
- const timeCapacity=Math.floor(minutes*7/25);
- const estimated=Math.min(qualified,timeCapacity);
- $('cadence-output').innerHTML='<strong>旧モデルによる参考上限：'+estimated+'本／週（投稿ノルマではありません）</strong>'+
- '<span>原稿の質、検証できる題材、本人の創作や生活を優先します。上限を目標にしないでください。</span>'+
- '<small>仮定値：確認を通る初稿 '+qualified+'本、確認時間による上限 '+timeCapacity+'本／週。実際の自動執筆実績や公開確定件数ではありません。</small>';
 }
 function initMagazineControls(){
  $('magazine').innerHTML=MAGAZINES.map(m=>'<option value="'+esc(m.id)+'">'+esc(m.name)+'</option>').join('');
  $('magazine').value=autoMagazine($('kind').value);magazineAdvice();
- drawMagazines();renderCadence();
- for(const id of ['drafts-per-week','ready-percent','minutes-per-day'])$(id).addEventListener('input',renderCadence);
+ drawMagazines();
  $('kind').addEventListener('change',()=>{if(!magazineUserEdited)$('magazine').value=autoMagazine($('kind').value);magazineAdvice()});
  $('magazine').addEventListener('change',()=>{magazineUserEdited=true;magazineAdvice()});
 }
@@ -396,14 +379,14 @@ async function init(){
   const mod=await import(IMPORT);
   client=mod.createClient(URL_SUPABASE,PUBLIC_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
   client.auth.onAuthStateChange((event,session)=>{
-   if(event==='SIGNED_OUT'){user=null;records=[];activeId='';$('private-app').hidden=true;status('ログインしていません。知の図書館からログインしてください。')}
+   if(event==='SIGNED_OUT'){user=null;records=[];activeId='';$('private-app').hidden=true;status('ログインしていません。画面上部の「ログイン・管理トップ」からログインしてください。')}
    if(event==='SIGNED_IN'&&session?.user&&user?.id!==session.user.id){user=session.user;$('private-app').hidden=false;setTimeout(()=>{refresh();loadResearchIdeas()},0)}
   });
   const {data,error}=await client.auth.getUser();
   if(error&&!String(error.message||'').toLowerCase().includes('session'))throw error;
-  if(!data?.user){status('未ログインです。画面上部の「知の図書館」からログインしてください。');return}
+  if(!data?.user){status('未ログインです。画面上部の「ログイン・管理トップ」からログインしてください。');return}
   user=data.user;$('private-app').hidden=false;await refresh();await loadResearchIdeas();
- }catch(e){status('認証状態を確認できませんでした。元の知の図書館でログインを確認してください：'+(e.message||String(e)),true)}
+ }catch(e){status('認証状態を確認できませんでした。「ログイン・管理トップ」でログインを確認してください：'+(e.message||String(e)),true)}
 }
 initMagazineControls();initFormats();initNotePackage();
 $('research-ideas').addEventListener('click',e=>{const el=e.target.closest('[data-idea]');if(el)selectResearchIdea(el.dataset.idea)});
