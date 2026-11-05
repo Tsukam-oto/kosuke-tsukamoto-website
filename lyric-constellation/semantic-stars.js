@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:false,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOpen:false,controlsExpanded:false,mapZoom:'fit',atlasOverlap:true,atlasNetworkOpen:false,atlasNetworkChoice:''};
-var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
+var records=[],pathRows=[],judgmentsByKey=new Map(),reviewDrafts=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
 
@@ -399,7 +399,7 @@ function graphSVG(){
  }).join('');
  return '<svg class="semantic-stars-svg'+(state.mapZoom==='detail'?' detailed':'')+'" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
-renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
+renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewDrafts.clear();reviewPending.clear();reviewStatus='signed_out';status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,counts=authorCounts(all),items=allCollections(all),paths=normalizePaths(pathRows,all);
  var options=['<option value="">すべての作品集</option>'].concat([...items].map(function(e){return '<option value="'+safe(e[0])+'"'+(state.collection===e[0]?' selected':'')+'>'+safe(e[0])+'（'+e[1]+'）</option>'; })).join('');
@@ -614,7 +614,7 @@ function journeyPanel(w,all){
 function authorReviewMarkup(e){
  if(state.mode==='words'||!e.key||!records.some(function(r){return r.link_key===e.key;}))return '';
  var judgment=judgmentsByKey.get(e.key),decision=judgment?.decision||'pending';
- var note=judgment?.author_note||'',pending=reviewPending.has(e.key);
+ var savedNote=judgment?.author_note||'',draft=reviewDrafts.get(e.key),note=draft===undefined?savedNote:draft,pending=reviewPending.has(e.key);
  var choices=[['confirmed','この思いはつながる'],['different','別の思いに見える'],['rejected','この線は違う'],['pending','保留へ戻す']];
  var buttons=choices.map(function(c){
   return '<button type="button" data-author-decision="'+c[0]+'" class="'+(decision===c[0]?'selected':'')+'"'+(pending||reviewStatus!=='ready'?' disabled':'')+'>'+safe(c[1])+'</button>';
@@ -624,13 +624,13 @@ function authorReviewMarkup(e){
  '<p>この比較をどう感じますか。AIの読解はそのまま残り、ご本人の判断だけを別に記録します。</p>'+
  '<label>ご自身の言葉（任意）<textarea data-author-note maxlength="1500" rows="2" placeholder="この二曲の奥には、こんな思いがある…">'+safe(note)+'</textarea></label>'+
  '<div class="semantic-author-choices">'+buttons+'</div>'+
- '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':reviewStatus==='loading'?'本人の記録を読み込み中…':reviewStatus==='error'?'本人の記録を取得できません':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
+ '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':reviewStatus==='loading'?'本人の記録を読み込み中…':reviewStatus==='error'?'本人の記録を取得できません':draft!==undefined&&draft!==savedNote?'未保存の入力があります':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
 }
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
  var available=userWorks(),w=available.find(function(x){return x.id===selected;})||available[0];if(!w)return '<div class="panel"><p class="desc">星を選ぶと、つながりの根拠が表示されます。非公開作品は本人ログイン後に読み込まれます。</p></div>';
  var links=related(edgeList(userWorks()),w.id).sort(function(a,b){return a.kind==='counterpoint'?-1:b.kind==='counterpoint'?1:0;});
- var max=state.expanded?links.length:7;
+ var max=state.expanded?links.length:3;
  var path=activePath(available),pos=path?path.ids.indexOf(w.id):-1;
  var step=path&&pos>=0?path.steps[pos]:null;
  var thematic=path?'<div class="semantic-path-story"><small>選んだ星座 / 精読の道筋</small><h3>'+safe(path.title)+'</h3><p>'+safe(path.question||'複数作品を通して読み進める仮説です。')+'</p>'+
@@ -648,15 +648,16 @@ selectedWorkCard=function(){
   var isLeft=e.a===w.id;
   var tag=e.kind==='counterpoint'?'対照':e.kind==='text_overlap'?'別版・再用':e.kind==='reframing'?'意味の変化':e.kind==='word'?'同じ一行':'共鳴・関係';
   var quote1=isLeft?e.left:e.right,quote2=isLeft?e.right:e.left;
-  return '<article class="semantic-related"><div class="semantic-related-head"><button type="button" data-star-focus="'+safe(other.id)+'">✦ '+safe(other.title)+'</button><small>'+tag+'</small></div><div class="semantic-related-theme">'+safe(e.topic||'作品のつながり')+'</div><p>'+safe(e.observation||'')+'</p><details><summary>なぜつながる？ 原文の根拠</summary>'+(quote1?'<blockquote>この曲：'+safe(quote1)+'</blockquote>':'')+(quote2?'<blockquote>相手の曲：'+safe(quote2)+'</blockquote>':'')+'<p>'+safe(e.interpretation||'')+'</p><p class="semantic-caution">これは精読による仮説です。作者が確認した制作意図ではありません。</p></details>'+
- (e.kind==='word'?'<p class="semantic-caution">一行の一致は原文検索の手がかりです。作者確認済みのつながりとは数えません。</p>':authorReviewMarkup(e))+'</article>';
+  return '<article class="semantic-related"><div class="semantic-related-head"><button type="button" data-star-focus="'+safe(other.id)+'">✦ '+safe(other.title)+'</button><small>'+tag+'</small></div><div class="semantic-related-theme">'+safe(e.topic||'作品のつながり')+'</div><p class="semantic-related-observation">'+safe(e.observation||'')+'</p><details class="semantic-evidence-details"><summary>原文の根拠と別の読みを開く</summary>'+(quote1?'<blockquote>この曲：'+safe(quote1)+'</blockquote>':'')+(quote2?'<blockquote>相手の曲：'+safe(quote2)+'</blockquote>':'')+'<p>'+safe(e.interpretation||'')+'</p>'+(e.alternative?'<p>別の読み：'+safe(e.alternative)+'</p>':'')+'<p class="semantic-caution">これは精読による仮説です。作者が確認した制作意図ではありません。</p></details>'+
+ (e.kind==='word'?'<p class="semantic-caution">一行の一致は原文検索の手がかりです。作者確認済みのつながりとは数えません。</p>':
+ '<details class="semantic-review-disclosure"><summary>この関係を判断する <span>'+safe(reviewChoiceLabel(judgmentsByKey.get(e.key)?.decision||'pending'))+(reviewDrafts.has(e.key)?'・未保存':'')+'</span></summary>'+authorReviewMarkup(e)+'</details>')+'</article>';
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
  thematic+membershipsPanel(w,available)+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
  '<div class="semantic-panel-actions"><button class="btn primary" data-open="'+safe(w.id)+'">原文を読む</button><button class="btn" data-deep-work="'+safe(w.id)+'">精読を読む</button></div>'+
- '<h3>つながっている作品</h3>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
- (links.length>7?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-7)+'組を見る')+'</button>':'')+'</div>';
+ '<h3>つながっている作品</h3><p class="semantic-reading-hint">原文の根拠と別の読みを確認し、判断したいときだけ確認欄を開けます。</p>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
+ (links.length>3?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-3)+'組を見る')+'</button>':'')+'</div>';
 };
 viewConstellation=function(){
  var html=originalConstellation();
@@ -699,7 +700,9 @@ async function saveAuthorJudgment(linkKey,decision,panel){
   var row=Array.isArray(result.data)?result.data.find(function(x){return x.link_key===linkKey;}):null;
   if(!row||row.decision!==decision||row.author_note!==note)throw new Error('記録を読み返せませんでした');
   if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
-  judgmentsByKey.set(linkKey,row);reviewError='';reviewPending.delete(linkKey);repaint();
+  judgmentsByKey.set(linkKey,row);
+   if((reviewDrafts.get(linkKey)||'').trim()===note)reviewDrafts.delete(linkKey);
+   reviewError='';reviewPending.delete(linkKey);repaint();
  }catch(err){
   if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
   reviewError=err?.message||'保存できませんでした';
@@ -758,6 +761,17 @@ loadMasterReadingCorpus=async function(user,epoch){
  await originalLoader(user,epoch);
  if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch),loadAuthorJudgments(user,epoch)]);
 };
+document.addEventListener('input',function(event){
+ var t=event.target;
+ if(!t?.matches?.('textarea[data-author-note]'))return;
+ var panel=t.closest('[data-author-review]'),key=panel?.getAttribute('data-author-review');
+ if(!key||!cloudUser)return;
+ var saved=judgmentsByKey.get(key)?.author_note||'';
+ if(t.value===saved)reviewDrafts.delete(key);else reviewDrafts.set(key,t.value);
+ var msg=panel.querySelector('.semantic-review-feedback');
+ if(msg)msg.textContent=reviewDrafts.has(key)?'未保存の入力があります。判断を選ぶと保存します。':
+  (judgmentsByKey.has(key)?'本人の記録を保存済み':'未確認・保存されていません');
+});
 document.addEventListener('click',function(event){
  var target=event.target.closest('[data-atlas-toggle],[data-atlas-network-toggle],[data-atlas-network-select],[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
  if(target.hasAttribute('data-atlas-toggle')){state.atlasOpen=target.dataset.atlasToggle==='show';repaint();return;}
