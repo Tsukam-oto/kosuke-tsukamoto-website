@@ -255,15 +255,21 @@ function discoveryCandidates(rows,all,judgments,filter){
  * Japanese character substrings or present these pairs as author-confirmed meanings. */
 function wordLinks(){
  if(sky!=='rap')return [];
- var actual=new Set(userWorks().map(function(w){return w.id;})),pairs=new Map();
+ var byId=new Map(userWorks().map(function(w){return [w.id,w];})),actual=new Set(byId.keys()),pairs=new Map();
  rapRepeatedPhrases().forEach(function(p){
   var ids=p.ids.filter(function(id){return actual.has(id);}).slice(0,12);
   for(var i=0;i<ids.length;i++)for(var j=i+1;j<ids.length;j++){
    var a=ids[i]<ids[j]?ids[i]:ids[j],b=ids[i]<ids[j]?ids[j]:ids[i],key=a+'|'+b;
    if(pairs.has(key))continue;
-   pairs.set(key,{a:a,b:b,kind:'word',topic:'同じ一行',observation:'二つの原文に、この一行が同じ形で現れます。',
+   var normalized=norm(p.text.trim().replace(/[ \t　]+/g,' '));
+   var findSourceLine=function(id){return (byId.get(id)?.lyrics||'').split(/\r?\n/).find(function(line){
+    return norm(line.trim().replace(/[ \t　]+/g,' '))===normalized;
+   });};
+   var left=findSourceLine(a),right=findSourceLine(b);
+   if(!left||!right)continue;
+   pairs.set(key,{a:a,b:b,kind:'word',topic:'同じ一行',observation:'空白と表記幅を揃えて比較すると、二つの原文に対応する一行が現れます。',
     interpretation:'原文の一行全体の文字列一致です。二曲の意味や作者の意図の一致ではありません。',
-    left:p.text,right:p.text,key:'exact-line-'+key,score:1});
+    left:left,right:right,key:'exact-line-'+key,score:1});
   }
  });
  return [...pairs.values()].slice(0,260);
@@ -665,6 +671,12 @@ viewConstellation=function(){
 render=function(){
  if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.atlasNetworkChoice='';state.atlasOpen=false;state.atlasNetworkOpen=false;state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
+ if(sky==='rap'){
+  var sidebar=document.querySelector('.sidebar-bottom p:first-child');
+  if(sidebar)sidebar.textContent=cloudUser?'本人専用の木乃伊アーカイブ：'+userWorks().length+'作品':'木乃伊の作品は本人ログイン後に表示します';
+  var footer=document.getElementById('constellationFooter');
+  if(footer)footer.textContent='原文の歌詞は非公開です。作品同士の関係は、根拠のある読解仮説として表示します。本人の確認とAIの解釈は別に保存します。';
+ }
 };
 async function saveAuthorJudgment(linkKey,decision,panel){
  var user=cloudUser,epoch=cloudEpoch;
