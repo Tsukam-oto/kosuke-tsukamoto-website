@@ -511,3 +511,70 @@ body.sky-rap .nav-separator{
  border-top:1px solid #294966;margin:10px 13px 12px
 }
 body.sky-rap .sidebar-bottom p{font-size:11px;line-height:1.75}
+
+
+/* Small, calm comparison cards: the author makes the decision only on demand. */
+body.sky-rap .semantic-focus-panel .semantic-related{
+ border:1px solid #d5e4ef;border-radius:11px;background:#fff;
+ padding:15px 17px;margin:11px 0;box-shadow:0 2px 9px #0a385108
+}
+body.sky-rap .semantic-related-head{gap:9px;align-items:center}
+body.sky-rap .semantic-related-head button{font-size:14px;font-weight:800}
+body.sky-rap .semantic-related-head small{
+ background:#e6f2fc;color:#276b91;border-radius:6px;
+ padding:4px 7px;font-size:10px;font-weight:700
+}
+body.sky-rap .semantic-related-theme{font-size:13px;color:#234e6e;font-weight:750;line-height:1.6}
+body.sky-rap .semantic-related-observation{
+ display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;
+ overflow:hidden;font-size:12px;line-height:1.9;color:#36566d
+}
+body.sky-rap .semantic-reading-hint{color:#55728a;font-size:11px;line-height:1.8}
+body.sky-rap .semantic-evidence-details,
+body.sky-rap .semantic-review-disclosure{
+ border-top:1px solid #e1ebf3;padding:10px 0 0;margin:11px 0 0
+}
+body.sky-rap .semantic-evidence-details summary,
+body.sky-rap .semantic-review-disclosure>summary{
+ cursor:pointer;font-size:12px;font-weight:750;line-height:1.8;
+ color:#126aa7;padding:5px 4px;border-radius:5px
+}
+body.sky-rap .semantic-review-disclosure>summary{
+ color:#265d7c;display:list-item;list-style-position:inside
+}
+body.sky-rap .semantic-review-disclosure>summary>span{
+ display:inline-block;font-size:10px;font-weight:700;margin-left:8px;
+ color:#637f92
+}
+body.sky-rap .semantic-evidence-details[open] summary,
+body.sky-rap .semantic-review-disclosure[open]>summary{color:#0d4a7c}
+body.sky-rap .semantic-review-disclosure .semantic-author-review{
+ margin:10px 0 0;background:#f3f8fc;border-color:#d2e5f1;
+ border-radius:9px;padding:13px 14px
+}
+body.sky-rap .semantic-review-disclosure .semantic-author-choices button{min-height:40px;font-size:11px}
+body.sky-rap .semantic-author-review textarea{font-size:13px;line-height:1.8;min-height:78px}
+body.sky-rap .semantic-title-results{
+ display:flex;flex-wrap:wrap;gap:7px;
+ border:1px solid #40729a;background:#0c2640;padding:10px;
+ border-radius:10px;margin-top:6px
+}
+body.sky-rap .semantic-title-results p{
+ flex:1 1 100%;color:#d5e9f7;font-size:11px;line-height:1.6;margin:0
+}
+body.sky-rap .semantic-title-results button{
+ min-height:39px;max-width:100%;display:inline-flex;align-items:center;
+ gap:7px;flex-wrap:wrap;border:1px solid #477a9d;background:#1c4d70;
+ color:#fff;font-size:12px;font-weight:800;padding:7px 11px;
+ border-radius:8px;text-align:left
+}
+body.sky-rap .semantic-title-results button.active{
+ color:#0b3557;background:#c6eafd;border-color:#a3dcff
+}
+body.sky-rap .semantic-title-results button small{font-size:9px;opacity:.75;font-weight:600}
+body.sky-rap .semantic-title-results button:hover{background:#24618b}
+@media(max-width:760px){
+ body.sky-rap .semantic-title-results button{width:100%;justify-content:space-between}
+ body.sky-rap .semantic-related-observation{-webkit-line-clamp:4}
+ body.sky-rap .semantic-review-disclosure .semantic-author-choices button{flex:1 1 42%;min-height:43px}
+}
