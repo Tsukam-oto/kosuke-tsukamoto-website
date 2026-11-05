@@ -1,0 +1,75 @@
+/* 星空 v1 — accent on the graph, not on decorated cards. No private lyric content. */
+.semantic-toolbar{padding:16px 17px 11px;border:1px solid #716084;border-bottom:0;background:linear-gradient(130deg,#231b32 0%,#352542 52%,#231b35 100%);color:#f5eafa}
+.semantic-toolbar-main{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.semantic-toolbar-main strong{display:block;font-size:17px;letter-spacing:.04em;font-weight:750}
+.semantic-toolbar-main small{display:block;font-size:10px;color:#d6c7e0;line-height:1.8;margin-top:3px}
+.semantic-switches{display:flex;gap:4px;align-items:center;background:#170f27;border:1px solid #645173;border-radius:11px;padding:4px;max-width:100%}
+.semantic-switches button{background:none;color:#d8cbe1;border:0;border-radius:7px;padding:7px 11px;font-size:11px;font-weight:700;white-space:nowrap;min-height:35px}
+.semantic-switches button.active{background:#bda0d1;color:#24162f}
+.semantic-switches button:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.semantic-controls{display:flex;flex-wrap:wrap;align-items:center;gap:7px;margin-top:13px}
+.semantic-controls input,.semantic-controls select{background:#191524;border:1px solid #826b91;border-radius:8px;color:#f5eef8;padding:9px 11px;font-size:11px;min-height:36px;max-width:100%}
+.semantic-controls input{width:148px}
+.semantic-controls input::placeholder{color:#a999b5}
+.semantic-controls select{width:min(260px,100%);flex:1 1 190px}
+.semantic-controls select option{background:#201729;color:#f5edf5}
+.semantic-controls>button{background:#32243e;border:1px solid #7b6588;color:#f5eefa;border-radius:8px;min-height:36px;padding:7px 11px;font-size:11px;font-weight:750}
+.semantic-controls>button:hover{background:#584063}
+.semantic-search-label{font-size:10px;color:#c9b8d4}
+.semantic-status{font-size:10px;line-height:1.7;letter-spacing:.025em;color:#ddcae9;margin:11px 0 1px;min-height:14px}
+.semantic-star-viewport{position:relative;background:radial-gradient(circle at 20% 20%,#37274e 0%,transparent 36%),radial-gradient(circle at 76% 70%,#302443 0%,transparent 38%),linear-gradient(145deg,#161122,#0f101c 70%,#1b122d);overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#806a92 #20182a;max-height:min(65vw,790px);min-height:300px}
+.semantic-star-viewport:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.65;background-image:radial-gradient(#ffffff99 .7px,transparent .7px),radial-gradient(#d3bde2aa .6px,transparent .6px);background-size:97px 119px,73px 87px;background-position:19px 20px,53px 31px}
+.semantic-stars-svg{display:block;width:max(100%,1730px);min-width:1120px;height:auto;min-height:345px;position:relative;isolation:isolate}
+.semantic-cluster-label{fill:#b6a3c9;text-anchor:middle;font-family:'Zen Kaku Gothic New',sans-serif;font-weight:650;font-size:13px;letter-spacing:.08em;pointer-events:none}
+.semantic-cluster-count{fill:#766584;text-anchor:middle;font-size:10px;font-family:Georgia,serif;letter-spacing:.13em;pointer-events:none}
+.semantic-link{stroke:#ba95df;stroke-width:1;stroke-linecap:round;fill:none;pointer-events:none;opacity:.12;transition:opacity .25s}
+.semantic-link.ambient{opacity:.07}
+.semantic-link.focused{stroke:#ffe4b4;stroke-width:1.65;opacity:.94;filter:drop-shadow(0 0 4px #ffe4b466)}
+.semantic-link.near-link{opacity:.45}
+.semantic-link.contrast{stroke:#dbafd5;stroke-dasharray:4 5}
+.semantic-link.version-link{stroke:#8eafcf;stroke-dasharray:2 6}
+.semantic-link.dim-link{opacity:.025}
+.semantic-trail{stroke:#f0c4a3;stroke-width:1.3;stroke-dasharray:2 7;opacity:.85;pointer-events:none}
+.semantic-star{cursor:pointer;outline:none}
+.semantic-star-halo{fill:#c7a4e3;opacity:.06;transition:opacity .2s,r .2s}
+.semantic-star:hover .semantic-star-halo,.semantic-star:focus-visible .semantic-star-halo{opacity:.45}
+.semantic-star-core{fill:#e1c3ed;stroke:#e1ccf3;stroke-width:1;filter:drop-shadow(0 0 6px #d7b2f680);transition:fill .2s,filter .2s}
+.semantic-star-core.tone-0{fill:#c6b3e7}.semantic-star-core.tone-1{fill:#f7d4ac}.semantic-star-core.tone-2{fill:#d4e8ff}.semantic-star-core.tone-3{fill:#e0bfde}.semantic-star-core.tone-4{fill:#c2e4dd}
+.semantic-star.chosen .semantic-star-halo{opacity:.52;fill:#ffe3ab}
+.semantic-star.chosen .semantic-star-core{fill:#fff4d1;stroke:#fff6e9;stroke-width:2;filter:drop-shadow(0 0 11px #f8d98a)}
+.semantic-star.neighbor .semantic-star-core{filter:drop-shadow(0 0 9px #e6c5f6)}
+.semantic-star.dim-star{opacity:.22}
+.semantic-star-name{fill:#fdf0f8;font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;font-weight:650;paint-order:stroke;stroke:#181322;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
+.semantic-star.chosen .semantic-star-name{fill:#ffedb7;font-weight:800;font-size:13px}
+.semantic-star:focus-visible .semantic-star-core{stroke:#fff;stroke-width:3}
+.starfield-empty{text-align:center;color:#e5d4ed;padding:110px 16px;font-size:12px;line-height:2}
+.semantic-focus-panel{background:#f8f6fb!important;border-color:#e3d6ec!important;color:#242034!important}
+.semantic-focus-panel h2{font-size:23px;line-height:1.5;margin:6px 0 9px;overflow-wrap:anywhere;color:#302641}
+.semantic-focus-panel .desc{color:#716278!important}
+.semantic-focus-panel .eyebrow{color:#765981!important}
+.semantic-focus-panel>h3{font-size:13px;margin:18px 0 6px;color:#4c385b}
+.semantic-focus-total{font:normal 28px/1.3 Georgia,serif;color:#78538c;border-bottom:1px solid #e2d7e9;margin:13px 0;padding-bottom:13px}
+.semantic-focus-total span{font:500 11px/1.7 'Zen Kaku Gothic New',sans-serif;color:#72617d;margin-left:4px}
+.semantic-panel-actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}
+.semantic-focus-panel .btn{font-size:11px}
+.semantic-related{padding:13px 0;border-top:1px solid #e8e0ed}
+.semantic-related-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.semantic-related-head button{background:none;border:0;padding:0;color:#593e6a;font-size:13px;text-align:left;font-weight:850;line-height:1.65}
+.semantic-related-head button:hover{text-decoration:underline}
+.semantic-related-head small{white-space:nowrap;border-radius:20px;padding:3px 8px;background:#eee5f3;color:#80618d;font-size:10px}
+.semantic-related-theme{font-size:11px;font-weight:800;color:#654d71;margin:6px 0}
+.semantic-related p{font-size:11px;line-height:1.85;color:#675c70;margin:6px 0;overflow-wrap:anywhere}
+.semantic-related details{font-size:11px;color:#64576b;line-height:1.8;margin-top:9px}
+.semantic-related summary{cursor:pointer;color:#5a416b;font-weight:700}
+.semantic-related blockquote{margin:10px 0;padding:8px 12px;border-left:2px solid #b89bc6;background:#f1eaf5;overflow-wrap:anywhere}
+.semantic-related .semantic-caution{font-size:10px;color:#8d7d94}
+.semantic-show-more{width:100%;border-radius:8px;border:1px solid #c8b4d0;color:#62466f;background:#f0e8f4;padding:10px;font-size:11px}
+.semantic-history{margin:10px 0 15px}
+.semantic-history>small{font-size:10px;color:#796987}
+.semantic-history>div{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.semantic-history button{background:#f0eaf4;border:1px solid #d7c7df;color:#6c4d79;padding:5px 8px;font-size:10px;border-radius:20px}
+body.sky-rap .semantic-focus-panel .btn.primary{color:#fff;background:#674977;border-color:#674977}
+body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#fff;border-color:#cdbbd7}
+@media(max-width:960px){.semantic-star-viewport{max-height:550px}.semantic-stars-svg{min-width:1120px}.semantic-stars-svg[data-scope="near"]{width:100%;min-width:680px}}
+@media(max-width:760px){.semantic-toolbar{padding:12px 11px 9px}.semantic-toolbar-main strong{font-size:15px}.semantic-toolbar-main small{font-size:10px}.semantic-switches{flex:1 1 auto;justify-content:center}.semantic-switches button{flex:1;padding:6px 8px}.semantic-controls{gap:6px}.semantic-controls input{flex:1;min-width:110px}.semantic-controls select{width:100%;flex-basis:100%}.semantic-star-viewport{max-height:440px;min-height:240px}.semantic-stars-svg{min-width:1120px}.semantic-stars-svg[data-scope="near"]{min-width:720px}.semantic-focus-panel h2{font-size:21px}.semantic-related{padding:12px 0}.semantic-history button{max-width:100%;overflow-wrap:anywhere}}
+@media(prefers-reduced-motion:reduce){.semantic-star-core,.semantic-link,.semantic-star-halo{transition:none;filter:none}}

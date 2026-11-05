@@ -34,5 +34,7 @@ jobs:
           node lyric-constellation/deep-reading.test.js
           node lyric-constellation/author-review.test.js
           node lyric-constellation/mummy-research.test.cjs
+          node lyric-constellation/semantic-stars.test.cjs
       - name: Browser smoke – desktop and mobile
         run: node lyric-constellation/browser-smoke.cjs
+          node lyric-constellation/semantic-stars.browser.cjs
