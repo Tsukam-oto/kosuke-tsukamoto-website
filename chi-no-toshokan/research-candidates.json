@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastRunAt": "2026-11-04T10:44:48+00:00",
+  "lastRunAt": "2026-11-05T10:59:54+00:00",
   "editorialPolicy": "これは検索APIから得た候補資料と書誌情報です。本文・研究結果・原典の該当箇所は未照合です。記事の根拠として承認していません。",
   "automation": {
     "frequency": "週2回（GitHub Actions）",
@@ -8,43 +8,61 @@
   },
   "runSummary": {
     "topicsSearched": [
-      "adler",
-      "therapeutic-alliance",
-      "odyssey-xenia",
-      "zeus-titans",
-      "roman-concrete",
-      "exoplanets",
-      "notation",
-      "temperament"
+      "care",
+      "habit-formation",
+      "bronze-collapse",
+      "oral-epic",
+      "microbiome",
+      "city",
+      "beethoven5",
+      "ravelbolero"
     ],
-    "providerCallsSucceeded": 17,
-    "errors": []
+    "providerCallsSucceeded": 14,
+    "errors": [
+      {
+        "source": "OpenAlex",
+        "topicId": "bronze-collapse",
+        "errorType": "HTTPError",
+        "httpStatus": 503
+      },
+      {
+        "source": "OpenAlex",
+        "topicId": "microbiome",
+        "errorType": "HTTPError",
+        "httpStatus": 503
+      },
+      {
+        "source": "OpenAlex",
+        "topicId": "beethoven5",
+        "errorType": "HTTPError",
+        "httpStatus": 503
+      }
+    ]
   },
   "items": [
     {
-      "id": "openalex:W2966849946",
+      "id": "openalex:W2949233698",
       "kind": "research-metadata",
-      "title": "From China to South Korea: Two Perspectives on Adlerian Psychology in Asia",
-      "url": "https://openalex.org/W2966849946",
+      "title": "Therapeutic Processes in Equine Assisted Psychotherapy: An exploratory qualitative study",
+      "url": "https://openalex.org/W2949233698",
       "area": "心理・臨床",
       "topicIds": [
-        "adler"
+        "care"
       ],
       "providers": [
         "OpenAlex"
       ],
       "reviewStatus": "未照合",
       "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2012,
+      "year": 2017,
       "authors": [
-        "Sun Shu-fang",
-        "James Robert Bitter"
+        "Anna Nina Lee"
       ],
-      "publication": "Digital Commons - East Tennessee State University (East Tennessee State University)",
-      "recordType": "article",
+      "publication": "eScholarship (California Digital Library)",
+      "recordType": "dissertation",
       "doi": "",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
       "id": "met:247308",
@@ -68,7 +86,7 @@
       "imageRights": "Met Open Access / CC0",
       "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
+      "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
       "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
@@ -87,7 +105,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
+      "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
       "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
@@ -106,7 +124,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
+      "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
       "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
@@ -125,7 +143,7 @@
       "recordType": "Ballet",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
+      "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
       "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
@@ -143,6 +161,860 @@
       "evidenceStatus": "書誌・作品情報のみ",
       "recordType": "",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.5325/jeasmedarcherstu.10.2.0186",
+      "kind": "research-metadata",
+      "title": "Revisiting 1177 BCE and the Late Bronze Age Collapse",
+      "url": "https://doi.org/10.5325/jeasmedarcherstu.10.2.0186",
+      "area": "神話・歴史",
+      "topicIds": [
+        "bronze-collapse"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "Guy D. Middleton"
+      ],
+      "publication": "Journal of Eastern Mediterranean Archaeology and Heritage Studies",
+      "recordType": "journal-article",
+      "doi": "10.5325/jeasmedarcherstu.10.2.0186",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.5325/jeasmedarcherstu.10.2.0181",
+      "kind": "research-metadata",
+      "title": "Revisiting 1177 BCE and the Late Bronze Age Collapse",
+      "url": "https://doi.org/10.5325/jeasmedarcherstu.10.2.0181",
+      "area": "神話・歴史",
+      "topicIds": [
+        "bronze-collapse"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "Eric H. Cline"
+      ],
+      "publication": "Journal of Eastern Mediterranean Archaeology and Heritage Studies",
+      "recordType": "journal-article",
+      "doi": "10.5325/jeasmedarcherstu.10.2.0181",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.5040/9781350932289",
+      "kind": "research-metadata",
+      "title": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
+      "url": "https://doi.org/10.5040/9781350932289",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2021,
+      "authors": [],
+      "publication": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
+      "recordType": "other",
+      "doi": "10.5040/9781350932289",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.5040/9781350882836",
+      "kind": "research-metadata",
+      "title": "Ravel: Bolero",
+      "url": "https://doi.org/10.5040/9781350882836",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2009,
+      "authors": [],
+      "publication": "Ravel: Bolero",
+      "recordType": "other",
+      "doi": "10.5040/9781350882836",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315008912-8",
+      "kind": "research-metadata",
+      "title": "THE THERAPEUTIC PROCESS",
+      "url": "https://doi.org/10.4324/9781315008912-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [],
+      "publication": "Psychotherapy with Children",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315008912-8",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.3389/fpsyg.2026.1897870",
+      "kind": "research-metadata",
+      "title": "Sudden gains and early response in routine outpatient psychotherapy: a study protocol for predicting symptom change.",
+      "url": "https://doi.org/10.3389/fpsyg.2026.1897870",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care",
+        "therapeutic-alliance"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Claus L, Raulfs F, Goltermann J, Driessen M, Steuwe C."
+      ],
+      "publication": "Frontiers in psychology",
+      "recordType": "indexed-publication",
+      "doi": "10.3389/fpsyg.2026.1897870",
+      "pmid": "42973837",
+      "publicationTypes": [
+        "methods-article",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-04T10:34:34+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.3138/9781442653382-005",
+      "kind": "research-metadata",
+      "title": "3. Oral Formulaic Composition and Texts",
+      "url": "https://doi.org/10.3138/9781442653382-005",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1967,
+      "authors": [],
+      "publication": "Oral Formulaic Language in the Biblical Psalms",
+      "recordType": "book-chapter",
+      "doi": "10.3138/9781442653382-005",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.3138/9781442653382-003",
+      "kind": "research-metadata",
+      "title": "1. Oral Formulaic Composition",
+      "url": "https://doi.org/10.3138/9781442653382-003",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1967,
+      "authors": [],
+      "publication": "Oral Formulaic Language in the Biblical Psalms",
+      "recordType": "book-chapter",
+      "doi": "10.3138/9781442653382-003",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.2307/1087058",
+      "kind": "research-metadata",
+      "title": "Homeric Modifications of Formulaic Prototypes: Studies in the Development of Greek Epic Diction",
+      "url": "https://doi.org/10.2307/1087058",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1966,
+      "authors": [
+        "W. McLeod",
+        "A. Hoekstra"
+      ],
+      "publication": "Phoenix",
+      "recordType": "journal-article",
+      "doi": "10.2307/1087058",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.2196/98961",
+      "kind": "research-metadata",
+      "title": "From Prediction to Interaction: A Behavioral Informatics Framework for AI in Preventive Health.",
+      "url": "https://doi.org/10.2196/98961",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Gavai A, Heringa J."
+      ],
+      "publication": "Journal of medical Internet research",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/98961",
+      "pmid": "42950341",
+      "publicationTypes": [
+        "research-article",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.2196/82857",
+      "kind": "research-metadata",
+      "title": "Multicomponent Behavior Change Technique Intervention for Caregivers of People With Alzheimer Disease and Related Dementias: Protocol for a Single-Arm, Personalized Behavioral Trial to Disrupt Sedentary Time.",
+      "url": "https://doi.org/10.2196/82857",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Miller D, Lambert S, Jordan L, Butler MJ, Sinvani L, Perrin A, Cheung YK, Cheung YK, Davidson KW, Goodwin AM."
+      ],
+      "publication": "JMIR research protocols",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/82857",
+      "pmid": "42263197",
+      "publicationTypes": [
+        "Clinical Trial Protocol",
+        "research-article",
+        "Journal Article",
+        "Research Support, N.I.H., Extramural"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.2196/104227",
+      "kind": "research-metadata",
+      "title": "Digital Behavioral Infrastructure for Glucagon-Like Peptide-1 Pharmacotherapy: Viewpoint on Persistence, Tolerability, and Postcessation Durability.",
+      "url": "https://doi.org/10.2196/104227",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Cook G."
+      ],
+      "publication": "Journal of medical Internet research",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/104227",
+      "pmid": "42709474",
+      "publicationTypes": [
+        "research-article",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1484/j.jua.5.137197",
+      "kind": "research-metadata",
+      "title": "Placing Space, Shaping Cities, and Making History in the Ancient Classical World",
+      "url": "https://doi.org/10.1484/j.jua.5.137197",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [
+        "Rubina Raja",
+        "Søren Sindbæk"
+      ],
+      "publication": "Journal of Urban Archaeology",
+      "recordType": "journal-article",
+      "doi": "10.1484/j.jua.5.137197",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1484/j.jua.5.131730",
+      "kind": "research-metadata",
+      "title": "Embattled Cities: The Urban Reinvention of History – Editorial",
+      "url": "https://doi.org/10.1484/j.jua.5.131730",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "Rubina Raja",
+        "Søren M. Sindbæk"
+      ],
+      "publication": "Journal of Urban Archaeology",
+      "recordType": "journal-article",
+      "doi": "10.1484/j.jua.5.131730",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1378/chest.62.6.683",
+      "kind": "research-metadata",
+      "title": "The “Bolero” by Ravel",
+      "url": "https://doi.org/10.1378/chest.62.6.683",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1972,
+      "authors": [],
+      "publication": "Chest",
+      "recordType": "journal-article",
+      "doi": "10.1378/chest.62.6.683",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1201/b18279-8",
+      "kind": "research-metadata",
+      "title": "Diet, Microbiome, and Human Health",
+      "url": "https://doi.org/10.1201/b18279-8",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2015,
+      "authors": [],
+      "publication": "Health Benefits of Fermented Foods and Beverages",
+      "recordType": "book-chapter",
+      "doi": "10.1201/b18279-8",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1186/s42779-026-00328-3",
+      "kind": "research-metadata",
+      "title": "Traditional fermented foods, indigenous knowledge systems, and gut microbiome health among tribal communities of Tripura, India: an integrative review",
+      "url": "https://doi.org/10.1186/s42779-026-00328-3",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Manabendra Debnath"
+      ],
+      "publication": "Journal of Ethnic Foods",
+      "recordType": "journal-article",
+      "doi": "10.1186/s42779-026-00328-3",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1177/14713012261498931",
+      "kind": "research-metadata",
+      "title": "The Experiences of Psychotherapy for People With Dementia: A Qualitative Interview Study With Family Members.",
+      "url": "https://doi.org/10.1177/14713012261498931",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Webster EJ, Griffiths AW, Mikhaylova-O'Connell Y, Whittlesea Reed E, Charura D, Jeffery S, Wilkinson H, Gates C, O'Donnell J, Donnellan WJ."
+      ],
+      "publication": "Dementia (London, England)",
+      "recordType": "indexed-publication",
+      "doi": "10.1177/14713012261498931",
+      "pmid": "42973085",
+      "publicationTypes": [
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1111/cp.12102",
+      "kind": "research-metadata",
+      "title": "The impact of technology on therapeutic alliance and engagement in psychotherapy: The therapist's perspective",
+      "url": "https://doi.org/10.1111/cp.12102",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2016,
+      "authors": [
+        "Penelope Richards",
+        "Susan Simpson",
+        "Tarun Joseph Bastiampillai"
+      ],
+      "publication": "Clinical Psychologist",
+      "recordType": "article",
+      "doi": "10.1111/cp.12102",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1101/2021.07.29.454400",
+      "kind": "research-metadata",
+      "title": "Habit formation viewed as structural change in the behavioral network",
+      "url": "https://doi.org/10.1101/2021.07.29.454400",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2021,
+      "authors": [
+        "Kota Yamada",
+        "Koji Toda"
+      ],
+      "publication": "",
+      "recordType": "posted-content",
+      "doi": "10.1101/2021.07.29.454400",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780195063776.003.0003",
+      "kind": "research-metadata",
+      "title": "Beethoven: Fifth Symphony",
+      "url": "https://doi.org/10.1093/oso/9780195063776.003.0003",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1997,
+      "authors": [
+        "Gunther Schuller"
+      ],
+      "publication": "The Compleat Conductor",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oso/9780195063776.003.0003",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780190498900.003.0013",
+      "kind": "research-metadata",
+      "title": "Spatial Representation of Vienna’s Street-Level Environment",
+      "url": "https://doi.org/10.1093/oso/9780190498900.003.0013",
+      "area": "科学・社会",
+      "topicIds": [
+        "city"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2020,
+      "authors": [
+        "Angelika Psenner"
+      ],
+      "publication": "Digital Cities",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oso/9780190498900.003.0013",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1093/obo/9780199828340-0232",
+      "kind": "research-metadata",
+      "title": "Habit Formation and Behavior Change",
+      "url": "https://doi.org/10.1093/obo/9780199828340-0232",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Benjamin Gardner",
+        "Amanda L Rebar"
+      ],
+      "publication": "Oxford Bibliographies in Psychology",
+      "recordType": "reference-entry",
+      "doi": "10.1093/obo/9780199828340-0232",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1093/acrefore/9780190236557.013.129",
+      "kind": "research-metadata",
+      "title": "Habit Formation and Behavior Change",
+      "url": "https://doi.org/10.1093/acrefore/9780190236557.013.129",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Benjamin Gardner",
+        "Amanda L Rebar"
+      ],
+      "publication": "Oxford Research Encyclopedia of Psychology",
+      "recordType": "reference-entry",
+      "doi": "10.1093/acrefore/9780190236557.013.129",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1037/e504092014-032",
+      "kind": "research-metadata",
+      "title": "The process of conducting qualitative research as an adjunct to the development of therapeutic abilities in psychology, psychotherapy and counseling students",
+      "url": "https://doi.org/10.1037/e504092014-032",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [],
+      "publication": "PsycEXTRA Dataset",
+      "recordType": "dataset",
+      "doi": "10.1037/e504092014-032",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1017/cbo9781139235976.004",
+      "kind": "research-metadata",
+      "title": "Haydn, orchestration, and re-orchestration",
+      "url": "https://doi.org/10.1017/cbo9781139235976.004",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [],
+      "publication": "The Orchestral Revolution",
+      "recordType": "book-chapter",
+      "doi": "10.1017/cbo9781139235976.004",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1017/9781805432036.007",
+      "kind": "research-metadata",
+      "title": "Motivic Intensity: The Fifth Symphony, Op. 67",
+      "url": "https://doi.org/10.1017/9781805432036.007",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [],
+      "publication": "The Creation of Beethoven's Nine Symphonies",
+      "recordType": "other",
+      "doi": "10.1017/9781805432036.007",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-323-98341-9.00018-9",
+      "kind": "research-metadata",
+      "title": "Fermented foods and gut microbiome: a focus on African Indigenous fermented foods",
+      "url": "https://doi.org/10.1016/b978-0-323-98341-9.00018-9",
+      "area": "科学・社会",
+      "topicIds": [
+        "microbiome"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2023,
+      "authors": [
+        "Beatrice Mofoluwaso Fasogbon",
+        "Oluwaseun Hannah Ademuyiwa",
+        "Oluwafemi Ayodeji Adebo"
+      ],
+      "publication": "Indigenous Fermented Foods for the Tropics",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-323-98341-9.00018-9",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1007/s10597-026-01720-8",
+      "kind": "research-metadata",
+      "title": "Understanding Psychotherapy Discontinuation Among Ethnically Minoritised Adults: A Systematic Review and Qualitative Synthesis.",
+      "url": "https://doi.org/10.1007/s10597-026-01720-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Fakolade J, Kinderman P, Hassan S, Elahi A."
+      ],
+      "publication": "Community mental health journal",
+      "recordType": "indexed-publication",
+      "doi": "10.1007/s10597-026-01720-8",
+      "pmid": "42726438",
+      "publicationTypes": [
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1007/bf02393345",
+      "kind": "research-metadata",
+      "title": "Therapeutic preliminaries: Conversational context and process in psychotherapy",
+      "url": "https://doi.org/10.1007/bf02393345",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1995,
+      "authors": [
+        "Mark Peyrot"
+      ],
+      "publication": "Qualitative Sociology",
+      "recordType": "journal-article",
+      "doi": "10.1007/bf02393345",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "doi:10.1002/9781444342369.ch8",
+      "kind": "research-metadata",
+      "title": "The Late Bronze Age Collapse and its Aftermath",
+      "url": "https://doi.org/10.1002/9781444342369.ch8",
+      "area": "神話・歴史",
+      "topicIds": [
+        "bronze-collapse"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2011,
+      "authors": [],
+      "publication": "The Mediterranean Context of Early Greek History",
+      "recordType": "other",
+      "doi": "10.1002/9781444342369.ch8",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "anchor:zeus-titans",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Theogony (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "anchor:odyssey-xenia",
+      "kind": "curated-reference-path",
+      "title": "Homer, Odyssey, Book VI (translated text)",
+      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "anchor:human-ages",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Works and Days (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "human-ages"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-05T10:59:54+00:00"
+    },
+    {
+      "id": "openalex:W2966849946",
+      "kind": "research-metadata",
+      "title": "From China to South Korea: Two Perspectives on Adlerian Psychology in Asia",
+      "url": "https://openalex.org/W2966849946",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2012,
+      "authors": [
+        "Sun Shu-fang",
+        "James Robert Bitter"
+      ],
+      "publication": "Digital Commons - East Tennessee State University (East Tennessee State University)",
+      "recordType": "article",
+      "doi": "",
       "firstSeen": "2026-11-04T10:07:48+00:00",
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
@@ -328,37 +1200,6 @@
       "recordType": "dataset",
       "doi": "10.3840/003269",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.3389/fpsyg.2026.1897870",
-      "kind": "research-metadata",
-      "title": "Sudden gains and early response in routine outpatient psychotherapy: a study protocol for predicting symptom change.",
-      "url": "https://doi.org/10.3389/fpsyg.2026.1897870",
-      "area": "心理・臨床",
-      "topicIds": [
-        "therapeutic-alliance"
-      ],
-      "providers": [
-        "Europe PMC"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2026,
-      "authors": [
-        "Claus L, Raulfs F, Goltermann J, Driessen M, Steuwe C."
-      ],
-      "publication": "Frontiers in psychology",
-      "recordType": "indexed-publication",
-      "doi": "10.3389/fpsyg.2026.1897870",
-      "pmid": "42973837",
-      "publicationTypes": [
-        "methods-article",
-        "Journal Article"
-      ],
-      "abstractAvailable": true,
-      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
-      "firstSeen": "2026-11-04T10:34:34+00:00",
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
@@ -1045,60 +1886,6 @@
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
-      "id": "anchor:zeus-titans",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Theogony (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "zeus-titans"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "anchor:odyssey-xenia",
-      "kind": "curated-reference-path",
-      "title": "Homer, Odyssey, Book VI (translated text)",
-      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "anchor:human-ages",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Works and Days (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "human-ages"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
       "id": "doi:10.3390/nu14071527",
       "kind": "research-metadata",
       "title": "Fermented Foods, Health and the Gut Microbiome",
@@ -1125,126 +1912,6 @@
       "lastSeen": "2026-11-04T10:07:48+00:00"
     },
     {
-      "id": "doi:10.1484/j.jua.5.137197",
-      "kind": "research-metadata",
-      "title": "Placing Space, Shaping Cities, and Making History in the Ancient Classical World",
-      "url": "https://doi.org/10.1484/j.jua.5.137197",
-      "area": "科学・社会",
-      "topicIds": [
-        "city"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2024,
-      "authors": [
-        "Rubina Raja",
-        "Søren Sindbæk"
-      ],
-      "publication": "Journal of Urban Archaeology",
-      "recordType": "journal-article",
-      "doi": "10.1484/j.jua.5.137197",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
-      "id": "doi:10.1484/j.jua.5.131730",
-      "kind": "research-metadata",
-      "title": "Embattled Cities: The Urban Reinvention of History – Editorial",
-      "url": "https://doi.org/10.1484/j.jua.5.131730",
-      "area": "科学・社会",
-      "topicIds": [
-        "city"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2022,
-      "authors": [
-        "Rubina Raja",
-        "Søren M. Sindbæk"
-      ],
-      "publication": "Journal of Urban Archaeology",
-      "recordType": "journal-article",
-      "doi": "10.1484/j.jua.5.131730",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
-      "id": "doi:10.1201/b18279-8",
-      "kind": "research-metadata",
-      "title": "Diet, Microbiome, and Human Health",
-      "url": "https://doi.org/10.1201/b18279-8",
-      "area": "科学・社会",
-      "topicIds": [
-        "microbiome"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2015,
-      "authors": [],
-      "publication": "Health Benefits of Fermented Foods and Beverages",
-      "recordType": "book-chapter",
-      "doi": "10.1201/b18279-8",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
-      "id": "doi:10.1186/s42779-026-00328-3",
-      "kind": "research-metadata",
-      "title": "Traditional fermented foods, indigenous knowledge systems, and gut microbiome health among tribal communities of Tripura, India: an integrative review",
-      "url": "https://doi.org/10.1186/s42779-026-00328-3",
-      "area": "科学・社会",
-      "topicIds": [
-        "microbiome"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2026,
-      "authors": [
-        "Manabendra Debnath"
-      ],
-      "publication": "Journal of Ethnic Foods",
-      "recordType": "journal-article",
-      "doi": "10.1186/s42779-026-00328-3",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
-      "id": "doi:10.1093/oso/9780190498900.003.0013",
-      "kind": "research-metadata",
-      "title": "Spatial Representation of Vienna’s Street-Level Environment",
-      "url": "https://doi.org/10.1093/oso/9780190498900.003.0013",
-      "area": "科学・社会",
-      "topicIds": [
-        "city"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2020,
-      "authors": [
-        "Angelika Psenner"
-      ],
-      "publication": "Digital Cities",
-      "recordType": "book-chapter",
-      "doi": "10.1093/oso/9780190498900.003.0013",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
       "id": "doi:10.1016/j.micpath.2025.107718",
       "kind": "research-metadata",
       "title": "Comprehensive review of food Archaeome: Exploring the understudied microbiome and health benefits of fermented foods",
@@ -1267,32 +1934,6 @@
       "publication": "Microbial Pathogenesis",
       "recordType": "review",
       "doi": "10.1016/j.micpath.2025.107718",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:07:48+00:00"
-    },
-    {
-      "id": "doi:10.1016/b978-0-323-98341-9.00018-9",
-      "kind": "research-metadata",
-      "title": "Fermented foods and gut microbiome: a focus on African Indigenous fermented foods",
-      "url": "https://doi.org/10.1016/b978-0-323-98341-9.00018-9",
-      "area": "科学・社会",
-      "topicIds": [
-        "microbiome"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2023,
-      "authors": [
-        "Beatrice Mofoluwaso Fasogbon",
-        "Oluwaseun Hannah Ademuyiwa",
-        "Oluwafemi Ayodeji Adebo"
-      ],
-      "publication": "Indigenous Fermented Foods for the Tropics",
-      "recordType": "book-chapter",
-      "doi": "10.1016/b978-0-323-98341-9.00018-9",
       "firstSeen": "2026-11-04T10:07:48+00:00",
       "lastSeen": "2026-11-04T10:07:48+00:00"
     }
