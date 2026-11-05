@@ -62,7 +62,8 @@ async function run(mobile){
   assert.match(await page.locator('.semantic-focus-panel').innerText(),/日々の異なる見え方/);
   await page.locator('.semantic-related details summary').first().click();
   assert.match(await page.locator('.semantic-related details').first().innerText(),/架空の精読仮説/);
-  assert.equal(await page.locator('.semantic-star').filter({hasText:'<img'}).count(),0,'malicious title is HTML escaped');
+  assert.equal(await page.locator('.semantic-stars-svg img').count(),0,'private title must not become an HTML image element');
+  assert.match(await page.locator('.semantic-stars-svg').innerHTML(),/&lt;img/,'unsafe characters must be escaped');
   await page.locator('[data-star-focus="master-fictional-050"]').first().click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/);
   await page.locator('[data-semantic-scope="near"]').click();
