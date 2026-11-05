@@ -319,7 +319,7 @@ async function loadPaths(user,epoch){
  pathRows=[];
  try{
   var res=await cloudClient.from('lyric_close_reading_paths')
-   .select('thread_key,title,guiding_question,anchors').eq('user_id',user.id).limit(80);
+   .select('thread_key,title,guiding_question,core_hypothesis,counterreading,inference_limit,anchors').eq('user_id',user.id).limit(80);
   if(res.error)throw res.error;
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
   pathRows=res.data||[];render();
