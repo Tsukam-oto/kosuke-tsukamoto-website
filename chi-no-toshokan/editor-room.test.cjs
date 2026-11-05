@@ -28,6 +28,7 @@ check('visual plan avoids stock image fetching',!noteSrc.includes('fetch(')&&!no
 check('mobile layout breakpoint',css.includes('@media(max-width:770px)'));
 check('quick memo mobile entry',html.includes('id="quick-text"')&&html.includes('id="quick-save"')&&css.includes('.quick-controls'));
 check('next-step guidance stays private and responsive',html.indexOf('id="update-guide"')>html.indexOf('id="private-app" hidden')&&css.includes('.next-panel')&&css.includes('@media(max-width:690px){.next-panel'));
+check('next-step guidance sits beside form on mobile',html.indexOf('id="update-guide"')>html.indexOf('id="editor-title"')&&html.indexOf('id="update-guide"')<html.indexOf('id="editor-form"'));
 check('quick memo saved as private note',src.includes("async function saveQuick()")&&src.includes("kind:'note'")&&src.includes("stage:'seed'"));
 check('research ideas require authentication',html.indexOf('id="research-ideas"')>html.indexOf('id="private-app" hidden'));
 check('research idea intake does not auto-publish',src.includes("function selectResearchIdea(id)")&&src.includes("stage').value='candidate'")&&src.includes('本文と主張は未照合'));
