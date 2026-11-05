@@ -674,7 +674,7 @@ render=function(){
  if(sky==='rap'){
   var sidebar=document.querySelector('.sidebar-bottom p:first-child');
   if(sidebar)sidebar.textContent=cloudUser?'本人専用の木乃伊アーカイブ：'+userWorks().length+'作品':'木乃伊の作品は本人ログイン後に表示します';
-  var footer=document.getElementById('constellationFooter');
+  var footer=typeof document.getElementById==='function'?document.getElementById('constellationFooter'):null;
   if(footer)footer.textContent='原文の歌詞は非公開です。作品同士の関係は、根拠のある読解仮説として表示します。本人の確認とAIの解釈は別に保存します。';
  }
 };
