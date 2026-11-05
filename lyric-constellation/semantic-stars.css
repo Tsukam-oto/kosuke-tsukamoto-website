@@ -31,6 +31,8 @@
 .semantic-link.dim-link{opacity:.025}
 .semantic-trail{stroke:#f0c4a3;stroke-width:1.3;stroke-dasharray:2 7;opacity:.85;pointer-events:none}
 .semantic-star{cursor:pointer;outline:none}
+.semantic-star-hit{fill:transparent;stroke:none;pointer-events:all;cursor:pointer}
+.semantic-star-halo,.semantic-star-core{pointer-events:none}
 .semantic-star-halo{fill:#c7a4e3;opacity:.06;transition:opacity .2s,r .2s}
 .semantic-star:hover .semantic-star-halo,.semantic-star:focus-visible .semantic-star-halo{opacity:.45}
 .semantic-star-core{fill:#e1c3ed;stroke:#e1ccf3;stroke-width:1;filter:drop-shadow(0 0 6px #d7b2f680);transition:fill .2s,filter .2s}
@@ -39,9 +41,10 @@
 .semantic-star.chosen .semantic-star-core{fill:#fff4d1;stroke:#fff6e9;stroke-width:2;filter:drop-shadow(0 0 11px #f8d98a)}
 .semantic-star.neighbor .semantic-star-core{filter:drop-shadow(0 0 9px #e6c5f6)}
 .semantic-star.dim-star{opacity:.22}
-.semantic-star-name{fill:#fdf0f8;font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;font-weight:650;paint-order:stroke;stroke:#181322;stroke-width:4px;stroke-linejoin:round;pointer-events:none}
-.semantic-star.chosen .semantic-star-name{fill:#ffedb7;font-weight:800;font-size:13px}
+.semantic-star-name{fill:#fdf0f8;font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;font-weight:650;paint-order:stroke;stroke:#181322;stroke-width:4px;stroke-linejoin:round;pointer-events:all;cursor:pointer}
+.semantic-star-name.chosen{fill:#ffedb7;font-weight:800;font-size:13px}
 .semantic-star:focus-visible .semantic-star-core{stroke:#fff;stroke-width:3}
+.semantic-star-name:focus-visible{fill:#fff4d1;text-decoration:underline;outline:none}
 .starfield-empty{text-align:center;color:#e5d4ed;padding:110px 16px;font-size:12px;line-height:2}
 .semantic-focus-panel{background:#f8f6fb!important;border-color:#e3d6ec!important;color:#242034!important}
 .semantic-focus-panel h2{font-size:23px;line-height:1.5;margin:6px 0 9px;overflow-wrap:anywhere;color:#302641}
