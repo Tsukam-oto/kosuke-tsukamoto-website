@@ -43,7 +43,7 @@ function coverRender(){
  const canvas=$('note-cover');
  if(!canvas||typeof canvas.getContext!=='function')return;
  try{
-  packageTool.cover(canvas,$('title').value.trim()||'ここに記事タイトル',$('magazine').selectedOptions?.[0]?.textContent||'知の図書館',$('magazine').value);
+  packageTool.cover(canvas,$('title').value.trim()||'ここに記事タイトル','束元康介',$('magazine').value);
  }catch(e){$('note-toc').textContent='見出し画像の表示ができませんでした：'+String(e.message||e)}
 }
 function updateNotePackage(){
@@ -199,6 +199,7 @@ function normalize(payload){
   result:String(p.result||'').slice(0,6000),
   lesson:String(p.lesson||'').slice(0,5000),
   sources:String(p.sources||'').slice(0,5000),
+  verificationNotes:String(p.verificationNotes||'').slice(0,5000),
   stage:stageNames[p.stage]?p.stage:'seed',
   publicUrl:String(p.publicUrl||'').slice(0,500),
   createdAt:p.createdAt||new Date().toISOString(),
@@ -209,7 +210,7 @@ function formPayload(){
  return normalize({kind:$('kind').value,magazine:$('magazine').value,
   format:$('format').value,articleBody:$('article-body').value,title:$('title').value.trim(),problem:$('problem').value.trim(),
   aiMethod:$('ai-method').value.trim(),result:$('result').value.trim(),lesson:$('lesson').value.trim(),
-  sources:$('sources').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim(),
+  sources:$('sources').value.trim(),verificationNotes:$('verification-notes').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim(),
   impressions7:$('impressions7').value,pv7:$('pv7').value,likes7:$('likes7').value});
 }
 function cleanForm(){
@@ -224,7 +225,7 @@ function loadForm(row){
  $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;
  $('format').value=p.format;formatUserEdited=true;$('article-body').value=p.articleBody;
  magazineAdvice();readingStatus();$('title').value=p.title;updateNotePackage();$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
- $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;
+ $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;$('verification-notes').value=p.verificationNotes;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
  for(const id of ['impressions7','pv7','likes7'])$(id).value=p[id]??'';
  $('delete-entry').hidden=false;drawList();
@@ -237,7 +238,7 @@ function drawList(){
  drawMagazines();formatOutcomes();
  const matching=records.filter(x=>{
   const p=x.payload||{};
-  return (filter==='all'||p.stage===filter)&&(!query||[p.title,p.problem,p.aiMethod,p.result,p.lesson].join(' ').toLocaleLowerCase('ja').includes(query));
+  return (filter==='all'||p.stage===filter)&&(!query||[p.title,p.problem,p.aiMethod,p.result,p.lesson,p.verificationNotes].join(' ').toLocaleLowerCase('ja').includes(query));
  });
  $('entry-list').innerHTML=matching.length?matching.map(r=>{
   const p=r.payload||{},date=new Date(r.updated_at||'');
@@ -327,12 +328,14 @@ function editorialPrompt(p){
   '【編集】独立した読者に前提を説明する。主題を一つに絞り、実際の「変更前→困りごと→直した理由→変更後」を証拠で示す。実装済み・未検証・今後の構想を分け、成功を捏造しない。映画・歴史等の読みものを無理にAI活用記事にしない。',
   '参考文献がある場合は本文との対応を確認し、確認できない箇所には「要出典・要確認」と印を付ける。',
   '出力：①記事タイトル案3つ ②記事本文 ③確認済み事実と未確認事項の区別 ④実物の画面・作品・図解の使用案と権利確認 ⑤動画化に独立した価値があるか。販売案内は許可取得まで作らない。公開は本人の承認が必要。',
+  '【検証ゲート】根拠メモに記載がない変更や検証結果は未確認として扱い、公開前に照合できるリンクと具体的な検証方法を提示する。',
   '',
   '【実践記録】',
   '区分：'+(names[p.kind]||''),'テーマ：'+p.title,
   '出発点：'+(p.problem||'未記入'),'AIに任せたこと・使い方：'+(p.aiMethod||'未記入'),
   '結果・失敗・未確認事項：'+(p.result||'未記入'),'再現できる工夫：'+(p.lesson||'未記入'),
   '参考資料：'+(p.sources||'未記入'),
+  '確認済み・未検証・本人の判断（未記入の場合は想像で補完しない）：'+(p.verificationNotes||'未記入'),
   '既存の未承認下書き（ある場合は素材として扱い、事実確認する）：'+(p.articleBody||'なし'),
  ].join('\n');
 }
