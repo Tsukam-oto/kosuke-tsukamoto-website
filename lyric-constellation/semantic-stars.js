@@ -257,7 +257,17 @@ selectedWorkCard=function(){
  var links=related(edgeList(userWorks()),w.id).sort(function(a,b){return a.kind==='counterpoint'?-1:b.kind==='counterpoint'?1:0;});
  var max=state.expanded?links.length:7;
  var path=activePath(available),pos=path?path.ids.indexOf(w.id):-1;
- var thematic=path?'<div class="semantic-path-story"><small>選んだ星座 / 精読の道筋</small><h3>'+safe(path.title)+'</h3><p>'+safe(path.question||'複数作品を通して読み進める仮説です。')+'</p><div class="semantic-path-progress">'+(pos>=0?String(pos+1)+' / '+path.ids.length+'作品目':'この星は星座の外にあります')+'</div><button type="button" data-semantic-action="next">この星座の次の星へ</button></div>':'';
+ var step=path&&pos>=0?path.steps[pos]:null;
+ var thematic=path?'<div class="semantic-path-story"><small>選んだ星座 / 精読の道筋</small><h3>'+safe(path.title)+'</h3><p>'+safe(path.question||'複数作品を通して読み進める仮説です。')+'</p>'+
+ (step?'<div class="semantic-step-anchor"><small>'+safe(step.technique||'原文に根拠のある読解')+'</small>'+
+ (step.quote?'<blockquote>'+safe(step.quote)+'</blockquote>':'')+
+ (step.observation?'<p>'+safe(step.observation)+'</p>':'')+'</div>':'<p>この星は選択した星座の道筋には含まれていません。</p>')+
+ '<div class="semantic-path-progress">'+(pos>=0?String(pos+1)+' / '+path.ids.length+'作品目':'星座の外')+'</div>'+
+ '<div class="semantic-path-steps"><button type="button" data-semantic-action="prev">前の星へ</button><button type="button" data-semantic-action="next">次の星へ</button></div>'+
+ (path.hypothesis?'<details class="semantic-theme-explanation"><summary>星座全体の読みと別の可能性</summary><p>'+safe(path.hypothesis)+'</p>'+
+ (path.alternative?'<p>別の読み：'+safe(path.alternative)+'</p>':'')+
+ (path.limit?'<p>読みの限界：'+safe(path.limit)+'</p>':'')+'</details>':'')+
+ '<p class="semantic-caution">点線は読む順番です。隣接する二曲の直接比較が成立したことを示すものではありません。</p></div>':'';
  var list=links.slice(0,max).map(function(e){
   var other=getWork(e.a===w.id?e.b:e.a);if(!other)return '';
   var isLeft=e.a===w.id;
