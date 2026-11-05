@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOverlap:true};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -65,6 +65,37 @@ function normalizePaths(rows,all){
    alternative:cleanText(p.counterreading),limit:cleanText(p.inference_limit),
    ids:steps.map(function(x){return x.id;}),steps:steps}:null;
  }).filter(Boolean).sort(function(a,b){return a.title.localeCompare(b.title,'ja');});
+}
+/* One work can appear in many reading constellations. A shared source anchor
+ * creates an overlap, not a new claim of direct song-to-song similarity. */
+function themeKind(path){
+ return /^(rap-album|rap-ep|rap-single)/.test(path.id)?'collection':'theme';
+}
+function membershipIndex(paths){
+ var result=new Map();
+ (paths||[]).forEach(function(p){p.ids.forEach(function(id){
+  if(!result.has(id))result.set(id,[]);
+  result.get(id).push(p.id);
+ });});
+ return result;
+}
+function intersectingConstellations(paths,id){
+ var active=(paths||[]).find(function(p){return p.id===id;});
+ if(!active)return [];
+ var seen=new Set(active.ids);
+ return paths.filter(function(p){return p.id!==id;}).map(function(p){
+  var shared=p.ids.filter(function(x){return seen.has(x);});
+  return {path:p,shared:shared};
+ }).filter(function(p){return p.shared.length>0;})
+  .sort(function(a,b){return b.shared.length-a.shared.length||a.path.title.localeCompare(b.path.title,'ja');});
+}
+function atlasFiltered(paths,filter,starId){
+ return (paths||[]).filter(function(p){
+  if(filter==='themes')return themeKind(p)==='theme';
+  if(filter==='collections')return themeKind(p)==='collection';
+  if(filter==='star')return p.ids.includes(starId);
+  return true;
+ });
 }
 /* Deterministic force-directed layout. Coordinates reflect sourced links, NOT a claim
  * of mathematical similarity or verified authorial intention. Unlinked works remain
@@ -243,7 +274,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
