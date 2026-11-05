@@ -202,3 +202,9 @@ assert.equal(stars.titleMatches(works,'　').length,0,'blank search does not ret
 const widthMatches=stars.titleMatches([{id:'f',title:'ＡＢＣ',sky:'rap'}],'abc');
 assert.equal(widthMatches[0].id,'f','width normalization supports actual titles without changing stored source names');
 console.log('title search: multiple candidates, exact priority, Japanese width and empty results');
+assert.equal(stars.adjacentCatalogId(works,'master-1',1),'master-2','reading continues in source order');
+assert.equal(stars.adjacentCatalogId(works,'master-2',-1),'master-1','previous returns to the prior source');
+assert.equal(stars.adjacentCatalogId(works,'master-168',1),'master-1','end wraps to start');
+assert.equal(stars.adjacentCatalogId(works,'master-1',-1),'master-168','start wraps to end');
+assert.equal(stars.adjacentCatalogId([],null,1),null,'empty corpus is safe');
+console.log('reading navigation: deterministic original-book order and boundaries');
