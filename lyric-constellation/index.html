@@ -531,39 +531,52 @@ function save(){try{db.updatedAt=new Date().toISOString();localStorage.setItem(S
 function works(){return [...PUBLIC,...db.userWorks,...masterReadingWorks].filter(w=>resolveSky(w)===sky)}
 function getWork(id){return works().find(w=>w.id===id)}
 
-/* Exact fragments, observed locally. Never infer or generate lyrics. */
+/* Explicit search terms are complete expressions, never slices of Japanese text.
+ * Japanese morphological units cannot be inferred by a fixed-width substring. */
+const RAP_SEARCH_GROUPS=[
+ {label:'呼びかけ',terms:['あなた','君','僕','俺','お前','あんた']},
+ {label:'心の動き',terms:['愛してる','ありがとう','ごめんね','幸せ','会いたい','後悔','忘れない']},
+ {label:'暮らしと風景',terms:['帰り道','誕生日','コンビニ','コーヒー','夏休み','春','夏','秋','冬']},
+ {label:'音楽と創作',terms:['音楽','ピアノ','ラップ','歌詞','曲を書く','新曲','マイク']}
+];
+/* Only the ENTIRE original line can be detected as a repeated phrase.
+ * A match is a textual observation, not proof of a common meaning. */
 let rapPhraseMemo={key:null,rows:[]};
 function rapRepeatedPhrases(){
  if(sky!=='rap')return [];
- const corpus=works().slice(0,200);
- const key=corpus.map(w=>w.id+':'+(w.updatedAt||'')+':'+w.lyrics.length+':'+w.lyrics.slice(0,16)).join('|');
+ const corpus=works().slice(0,300);
+ const key=corpus.map(w=>w.id+':'+(w.updatedAt||'')+':'+hashText(w.lyrics)).join('|');
  if(rapPhraseMemo.key===key)return rapPhraseMemo.rows;
  const inverted=new Map();
  for(const w of corpus){
-  const seen=new Set();let budget=4200;
-  for(const line of w.lyrics.split(/\r?\n/).slice(0,150)){
-   if(budget<=0)break;
-   const t=norm(line).slice(0,125);
-   for(let len=4;len<=8&&budget>0;len++){
-    for(let i=0;i+len<=t.length&&budget>0;i++){
-     budget--;
-     const part=t.slice(i,i+len);
-     if(!/^[\p{L}]+$/u.test(part))continue;
-     seen.add(part);
-    }
-   }
+  const seen=new Map();
+  for(const originalLine of w.lyrics.split(/\r?\n/).slice(0,400)){
+   const line=originalLine.trim().replace(/[ \t　]+/g,' ');
+   if(line.length<6||line.length>105||!/[\p{L}]{3}/u.test(line))continue;
+   if(/^([※☆★\-_=〜~\s]+|(?:chorus|verse|hook)(?:\s*\d+)?)$/i.test(line))continue;
+   const normalized=norm(line);
+   if(!seen.has(normalized))seen.set(normalized,line);
   }
-  for(const part of seen){if(!inverted.has(part))inverted.set(part,new Set());inverted.get(part).add(w.id);}
+  for(const [normalized,text]of seen){
+   if(!inverted.has(normalized))inverted.set(normalized,{text,ids:new Set()});
+   inverted.get(normalized).ids.add(w.id);
+  }
  }
- const raw=[...inverted].filter(([t,ids])=>ids.size>=2).map(([text,ids])=>({text,ids:[...ids],count:ids.size,quality:ids.size*Math.log2(text.length+1)}));
- raw.sort((a,b)=>b.text.length-a.text.length||b.count-a.count||a.text.localeCompare(b.text,'ja'));
- const kept=[];
- for(const p of raw){if(kept.some(l=>{if(!p.ids.every(id=>l.ids.includes(id)))return false;if(l.text.includes(p.text))return true;for(let i=0;i+5<=p.text.length;i++)if(l.text.includes(p.text.slice(i,i+5)))return true;return false;}))continue;kept.push(p);if(kept.length>=32)break;}
- kept.sort((a,b)=>b.quality-a.quality||b.text.length-a.text.length||a.text.localeCompare(b.text,'ja'));
- rapPhraseMemo={key,rows:kept.slice(0,24)};
+ const found=[...inverted.values()].filter(x=>x.ids.size>=2)
+  .map(x=>({text:x.text,ids:[...x.ids],count:x.ids.size}))
+  .sort((a,b)=>b.count-a.count||b.text.length-a.text.length||a.text.localeCompare(b.text,'ja'));
+ rapPhraseMemo={key,rows:found.slice(0,24)};
  return rapPhraseMemo.rows;
 }
-function words(){return [...new Set([...DEFAULT_WORDS,...db.customWords,...(sky==='rap'?rapRepeatedPhrases().map(x=>x.text):[])])].filter(Boolean)}
+function hashText(text){
+ let h=2166136261;
+ for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+ return h;
+}
+function words(){
+ const catalog=sky==='rap'?RAP_SEARCH_GROUPS.flatMap(group=>group.terms):DEFAULT_WORDS;
+ return [...new Set([...catalog,...db.customWords])].filter(Boolean);
+}
 function tokens(w){const t=norm(w.lyrics);return words().filter(x=>t.includes(norm(x))).sort((a,b)=>b.length-a.length)}
 function occurrences(text,needle){if(!needle)return 0;const a=norm(text),b=norm(needle);let count=0,at=0;while((at=a.indexOf(b,at))!==-1){count++;at+=b.length}return count;}
 function wordDF(){const arr=works(),map=new Map();for(const word of words()){let df=0,ct=0;for(const w of arr){const n=occurrences(w.lyrics,word);if(n){df++;ct+=n}}if(df)map.set(word,{df,count:ct})}return map}
