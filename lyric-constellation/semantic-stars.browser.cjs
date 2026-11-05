@@ -219,7 +219,7 @@ async function run(mobile){
    await review.locator('[data-author-note]').fill('まだ送信していない、途中のメモ');
    assert.match(await review.locator('.semantic-review-feedback').innerText(),/未保存/);
    assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),true,'a pending note blocks silent logout');
-   assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('lyric-review-tab-v1:fictional-user')).notes.length),1,'draft is stored for tab-local reload recovery');
+   assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('lyric-review-tab-v1:fictional-user')).notes.some(pair=>pair[0]==='a'&&pair[1]==='まだ送信していない、途中のメモ')),true,'draft is stored for tab-local reload recovery alongside another failed comparison');
    await page.locator('[data-semantic-action="map-zoom"]').click();
    await targetRelation.locator('.semantic-review-disclosure>summary').click();
    assert.equal(await review.locator('[data-author-note]').inputValue(),'まだ送信していない、途中のメモ','author note survives starfield rerender');
