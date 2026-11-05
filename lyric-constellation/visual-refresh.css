@@ -1,0 +1,323 @@
+/* LYRIC CONSTELLATION / REFINED EDITORIAL SYSTEM
+ * No lavender chrome, no substring word clouds.
+ * All color decisions are presentation only; private corpus remains behind RLS. */
+body.sky-rap{
+ --bg:#f3f7fb;
+ --surface:#ffffff;
+ --ink:#12243a;
+ --muted:#61758a;
+ --border:#d8e3ee;
+ --shadow:0 12px 42px #0a214012;
+ color:var(--ink);
+ background:var(--bg);
+}
+body.sky-rap .layout{max-width:1720px}
+body.sky-rap .sidebar{
+ background:#0c1b30;border-right:1px solid #29405a;
+ padding:31px 19px;
+}
+body.sky-rap .brand{padding:5px 8px 30px}
+body.sky-rap .brand-symbol{background:#176bdc;color:#fff;box-shadow:0 4px 20px #247cf04c}
+body.sky-rap .brand strong{color:#fff;font-size:19px;letter-spacing:.04em}
+body.sky-rap .brand small{color:#94b9de;font-size:9px;letter-spacing:.1em}
+body.sky-rap .nav-label{color:#88a4be;font-size:10px;letter-spacing:.1em}
+body.sky-rap .nav button{color:#bcd0e4;border-radius:9px;font-weight:750;font-size:13px;min-height:47px}
+body.sky-rap .nav button.active{background:#146ee6;color:#fff;box-shadow:0 6px 16px #0b5ac43d}
+body.sky-rap .nav button:hover:not(.active){background:#183657;color:#fff}
+body.sky-rap .nav button small{display:none}
+body.sky-rap .sidebar-bottom{border-color:#2a4662;color:#abc2d9}
+body.sky-rap .sidebar-bottom strong{color:#f2f8ff}
+body.sky-rap .breadcrumb{color:#58728a}
+body.sky-rap .heading{color:#10283f;font-size:clamp(26px,3.1vw,39px);line-height:1.35}
+body.sky-rap .lede{color:#4e667e;max-width:740px;font-size:13px;line-height:1.9;margin-bottom:23px}
+body.sky-rap .eyebrow{color:#2877bf;letter-spacing:.09em}
+body.sky-rap .panel,
+body.sky-rap .stat,
+body.sky-rap .term-result,
+body.sky-rap .work-card,
+body.sky-rap .reading,
+body.sky-rap .compare-col{background:#fff;color:#12243a;border-color:#d8e3ee}
+body.sky-rap .panel h2,
+body.sky-rap .section-top h2,
+body.sky-rap .term-result h3{color:#112d49}
+body.sky-rap .stat b,body.sky-rap .counts{color:#0a4fa3}
+body.sky-rap .stat span,body.sky-rap .panel-sub,
+body.sky-rap .desc,body.sky-rap .notice,body.sky-rap .small-muted{color:#526a82}
+body.sky-rap .btn,body.sky-rap .pill{background:#fff;border-color:#cad9e9;color:#21567b}
+body.sky-rap .btn.primary{background:#086be6;border-color:#086be6;color:#fff}
+body.sky-rap .btn:hover,body.sky-rap .pill:hover{background:#eaf3ff}
+body.sky-rap .pill.active{background:#0b63d3;color:#fff;border-color:#0b63d3}
+body.sky-rap .sky-switch{max-width:690px;gap:10px;margin-bottom:8px}
+body.sky-rap .sky-switch button{background:#fff;color:#4e657d;border:1px solid #d1deeb;padding:12px 17px;border-radius:12px}
+body.sky-rap .sky-switch button.active,
+body.sky-rap .sky-switch button.rap-selected{background:#126ce2;color:#fff;border-color:#126ce2;box-shadow:0 5px 18px #126ce229}
+body.sky-rap .sky-switch button small{color:inherit;opacity:.82}
+body.sky-rap .sky-help{color:#62798d;font-size:11px;margin-bottom:22px}
+body.sky-rap .control-row input,body.sky-rap .search,
+body.sky-rap .field input,body.sky-rap .field textarea,body.sky-rap .field select{
+ background:#fff;color:#12243a;border-color:#cbd9e9
+}
+body.sky-rap .word,body.sky-rap .work-card,body.sky-rap .term-result{
+ background:#fff;color:#183650;border-color:#d7e3ee
+}
+body.sky-rap .word:hover,body.sky-rap .word.active{
+ background:#e8f3ff;color:#0b4b9c;border-color:#67a9f4
+}
+body.sky-rap .word small,body.sky-rap .work-card small,body.sky-rap .term-result small{color:#61758b}
+body.sky-rap .work-card .eyebrow{color:#2979bf}
+body.sky-rap .work-card .tags span,body.sky-rap .tag{background:#ecf3f9;color:#2c617f;border-color:#d1e2f0}
+body.sky-rap .insight,body.sky-rap .note-box,body.sky-rap .status,body.sky-rap .rap-welcome{
+ background:#eaf3fc;color:#27455f;border-color:#caddf0
+}
+body.sky-rap .drawer,body.sky-rap dialog{background:#fff;color:#10243a}
+body.sky-rap .drawer h2,body.sky-rap dialog h2{color:#153954}
+body.sky-rap .timeline-item,body.sky-rap .settings-row{border-color:#d9e4ed}
+body.sky-rap .timeline-item button{color:#0867c4}
+body.sky-rap .reading-meta,body.sky-rap .reading-stat{color:#687e92}
+body.sky-rap .term-result blockquote,body.sky-rap .poem-text{color:#273e54}
+body.sky-rap .field label{color:#274966}
+body.sky-rap .close{background:#eaf2fa;color:#214561}
+body.sky-rap .cloud-card{background:#fff;border-color:#d9e5ef}
+body.sky-rap .cloud-card p,body.sky-rap .cloud-note{color:#566f84}
+/* The graph itself remains a precise, deep-blue star field. */
+body.sky-rap .dark-card{background:#071c33;border:1px solid #203b59;border-radius:16px}
+body.sky-rap .dark-head h2{color:#f5fbff}
+body.sky-rap .dark-bottom{color:#b0d0ea}
+body.sky-rap .semantic-toolbar{
+ background:#102b48;border:1px solid #2b526f;color:#eef7ff;border-bottom:0
+}
+body.sky-rap .semantic-toolbar-main small,body.sky-rap .semantic-status{color:#c1d8eb}
+body.sky-rap .semantic-switches{background:#061d34;border-color:#426787}
+body.sky-rap .semantic-switches button{color:#d6e9f7}
+body.sky-rap .semantic-switches button.active{background:#30b6ff;color:#042138}
+body.sky-rap .semantic-intent-toolbar{background:#173b5a;border-color:#426d90}
+body.sky-rap .semantic-intent-toolbar>span,
+body.sky-rap .semantic-layout-toolbar>span{color:#f4fbff}
+body.sky-rap .semantic-intent-toolbar>small,
+body.sky-rap .semantic-layout-toolbar>small{color:#c9e1f1}
+body.sky-rap .semantic-path-control{background:#08243f;border-color:#406686}
+body.sky-rap .semantic-path-control label{color:#eef8ff}
+body.sky-rap .semantic-path-control select,
+body.sky-rap .semantic-controls select,body.sky-rap .semantic-controls input{
+ background:#fff;color:#12314e;border-color:#a7c8e3
+}
+body.sky-rap .semantic-path-control span{color:#bfd6e9}
+body.sky-rap .semantic-controls>button{background:#1b496c;border-color:#5a89ac;color:#fff}
+body.sky-rap .semantic-controls>button:hover{background:#126bac}
+body.sky-rap .semantic-search-label{color:#cde3f4}
+body.sky-rap .semantic-star-viewport{
+ background:radial-gradient(ellipse at 25% 25%,#173f61 0%,transparent 48%),
+ radial-gradient(ellipse at 77% 76%,#10354c 0%,transparent 40%),linear-gradient(145deg,#06172a,#06121d);
+}
+body.sky-rap .semantic-star-viewport::before{
+ background-image:radial-gradient(#d8f3ffb8 .8px,transparent .8px),
+ radial-gradient(#b2d9f499 .65px,transparent .65px)
+}
+body.sky-rap .semantic-cluster-label{fill:#c3e8ff}
+body.sky-rap .semantic-cluster-count{fill:#83a9c8}
+body.sky-rap .semantic-link{stroke:#40bafa}
+body.sky-rap .semantic-link.focused{stroke:#ffe5a2}
+body.sky-rap .semantic-star .semantic-star-core{stroke:#cdf3ff}
+body.sky-rap .semantic-star.author-affirmed .semantic-star-core{fill:#fff1b5;stroke:#ffdb7d}
+body.sky-rap .semantic-network,
+body.sky-rap .semantic-discovery{
+ background:linear-gradient(135deg,#0b2440,#08233b);
+ color:#f5fbff;border-color:#2c5b7a
+}
+body.sky-rap .semantic-atlas{
+ background:#fff;border:1px solid #c9dfee;color:#17314a;box-shadow:0 10px 40px #0c345a13
+}
+body.sky-rap .semantic-atlas-kicker{color:#167ed2}
+body.sky-rap .semantic-atlas-heading h2{color:#113755}
+body.sky-rap .semantic-atlas-heading p{color:#516f88}
+body.sky-rap .semantic-atlas-stats strong{color:#0d66b0}
+body.sky-rap .semantic-atlas-stats span{color:#627a90}
+body.sky-rap .semantic-atlas-filters button,
+body.sky-rap .semantic-atlas-overlap-toggle{background:#edf5fc;border-color:#cbdfee;color:#285c7d}
+body.sky-rap .semantic-atlas-filters button.active,
+body.sky-rap .semantic-atlas-overlap-toggle.active{background:#0877dc;color:#fff;border-color:#0877dc}
+body.sky-rap .semantic-atlas-card{background:#f8fbff;border-color:#dce8f2;color:#163852}
+body.sky-rap .semantic-atlas-card h3{color:#103c63}
+body.sky-rap .semantic-atlas-card p,
+body.sky-rap .semantic-atlas-card-bottom small{color:#587088}
+body.sky-rap .semantic-atlas-card-bottom button{background:#086ad4;border-color:#086ad4}
+body.sky-rap .semantic-atlas-card.active{background:#eaf5ff;border-color:#0c78d5}
+body.sky-rap .semantic-atlas-pager span{color:#526d85}
+body.sky-rap .semantic-atlas-pager button{background:#edf5fc;border-color:#c8def0;color:#14598a}
+body.sky-rap .semantic-atlas-overlapping{border-color:#d3e1ec}
+body.sky-rap .semantic-atlas-overlapping>strong{color:#204a68}
+body.sky-rap .semantic-atlas-overlapping button{background:#f2f8fe;border-color:#bfd7ec;color:#164f80}
+body.sky-rap .semantic-atlas-overlapping button small{color:#527991}
+body.sky-rap .semantic-atlas-note{color:#5e7487}
+body.sky-rap .semantic-atlas-empty{color:#526a7f}
+body.sky-rap .semantic-overlap-ring{stroke:#3baeff}
+body.sky-rap .semantic-focus-panel,
+body.sky-rap .semantic-path-story,body.sky-rap .semantic-memberships,
+body.sky-rap .semantic-author-review{
+ background:#f2f8fe;border-color:#cfe1f0;color:#193b54
+}
+body.sky-rap .semantic-focus-panel h2,body.sky-rap .semantic-path-story h3,
+body.sky-rap .semantic-memberships h3{color:#104e7c}
+body.sky-rap .semantic-memberships p,
+body.sky-rap .semantic-path-story p{color:#415f78}
+body.sky-rap .semantic-related{border-color:#d2e5f1;background:#fff;color:#193953}
+body.sky-rap .semantic-related p,body.sky-rap .semantic-related details{color:#435e73}
+body.sky-rap .semantic-related summary{color:#156ca7}
+body.sky-rap .semantic-related blockquote{background:#eaf5fe;border-color:#34a6e0}
+body.sky-rap .semantic-path-story button,
+body.sky-rap .semantic-focus-panel .btn.primary,
+body.sky-rap .semantic-show-more{background:#0a70d4;border-color:#0a70d4;color:#fff}
+body.sky-rap .semantic-memberships button{background:#fff;color:#1d618d;border-color:#c5deef}
+body.sky-rap .semantic-theme-explanation summary{color:#146fa6}
+body.sky-rap .semantic-discovery-filters button{background:#1d4566;color:#e4f4ff;border-color:#517a9a}
+body.sky-rap .semantic-discovery-filters button.active{background:#32bbff;color:#05233b;border-color:#32bbff}
+body.sky-rap .semantic-discovery-card{border-color:#a4cddd;background:#fff;color:#1b344d}
+body.sky-rap .semantic-discovery-card h3{color:#153e63}
+body.sky-rap .semantic-discovery-pair>div{background:#edf6fd;border-color:#d8e8f3}
+body.sky-rap .semantic-discovery-pair blockquote{color:#143a54;border-color:#11a8e7}
+body.sky-rap .semantic-discovery-title{color:#145fa1}
+body.sky-rap .semantic-discovery-reading>p{color:#49647b}
+body.sky-rap .semantic-discovery-actions button{background:#076fcd;border-color:#076fcd}
+body.sky-rap .semantic-author-review-heading strong{color:#1a4e7a}
+body.sky-rap .semantic-author-review-heading span{color:#2a678d}
+body.sky-rap .semantic-author-review label{color:#234b6f}
+body.sky-rap .semantic-author-choices button{background:#fff;border-color:#b9d9eb;color:#1f5a86}
+body.sky-rap .semantic-author-choices button.selected{background:#daf0ff;border-color:#118bd9;color:#144f7f}
+body.sky-rap .semantic-network-heading h3{color:#fff}
+body.sky-rap .semantic-network-heading p,body.sky-rap .semantic-network-note{color:#cae2f1}
+body.sky-rap .semantic-network-heading>button{background:#1e4b72;border-color:#4c86b2}
+body.sky-rap .semantic-network-scroller{background:radial-gradient(circle at 48% 48%,#153f62,#031426 78%);border-color:#3b647f}
+body.sky-rap .semantic-network-edge{stroke:#32bcf2}
+body.sky-rap .semantic-network-edge.focused{stroke:#ffde90}
+body.sky-rap .semantic-network-star .semantic-network-halo{fill:#52b8ff}
+body.sky-rap .semantic-network-star .semantic-network-core{fill:#b6e4ff;stroke:#fff}
+body.sky-rap .semantic-network-star.collection .semantic-network-core{fill:#ffd393;stroke:#fff3d8}
+body.sky-rap .semantic-network-star text{fill:#d5efff;stroke:#09223c}
+body.sky-rap .semantic-network-detail{background:#f4f9fe;color:#1a3b57}
+body.sky-rap .semantic-network-detail h4{color:#115d94}
+body.sky-rap .semantic-network-detail p{color:#476780}
+body.sky-rap .semantic-network-relations button{background:#fff;border-color:#cee2f1}
+body.sky-rap .semantic-network-relations button strong{color:#155f9a}
+body.sky-rap .semantic-network-read{background:#0878dc;border-color:#0878dc}
+/* Exact original-line observation: no bogus fragmented phrase collection. */
+body.sky-rap .rap-discovery-intro{
+ background:#fff;border:1px solid #d3e4f3;color:#14334b;border-radius:12px;padding:19px 23px
+}
+body.sky-rap .rap-discovery-intro h2{color:#113b5e}
+body.sky-rap .rap-discovery-intro p{color:#4b657b}
+body.sky-rap .rap-discovery-box{background:#fff;border-color:#d7e3ec}
+body.sky-rap .rap-phrase{
+ background:#eaf4ff;color:#195f97;border:1px solid #c2dcef;border-radius:9px;
+ font-size:12px;padding:8px 11px;min-height:39px;text-align:left;line-height:1.7
+}
+body.sky-rap .rap-phrase:hover{background:#d4edff}
+body.sky-rap .rap-discovery-caveat{color:#536e84}
+body.sky-rap .rap-empty{color:#566c7f}
+/* Words: typography first, source text second, visual noise never. */
+body.sky-rap .word-workbench{background:transparent;min-width:0}
+body.sky-rap .word-workbench-search{
+ padding:24px 28px;background:#0c2b49;color:#fff;border:1px solid #184c71;
+ border-radius:16px;margin-bottom:18px;box-shadow:0 10px 30px #0e3a6319
+}
+body.sky-rap .word-workbench-label{color:#72c9ff;letter-spacing:.11em;font-size:10px;font-weight:850}
+body.sky-rap .word-workbench-search label{
+ display:block;color:#f8fbff;font-weight:850;font-size:19px;margin:6px 0 13px
+}
+body.sky-rap .word-search-form{display:flex;gap:8px;align-items:stretch;max-width:950px}
+body.sky-rap .word-search-form input{
+ flex:1 1 auto;min-width:0;background:#fff;color:#142d46;border:2px solid #c1e3ff;
+ border-radius:10px;padding:12px 15px;font-size:14px;font-weight:600
+}
+body.sky-rap .word-search-form input::placeholder{color:#8394a5;font-weight:400}
+body.sky-rap .word-search-form button{
+ flex:0 0 auto;border:1px solid #30b9ff;border-radius:10px;background:#28b7ff;
+ color:#062541;font-weight:900;font-size:12px;min-width:120px;padding:10px 15px
+}
+body.sky-rap .word-workbench-search>p{
+ color:#c7e1f2;font-size:11px;line-height:1.8;margin:12px 0 0
+}
+body.sky-rap .word-workbench-body{
+ display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:18px;align-items:start
+}
+body.sky-rap .word-workbench-index,
+body.sky-rap .word-workbench-results{
+ min-width:0;padding:23px 24px;background:#fff;border:1px solid #d8e3ef;border-radius:15px
+}
+body.sky-rap .word-workbench-title{margin:0 0 19px;border-bottom:1px solid #d7e4ef;padding-bottom:13px}
+body.sky-rap .word-workbench-title h2{font-size:17px;line-height:1.5;color:#123750;margin:0 0 4px}
+body.sky-rap .word-workbench-title span{font-size:11px;color:#617b90}
+body.sky-rap .word-index-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 17px}
+body.sky-rap .word-index-group{min-width:0}
+body.sky-rap .word-index-group h3{
+ color:#305e79;font-size:12px;font-weight:850;border-left:3px solid #1d9fea;
+ padding-left:9px;margin:0 0 9px
+}
+body.sky-rap .word-index-terms{display:flex;flex-wrap:wrap;gap:6px}
+body.sky-rap .word-index-term{
+ display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;text-align:left;
+ color:#1a4c70;background:#f2f8fd;border:1px solid #cfe2f0;border-radius:8px;
+ padding:7px 9px;min-height:39px;font-size:12px;line-height:1.5
+}
+body.sky-rap .word-index-term strong{font-weight:780}
+body.sky-rap .word-index-term small{color:#647c8e;font-size:10px}
+body.sky-rap .word-index-term:hover{background:#dff0ff;border-color:#65b2eb}
+body.sky-rap .word-index-term.active{background:#0b75d9;color:#fff;border-color:#0b75d9}
+body.sky-rap .word-index-term.active small{color:#e1f1ff}
+body.sky-rap .word-index-saved{grid-column:1/-1}
+body.sky-rap .word-index-add{border-top:1px solid #dfeaf2;padding-top:16px;margin-top:20px}
+body.sky-rap .word-index-add label{display:block;font-size:12px;font-weight:800;color:#365d77;margin-bottom:8px}
+body.sky-rap .word-index-add>div{display:flex;gap:8px;align-items:stretch}
+body.sky-rap .word-index-add input{flex:1 1 auto;min-width:0;font-size:12px}
+body.sky-rap .word-index-add button{background:#eaf4fb;border:1px solid #bcd9e9;color:#195e87;padding:9px 14px;border-radius:10px;font-size:12px;font-weight:800}
+body.sky-rap .word-index-add p{font-size:10px;color:#688094;line-height:1.8;margin:8px 0 0}
+body.sky-rap .word-current-term{background:#e8f4ff;padding:13px 15px;border-radius:10px;border-left:4px solid #118adb;margin-bottom:13px;overflow-wrap:anywhere}
+body.sky-rap .word-current-term>span{display:block;font-size:10px;color:#4c7b98;font-weight:800}
+body.sky-rap .word-current-term strong{display:block;font-size:19px;color:#103f69;line-height:1.5;margin:4px 0}
+body.sky-rap .word-current-term p{font-size:11px;color:#3b647d;margin:5px 0}
+body.sky-rap .word-current-term p small{margin-left:8px;color:#688397}
+body.sky-rap .word-empty-selection,body.sky-rap .word-no-hits{
+ background:#f0f5fa;border:1px dashed #bacfdf;border-radius:10px;padding:17px;
+ color:#365c76;font-size:12px;line-height:1.9
+}
+body.sky-rap .word-empty-selection strong{display:block;font-size:14px}
+body.sky-rap .word-empty-selection p{margin:6px 0}
+body.sky-rap .word-source-card{padding:15px 0 16px;border-bottom:1px solid #e0e9f0}
+body.sky-rap .word-source-card:last-of-type{border-bottom:0}
+body.sky-rap .word-source-meta{display:flex;justify-content:space-between;color:#7190a8;font-size:10px;gap:10px}
+body.sky-rap .word-source-card h3{margin:5px 0 10px;font-size:15px;line-height:1.55;color:#153b5a;overflow-wrap:anywhere}
+body.sky-rap .word-source-card blockquote{
+ white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;line-height:2;color:#2a465d;
+ background:#f7fbff;border-left:3px solid #13a2e9;margin:0;padding:11px 13px
+}
+body.sky-rap .word-source-card mark{background:#ffdf8e;color:#152735;border-radius:2px;padding:0 2px}
+body.sky-rap .word-source-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+body.sky-rap .word-source-actions button{
+ background:#fff;border:1px solid #bcd5e8;color:#156699;border-radius:8px;
+ padding:8px 10px;font-size:11px;min-height:35px;font-weight:800
+}
+body.sky-rap .word-source-actions button:last-child{background:#e9f5ff}
+body.sky-rap .word-more-results{
+ width:100%;background:#126bd3;border:1px solid #126bd3;color:#fff;
+ border-radius:9px;padding:11px;font-size:12px;font-weight:850;margin-top:12px
+}
+body.sky-rap button:focus-visible,body.sky-rap input:focus-visible{
+ outline:3px solid #0e9be6;outline-offset:2px
+}
+@media(max-width:1100px){
+ body.sky-rap .word-workbench-body{grid-template-columns:minmax(0,1fr)}
+}
+@media(max-width:760px){
+ body.sky-rap .sidebar{background:#0c1b30}
+ body.sky-rap .nav button.active{background:#146ee6}
+ body.sky-rap .word-workbench-search{padding:17px}
+ body.sky-rap .word-workbench-search label{font-size:16px}
+ body.sky-rap .word-search-form{flex-direction:column}
+ body.sky-rap .word-search-form button{min-height:43px}
+ body.sky-rap .word-workbench-index,body.sky-rap .word-workbench-results{padding:17px}
+ body.sky-rap .word-index-groups{grid-template-columns:minmax(0,1fr)}
+ body.sky-rap .word-source-card blockquote{font-size:13px}
+ body.sky-rap .sky-switch button{padding:10px}
+}
+@media(prefers-reduced-motion:reduce){
+ body.sky-rap .word-index-term,body.sky-rap .word-source-actions button{transition:none}
+}
