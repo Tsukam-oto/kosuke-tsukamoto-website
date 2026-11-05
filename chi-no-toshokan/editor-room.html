@@ -78,7 +78,7 @@
     <input type="hidden" id="record-id">
     <label for="kind">どの活動から生まれた記録ですか</label>
     <select id="kind"><option value="education">音楽教育・授業研究</option><option value="workflow">AI活用・ICT・校務改善</option><option value="composition">作曲・編曲・録音</option><option value="research">映画・音楽・知識探究</option></select>
-    <label for="magazine">掲載を検討するマガジン</label>
+    <label for="magazine">保存用の従来分類（既存記録との互換用）</label>
     <select id="magazine" aria-label="掲載先マガジン"></select>
     <div id="magazine-advice" class="magazine-advice" aria-live="polite"></div>
     <label for="title">テーマ</label><input id="title" required maxlength="150" placeholder="例：鑑賞授業の準備をAIとどう改善したか">
@@ -87,6 +87,11 @@
     <label for="result">実際の結果：成功、失敗、未確認</label><textarea id="result" rows="3" maxlength="6000" placeholder="何が改善したか。未検証なら未検証と明記"></textarea>
     <label for="lesson">他の人が再現するときの要点</label><textarea id="lesson" rows="3" maxlength="5000" placeholder="手順、注意点、次回改善したい点"></textarea>
     <label for="sources">参考資料・実装リンク（任意）</label><textarea id="sources" rows="2" maxlength="5000" placeholder="公開できるURL・資料名のみ"></textarea>
+    <details class="tracking-details"><summary>任意：確認できたこと・まだ確かめていないこと</summary>
+      <p class="small-note">AIの提案・本人の判断・実際に確認した結果を区別します。今は書かなくても保存できます。学校内部の情報や個人情報を貼り付けないでください。</p>
+      <label for="verification-notes">根拠・検証メモ（公開前の確認用）</label>
+      <textarea id="verification-notes" rows="4" maxlength="5000" placeholder="例：確認済み＝トップの音源ボタンは公開ページで再生を確認。未確認＝すべてのスマートフォン機種での動作。本人の判断＝作品への入口を短くする。"></textarea>
+    </details>
     <section class="draft-section" aria-labelledby="draft-title">
      <div class="panel-head"><h3 id="draft-title">note記事の原稿</h3><span class="small-note">構成・分量は記事に合わせて柔軟に</span></div>
      <label for="format">記事の長さ・形式</label><select id="format"></select>
