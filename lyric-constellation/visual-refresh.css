@@ -352,3 +352,162 @@ body.sky-rap .dark-head p{color:#c4e1f5}
  body.sky-rap .rap-stars-layout{grid-template-columns:minmax(0,1fr)}
  body.sky-rap .rap-selected-work-actions{display:flex;flex-wrap:wrap}
 }
+
+
+/* v3.3 Reading-first layout — work precedes tools, with honest source labels. */
+body.sky-rap .main{padding-top:28px}
+body.sky-rap .nav button{font-size:14px;letter-spacing:.012em}
+body.sky-rap .topline{margin-bottom:25px}
+body.sky-rap .rap-overview{margin-bottom:17px}
+body.sky-rap .rap-overview>p{font-size:12px}
+body.sky-rap .semantic-toolbar{
+ margin:0 0 15px;padding:18px 20px 15px;
+ border:1px solid #2b5b7c;border-radius:14px;
+ background:linear-gradient(145deg,#0b2744,#0d3557);box-shadow:0 9px 23px #143a5a17
+}
+body.sky-rap .semantic-toolbar-main{gap:16px}
+body.sky-rap .semantic-toolbar-main strong{font-size:18px;line-height:1.45;color:#fff}
+body.sky-rap .semantic-toolbar-main small{font-size:12px;color:#d2e7f7;margin-top:5px}
+body.sky-rap .semantic-switches button{font-size:12px;min-height:41px}
+body.sky-rap .semantic-primary-controls{
+ display:grid;grid-template-columns:minmax(210px,.7fr) minmax(250px,1fr);
+ gap:12px;align-items:end;margin-top:17px
+}
+body.sky-rap .semantic-quick-search{display:flex;flex-direction:column;gap:7px;min-width:0}
+body.sky-rap .semantic-quick-search label{font-size:12px;color:#d9eeff;font-weight:750}
+body.sky-rap .semantic-quick-search>div{display:flex;gap:8px}
+body.sky-rap .semantic-quick-search input{
+ flex:1 1 auto;min-width:0;border:1px solid #a9c6df;background:#fff;color:#1c3d55;
+ padding:11px 12px;border-radius:8px;font-size:13px;min-height:43px
+}
+body.sky-rap .semantic-quick-search button,
+body.sky-rap .semantic-details-toggle,body.sky-rap .semantic-map-zoom{
+ border:1px solid #62b6e9;background:#1b597f;color:#fff;
+ border-radius:8px;min-height:43px;padding:9px 13px;font-size:12px;font-weight:800
+}
+body.sky-rap .semantic-quick-search button{background:#29b9ff;border-color:#29b9ff;color:#06233b}
+body.sky-rap .semantic-path-control{
+ display:flex;flex-direction:column;gap:7px;margin:0;padding:0;background:transparent;border:0;min-width:0
+}
+body.sky-rap .semantic-path-control label{font-size:12px;color:#d9eeff;font-weight:750}
+body.sky-rap .semantic-path-control select{
+ width:100%;flex:auto;min-height:43px;font-size:12px;border:1px solid #a9c6df;border-radius:8px;
+ padding:9px 12px;color:#173c59;background:#fff
+}
+body.sky-rap .semantic-toolbar-bottom{display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-top:13px}
+body.sky-rap .semantic-details-toggle,body.sky-rap .semantic-map-zoom{
+ background:transparent;border:1px solid #6286a5;color:#dcedf9;min-height:37px
+}
+body.sky-rap .semantic-details-toggle:hover,body.sky-rap .semantic-map-zoom:hover{background:#1d5377}
+body.sky-rap .semantic-toolbar-bottom .semantic-status{
+ flex:1 1 270px;text-align:right;font-size:11px;line-height:1.8;color:#c7dfec;margin:0
+}
+body.sky-rap .semantic-advanced-settings{
+ border-top:1px solid #426c8c;margin-top:14px;padding-top:14px
+}
+body.sky-rap .semantic-advanced-settings .semantic-intent-toolbar{
+ background:#173d5d;border:1px solid #497a98;border-radius:9px;margin:0 0 10px
+}
+body.sky-rap .semantic-advanced-settings .semantic-layout-toolbar{margin:0 0 10px}
+body.sky-rap .semantic-advanced-settings .semantic-controls{margin:0}
+body.sky-rap .semantic-stars-svg{
+ width:100%!important;min-width:0!important;height:auto!important;min-height:0!important
+}
+body.sky-rap .semantic-stars-svg.detailed{
+ width:1550px!important;min-width:1550px!important
+}
+body.sky-rap .rap-stars-layout{display:grid;grid-template-columns:minmax(0,1fr);gap:15px}
+body.sky-rap .rap-stars-layout>.panel{min-width:0}
+body.sky-rap .rap-stars-layout .dark-card{overflow:hidden;border-radius:14px}
+body.sky-rap .semantic-star-viewport{min-height:340px}
+body.sky-rap .rap-stars-layout .dark-head{padding:18px 23px 10px}
+body.sky-rap .rap-stars-layout .dark-head h2{font-size:19px}
+body.sky-rap .rap-stars-layout .dark-bottom{padding:9px 22px 15px}
+body.sky-rap .semantic-focus-panel{
+ max-width:none;padding:20px 23px;background:#fff;border:1px solid #d2e2ee;
+ box-shadow:0 7px 22px #0d36580b
+}
+body.sky-rap .semantic-focus-panel h2{font-size:22px;line-height:1.45}
+body.sky-rap .semantic-related{padding:13px 15px;border-radius:9px}
+body.sky-rap .semantic-related p{font-size:12px;line-height:1.85}
+body.sky-rap .semantic-related button{font-size:13px}
+body.sky-rap .semantic-focus-panel .semantic-panel-actions{
+ display:flex;flex-wrap:wrap;gap:9px;margin:13px 0 18px
+}
+body.sky-rap .semantic-focus-panel .semantic-panel-actions button{font-size:12px;min-height:43px}
+body.sky-rap .semantic-atlas{margin-top:20px;padding:19px;border-radius:13px}
+body.sky-rap .semantic-atlas-collapsed{
+ border:1px solid #c9ddeb;background:#fff;box-shadow:none
+}
+body.sky-rap .semantic-atlas-collapsed-inner{
+ display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px
+}
+body.sky-rap .semantic-atlas-collapsed-inner h2{
+ font-size:19px;color:#133955;margin:4px 0 5px;line-height:1.4
+}
+body.sky-rap .semantic-atlas-collapsed-inner p{font-size:12px;color:#556d80;line-height:1.7;margin:0}
+body.sky-rap .semantic-atlas-collapsed-inner button,
+body.sky-rap .semantic-atlas-heading>button{
+ background:#0b73d4;border:1px solid #0b73d4;color:#fff;
+ padding:10px 16px;border-radius:9px;min-height:43px;font-size:12px;font-weight:800
+}
+body.sky-rap .semantic-atlas-heading h2{font-size:21px}
+body.sky-rap .semantic-atlas-heading p{font-size:12px;line-height:1.8}
+body.sky-rap .semantic-atlas-cards{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+body.sky-rap .semantic-atlas-card{min-height:196px;padding:16px}
+body.sky-rap .semantic-atlas-card h3{font-size:15px;line-height:1.6}
+body.sky-rap .semantic-atlas-card>p{font-size:12px;line-height:1.75}
+body.sky-rap .semantic-atlas-card-meta,body.sky-rap .semantic-atlas-card-bottom small{font-size:11px}
+body.sky-rap .semantic-atlas-card-bottom button{min-height:42px;font-size:12px}
+body.sky-rap .semantic-discovery{
+ margin-top:18px;padding:19px;border:1px solid #d4e1ec;
+ background:#fff;border-radius:13px;color:#183c56
+}
+body.sky-rap .semantic-discovery-heading h2{color:#143b56;font-size:21px}
+body.sky-rap .semantic-discovery-heading p{color:#576e83;font-size:12px;line-height:1.8}
+body.sky-rap .semantic-discovery-heading>div>span{color:#1b80bf}
+body.sky-rap .semantic-discovery-progress strong{color:#0b69ba}
+body.sky-rap .semantic-discovery-progress span{color:#627d94}
+body.sky-rap .semantic-discovery-heading>button{
+ background:#0c72d3;border-color:#0c72d3;color:#fff;
+ min-height:41px;font-size:12px
+}
+body.sky-rap .semantic-discovery-body{margin-top:15px}
+body.sky-rap .rap-evidence-only{margin:24px 0 0}
+body.sky-rap .rap-discovery-intro h2{font-size:18px}
+body.sky-rap .rap-discovery-intro p{font-size:12px}
+body.sky-rap .rap-phrase-list{max-width:100%}
+@media(max-width:1020px){
+ body.sky-rap .semantic-primary-controls{grid-template-columns:minmax(0,1fr)}
+ body.sky-rap .semantic-atlas-cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:760px){
+ body.sky-rap .semantic-toolbar{padding:14px}
+ body.sky-rap .semantic-toolbar-main{align-items:stretch}
+ body.sky-rap .semantic-toolbar-main .semantic-switches{width:100%}
+ body.sky-rap .semantic-toolbar-main .semantic-switches button{flex:1 1 50%}
+ body.sky-rap .semantic-quick-search>div button{min-width:66px}
+ body.sky-rap .semantic-toolbar-bottom .semantic-status{text-align:left;flex-basis:100%}
+ body.sky-rap .semantic-atlas-cards{
+  display:grid;grid-auto-flow:column;grid-auto-columns:minmax(245px,75vw);
+  grid-template-columns:none;overflow-x:auto;scroll-snap-type:x mandatory
+ }
+ body.sky-rap .semantic-atlas-card{scroll-snap-align:start;min-height:195px}
+ body.sky-rap .semantic-atlas{padding:14px}
+ body.sky-rap .semantic-atlas-heading>button{width:100%}
+ body.sky-rap .rap-overview>div{flex:1 1 130px}
+ body.sky-rap .semantic-focus-panel{padding:16px}
+ body.sky-rap .semantic-discovery{padding:14px}
+}
+
+
+/* Version update is opt-in: never discard unsaved reading notes automatically. */
+.app-update[hidden]{display:none!important}
+body.sky-rap .app-update{
+ background:#ffe6a8!important;border:1px solid #c48e27!important;
+ color:#603d05!important;font-weight:900;box-shadow:0 4px 12px #c58d2740
+}
+body.sky-rap .nav-separator{
+ border-top:1px solid #294966;margin:10px 13px 12px
+}
+body.sky-rap .sidebar-bottom p{font-size:11px;line-height:1.75}

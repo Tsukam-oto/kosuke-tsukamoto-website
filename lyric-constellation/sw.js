@@ -1,6 +1,43 @@
-/* Scoped to /lyric-constellation/ only. Supabase authentication and user data are never cached by this worker. */
-const CACHE='lyric-constellation-v3.2';
-const CORE=['./','./index.html','./deep-reading.js','./semantic-stars.js','./semantic-stars.css','./visual-refresh.css','./mummy-research.js','./mummy-research-view.js','./mummy-research.css','./manifest.webmanifest','./icon.svg','./icon.png','./icon-512.png'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith('lyric-constellation-')&&k!==CACHE).map(k=>caches.delete(k)))));self.clients.claim()});
-self.addEventListener('fetch',e=>{const u=new URL(e.request.url);if(e.request.method!=='GET'||u.origin!==self.location.origin||!u.pathname.startsWith('/lyric-constellation/'))return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).then(res=>{if(res.ok){let copy=res.clone();caches.open(CACHE).then(c=>c.put('./index.html',copy))}return res}).catch(()=>caches.match('./index.html')));return;}e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{if(r.ok){let copy=r.clone();caches.open(CACHE).then(c=>c.put(e.request,copy))}return r})))})
+/* Scoped to /lyric-constellation/. Private lyrics and auth/API requests are
+ * NEVER intercepted. Prefer the network for code so stale JavaScript and CSS
+ * cannot survive a manual page reload simply because old PWA assets exist. */
+const CACHE='lyric-constellation-v3.3';
+const CORE=[
+ './','./index.html','./deep-reading.js','./semantic-stars.js',
+ './semantic-stars.css','./visual-refresh.css','./mummy-research.js',
+ './mummy-research-view.js','./mummy-research.css',
+ './manifest.webmanifest','./icon.svg','./icon.png','./icon-512.png'
+];
+self.addEventListener('install',event=>{
+ event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)));
+ self.skipWaiting();
+});
+self.addEventListener('activate',event=>{
+ event.waitUntil(caches.keys().then(keys=>Promise.all(
+  keys.filter(key=>key.startsWith('lyric-constellation-')&&key!==CACHE).map(key=>caches.delete(key))
+ )));
+ self.clients.claim();
+});
+self.addEventListener('fetch',event=>{
+ const req=event.request,url=new URL(req.url);
+ if(req.method!=='GET'||url.origin!==self.location.origin||
+    !url.pathname.startsWith('/lyric-constellation/'))return;
+ const remember=response=>{
+  if(response.ok){
+   const copy=response.clone();
+   caches.open(CACHE).then(cache=>cache.put(req.mode==='navigate'?'./index.html':req,copy)).catch(()=>{});
+  }
+  return response;
+ };
+ if(req.mode==='navigate'){
+  event.respondWith(fetch(req,{cache:'no-store'}).then(remember)
+   .catch(()=>caches.match('./index.html')));
+  return;
+ }
+ if(req.destination==='script'||req.destination==='style'){
+  event.respondWith(fetch(req,{cache:'no-store'}).then(remember)
+   .catch(()=>caches.match(req)));
+  return;
+ }
+ event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(remember)));
+});
