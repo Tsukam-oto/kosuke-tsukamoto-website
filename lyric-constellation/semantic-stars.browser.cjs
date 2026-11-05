@@ -211,7 +211,7 @@ async function run(mobile){
   assert.equal(await page.locator('.semantic-related').count(),2,'a compact list is shown initially');
    assert.equal(await targetRelation.locator('.semantic-review-disclosure[open]').count(),0,'decision form starts hidden');
    await targetRelation.locator('.semantic-evidence-details summary').click();
-  assert.match(await targetRelation.locator('details').innerText(),/架空の精読仮説/);
+  assert.match(await targetRelation.locator('.semantic-evidence-details').innerText(),/架空の精読仮説/);
   assert.match(await page.locator('.semantic-status').innerText(),/本人確認済み 0組/);
    await targetRelation.locator('.semantic-review-disclosure>summary').click();
    const review=targetRelation.locator('.semantic-author-review');
