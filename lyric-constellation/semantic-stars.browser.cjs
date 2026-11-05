@@ -227,7 +227,7 @@ async function run(mobile){
   await review.locator('[data-author-decision="confirmed"]').click();
   assert.match(await page.locator('.semantic-status').innerText(),/本人確認済み 1組/);
   assert.equal(await page.locator('.semantic-link.author-confirmed').count(),1,'only explicitly affirmed link receives gold');
-   assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),false,'successful verified save clears the unsaved-note guard');
+   assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),true,'a failed save for a different comparison still needs protection');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/1\s*\/\s*2/);
   assert.ok(!(await page.locator('.semantic-discovery-card').innerText()).includes('日々の異なる見え方'),'confirmed card automatically leaves the reading queue');
   assert.equal(await page.locator('.semantic-star.author-affirmed').count(),2,'both endpoints of the affirmed feeling shine');
@@ -240,6 +240,7 @@ async function run(mobile){
    await secondRelation.locator('.semantic-author-review [data-author-note]').fill('この線は、まだ違う意味に思えます。');
   await secondRelation.locator('[data-author-decision="different"]').click();
   assert.equal(await page.locator('.semantic-link.author-different').count(),1);
+   assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),false,'once both comparisons are confirmed and saved, the unsaved-note guard clears');
   assert.match(await page.locator('.semantic-related').filter({hasText:'対照として読む'}).locator('.semantic-review-disclosure>summary').innerText(),/別の思いに見える/,'saved judgment remains visible even when review controls are folded away');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/2\s*\/\s*2/);
   assert.match(await page.locator('.semantic-discovery-empty').innerText(),/すべて判断を記録済み/);
