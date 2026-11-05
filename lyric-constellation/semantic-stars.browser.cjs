@@ -179,7 +179,7 @@ async function run(mobile){
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/);
   await page.locator('[data-semantic-layout="gravity"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168,'meaning layout retains the whole catalog');
-  assert.equal(await page.locator('.semantic-star.no-relation').count(),165,'no invented lines for unrelated songs');
+  assert.equal(await page.locator('.semantic-star.no-relation').count(),163,'five source-backed stars connected through two direct comparisons and three thematic routes');
   assert.match(await page.locator('[data-semantic-layout="gravity"]').getAttribute('class'),/active/);
   const beforeCoord=await page.locator('.semantic-star[data-star-focus="master-fictional-000"] .semantic-star-core').getAttribute('cx');
   await page.locator('[data-atlas-open="synthetic-memory"]').click();
