@@ -40,3 +40,26 @@ assert.equal(stars.buildGraphModel(works,rows,'master-1','all','meaning').links.
 assert.equal(stars.safe('<img src=x onerror=alert(1)>'),'&lt;img src=x onerror=alert(1)&gt;');
 assert.equal(stars.normalize(rows,[...works,{id:'master-X',sky:'choir'}]).length,2,'choir songs do not create rap connections');
 console.log('semantic starfield: 168 positions, full coverage, author-only links, dedup, XSS escaped');
+
+/* Integration smoke: the actual render function exposes every star and respects logout. */
+const ownerWorks=works.map(w=>({...w,sourceSystem:'lyric_master',lyrics:'非公開のテスト本文'}));
+const ctx={
+ window:{},document:{querySelector(){return null;},addEventListener(){}},
+ console,works:()=>ownerWorks,getWork:id=>ownerWorks.find(w=>w.id===id),
+ connections:()=>[],renderGraph:()=>'<svg id="old"/>',
+ selectedWorkCard:()=>'<p>old</p>',viewConstellation:()=>'<div class="constellation-scroll"></div><span>代表40 / 全168 stars</span><span>星図は代表40点。作品画面で全件を確認できます。</span><span>線＝主な共通語のつながり</span>',
+ render(){},loadMasterReadingCorpus:async()=>{},
+ cloudUser:{id:'owner'},cloudClient:null,cloudEpoch:1,
+ selected:'master-1',sky:'rap',view:'constellation',db:{customWords:[]}
+};
+vm.createContext(ctx);
+vm.runInContext(code,ctx,{timeout:10000});
+let graph=ctx.renderGraph();
+assert.equal((graph.match(/class="semantic-star(?: |")/g)||[]).length,168,'all song stars render');
+assert.match(ctx.viewConstellation(),/168 stars/);
+assert.match(ctx.selectedWorkCard(),/SELECTED STAR/);
+ctx.cloudUser=null; // A stale private object may exist briefly while logging out.
+graph=ctx.renderGraph();
+assert.equal((graph.match(/class="semantic-star(?: |")/g)||[]).length,0,'logged-out user sees no private star');
+assert.doesNotMatch(ctx.selectedWorkCard(),/架空の歌/,'private song title must be hidden at logout');
+console.log('semantic starfield integration: rendering, controls and private-data isolation passed');
