@@ -63,3 +63,17 @@ graph=ctx.renderGraph();
 assert.equal((graph.match(/class="semantic-star(?: |")/g)||[]).length,0,'logged-out user sees no private star');
 assert.doesNotMatch(ctx.selectedWorkCard(),/架空の歌/,'private song title must be hidden at logout');
 console.log('semantic starfield integration: rendering, controls and private-data isolation passed');
+
+
+const paths=[
+ {thread_key:'demo-theme',title:'架空の星座',guiding_question:'誰の言葉がつながるか？',
+  anchors:[{kind:'work',source_id:'1'},{kind:'note',source_id:'secret'},{kind:'work',source_id:'4'},
+  {kind:'work',source_id:'1'},{kind:'work',source_id:'missing'}]},
+ {thread_key:'single',title:'一作だけ',anchors:[{kind:'work',source_id:'2'}]}
+];
+const selectedPaths=stars.normalizePaths(paths,works);
+assert.equal(selectedPaths.length,1,'exclude incomplete themes and note-only anchors');
+assert.equal(selectedPaths[0].ids.join(','),'master-1,master-4','theme uses distinct known song ids');
+assert.equal(selectedPaths[0].question,'誰の言葉がつながるか？');
+assert.equal(stars.normalizePaths([{thread_key:'bad',anchors:'not an array'}],works).length,0);
+console.log('thematic path normalization: verified source work ids only');

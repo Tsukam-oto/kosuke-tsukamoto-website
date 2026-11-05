@@ -76,3 +76,24 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
 @media(max-width:960px){.semantic-star-viewport{max-height:550px}.semantic-stars-svg{min-width:1120px}.semantic-stars-svg[data-scope="near"]{width:100%;min-width:680px}}
 @media(max-width:760px){.semantic-toolbar{padding:12px 11px 9px}.semantic-toolbar-main strong{font-size:15px}.semantic-toolbar-main small{font-size:10px}.semantic-switches{flex:1 1 auto;justify-content:center}.semantic-switches button{flex:1;padding:6px 8px}.semantic-controls{gap:6px}.semantic-controls input{flex:1;min-width:110px}.semantic-controls select{width:100%;flex-basis:100%}.semantic-star-viewport{max-height:440px;min-height:240px}.semantic-stars-svg{min-width:1120px}.semantic-stars-svg[data-scope="near"]{min-width:720px}.semantic-focus-panel h2{font-size:21px}.semantic-related{padding:12px 0}.semantic-history button{max-width:100%;overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){.semantic-star-core,.semantic-link,.semantic-star-halo{transition:none;filter:none}}
+/* テーマを横断する星座は、二曲間の精読エッジと混同しない点線として示す。 */
+.semantic-path-control{margin-top:13px;padding:12px;display:flex;flex-wrap:wrap;align-items:center;gap:9px;background:#1d1528;border:1px solid #725483;border-radius:10px}
+.semantic-path-control label{font-size:12px;color:#f5deff;font-weight:800;white-space:nowrap}
+.semantic-path-control select{flex:1 1 260px;max-width:100%;min-height:40px;background:#31223f;border:1px solid #9579a5;border-radius:8px;padding:8px 10px;color:#fff;font-size:11px}
+.semantic-path-control select:disabled{opacity:.5}
+.semantic-path-control select option{background:#251a31;color:#fff}
+.semantic-path-control span{width:100%;font-size:10px;color:#d4bfde;line-height:1.5}
+.semantic-theme-route{stroke:#ffcf90;stroke-width:2.1;stroke-dasharray:5 8;stroke-linecap:round;fill:none;pointer-events:none;opacity:.83;filter:drop-shadow(0 0 4px #ffcf9080)}
+.semantic-star.in-theme .semantic-star-halo{fill:#ffd7a0;opacity:.32}
+.semantic-star.in-theme .semantic-star-core{fill:#ffedca;stroke:#ffe5b5;filter:drop-shadow(0 0 11px #ffdaa7)}
+.semantic-star.outside-theme{opacity:.25}
+.semantic-star-name.in-theme{fill:#ffeac9}
+.semantic-path-story{margin:14px 0;padding:15px;background:#f1e8f6;border:1px solid #ddcbe7;border-radius:12px}
+.semantic-path-story small{display:block;font-size:10px;font-weight:800;color:#856495}
+.semantic-path-story h3{margin:7px 0;color:#4c345e;font-size:14px;line-height:1.5}
+.semantic-path-story p{font-size:11px;line-height:1.8;color:#65556c;overflow-wrap:anywhere}
+.semantic-path-progress{font-size:10px;color:#725581;margin:10px 0}
+.semantic-path-story button{background:#674977;border:1px solid #674977;color:white;border-radius:8px;padding:9px 12px;font-size:11px;font-weight:800;min-height:36px}
+.semantic-path-story button:focus-visible{outline:2px solid #352242;outline-offset:3px}
+@media(max-width:760px){.semantic-path-control{padding:10px}.semantic-path-control select{flex-basis:100%;width:100%}.semantic-path-control span{font-size:9px}}
+@media(prefers-reduced-motion:reduce){.semantic-theme-route{filter:none}}
