@@ -196,6 +196,31 @@ function formPayload(){
   sources:$('sources').value.trim(),verificationNotes:$('verification-notes').value.trim(),stage:$('stage').value,publicUrl:$('public-url').value.trim(),
   impressions7:$('impressions7').value,pv7:$('pv7').value,likes7:$('likes7').value});
 }
+function updateGuide(){
+ const stage=$('stage').value||'seed',title=$('title').value.trim();
+ const hasInput=Boolean(title||$('problem').value.trim()||$('article-body').value.trim());
+ const chosen=Boolean(activeId||hasInput);
+ let instruction='';
+ if(!chosen){
+  const pending=records.some(r=>['candidate','draft'].includes(r.payload?.stage));
+  instruction=pending?'素材箱から気になる記事候補を選び、根拠の確認や原稿づくりを進めてください。':'まずは気づいたことを一言メモに残してください。記事にするかどうかは後から選べます。';
+ }else if(stage==='seed'){
+  instruction=title?'面白いと思った理由や困った点を短く残し、記事にする価値がある場合だけ「記事化候補」に変更して保存してください。':'まずテーマを記録して保存してください。記事にする必要はありません。';
+ }else if(stage==='candidate'){
+  instruction=!$('sources').value.trim()&&!$('verification-notes').value.trim()?
+   '記事にする前に、実物の画面・変更履歴・出典などを確認してください。分からない点は「未確認」と記録できます。':
+   '根拠を確認したら記事化ブリーフを作り、読んで面白い原稿に育ててください。完成を急ぐ必要はありません。';
+ }else if(stage==='draft'){
+  instruction=!$('article-body').value.trim()?'原稿本文を記録してください。文章だけでなく、実物の画面や根拠を使う箇所も考えましょう。':
+   !$('verification-notes').value.trim()?
+   '原稿があります。公開前に、本人の実際の経験・出典・未確認事項を根拠メモで整理してください。':
+   '原稿と根拠メモがあります。画像・引用の権利、公開範囲、スマートフォンでの表示を本人が最終確認してください。自動公開はされません。';
+ }else if(stage==='published'){
+  instruction='公開済みURLと内容を確認し、必要なら公開後の反応や修正点を記録してください。新しい記事を量産する必要はありません。';
+ }else instruction='素材の内容を確認してください。';
+ $('update-state').textContent=chosen?(activeId?'選択中':'入力中・未保存')+' · '+(stageNames[stage]||'確認中'):'未選択 · 非公開の素材箱';
+ $('update-guide').textContent=instruction;
+}
 function cleanForm(){
  $('editor-form').reset();$('record-id').value='';activeId='';$('stage').value='seed';$('delete-entry').hidden=true;
  magazineUserEdited=false;formatUserEdited=false;$('magazine').value=autoMagazine($('kind').value);
@@ -207,11 +232,11 @@ function loadForm(row){
  const p=normalize(row.payload);activeId=row.id;$('record-id').value=row.id;
  $('kind').value=p.kind;$('magazine').value=p.magazine;magazineUserEdited=true;
  $('format').value=p.format;formatUserEdited=true;$('article-body').value=p.articleBody;
- magazineAdvice();readingStatus();$('title').value=p.title;updateNotePackage();$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
+ magazineAdvice();readingStatus();$('title').value=p.title;$('problem').value=p.problem;$('ai-method').value=p.aiMethod;
  $('result').value=p.result;$('lesson').value=p.lesson;$('sources').value=p.sources;$('verification-notes').value=p.verificationNotes;
  $('stage').value=p.stage;$('public-url').value=p.publicUrl;
  for(const id of ['impressions7','pv7','likes7'])$(id).value=p[id]??'';
- $('delete-entry').hidden=false;drawList();
+ $('delete-entry').hidden=false;updateNotePackage();drawList();
  if(window.matchMedia?.('(max-width:770px)').matches)$('editor-title').scrollIntoView({block:'start',behavior:'auto'});
 }
 function drawList(){
@@ -230,6 +255,7 @@ function drawList(){
    '<strong>'+esc(p.title)+'</strong><small>'+esc(MAG_BY_ID[p.magazine]?.name||names[p.kind]||'')+' · '+esc(stageNames[p.stage]||'')+' · '+esc(stamp)+'</small>'+
    '<p>'+esc(String(p.problem||p.aiMethod||p.result||'').slice(0,90))+'</p></button>';
  }).join(''):'<p class="empty">記録がありません。仕事や創作で試したことを一件ずつ残してください。</p>';
+ updateGuide();
 }
 function setDisabled(value){
  busy=value;
@@ -388,7 +414,9 @@ async function init(){
   user=data.user;$('private-app').hidden=false;await refresh();await loadResearchIdeas();
  }catch(e){status('認証状態を確認できませんでした。「ログイン・管理トップ」でログインを確認してください：'+(e.message||String(e)),true)}
 }
-initMagazineControls();initFormats();initNotePackage();
+initMagazineControls();initFormats();initNotePackage();updateGuide();
+$('editor-form').addEventListener('input',updateGuide);
+$('editor-form').addEventListener('change',updateGuide);
 $('research-ideas').addEventListener('click',e=>{const el=e.target.closest('[data-idea]');if(el)selectResearchIdea(el.dataset.idea)});
 $('quick-save').addEventListener('click',saveQuick);
 $('editor-form').addEventListener('submit',save);
