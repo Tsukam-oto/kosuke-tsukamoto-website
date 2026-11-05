@@ -283,17 +283,18 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 <body><div class="layout">
 <aside class="sidebar">
 <div class="brand"><div class="brand-symbol">✦</div><div><strong>歌詞の星座</strong><small>LYRIC CONSTELLATION</small></div></div>
-<div class="nav-label">COLLECTION</div><nav class="nav" aria-label="ページ切替">
-<button data-view="constellation" class="active"><span class="icon">✧</span>星座<small>01</small></button>
-<button data-view="works"><span class="icon">▤</span>作品<small>02</small></button>
-<button data-view="words"><span class="icon">⌕</span>言葉<small>03</small></button>
-<button data-view="timeline"><span class="icon">◷</span>時間<small>04</small></button>
-<button data-view="settings"><span class="icon">⚙</span>管理<small>05</small></button>
-<button data-view="research" type="button"><span class="icon">◈</span>研究<small>07</small></button>
-<button data-view="strata" type="button" aria-controls="strataHost"><span class="icon">▧</span>地層<small>06</small></button>
+<div class="nav-label">ライブラリ</div><nav class="nav" aria-label="ページ切替">
+<button data-view="constellation" class="active"><span class="icon">✧</span>星座をたどる</button>
+<button data-view="works"><span class="icon">▤</span>作品一覧</button>
+<button data-view="words"><span class="icon">⌕</span>原文を探す</button>
+<button data-view="research" type="button"><span class="icon">◈</span>作品の精読</button>
+<button data-view="strata" type="button" aria-controls="strataHost"><span class="icon">▧</span>言葉の地層</button>
+<div class="nav-separator" aria-hidden="true"></div>
+<button data-view="timeline"><span class="icon">◷</span>作品年表</button>
+<button data-view="settings"><span class="icon">⚙</span>設定・バックアップ</button>
 </nav><div class="sidebar-bottom"><p><strong>公開作品 11篇</strong>を収録</p><p>新しい言葉は作らず、書かれた言葉を読み直す。</p><p id="save-status">端末内に保存</p></div>
 </aside>
-<main class="main"><div class="topline"><span class="breadcrumb" id="breadcrumb">PRIVATE READING ROOM / CONSTELLATION</span><div class="top-actions"><button class="btn" id="cloudTop" type="button">ログイン・同期</button><span id="cloud-status" aria-live="polite">端末内で利用中</span><button class="btn" id="backupTop">↓ 記録を保存</button><button class="btn primary" id="addTop">＋ 作品を追加</button></div></div><section id="screen" aria-live="polite"></section>
+<main class="main"><div class="topline"><span class="breadcrumb" id="breadcrumb">PRIVATE READING ROOM / CONSTELLATION</span><div class="top-actions"><button class="btn" id="cloudTop" type="button">ログイン・同期</button><span id="cloud-status" aria-live="polite">端末内で利用中</span><button type="button" id="appUpdate" class="btn sm app-update" hidden>新版を読み込む</button><button class="btn" id="backupTop">↓ 記録を保存</button><button class="btn primary" id="addTop">＋ 作品を追加</button></div></div><section id="screen" aria-live="polite"></section>
 <section id="strataHost" class="strata-host" hidden aria-label="言葉の地層">
   <div class="strata-host-title"><span>THE LAYERS BELOW</span><h1>言葉の地層</h1><p>書き残した言葉の原文と記録日時を、星座と同じページでたどります。<br>地層の記録は星座の分析には加えません。</p></div>
   <iframe id="strataFrame" title="言葉の地層｜自分のメモを読む・回収する" src="../lyric-strata/?embed=1" loading="lazy" referrerpolicy="same-origin"></iframe>
@@ -302,7 +303,7 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 <div class="footer-note" id="constellationFooter">公式サイト公開版を初期資料として収録。共通語は表記上の一致であり、意味や作者の意図を断定するものではありません。非公開メモは未ログイン時は端末内、ログイン時は本人専用クラウドへ同期できます。</div></main>
 </div>
 <div id="scrim" class="scrim"></div><aside class="drawer" id="drawer" aria-label="作品の全文" aria-hidden="true"></aside>
-<dialog id="editor"><div class="modal-top"><strong id="modal-title">作品を登録</strong><button class="close" id="closeEditor" aria-label="閉じる">×</button></div><form id="editForm" class="modal-body"><input type="hidden" name="id"><div class="field"><label for="titleF">作品名</label><input id="titleF" name="title" required maxlength="140" placeholder="作品名"></div><div class="field"><label for="yearF">制作年（任意）</label><input id="yearF" name="year" type="number" min="1900" max="2100" placeholder="2026"></div><div class="field"><label for="skyF">記録する空</label><select id="skyF" name="sky"><option value="choir">合唱・詩の空</option><option value="rap">木乃伊の空</option></select></div><div class="field"><label for="kindF">種類</label><select id="kindF" name="kind"><option>合唱・詩</option><option>弾き語り</option><option>ラップ（木乃伊）</option><option>その他</option></select></div><div class="field"><label for="creditF">作者表記</label><input id="creditF" name="credit" maxlength="250" placeholder="作詞：…"></div><div class="field"><label for="textF">歌詞・詩の原文</label><textarea id="textF" name="lyrics" rows="13" required placeholder="ご自身が書いた原文を、改行を保って入力してください。AIが新しい歌詞を補いません。"></textarea></div><div class="field"><label for="tagsF">手動タグ（読点で区切る）</label><input id="tagsF" name="tags" placeholder="風景、季節、時間"></div><div class="form-actions"><button class="btn" type="button" id="cancelEditor">キャンセル</button><button class="btn primary" type="submit">保存する</button></div></form></dialog>
+<dialog id="editor"><div class="modal-top"><strong id="modal-title">作品を登録</strong><button class="close" id="closeEditor" aria-label="閉じる">×</button></div><form id="editForm" class="modal-body"><input type="hidden" name="id"><div class="field"><label for="titleF">作品名</label><input id="titleF" name="title" required maxlength="140" placeholder="作品名"></div><div class="field"><label for="yearF">制作年（任意）</label><input id="yearF" name="year" type="number" min="1900" max="2100" placeholder="2026"></div><div class="field"><label for="skyF">作品の名義</label><select id="skyF" name="sky"><option value="choir">束元康介（合唱・詩）</option><option value="rap">木乃伊（ラップ）</option></select></div><div class="field"><label for="kindF">種類</label><select id="kindF" name="kind"><option>合唱・詩</option><option>弾き語り</option><option>ラップ（木乃伊）</option><option>その他</option></select></div><div class="field"><label for="creditF">作者表記</label><input id="creditF" name="credit" maxlength="250" placeholder="作詞：…"></div><div class="field"><label for="textF">歌詞・詩の原文</label><textarea id="textF" name="lyrics" rows="13" required placeholder="ご自身が書いた原文を、改行を保って入力してください。AIが新しい歌詞を補いません。"></textarea></div><div class="field"><label for="tagsF">手動タグ（読点で区切る）</label><input id="tagsF" name="tags" placeholder="風景、季節、時間"></div><div class="form-actions"><button class="btn" type="button" id="cancelEditor">キャンセル</button><button class="btn primary" type="submit">保存する</button></div></form></dialog>
 <input id="importFile" type="file" accept="application/json,.json" hidden><input id="textFile" type="file" accept="text/plain,.txt" hidden><div class="toast" id="toast" role="status"></div>
 <dialog id="authDialog" aria-label="クラウドログイン">
 <div class="auth-body">
@@ -585,7 +586,7 @@ function connections(){if(sky==='rap')return [];const all=works(),df=wordDF(),n=
 function formatTags(w){const arr=tokens(w).filter(x=>x.length>=2).slice(0,3);return arr.length?arr.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>未分類</span>'}
 function summary(){const all=works(),conn=connections(),df=wordDF();return {all,conn,df,nwords:df.size,lines:all.reduce((s,w)=>s+w.lyrics.split('\n').filter(Boolean).length,0),private:db.userWorks.length};}
 function toast(message){const x=$('#toast');x.textContent=message;x.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>x.classList.remove('show'),3000)}
-function go(to){if(to==='strata'||to==='research')closeWork();if(to==='research')sky='rap';view=to;query='';visibility='all';try{const target=location.pathname+location.search+(to==='strata'?'#strata':to==='research'?'#mummy-research':'');history.replaceState(null,'',target)}catch{}window.scrollTo({top:0,behavior:'instant'});render()}
+function go(to){if(to==='words'&&view!=='words'){term='';wordResultLimit=12;}if(to==='strata'||to==='research')closeWork();if(to==='research')sky='rap';view=to;query='';visibility='all';try{const target=location.pathname+location.search+(to==='strata'?'#strata':to==='research'?'#mummy-research':'');history.replaceState(null,'',target)}catch{}window.scrollTo({top:0,behavior:'instant'});render()}
 function header(title,sub){const out=title==='書いた言葉は、星座になる。'?'<span class="headline-segment">書いた言葉は、</span><span class="headline-segment">星座になる。</span>':esc(title);return `<h1 class="heading">${out}</h1><p class="lede">${esc(sub)}</p>`}
 function switchSky(next){if(next!=='rap'&&next!=='choir')return;if(next==='choir'&&view==='research')view='works';sky=next;term='';query='';visibility='all';selected=works()[0]?.id||null;try{localStorage.setItem(SKY_PREF,sky)}catch{}closeWork();render();window.scrollTo({top:0,behavior:'instant'})}
 function skySwitch(){return `<div class="sky-switch" role="group" aria-label="作品の名義を切り替える"><button data-sky="choir" class="${sky==='choir'?'active':''}" aria-pressed="${sky==='choir'}"><strong>合唱・詩</strong><small>束元康介の作品</small></button><button data-sky="rap" class="${sky==='rap'?'active rap-selected':''}" aria-pressed="${sky==='rap'}"><strong>木乃伊</strong><small>ラップの作品</small></button></div><div class="sky-help">${sky==='rap'?'現在は木乃伊名義の作品だけを表示しています。合唱・詩の作品とは混在しません。':'現在は合唱・詩の作品だけを表示しています。木乃伊名義とは混在しません。'}</div>`}
