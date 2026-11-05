@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOverlap:true};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOverlap:true,atlasNetworkOpen:true,atlasNetworkChoice:''};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -96,6 +96,36 @@ function atlasFiltered(paths,filter,starId){
   if(filter==='star')return p.ids.includes(starId);
   return true;
  });
+}
+/* A map OF constellations. Two reading themes have an overlap only if they
+ * cite at least one of the SAME actual songs. These are not song-to-song
+ * comparison links, nor verified authorial intentions. */
+function constellationNetwork(paths){
+ var indexed=Array.isArray(paths)?paths.slice():[];
+ var kinds=['theme','collection'];
+ var width=1100,height=680,cx=width/2,cy=height/2+5,geo=new Map(),nodes=[];
+ kinds.forEach(function(kind){
+  var group=indexed.filter(function(p){return themeKind(p)===kind;})
+    .slice().sort(function(a,b){return a.id.localeCompare(b.id);});
+  group.forEach(function(p,i){
+   var angle=-Math.PI/2+(i/group.length)*Math.PI*2+(kind==='collection'?.08:0);
+   var rx=kind==='theme'?490:253,ry=kind==='theme'?271:136;
+   var point={id:p.id,title:p.title,question:p.question,n:p.ids.length,kind:kind,
+    x:cx+rx*Math.cos(angle),y:cy+ry*Math.sin(angle)};
+   nodes.push(point);geo.set(p.id,point);
+  });
+ });
+ var edges=[];
+ for(var i=0;i<indexed.length;i++)for(var j=i+1;j<indexed.length;j++){
+  var one=indexed[i],two=indexed[j],ids=new Set(one.ids);
+  var shared=two.ids.filter(function(id){return ids.has(id);});
+  if(shared.length)edges.push({a:one.id,b:two.id,shared:shared,n:shared.length});
+ }
+ edges.sort(function(a,b){return b.n-a.n||a.a.localeCompare(b.a)||a.b.localeCompare(b.b);});
+ var degree=new Map(nodes.map(function(n){return [n.id,0];}));
+ edges.forEach(function(e){degree.set(e.a,degree.get(e.a)+1);degree.set(e.b,degree.get(e.b)+1);});
+ return {nodes:nodes,edges:edges,position:geo,width:width,height:height,
+  isolated:nodes.filter(function(n){return degree.get(n.id)===0;}).map(function(n){return n.id;})};
 }
 /* Deterministic force-directed layout. Coordinates reflect sourced links, NOT a claim
  * of mathematical similarity or verified authorial intention. Unlinked works remain
@@ -274,7 +304,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,constellationNetwork:constellationNetwork,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
@@ -368,6 +398,55 @@ function controls(){
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
+function atlasNetworkPanel(paths,all){
+ if(!paths.length)return '';
+ var model=constellationNetwork(paths);
+ var active=paths.find(function(p){return p.id===state.atlasNetworkChoice;})||
+  paths.find(function(p){return p.id===state.path;})||paths[0];
+ var activeId=active.id,neighbors=model.edges.filter(function(e){return e.a===activeId||e.b===activeId;});
+ var adjacent=new Set(neighbors.map(function(e){return e.a===activeId?e.b:e.a;}));
+ var basic=model.edges.filter(function(e){return e.n>=2&&e.a!==activeId&&e.b!==activeId;})
+  .slice(0,52).map(function(e){
+   var a=model.position.get(e.a),b=model.position.get(e.b);
+   return '<line class="semantic-network-edge" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"><title>'+e.n+'作品を共有</title></line>';
+  }).join('');
+ var focused=neighbors.map(function(e){
+  var a=model.position.get(e.a),b=model.position.get(e.b);
+  return '<line class="semantic-network-edge focused" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"><title>'+e.n+'作品を共有</title></line>';
+ }).join('');
+ var stars=model.nodes.map(function(n){
+  var current=n.id===activeId,near=adjacent.has(n.id),isolated=model.isolated.includes(n.id);
+  var short=n.title.split('｜').slice(-1)[0].slice(0,9);
+  return '<g class="semantic-network-star '+n.kind+(current?' selected':'')+(near?' connected':'')+(isolated?' isolated':'')+
+   '" data-atlas-network-select="'+safe(n.id)+'" role="button" tabindex="0" aria-label="'+safe(n.title)+'：'+n.n+'作品の星座を選ぶ">'+
+   '<title>'+safe(n.title)+'（'+n.n+'作品）</title>'+
+   '<circle class="semantic-network-hit" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="20"/>'+
+   '<circle class="semantic-network-halo" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+(current?16:near?13:10)+'"/>'+
+   '<circle class="semantic-network-core" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+(current?8:near?6.2:4.7)+'"/>'+
+   '<text x="'+n.x.toFixed(1)+'" y="'+(n.y+28).toFixed(1)+'" text-anchor="middle">'+safe(short)+'</text></g>';
+ }).join('');
+ var related=neighbors.slice(0,4).map(function(e){
+  var other=paths.find(function(p){return p.id===(e.a===activeId?e.b:e.a);});
+  if(!other)return '';
+  var names=e.shared.slice(0,2).map(function(id){return all.find(function(w){return w.id===id;})?.title||'';}).filter(Boolean);
+  return '<button type="button" data-atlas-network-select="'+safe(other.id)+'"><strong>'+safe(other.title)+'</strong>'+
+   '<small>'+e.n+'作品を共有'+(names.length?'：'+safe(names.join('・')):'')+'</small></button>';
+ }).join('');
+ return '<section class="semantic-network" aria-label="星座と星座のつながり">'+
+  '<div class="semantic-network-heading"><div><h3>星座の星空</h3>'+
+  '<p>一曲の思いが、別の星座への入口になります。線は二つの読解テーマが実際に共有する作品を示します。</p></div>'+
+  '<button type="button" data-atlas-network-toggle="'+(state.atlasNetworkOpen?'hide':'show')+'" aria-expanded="'+state.atlasNetworkOpen+'">'+
+  (state.atlasNetworkOpen?'地図を閉じる':'星座の地図を開く')+'</button></div>'+
+  (state.atlasNetworkOpen?'<div class="semantic-network-content"><div class="semantic-network-scroller">'+
+  '<svg class="semantic-network-svg" viewBox="0 0 '+model.width+' '+model.height+'" role="group" aria-label="共有する作品によって結ばれた'+paths.length+'個の星座。星を選ぶと別の星座との重なりが分かります。" xmlns="http://www.w3.org/2000/svg">'+
+  basic+focused+stars+'</svg></div>'+
+  '<div class="semantic-network-detail"><div><small>いま選んでいる星座</small><h4>'+safe(active.title)+'</h4>'+
+  '<p>'+safe(active.question||'この作品群で何がつながるでしょうか。')+'</p>'+
+  '<p class="semantic-network-stat">'+active.ids.length+'作品の星座。'+(neighbors.length?neighbors.length+'の別の星座と作品を共有します。':'他の星座とは共有作品がありません。')+'</p></div>'+
+  '<div class="semantic-network-relations">'+(related||'<p>この星座は独立した読解です。根拠のない線は追加しません。</p>')+'</div>'+
+  '<button type="button" data-atlas-open="'+safe(active.id)+'" class="semantic-network-read">この星座の作品を順に読む</button></div></div>':'')+
+  '<p class="semantic-network-note">淡い線＝2作品以上の共有。光る線＝選択中の星座と共有する作品（1作品以上）。直接的な曲同士の比較や作者の意図を表す線ではありません。</p></section>';
+}
 function atlasPanel(){
  if(!cloudUser)return '';
  var all=userWorks(),paths=normalizePaths(pathRows,all),member=membershipIndex(paths);
@@ -406,7 +485,7 @@ function atlasPanel(){
   '<div class="semantic-atlas-pager"><span>'+(start+1)+'–'+(start+subset.length)+' / '+list.length+'星座</span>'+
   '<button type="button" data-atlas-page="prev"'+(start===0?' disabled':'')+'>前の星座</button>'+
   '<button type="button" data-atlas-page="next"'+(start+pageSize>=list.length?' disabled':'')+'>次の星座</button></div></div>':empty)+other+
-  '<p class="semantic-atlas-note">星座はAIによる文学的な読解仮説です。同じ作品が現れても、二つの星座の主題が同一であるとは限りません。</p></section>';
+  '<p class="semantic-atlas-note">星座はAIによる文学的な読解仮説です。同じ作品が現れても、二つの星座の主題が同一であるとは限りません。</p>'+atlasNetworkPanel(paths,all)+'</section>';
 }
 function membershipsPanel(work,all){
  var paths=normalizePaths(pathRows,all).filter(function(p){return p.ids.includes(work.id);});
@@ -553,7 +632,7 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.atlasNetworkChoice='';state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
@@ -641,7 +720,17 @@ loadMasterReadingCorpus=async function(user,epoch){
  if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch),loadAuthorJudgments(user,epoch)]);
 };
 document.addEventListener('click',function(event){
- var target=event.target.closest('[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ var target=event.target.closest('[data-atlas-network-toggle],[data-atlas-network-select],[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ if(target.hasAttribute('data-atlas-network-toggle')){
+  state.atlasNetworkOpen=target.dataset.atlasNetworkToggle==='show';repaint();return;
+ }
+ if(target.hasAttribute('data-atlas-network-select')){
+  var id=target.dataset.atlasNetworkSelect;
+  if(normalizePaths(pathRows,userWorks()).some(function(p){return p.id===id;})){
+   state.atlasNetworkChoice=id;repaint();
+  }
+  return;
+ }
  if(target.hasAttribute('data-atlas-filter')){
   state.atlasFilter=['themes','collections','star','all'].includes(target.dataset.atlasFilter)?target.dataset.atlasFilter:'themes';
   state.atlasOffset=0;repaint();return;
@@ -658,7 +747,7 @@ document.addEventListener('click',function(event){
  if(target.hasAttribute('data-atlas-open')){
   var id=target.dataset.atlasOpen,path=normalizePaths(pathRows,userWorks()).find(function(p){return p.id===id;});
   if(!path)return;
-  state.path=path.id;state.scope='all';state.mode='meaning';state.discoveryOpen=false;
+  state.path=path.id;state.atlasNetworkChoice=path.id;state.scope='all';state.mode='meaning';state.discoveryOpen=false;
   state.atlasOffset=0;selectStar(path.ids[0]);return;
  }
  if(target.hasAttribute('data-author-decision')){var panel=target.closest('[data-author-review]');if(panel)saveAuthorJudgment(panel.getAttribute('data-author-review'),target.dataset.authorDecision,panel);return;}
@@ -703,7 +792,7 @@ document.addEventListener('click',function(event){
   if(!options.length)options=all.map(function(w){return w.id;}).filter(function(id){return id!==selected;});
   if(options.length)selectStar(options[Math.floor(Math.random()*options.length)]);return;
  }
- if(action==='reset'){state.collection='';state.search='';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
+ if(action==='reset'){state.collection='';state.search='';state.path='';state.atlasNetworkChoice='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
  if(action==='search'){
   state.search=document.getElementById('semanticStarSearch')?.value.trim()||'';
   var found=userWorks().find(function(w){return w.title.toLocaleLowerCase('ja').includes(state.search.toLocaleLowerCase('ja'));});
@@ -713,9 +802,13 @@ document.addEventListener('click',function(event){
 });
 document.addEventListener('change',function(event){
  if(event.target.id==='semanticCollection'){state.collection=event.target.value;repaint();}
- if(event.target.id==='semanticPath'){state.path=event.target.value;state.scope='all';state.collection='';state.search='';var p=activePath(userWorks());if(p){selectStar(p.ids[0]);}else repaint();}
+ if(event.target.id==='semanticPath'){state.path=event.target.value;state.atlasNetworkChoice=event.target.value;state.scope='all';state.collection='';state.search='';var p=activePath(userWorks());if(p){selectStar(p.ids[0]);}else repaint();}
 });
 document.addEventListener('keydown',function(event){
+ if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-network-star[data-atlas-network-select]')){
+  event.preventDefault();var id=event.target.closest('[data-atlas-network-select]').dataset.atlasNetworkSelect;
+  if(normalizePaths(pathRows,userWorks()).some(function(p){return p.id===id;})){state.atlasNetworkChoice=id;repaint();}
+ }
  if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-star[data-star-focus],.semantic-star-name[data-star-focus]')){event.preventDefault();selectStar(event.target.closest('[data-star-focus]').dataset.starFocus);}
  if(event.key==='Enter'&&event.target.id==='semanticStarSearch'&&!event.isComposing){event.preventDefault();document.querySelector('[data-semantic-action="search"]')?.click();}
 });

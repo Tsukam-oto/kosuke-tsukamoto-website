@@ -1,0 +1,37 @@
+name: Lyric starfield fast checks
+
+on:
+  pull_request:
+    paths:
+      - "lyric-constellation/**"
+      - ".github/workflows/lyric-starfield-fast.yml"
+  push:
+    branches: [main]
+    paths:
+      - "lyric-constellation/**"
+      - ".github/workflows/lyric-starfield-fast.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  static-and-unit:
+    name: Static syntax and pure reading tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Check application JavaScript syntax
+        run: |
+          node --check lyric-constellation/semantic-stars.js
+          node --check lyric-constellation/semantic-stars.browser.cjs
+          node --check lyric-constellation/semantic-stars.test.cjs
+      - name: Run source-grounded, privacy and star-map unit tests
+        run: |
+          node lyric-constellation/deep-reading.test.js
+          node lyric-constellation/author-review.test.js
+          node lyric-constellation/mummy-research.test.cjs
+          node lyric-constellation/semantic-stars.test.cjs
