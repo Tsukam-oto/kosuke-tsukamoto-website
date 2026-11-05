@@ -89,6 +89,18 @@ async function run(mobile){
   assert.match(await page.locator('.semantic-status').innerText(),/2組/,'links come from semantic data');
   assert.equal(await page.locator('.semantic-atlas-card').count(),2,'two thematic lenses initially visible');
   assert.match(await page.locator('.semantic-atlas-stats').innerText(),/3/,'atlas counts three multi-work constellations');
+  assert.equal(await page.locator('.semantic-network-star').count(),3,'a second star map displays three distinct reading themes');
+  assert.equal(await page.locator('.semantic-network-edge').count(),2,'only real shared-song connections are drawn');
+  await page.locator('.semantic-network-star[data-atlas-network-select="synthetic-memory"]').click();
+  assert.match(await page.locator('.semantic-network-detail h4').innerText(),/記憶の星座/);
+  assert.equal(await page.locator('.semantic-network-edge.focused').count(),1,'selected theme exposes its actual one shared-theme edge');
+  assert.match(await page.locator('.semantic-network-relations').innerText(),/暮らしの星座/);
+  await page.locator('.semantic-network-star[data-atlas-network-select="rap-ep1-fictional"]').press('Enter');
+  assert.match(await page.locator('.semantic-network-detail h4').innerText(),/架空EPの読解/,'keyboard can select a thematic star');
+  await page.locator('[data-atlas-network-toggle="hide"]').click();
+  assert.equal(await page.locator('.semantic-network-svg').count(),0,'secondary map can be folded away');
+  await page.locator('[data-atlas-network-toggle="show"]').click();
+  assert.equal(await page.locator('.semantic-network-star').count(),3,'secondary map can be restored');
   assert.equal(await page.locator('.semantic-star.constellation-crossing').count(),3,'shared stars have a separate ring');
   assert.equal(await page.locator('.semantic-overlap-ring').count(),3);
   await page.locator('[data-atlas-filter="all"]').click();
@@ -237,13 +249,14 @@ async function run(mobile){
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();
    return {leak:document.getElementById('screen').textContent.includes('検証曲001'),
-    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('記憶の星座')||document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),reviewLeak:document.getElementById('screen').textContent.includes('原文を見て、私はこの思い'),remaining:document.querySelectorAll('.semantic-star').length};
+    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('記憶の星座')||document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),reviewLeak:document.getElementById('screen').textContent.includes('原文を見て、私はこの思い'),metaStars:document.querySelectorAll('.semantic-network-star').length,remaining:document.querySelectorAll('.semantic-star').length};
   });
   assert.equal(after.leak,false,'private star names vanish after logout');
   assert.equal(after.stored,false,'private star data is not stored in local storage');
    assert.equal(after.themeLeak,false,'private thematic path never remains on logout');
    assert.equal(after.reviewLeak,false,'private author notes never remain on logout');
   assert.equal(after.remaining,0,'private stars vanish after logout');
+  assert.equal(after.metaStars,0,'private thematic map clears on logout');
   assert.equal(errors.length,0,'uncaught browser JS errors: '+errors.join(' | '));
   console.log('semantic starfield PASS '+(mobile?'mobile':'desktop')+
    ': 168 stars, 2 verified-source comparisons, search, near/all, modes, logout privacy');
