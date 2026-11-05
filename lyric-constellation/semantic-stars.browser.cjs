@@ -111,7 +111,7 @@ async function run(mobile){
   await page.locator('.semantic-discovery-card [data-author-decision="confirmed"]').click();
   await page.waitForFunction(()=>document.querySelector('.semantic-discovery-card .semantic-review-feedback')?.textContent?.includes('架空の保存拒否'));
   assert.equal(await page.locator('.semantic-link.author-confirmed').count(),0,'failed save never creates a gold connection');
-  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\\s*\\/\\s*2/,'failed write does not advance progress');
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\s*\/\s*2/,'failed write does not advance progress');
   await page.evaluate(()=>window.__restoreFeelingWrite());
   assert.equal(await page.locator('.semantic-link.focused').count(),2,'selected star highlights two evidence-backed lines');
   assert.match(await page.locator('.semantic-focus-panel').innerText(),/日々の異なる見え方/);
