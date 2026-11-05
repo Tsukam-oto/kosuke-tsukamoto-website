@@ -499,3 +499,15 @@ body.sky-rap .rap-phrase-list{max-width:100%}
  body.sky-rap .semantic-focus-panel{padding:16px}
  body.sky-rap .semantic-discovery{padding:14px}
 }
+
+
+/* Version update is opt-in: never discard unsaved reading notes automatically. */
+.app-update[hidden]{display:none!important}
+body.sky-rap .app-update{
+ background:#ffe6a8!important;border:1px solid #c48e27!important;
+ color:#603d05!important;font-weight:900;box-shadow:0 4px 12px #c58d2740
+}
+body.sky-rap .nav-separator{
+ border-top:1px solid #294966;margin:10px 13px 12px
+}
+body.sky-rap .sidebar-bottom p{font-size:11px;line-height:1.75}
