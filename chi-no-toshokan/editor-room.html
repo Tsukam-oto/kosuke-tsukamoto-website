@@ -49,17 +49,6 @@
   <p class="small-note">既存の記録をそのまま使えるよう、保存用の分類IDは変更していません。ここに表示する分類は新しい発信メディア名ではありません。</p>
   <div id="magazine-list" class="magazine-list"></div>
  </details>
- <details class="cadence-details"><summary>参考：旧・投稿作業量の試算（現在の目標ではありません）</summary>
- <p>AIの原稿生成本数、根拠確認で通過する割合、本人の確認時間を仮定した試算です。現在の自動生成実績ではありません。</p>
- <div class="cadence-inputs">
-  <label for="drafts-per-week">AIが作成する初稿（週） <strong id="draft-value">10</strong>本<input id="drafts-per-week" type="range" min="0" max="28" step="1" value="10"></label>
-  <label for="ready-percent">公開に向けた確認を通過する割合 <strong id="ready-value">50</strong>%<input id="ready-percent" type="range" min="0" max="100" step="5" value="50"></label>
-  <label for="minutes-per-day">本人が確認・投稿に使える時間（1日） <strong id="minutes-value">30</strong>分<input id="minutes-per-day" type="range" min="0" max="120" step="5" value="30"></label>
- </div>
- <div id="cadence-output" class="cadence-output" aria-live="polite"></div>
- <p class="small-note">試算では1本あたり25分（事実・権利・個人情報チェックと投稿操作の合計）を仮定します。専門記事はさらに時間が必要です。</p>
- </details>
- <details class="cadence-details"><summary>参考：旧・曜日別分類案（現在の投稿計画ではありません）</summary><div class="weekly-table" id="weekly-table"></div><p class="small-note">過去のモデルを互換確認のため残しています。現在は週4本・毎日1本などの公開本数をノルマにしていません。</p></details>
  <details class="cadence-details"><summary>記事の長さ別｜公開7日間の反応を比較</summary>
  <p>noteのダッシュボードで公開後7日間にそろえた数値を手入力し、形式別に比較します。現在はnoteからの自動取得ではありません。</p>
  <div id="format-outcomes" class="format-outcomes"></div>
