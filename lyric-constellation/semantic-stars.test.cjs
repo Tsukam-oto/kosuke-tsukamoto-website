@@ -97,3 +97,13 @@ assert.equal(detailed[0].steps[0].quote,'架空の原文');
 assert.equal(detailed[0].steps[0].observation,'架空の観察');
 assert.equal(detailed[0].hypothesis,'他者との対話を問い直す');
 console.log('semantic gravity: 168 finite nodes, no invented relations, stable positions and per-work source anchors');
+
+const twoHop=stars.shortestRoute(edges,'master-2','master-3');
+assert.deepEqual(Array.from(twoHop.ids),['master-2','master-1','master-3'],'two-hop path follows only registered comparison links');
+assert.equal(twoHop.edges.length,2,'both hops contain evidence');
+assert.equal(twoHop.edges[0].topic,'別の読み');
+assert.equal(twoHop.edges[1].topic,'作品の共鳴');
+assert.equal(stars.shortestRoute(edges,'master-2','master-8'),null,'unconnected targets must not get invented routes');
+assert.deepEqual(Array.from(stars.shortestRoute(edges,'master-1','master-1').ids),['master-1'],'start equals end');
+assert.equal(stars.shortestRoute(edges,'','master-2'),null,'requires two real endpoints');
+console.log('shortest journey: verified link-only two-hop route, no hallucinated edge, graceful disconnected handling');
