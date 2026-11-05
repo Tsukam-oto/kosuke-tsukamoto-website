@@ -77,3 +77,23 @@ assert.equal(selectedPaths[0].ids.join(','),'master-1,master-4','theme uses dist
 assert.equal(selectedPaths[0].question,'誰の言葉がつながるか？');
 assert.equal(stars.normalizePaths([{thread_key:'bad',anchors:'not an array'}],works).length,0);
 console.log('thematic path normalization: verified source work ids only');
+
+
+const gravity=stars.semanticPositions(works,edges,selectedPaths);
+assert.equal(gravity.pos.size,168,'semantic map preserves all songs, even without comparisons');
+assert.equal(gravity.unlinked,164,'unlinked stars stay visible rather than acquiring invented relationships');
+assert.equal(gravity.labels.length,0,'semantic map does not pretend positions are album groups');
+for(const p of gravity.pos.values()){
+ assert.ok(Number.isFinite(p.x)&&Number.isFinite(p.y),'finite position');
+ assert.ok(p.x>0&&p.x<gravity.width&&p.y>0&&p.y<gravity.height,'inside semantic sky');
+}
+const again=stars.semanticPositions(works,edges,selectedPaths);
+assert.equal(again.pos.get('master-1').x,gravity.pos.get('master-1').x,'semantic layout is deterministic and stable');
+const detailed=stars.normalizePaths([{thread_key:'deep-quote',title:'声の変化',
+ core_hypothesis:'他者との対話を問い直す',counterreading:'別の解釈も可能',inference_limit:'原文校正を継続',
+ anchors:[{kind:'work',source_id:'1',quote:'架空の原文',observation:'架空の観察',technique:'反復'},
+ {kind:'work',source_id:'4',quote:'架空の別の原文'}]}],works);
+assert.equal(detailed[0].steps[0].quote,'架空の原文');
+assert.equal(detailed[0].steps[0].observation,'架空の観察');
+assert.equal(detailed[0].hypothesis,'他者との対話を問い直す');
+console.log('semantic gravity: 168 finite nodes, no invented relations, stable positions and per-work source anchors');

@@ -97,3 +97,22 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
 .semantic-path-story button:focus-visible{outline:2px solid #352242;outline-offset:3px}
 @media(max-width:760px){.semantic-path-control{padding:10px}.semantic-path-control select{flex-basis:100%;width:100%}.semantic-path-control span{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.semantic-theme-route{filter:none}}
+
+/* 自動的な意味配置は実際に保存された比較関係による。未比較の作品は消さない。 */
+.semantic-layout-toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:9px 1px;margin-top:12px}
+.semantic-layout-toolbar>span{font-size:11px;font-weight:800;color:#f1e0ff}
+.semantic-layout-toolbar>small{flex:1 1 210px;color:#d6c5e1;font-size:10px;line-height:1.6}
+.semantic-layout-toolbar .semantic-switches{flex:0 1 auto}
+.semantic-switches button:disabled,.semantic-controls>button:disabled{opacity:.43;cursor:not-allowed}
+.semantic-star.no-relation .semantic-star-core{stroke:#d8d2e9;stroke-width:.9;opacity:.87}
+.semantic-star.no-relation .semantic-star-halo{opacity:.12}
+.semantic-step-anchor{background:#fffaf6;border:1px solid #dbc6b2;border-radius:9px;padding:11px;margin-top:13px}
+.semantic-step-anchor blockquote{border-left:3px solid #ba996c;padding:8px 11px;margin:8px 0;color:#48394f;font-size:12px;font-weight:600;line-height:1.75;white-space:pre-wrap;overflow-wrap:anywhere}
+.semantic-step-anchor small{color:#795a37}
+.semantic-step-anchor p{color:#53445b;font-size:11px;line-height:1.8}
+.semantic-path-steps{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.semantic-theme-explanation{margin-top:13px;border-top:1px solid #d9c5df;padding-top:10px}
+.semantic-theme-explanation summary{cursor:pointer;color:#674977;font-weight:750;font-size:11px;padding:5px}
+.semantic-theme-explanation p{padding-left:8px;margin:6px 0 10px}
+.semantic-path-story>.semantic-caution{font-size:10px;color:#786781;margin-top:12px}
+@media(max-width:760px){.semantic-layout-toolbar{align-items:flex-start}.semantic-layout-toolbar>small{flex-basis:100%}.semantic-path-steps button{flex:1 1 100px}}
