@@ -116,3 +116,32 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
 .semantic-theme-explanation p{padding-left:8px;margin:6px 0 10px}
 .semantic-path-story>.semantic-caution{font-size:10px;color:#786781;margin-top:12px}
 @media(max-width:760px){.semantic-layout-toolbar{align-items:flex-start}.semantic-layout-toolbar>small{flex-basis:100%}.semantic-path-steps button{flex:1 1 100px}}
+
+/* 星から星へ: 登録済みの直接比較だけを通る経路 */
+.semantic-journey-route{stroke:#87eee1;stroke-width:3.7;stroke-linecap:round;opacity:.98;filter:drop-shadow(0 0 7px #48ddd4cc);pointer-events:none}
+.semantic-star.in-journey .semantic-star-halo{fill:#73e9dc;opacity:.45}
+.semantic-star.in-journey .semantic-star-core{fill:#e2fff9;stroke:#8be6dd;stroke-width:2;filter:drop-shadow(0 0 9px #80f4df)}
+.semantic-star-name.in-journey{fill:#c8fff4;font-weight:800}
+.semantic-journey-panel{border:1px solid #b8d9d1;background:#edf8f5;border-radius:13px;padding:14px;margin:16px 0;color:#2b4a47}
+.semantic-journey-panel .eyebrow{color:#477f77;font-size:10px;letter-spacing:.08em}
+.semantic-journey-panel h3{margin:5px 0 9px;font-size:15px;color:#235950}
+.semantic-journey-hint{font-size:11px;line-height:1.8;margin:7px 0 10px;color:#35645e}
+.semantic-journey-actions{display:flex;flex-wrap:wrap;gap:6px}
+.semantic-journey-actions button{border:1px solid #4c9288;background:#d1f2e9;color:#215850;border-radius:8px;padding:8px 11px;font-size:11px;font-weight:700;min-height:38px}
+.semantic-journey-actions button:hover{background:#b1e8db}
+.semantic-journey-actions button:disabled{opacity:.42;cursor:not-allowed}
+.semantic-journey-actions button:focus-visible,.semantic-journey-result button:focus-visible{outline:2px solid #276d64;outline-offset:2px}
+.semantic-journey-result{background:#fcfffe;border:1px solid #bedfd6;border-radius:11px;margin-top:13px;padding:12px}
+.semantic-journey-result>strong{font-size:12px;color:#245149;line-height:1.8}
+.semantic-journey-result>p{font-size:10px;line-height:1.7;color:#43645d;margin:7px 0}
+.semantic-journey-result ol{list-style:none;margin:9px 0;padding:0;display:flex;flex-direction:column;gap:7px}
+.semantic-journey-result li{border-left:2px solid #7dc8ba;padding:6px 0 7px 13px}
+.semantic-journey-result li>button{background:#e8f5f1;color:#285e56;border:1px solid #c7e8dd;border-radius:7px;padding:7px 10px;text-align:left;font-size:12px;font-weight:700;max-width:100%;overflow-wrap:anywhere}
+.semantic-journey-edge{font-size:10px;color:#375d54;line-height:1.7;padding-bottom:4px}
+.semantic-journey-edge small{font-size:9px;color:#5f837b}
+.semantic-journey-result details{font-size:10px;color:#4e675d;margin:4px 0}
+.semantic-journey-result details summary{cursor:pointer;font-weight:600;padding:5px 0}
+.semantic-journey-result details p{font-size:10px;line-height:1.8;color:#3d645a;margin:5px 0}
+.semantic-journey-result .semantic-caution{font-size:10px;color:#53756a}
+@media(max-width:760px){.semantic-journey-panel{padding:11px}.semantic-journey-actions button{flex:1 1 120px;font-size:10px}.semantic-journey-result{padding:9px}}
+@media(prefers-reduced-motion:reduce){.semantic-journey-route{filter:none}}

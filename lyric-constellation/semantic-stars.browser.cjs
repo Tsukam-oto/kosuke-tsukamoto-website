@@ -114,6 +114,19 @@ async function run(mobile){
   await page.locator('[data-semantic-action="unlinked"]').click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲002/,'discover a truly unlinked song');
   await page.locator('[data-semantic-action="reset"]').click();
+  await page.locator('#semanticStarSearch').fill('検証曲051');
+  await page.locator('[data-semantic-action="search"]').click();
+  await page.locator('[data-semantic-action="journey-start"]').click();
+  assert.match(await page.locator('.semantic-journey-hint').first().innerText(),/検証曲051/);
+  await page.locator('#semanticStarSearch').fill('検証曲096');
+  await page.locator('[data-semantic-action="search"]').click();
+  await page.locator('[data-semantic-action="journey-connect"]').click();
+  assert.equal(await page.locator('.semantic-journey-route').count(),2,'route highlights only the two evidence-backed hops');
+  assert.equal(await page.locator('.semantic-journey-result li').count(),3,'route lists all three songs');
+  assert.match(await page.locator('.semantic-journey-result').innerText(),/日々の異なる見え方/);
+  assert.match(await page.locator('.semantic-journey-result').innerText(),/対照として読む/);
+  await page.locator('.semantic-journey-result li').first().locator('button[data-star-focus]').click();
+  assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/,'a stop on the new journey is clickable');
    const after=await page.evaluate(()=>{
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();

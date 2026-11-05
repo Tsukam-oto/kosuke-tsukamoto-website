@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[]};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[],journeyStart:'',journey:null,journeyMessage:''};
 var records=[],pathRows=[],status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -131,6 +131,39 @@ function semanticPositions(all,links,paths){
  gravityCache={key:signature,geo:{pos:pos,labels:[],width:width,height:height,unlinked:outside.length}};
  return gravityCache.geo;
 }
+/* Breadth-first search: ONLY authenticated, evidence-backed work-to-work
+ * links are navigable. Route length counts comparison hops, not semantic distance. */
+function shortestRoute(edges,start,end){
+ if(!start||!end)return null;
+ if(start===end)return {ids:[start],edges:[]};
+ var adj=new Map();
+ (Array.isArray(edges)?edges:[]).forEach(function(e){
+  if(!e||!e.a||!e.b||e.a===e.b)return;
+  if(!adj.has(e.a))adj.set(e.a,[]);
+  if(!adj.has(e.b))adj.set(e.b,[]);
+  adj.get(e.a).push({id:e.b,via:e});
+  adj.get(e.b).push({id:e.a,via:e});
+ });
+ var visited=new Set([start]),parent=new Map(),queue=[start],cursor=0,found=false;
+ while(cursor<queue.length&&!found){
+  var at=queue[cursor++];
+  for(const n of adj.get(at)||[]){
+   if(visited.has(n.id))continue;
+   visited.add(n.id);parent.set(n.id,{from:at,via:n.via});
+   if(n.id===end){found=true;break;}
+   queue.push(n.id);
+  }
+ }
+ if(!found)return null;
+ var ids=[end],steps=[],cur=end;
+ while(cur!==start){
+  var p=parent.get(cur);
+  if(!p)return null;
+  ids.push(p.from);steps.push(p.via);cur=p.from;
+ }
+ ids.reverse();steps.reverse();
+ return {ids:ids,edges:steps};
+}
 function wordLinks(){
  return connections().slice(0,600).map(function(e){
   return {a:e.a,b:e.b,kind:'word',topic:e.shared.slice(0,3).join('・'),
@@ -166,7 +199,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
@@ -200,7 +233,7 @@ function graphSVG(){
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
  var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,normalize(records,all),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
- var path=activePath(all),inPath=new Set(path?path.ids:[]);
+ var path=activePath(all),inPath=new Set(path?path.ids:[]),onJourney=new Set(state.journey?state.journey.ids:[]);
  var available=new Set(nodes.map(function(w){return w.id;}));
  var filtered=edges.filter(function(e){return available.has(e.a)&&available.has(e.b);});
  var hot=related(filtered,picked?.id),chosenNeighbors=new Set(hot.map(function(e){return e.a===picked.id?e.b:e.a;}));
@@ -219,6 +252,7 @@ function graphSVG(){
  }).join('');
  var route=path?path.ids.filter(function(id){return geo.pos.has(id);}).map(function(id){return geo.pos.get(id);}):[];
  var pathLines=route.slice(1).map(function(p,i){var a=route[i];return '<line class="semantic-theme-route" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'"/>';}).join('');
+ var journeyLines=state.journey?state.journey.ids.slice(1).map(function(id,i){var a=geo.pos.get(state.journey.ids[i]),b=geo.pos.get(id);return a&&b?'<line class="semantic-journey-route" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/>':'';}).join(''):'';
  var trail=state.history.slice(-7).filter(function(id){return geo.pos.has(id);}).map(function(id){return geo.pos.get(id);});
  var traces=trail.slice(1).map(function(p,i){var a=trail[i];return '<line class="semantic-trail" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'"/>';}).join('');
  var labels=geo.labels.map(function(g,i){
@@ -227,18 +261,18 @@ function graphSVG(){
  var stars=nodes.map(function(w){
   var p=geo.pos.get(w.id);if(!p)return '';
   var active=w.id===picked?.id,neighbor=chosenNeighbors.has(w.id),match=wanted.has(w.id);
-  var onPath=inPath.has(w.id);
-  var show=state.scope==='near'||active||onPath||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
-  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(path&&!onPath&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
+  var onPath=inPath.has(w.id),inJourney=onJourney.has(w.id);
+  var show=state.scope==='near'||active||onPath||inJourney||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
+  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
-  var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
+  var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
   // hit bounding box into the empty sky, where the SVG background intercepts clicks.
   return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/><circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
  }).join('');
- return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+traces+stars+'</svg>';
+ return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
-renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';}return graphSVG();};
+renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,items=allCollections(all),paths=normalizePaths(pathRows,all);
  var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
@@ -250,6 +284,38 @@ function controls(){
  '<div class="semantic-layout-toolbar"><span>星の並び方</span><div class="semantic-switches"><button type="button" data-semantic-layout="album" class="'+(state.layout==='album'?'active':'')+'">作品集ごと</button><button type="button" data-semantic-layout="gravity" class="'+(state.layout==='gravity'?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>意味の星空</button></div><small>'+(state.layout==='gravity'?'精読の直接比較と星座の順路をもとに配置。線のない作品は外周に残します。':'収録作品集の位置関係です。')+'</small></div>'+
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
+}
+function journeyPanel(w,all){
+ var start=all.find(function(x){return x.id===state.journeyStart;});
+ var route=state.journey;
+ var btn='<div class="semantic-journey-actions"><button type="button" data-semantic-action="journey-start"'+(status!=='ready'?' disabled':'')+'>この星を出発点にする</button>';
+ if(start){
+  btn+='<button type="button" data-semantic-action="journey-connect"'+(status!=='ready'||start.id===w.id?' disabled':'')+'>出発点からこの星へ結ぶ</button>'+
+   '<button type="button" data-semantic-action="journey-clear">道筋を消す</button>';
+ }
+ btn+='</div>';
+ var summary=start?'<p class="semantic-journey-hint">出発点：<strong>'+safe(start.title)+'</strong>。別の星を選び、「この星へ結ぶ」を押してください。</p>':
+ '<p class="semantic-journey-hint">気になる一曲を出発点に設定し、次に別の星を選びます。</p>';
+ var routeHtml='';
+ if(route&&route.ids.length){
+  var first=all.find(function(x){return x.id===route.ids[0];});
+  var last=all.find(function(x){return x.id===route.ids[route.ids.length-1];});
+  routeHtml='<div class="semantic-journey-result" aria-live="polite"><strong>'+safe(first?.title||'出発の星')+' から '+safe(last?.title||'到着の星')+' へ</strong>'+
+   '<p>'+route.edges.length+'組の作品間比較をたどる最短の道筋です。作品を選ぶと個別の精読を確認できます。</p><ol>';
+  route.ids.forEach(function(id,i){
+   var item=all.find(function(x){return x.id===id;});
+   if(!item)return;
+   var e=i?route.edges[i-1]:null;
+   routeHtml+='<li>'+ (e?'<div class="semantic-journey-edge">比較のテーマ：'+safe(e.topic||'作品間の比較')+' <small>('+safe(e.kind==='counterpoint'?'対照':e.kind==='reframing'?'意味の変化':e.kind==='text_overlap'?'再用・別版':'共鳴・関係')+')</small></div>':'')+
+    '<button type="button" data-star-focus="'+safe(id)+'">'+(i+1)+'. '+safe(item.title)+'</button>'+
+    (e?'<details><summary>この二曲がつながる根拠</summary><p>'+safe(e.observation||'')+'</p><p>'+safe(e.interpretation||'')+'</p></details>':'')+
+    '</li>';
+  });
+  routeHtml+='</ol><p class="semantic-caution">これは登録された比較を最少本数でたどる経路です。制作意図や意味の近さを数値化した順位ではありません。</p></div>';
+ }else if(state.journeyMessage){
+  routeHtml='<p class="semantic-journey-hint" role="status">'+safe(state.journeyMessage)+'</p>';
+ }
+ return '<section class="semantic-journey-panel"><div class="eyebrow">STAR TO STAR / 星から星へ</div><h3>二曲のつながりを探す</h3>'+summary+btn+routeHtml+'</section>';
 }
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
@@ -277,7 +343,7 @@ selectedWorkCard=function(){
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
- thematic+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
+ thematic+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
  '<div class="semantic-panel-actions"><button class="btn primary" data-open="'+safe(w.id)+'">原文を読む</button><button class="btn" data-deep-work="'+safe(w.id)+'">精読を読む</button></div>'+
  '<h3>つながっている作品</h3>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
  (links.length>7?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-7)+'組を見る')+'</button>':'')+'</div>';
@@ -292,7 +358,7 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];state.path='';state.history=[];gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
@@ -301,7 +367,7 @@ render=function(){
 };
 async function loadLinks(user,epoch){
  if(!user?.id||!cloudClient)return;
- status='loading';records=[];problem='';render();
+ status='loading';records=[];state.journeyStart='';state.journey=null;state.journeyMessage='';problem='';render();
  try{
   var res=await cloudClient.from('lyric_cross_readings')
    .select('link_key,topic,relation_type,left_work_id,right_work_id,evidence_left,evidence_right,observation,interpretation,alternative')
@@ -343,6 +409,14 @@ document.addEventListener('click',function(event){
  if(target.hasAttribute('data-semantic-scope')){state.scope=target.dataset.semanticScope==='near'?'near':'all';repaint();centerSelected();return;}
  var action=target.dataset.semanticAction;
  if(action==='more'){state.expanded=!state.expanded;repaint();return;}
+ if(action==='journey-start'){state.journeyStart=selected;state.journey=null;state.journeyMessage='';repaint();return;}
+ if(action==='journey-clear'){state.journeyStart='';state.journey=null;state.journeyMessage='';repaint();return;}
+ if(action==='journey-connect'){
+  if(status!=='ready'||!state.journeyStart||state.journeyStart===selected)return;
+  state.journey=shortestRoute(normalize(records,userWorks()),state.journeyStart,selected);
+  state.journeyMessage=state.journey?'':'この二曲をつなぐ直接比較の道筋は、まだ見つかりません。';
+  state.scope='all';state.mode='meaning';repaint();centerSelected();return;
+ }
  if(action==='prev'){
   var path=activePath(userWorks());if(path){
    var i=path.ids.indexOf(selected);selectStar(path.ids[(i+path.ids.length-1)%path.ids.length]);
@@ -363,7 +437,7 @@ document.addEventListener('click',function(event){
   if(!options.length)options=all.map(function(w){return w.id;}).filter(function(id){return id!==selected;});
   if(options.length)selectStar(options[Math.floor(Math.random()*options.length)]);return;
  }
- if(action==='reset'){state.collection='';state.search='';state.path='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
+ if(action==='reset'){state.collection='';state.search='';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
  if(action==='search'){
   state.search=document.getElementById('semanticStarSearch')?.value.trim()||'';
   var found=userWorks().find(function(w){return w.title.toLocaleLowerCase('ja').includes(state.search.toLocaleLowerCase('ja'));});
