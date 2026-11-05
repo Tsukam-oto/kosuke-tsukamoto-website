@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
-  "rulebookVersion": "1.4",
-  "lastUpdated": "2026-11-04",
+  "rulebookVersion": "2.7",
+  "lastUpdated": "2026-11-05",
   "authoritativeSource": "Google Docs",
   "rulebookUrl": "https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit",
   "mode": "private_drafts_only",
   "unattended_publication": false,
-  "statement": "本人が気になりAIと調べた問いを、原資料の該当箇所に照らし、実名で誠実に共有する。主張が未照合なら公開しない。実装されていない自動検証を稼働中と扱わない。",
+  "statement": "束元康介がAIと対話し、面白そうだから試し、使いにくさを発見して改善した実践や、音楽・創作・映画等への実際の関心を、確認可能な根拠とともに共有する。投稿数はノルマにしない。本人の経験や反応を捏造せず、未承認・未照合なら公開しない。",
   "sourcePolicy": {
     "allowed": [
       "explicitly approved public-safe editorial records",
@@ -27,28 +27,33 @@
   "magazines": [
     {
       "id": "ai-work",
-      "goalPerWeek": 2,
-      "readers": "AIで仕事を改善したい人"
+      "goalPerWeek": null,
+      "readers": "AIで仕事を改善したい人",
+      "legacyClassification": true
     },
     {
       "id": "music-education",
-      "goalPerWeek": 2,
-      "readers": "音楽教育関係者"
+      "goalPerWeek": null,
+      "readers": "音楽教育関係者",
+      "legacyClassification": true
     },
     {
       "id": "composing",
-      "goalPerWeek": 1,
-      "readers": "音楽制作に興味のある人"
+      "goalPerWeek": null,
+      "readers": "音楽制作に興味のある人",
+      "legacyClassification": true
     },
     {
       "id": "knowledge",
-      "goalPerWeek": 1,
-      "readers": "音楽理論・歴史・知識探究の読者"
+      "goalPerWeek": null,
+      "readers": "音楽理論・歴史・知識探究の読者",
+      "legacyClassification": true
     },
     {
       "id": "tools",
-      "goalPerWeek": 1,
-      "readers": "実用教材・ICTツールを必要とする人"
+      "goalPerWeek": null,
+      "readers": "実用教材・ICTツールを必要とする人",
+      "legacyClassification": true
     }
   ],
   "articleFormats": {
@@ -126,8 +131,8 @@
     "publishedRequiresPublicUrl": true
   },
   "targetCadence": {
-    "startPerWeek": 4,
-    "steadyPerWeek": 7,
+    "startPerWeek": null,
+    "steadyPerWeek": null,
     "indicators": [
       "quality",
       "unverified-claims",
@@ -135,7 +140,9 @@
       "human-input-minutes",
       "private-draft-inventory",
       "7-day-pageviews"
-    ]
+    ],
+    "required": false,
+    "policy": "no_fixed_publication_quota"
   },
   "featureStatus": {
     "currentlyImplemented": [
@@ -205,12 +212,12 @@
     "humanAndSourceReviewStillRequired": true
   },
   "editorialIdentity": {
-    "publicByline": "the real-name author; never impersonate a researcher",
-    "stance": "share questions the author actually pursued and things learned with AI after source-level verification",
-    "correctionNotice": "Invite factual corrections with evidence; investigate, correct, and log changes",
-    "correctionNoticeRequiresWorkingChannel": true,
-    "noInventedFirstPersonExperiences": true,
-    "noMandatoryAIDisclosureFormula": true
+    "author": "束元康介",
+    "separateAiPersona": false,
+    "brandName": "undecided-no-new-brand",
+    "principle": "面白いから試す。使いにくいから直す。できたら共有する。",
+    "charterUrl": "https://docs.google.com/document/d/1D6LS2uhaD5v12Ky_DtAIh1pRRrfUlBEPabatDqp_A-U/edit",
+    "sourceOfTruth": "author-approved real practice and verified source material"
   },
   "topicSelection": {
     "priority": [
@@ -234,5 +241,34 @@
     ],
     "prohibitPublicAIImageGenerationShowcase": true,
     "useOnlyVerifiedActualAchievements": true
+  },
+  "editorialEntrances": [
+    {
+      "id": "made",
+      "name": "つくってみた"
+    },
+    {
+      "id": "improved",
+      "name": "使いにくいから、直してみた"
+    },
+    {
+      "id": "creation",
+      "name": "作ること、考えること"
+    },
+    {
+      "id": "curiosity",
+      "name": "気になったから、調べてみた"
+    }
+  ],
+  "sales": {
+    "currentStage": "practice-sharing-and-private-product-preparation",
+    "paidSalesEnabled": false,
+    "requireAuthorPermissionAndRightsCheck": true,
+    "forbiddenUntilAuthorized": [
+      "payments",
+      "paid-product-offers",
+      "preorders",
+      "paid-license-fulfillment"
+    ]
   }
 }
