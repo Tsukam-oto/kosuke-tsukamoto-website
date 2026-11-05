@@ -287,3 +287,48 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
  .semantic-atlas-overlapping button{flex:1 1 100%}
 }
 @media(prefers-reduced-motion:reduce){.semantic-overlap-ring{filter:none}}
+
+
+/* 星座の星空: 共通出典を持つ読解テーマだけを結ぶ縮約グラフ。 */
+.semantic-network{margin-top:16px;padding:13px;border:1px solid #64577f;background:linear-gradient(135deg,#121629,#21172e);border-radius:13px;color:#f5e9fb}
+.semantic-network-heading{display:flex;gap:12px;align-items:flex-start;justify-content:space-between;flex-wrap:wrap}
+.semantic-network-heading>div{flex:1 1 220px}
+.semantic-network-heading h3{color:#fce6ff;font-size:16px;margin:0 0 6px}
+.semantic-network-heading p{color:#d9c9e7;font-size:11px;line-height:1.75;margin:0}
+.semantic-network-heading>button{border:1px solid #8d74a9;background:#3a3050;color:#fff3ff;padding:8px 11px;border-radius:8px;min-height:39px;font-size:11px;font-weight:750}
+.semantic-network-content{margin-top:12px}
+.semantic-network-scroller{background:radial-gradient(ellipse at 50% 45%,#38304e 0,#161629 65%,#101322 100%);border:1px solid #4e4768;border-radius:10px;overflow-x:auto;overflow-y:hidden;max-width:100%}
+.semantic-network-svg{display:block;min-width:850px;width:100%;height:auto;max-width:none}
+.semantic-network-edge{stroke:#8d7ba8;stroke-width:1.2;stroke-opacity:.24;pointer-events:none}
+.semantic-network-edge.focused{stroke:#ffe4ac;stroke-width:2.3;stroke-opacity:.85;filter:drop-shadow(0 0 3px #f4d58c);pointer-events:none}
+.semantic-network-star{cursor:pointer}
+.semantic-network-star .semantic-network-hit{fill:transparent;pointer-events:all}
+.semantic-network-star .semantic-network-halo{fill:#868ad0;opacity:.19;pointer-events:none}
+.semantic-network-star .semantic-network-core{fill:#b9b6ff;stroke:#e0d7ff;stroke-width:1.2;pointer-events:none}
+.semantic-network-star.collection .semantic-network-halo{fill:#deb6c6}
+.semantic-network-star.collection .semantic-network-core{fill:#ffdfdf;stroke:#ffe7ed}
+.semantic-network-star.connected .semantic-network-halo{opacity:.38;fill:#ffdea5}
+.semantic-network-star.connected .semantic-network-core{fill:#ffe4be;stroke:#fff8e0}
+.semantic-network-star.selected .semantic-network-halo{fill:#ffe19f;opacity:.65;filter:drop-shadow(0 0 9px #ffe2a0)}
+.semantic-network-star.selected .semantic-network-core{fill:#fff8d9;stroke:#ffdf82;stroke-width:2}
+.semantic-network-star.isolated .semantic-network-core{fill:#b3b7c7;stroke:#d7d9e2}
+.semantic-network-star text{fill:#d7c9e5;font-size:10px;font-weight:650;paint-order:stroke;stroke:#20182d;stroke-width:2.8;pointer-events:none}
+.semantic-network-star.selected text{fill:#fff2c6;font-size:11px;font-weight:850}
+.semantic-network-star.connected text{fill:#f8e6d0}
+.semantic-network-star:focus-visible{outline:none}
+.semantic-network-star:focus-visible .semantic-network-halo{stroke:#fff1ac;stroke-width:3;opacity:.95}
+.semantic-network-detail{display:grid;grid-template-columns:minmax(180px,1fr) minmax(250px,1.2fr);gap:12px;margin-top:12px;padding:12px;background:#f9f5fc;border-radius:10px;color:#382b44}
+.semantic-network-detail>div:first-child{grid-row:span 2;min-width:0}
+.semantic-network-detail small{font-size:10px;color:#806a90;font-weight:700}
+.semantic-network-detail h4{margin:6px 0 8px;color:#4b2f61;font-size:15px;line-height:1.5;overflow-wrap:anywhere}
+.semantic-network-detail p{font-size:11px;color:#564862;line-height:1.75;margin:5px 0 9px}
+.semantic-network-detail .semantic-network-stat{font-weight:700;font-size:10px;color:#795e8d}
+.semantic-network-relations{display:flex;flex-direction:column;gap:6px;min-width:0}
+.semantic-network-relations button{background:#fff;border:1px solid #d9c6e7;padding:8px 10px;border-radius:8px;text-align:left;min-height:41px}
+.semantic-network-relations button strong{color:#5d3c71;font-size:10px;line-height:1.5;display:block}
+.semantic-network-relations button small{color:#816d8c;font-size:9px;line-height:1.5;display:block;font-weight:400;margin-top:3px}
+.semantic-network-read{grid-column:2;background:#68457e;border:1px solid #68457e;border-radius:8px;color:#fff;min-height:41px;padding:8px 12px;font-size:11px;font-weight:800}
+.semantic-network-note{color:#d9c7e7;font-size:9px;line-height:1.7;margin:9px 0 0}
+.semantic-network button:focus-visible{outline:2px solid #f6cc89;outline-offset:2px}
+@media(max-width:760px){.semantic-network{padding:10px}.semantic-network-heading h3{font-size:15px}.semantic-network-svg{width:960px;min-width:960px}.semantic-network-detail{grid-template-columns:minmax(0,1fr);gap:9px;padding:10px}.semantic-network-detail>div:first-child{grid-row:auto}.semantic-network-read{grid-column:auto}.semantic-network-relations button{min-height:42px}}
+@media(prefers-reduced-motion:reduce){.semantic-network-edge.focused,.semantic-network-star.selected .semantic-network-halo{filter:none}}
