@@ -28,7 +28,7 @@ async function run(mobile){
   assert.match(await page.locator('.starfield-empty').innerText(),/非公開/);
   assert.equal(await page.locator('.semantic-star').count(),0,'never reveal private stars when signed out');
   await page.evaluate(async()=>{
-   const catalog=[],texts=[],relations=[],themes=[];
+   const catalog=[],texts=[],relations=[],themes=[],judgments=[];
    const uid='fictional-user';let n=168;
    for(let i=0;i<n;i++){
     const id='fictional-'+String(i).padStart(3,'0');
@@ -56,9 +56,24 @@ async function run(mobile){
        {kind:'note',source_id:'private-draft'},
        {kind:'work',source_id:'fictional-095',quote:'音楽のある生活が続く',observation:'第三の星の読み',technique:'反復'}]});
     cloudEpoch++;cloudUser={id:uid};const epoch=cloudEpoch;
-   cloudClient={from(table){return {select(){return this},eq(){return this},not(){return this},
+   cloudClient={from(table){return {
+    pendingWrite:null,
+    upsert(row){this.pendingWrite=row;return this},
+    select(){
+     if(this.pendingWrite){
+      if(table!=='lyric_author_link_judgments')return Promise.resolve({data:null,error:{message:'Wrong write table'}});
+      const row={...this.pendingWrite};
+      const i=judgments.findIndex(x=>x.link_key===row.link_key);
+      if(i>=0)judgments[i]=row;else judgments.push(row);
+      return Promise.resolve({data:[row],error:null});
+     }
+     return this;
+    },
+    eq(){return this},not(){return this},
     order(){return table==='lyric_master_works'?Promise.resolve({data:catalog,error:null}):this},
-    limit(){return Promise.resolve({data:table==='lyric_cross_readings'?relations:table==='lyric_close_reading_paths'?themes:texts,error:null})}
+    limit(){return Promise.resolve({data:table==='lyric_cross_readings'?relations:
+       table==='lyric_close_reading_paths'?themes:
+       table==='lyric_author_link_judgments'?judgments:texts,error:null})}
    }}};
    await loadMasterReadingCorpus(cloudUser,epoch);
   });
@@ -69,6 +84,25 @@ async function run(mobile){
   const targetRelation=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'});
   await targetRelation.locator('details summary').click();
   assert.match(await targetRelation.locator('details').innerText(),/架空の精読仮説/);
+  assert.match(await page.locator('.semantic-status').innerText(),/確認した思い 0組/);
+  const review=targetRelation.locator('.semantic-author-review');
+  assert.match(await review.innerText(),/未確認・保存されていません/);
+  await review.locator('[data-author-note]').fill('原文を見て、私はこの思いがつながると感じる <script>alert(1)</script>');
+  await review.locator('[data-author-decision="confirmed"]').click();
+  assert.match(await page.locator('.semantic-status').innerText(),/確認した思い 1組/);
+  assert.equal(await page.locator('.semantic-link.author-confirmed').count(),1,'only explicitly affirmed link receives gold');
+  assert.equal(await page.locator('.semantic-star.author-affirmed').count(),2,'both endpoints of the affirmed feeling shine');
+  assert.equal(await page.locator('.semantic-author-review script').count(),0,'owner note must remain inert text');
+  await page.locator('[data-semantic-line-view="confirmed"]').click();
+  assert.equal(await page.locator('.semantic-link').count(),1,'confirmed-only mode must hide unreviewed links');
+  await page.locator('[data-semantic-line-view="all"]').click();
+  const secondRelation=page.locator('.semantic-related').filter({hasText:'対照として読む'});
+  await secondRelation.locator('.semantic-author-review [data-author-note]').fill('この線は、まだ違う意味に思えます。');
+  await secondRelation.locator('[data-author-decision="different"]').click();
+  assert.equal(await page.locator('.semantic-link.author-different').count(),1);
+  assert.match(await page.locator('.semantic-status').innerText(),/別の思いに見える線 1組/);
+  const savedNote=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'}).locator('[data-author-note]');
+  assert.match(await savedNote.inputValue(),/この思いがつながる/,'saved author note returns on redraw');
   assert.equal(await page.locator('.semantic-stars-svg img').count(),0,'private title must not become an HTML image element');
   assert.match(await page.locator('.semantic-stars-svg').innerHTML(),/&lt;img/,'unsafe characters must be escaped');
   await page.locator('.semantic-star[data-star-focus="master-fictional-050"] .semantic-star-hit').click();
@@ -131,11 +165,12 @@ async function run(mobile){
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();
    return {leak:document.getElementById('screen').textContent.includes('検証曲001'),
-    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),remaining:document.querySelectorAll('.semantic-star').length};
+    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),reviewLeak:document.getElementById('screen').textContent.includes('原文を見て、私はこの思い'),remaining:document.querySelectorAll('.semantic-star').length};
   });
   assert.equal(after.leak,false,'private star names vanish after logout');
   assert.equal(after.stored,false,'private star data is not stored in local storage');
    assert.equal(after.themeLeak,false,'private thematic path never remains on logout');
+   assert.equal(after.reviewLeak,false,'private author notes never remain on logout');
   assert.equal(after.remaining,0,'private stars vanish after logout');
   assert.equal(errors.length,0,'uncaught browser JS errors: '+errors.join(' | '));
   console.log('semantic starfield PASS '+(mobile?'mobile':'desktop')+

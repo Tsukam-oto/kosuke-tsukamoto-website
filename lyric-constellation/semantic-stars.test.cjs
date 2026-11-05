@@ -107,3 +107,13 @@ assert.equal(stars.shortestRoute(edges,'master-2','master-8'),null,'unconnected 
 assert.deepEqual(Array.from(stars.shortestRoute(edges,'master-1','master-1').ids),['master-1'],'start equals end');
 assert.equal(stars.shortestRoute(edges,'','master-2'),null,'requires two real endpoints');
 console.log('shortest journey: verified link-only two-hop route, no hallucinated edge, graceful disconnected handling');
+
+
+assert.equal(stars.reviewChoiceLabel('confirmed'),'この思いはつながる');
+assert.equal(stars.reviewChoiceLabel('different'),'別の思いに見える');
+assert.equal(stars.reviewChoiceLabel('rejected'),'この線は違う');
+assert.equal(stars.reviewChoiceLabel('pending'),'まだ判断していない');
+assert.equal(stars.isJudgmentDecision('confirmed'),true);
+assert.equal(stars.isJudgmentDecision('rejected'),true);
+assert.equal(stars.isJudgmentDecision('invalid'),false);
+console.log('author intention: all decisions are explicit, no automatic confirmation');
