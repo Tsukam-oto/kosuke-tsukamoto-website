@@ -632,7 +632,7 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.discoveryFilter='all';state.discoveryIndex=0;state.atlasFilter='themes';state.atlasOffset=0;state.atlasNetworkChoice='';state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
@@ -720,7 +720,17 @@ loadMasterReadingCorpus=async function(user,epoch){
  if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch),loadAuthorJudgments(user,epoch)]);
 };
 document.addEventListener('click',function(event){
- var target=event.target.closest('[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ var target=event.target.closest('[data-atlas-network-toggle],[data-atlas-network-select],[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ if(target.hasAttribute('data-atlas-network-toggle')){
+  state.atlasNetworkOpen=target.dataset.atlasNetworkToggle==='show';repaint();return;
+ }
+ if(target.hasAttribute('data-atlas-network-select')){
+  var id=target.dataset.atlasNetworkSelect;
+  if(normalizePaths(pathRows,userWorks()).some(function(p){return p.id===id;})){
+   state.atlasNetworkChoice=id;repaint();
+  }
+  return;
+ }
  if(target.hasAttribute('data-atlas-filter')){
   state.atlasFilter=['themes','collections','star','all'].includes(target.dataset.atlasFilter)?target.dataset.atlasFilter:'themes';
   state.atlasOffset=0;repaint();return;
@@ -737,7 +747,7 @@ document.addEventListener('click',function(event){
  if(target.hasAttribute('data-atlas-open')){
   var id=target.dataset.atlasOpen,path=normalizePaths(pathRows,userWorks()).find(function(p){return p.id===id;});
   if(!path)return;
-  state.path=path.id;state.scope='all';state.mode='meaning';state.discoveryOpen=false;
+  state.path=path.id;state.atlasNetworkChoice=path.id;state.scope='all';state.mode='meaning';state.discoveryOpen=false;
   state.atlasOffset=0;selectStar(path.ids[0]);return;
  }
  if(target.hasAttribute('data-author-decision')){var panel=target.closest('[data-author-review]');if(panel)saveAuthorJudgment(panel.getAttribute('data-author-review'),target.dataset.authorDecision,panel);return;}
@@ -782,7 +792,7 @@ document.addEventListener('click',function(event){
   if(!options.length)options=all.map(function(w){return w.id;}).filter(function(id){return id!==selected;});
   if(options.length)selectStar(options[Math.floor(Math.random()*options.length)]);return;
  }
- if(action==='reset'){state.collection='';state.search='';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
+ if(action==='reset'){state.collection='';state.search='';state.path='';state.atlasNetworkChoice='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
  if(action==='search'){
   state.search=document.getElementById('semanticStarSearch')?.value.trim()||'';
   var found=userWorks().find(function(w){return w.title.toLocaleLowerCase('ja').includes(state.search.toLocaleLowerCase('ja'));});
@@ -792,9 +802,13 @@ document.addEventListener('click',function(event){
 });
 document.addEventListener('change',function(event){
  if(event.target.id==='semanticCollection'){state.collection=event.target.value;repaint();}
- if(event.target.id==='semanticPath'){state.path=event.target.value;state.scope='all';state.collection='';state.search='';var p=activePath(userWorks());if(p){selectStar(p.ids[0]);}else repaint();}
+ if(event.target.id==='semanticPath'){state.path=event.target.value;state.atlasNetworkChoice=event.target.value;state.scope='all';state.collection='';state.search='';var p=activePath(userWorks());if(p){selectStar(p.ids[0]);}else repaint();}
 });
 document.addEventListener('keydown',function(event){
+ if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-network-star[data-atlas-network-select]')){
+  event.preventDefault();var id=event.target.closest('[data-atlas-network-select]').dataset.atlasNetworkSelect;
+  if(normalizePaths(pathRows,userWorks()).some(function(p){return p.id===id;})){state.atlasNetworkChoice=id;repaint();}
+ }
  if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-star[data-star-focus],.semantic-star-name[data-star-focus]')){event.preventDefault();selectStar(event.target.closest('[data-star-focus]').dataset.starFocus);}
  if(event.key==='Enter'&&event.target.id==='semanticStarSearch'&&!event.isComposing){event.preventDefault();document.querySelector('[data-semantic-action="search"]')?.click();}
 });
