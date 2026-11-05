@@ -65,8 +65,12 @@ async function run(mobile){
   assert.match(await targetRelation.locator('details').innerText(),/架空の精読仮説/);
   assert.equal(await page.locator('.semantic-stars-svg img').count(),0,'private title must not become an HTML image element');
   assert.match(await page.locator('.semantic-stars-svg').innerHTML(),/&lt;img/,'unsafe characters must be escaped');
-  await page.locator('[data-star-focus="master-fictional-050"]').first().click();
+  await page.locator('.semantic-star[data-star-focus="master-fictional-050"] .semantic-star-hit').click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/);
+  await page.locator('.semantic-star-name[data-star-focus="master-fictional-000"]').click();
+  assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/,'tap on title should select the star');
+  await page.locator('.semantic-star-name[data-star-focus="master-fictional-050"]').press('Enter');
+  assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/,'keyboard selection of the star label works');
   await page.locator('[data-semantic-scope="near"]').click();
   assert.ok(await page.locator('.semantic-star').count()<168,'near view limits the visible neighborhood');
   await page.locator('[data-semantic-scope="all"]').click();
