@@ -398,6 +398,55 @@ function controls(){
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
+function atlasNetworkPanel(paths,all){
+ if(!paths.length)return '';
+ var model=constellationNetwork(paths);
+ var active=paths.find(function(p){return p.id===state.atlasNetworkChoice;})||
+  paths.find(function(p){return p.id===state.path;})||paths[0];
+ var activeId=active.id,neighbors=model.edges.filter(function(e){return e.a===activeId||e.b===activeId;});
+ var adjacent=new Set(neighbors.map(function(e){return e.a===activeId?e.b:e.a;}));
+ var basic=model.edges.filter(function(e){return e.n>=2&&e.a!==activeId&&e.b!==activeId;})
+  .slice(0,52).map(function(e){
+   var a=model.position.get(e.a),b=model.position.get(e.b);
+   return '<line class="semantic-network-edge" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"><title>'+e.n+'作品を共有</title></line>';
+  }).join('');
+ var focused=neighbors.map(function(e){
+  var a=model.position.get(e.a),b=model.position.get(e.b);
+  return '<line class="semantic-network-edge focused" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"><title>'+e.n+'作品を共有</title></line>';
+ }).join('');
+ var stars=model.nodes.map(function(n){
+  var current=n.id===activeId,near=adjacent.has(n.id),isolated=model.isolated.includes(n.id);
+  var short=n.title.split('｜').slice(-1)[0].slice(0,9);
+  return '<g class="semantic-network-star '+n.kind+(current?' selected':'')+(near?' connected':'')+(isolated?' isolated':'')+
+   '" data-atlas-network-select="'+safe(n.id)+'" role="button" tabindex="0" aria-label="'+safe(n.title)+'：'+n.n+'作品の星座を選ぶ">'+
+   '<title>'+safe(n.title)+'（'+n.n+'作品）</title>'+
+   '<circle class="semantic-network-hit" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="20"/>'+
+   '<circle class="semantic-network-halo" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+(current?16:near?13:10)+'"/>'+
+   '<circle class="semantic-network-core" cx="'+n.x.toFixed(1)+'" cy="'+n.y.toFixed(1)+'" r="'+(current?8:near?6.2:4.7)+'"/>'+
+   '<text x="'+n.x.toFixed(1)+'" y="'+(n.y+28).toFixed(1)+'" text-anchor="middle">'+safe(short)+'</text></g>';
+ }).join('');
+ var related=neighbors.slice(0,4).map(function(e){
+  var other=paths.find(function(p){return p.id===(e.a===activeId?e.b:e.a);});
+  if(!other)return '';
+  var names=e.shared.slice(0,2).map(function(id){return all.find(function(w){return w.id===id;})?.title||'';}).filter(Boolean);
+  return '<button type="button" data-atlas-network-select="'+safe(other.id)+'"><strong>'+safe(other.title)+'</strong>'+
+   '<small>'+e.n+'作品を共有'+(names.length?'：'+safe(names.join('・')):'')+'</small></button>';
+ }).join('');
+ return '<section class="semantic-network" aria-label="星座と星座のつながり">'+
+  '<div class="semantic-network-heading"><div><h3>星座の星空</h3>'+
+  '<p>一曲の思いが、別の星座への入口になります。線は二つの読解テーマが実際に共有する作品を示します。</p></div>'+
+  '<button type="button" data-atlas-network-toggle="'+(state.atlasNetworkOpen?'hide':'show')+'" aria-expanded="'+state.atlasNetworkOpen+'">'+
+  (state.atlasNetworkOpen?'地図を閉じる':'星座の地図を開く')+'</button></div>'+
+  (state.atlasNetworkOpen?'<div class="semantic-network-content"><div class="semantic-network-scroller">'+
+  '<svg class="semantic-network-svg" viewBox="0 0 '+model.width+' '+model.height+'" role="group" aria-label="共有する作品によって結ばれた'+paths.length+'個の星座。星を選ぶと別の星座との重なりが分かります。" xmlns="http://www.w3.org/2000/svg">'+
+  basic+focused+stars+'</svg></div>'+
+  '<div class="semantic-network-detail"><div><small>いま選んでいる星座</small><h4>'+safe(active.title)+'</h4>'+
+  '<p>'+safe(active.question||'この作品群で何がつながるでしょうか。')+'</p>'+
+  '<p class="semantic-network-stat">'+active.ids.length+'作品の星座。'+(neighbors.length?neighbors.length+'の別の星座と作品を共有します。':'他の星座とは共有作品がありません。')+'</p></div>'+
+  '<div class="semantic-network-relations">'+(related||'<p>この星座は独立した読解です。根拠のない線は追加しません。</p>')+'</div>'+
+  '<button type="button" data-atlas-open="'+safe(active.id)+'" class="semantic-network-read">この星座の作品を順に読む</button></div></div>':'')+
+  '<p class="semantic-network-note">淡い線＝2作品以上の共有。光る線＝選択中の星座と共有する作品（1作品以上）。直接的な曲同士の比較や作者の意図を表す線ではありません。</p></section>';
+}
 function atlasPanel(){
  if(!cloudUser)return '';
  var all=userWorks(),paths=normalizePaths(pathRows,all),member=membershipIndex(paths);
@@ -436,7 +485,7 @@ function atlasPanel(){
   '<div class="semantic-atlas-pager"><span>'+(start+1)+'–'+(start+subset.length)+' / '+list.length+'星座</span>'+
   '<button type="button" data-atlas-page="prev"'+(start===0?' disabled':'')+'>前の星座</button>'+
   '<button type="button" data-atlas-page="next"'+(start+pageSize>=list.length?' disabled':'')+'>次の星座</button></div></div>':empty)+other+
-  '<p class="semantic-atlas-note">星座はAIによる文学的な読解仮説です。同じ作品が現れても、二つの星座の主題が同一であるとは限りません。</p></section>';
+  '<p class="semantic-atlas-note">星座はAIによる文学的な読解仮説です。同じ作品が現れても、二つの星座の主題が同一であるとは限りません。</p>'+atlasNetworkPanel(paths,all)+'</section>';
 }
 function membershipsPanel(work,all){
  var paths=normalizePaths(pathRows,all).filter(function(p){return p.ids.includes(work.id);});
