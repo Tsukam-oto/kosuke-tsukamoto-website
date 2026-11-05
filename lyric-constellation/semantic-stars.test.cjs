@@ -192,3 +192,13 @@ const metaAgain=stars.constellationNetwork(mapDemo);
 assert.equal(meta.position.get('crossed').x,metaAgain.position.get('crossed').x,'constellation placement is stable');
 assert.equal(stars.constellationNetwork([]).nodes.length,0,'empty private data renders no stars');
 console.log('constellation meta-map: actual overlaps only, independent themes retained, accessible deterministic positions');
+
+
+const titleHits=stars.titleMatches(works,'架空の歌 1');
+assert.ok(titleHits.length>1,'a partial title can match multiple works');
+assert.equal(titleHits[0].title,'架空の歌 1','exact match has priority over partial results');
+assert.equal(stars.titleMatches(works,'存在しない曲').length,0,'unknown titles are not substituted with unrelated songs');
+assert.equal(stars.titleMatches(works,'　').length,0,'blank search does not return all songs');
+const widthMatches=stars.titleMatches([{id:'f',title:'ＡＢＣ',sky:'rap'}],'abc');
+assert.equal(widthMatches[0].id,'f','width normalization supports actual titles without changing stored source names');
+console.log('title search: multiple candidates, exact priority, Japanese width and empty results');
