@@ -285,6 +285,38 @@ function controls(){
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
+function journeyPanel(w,all){
+ var start=all.find(function(x){return x.id===state.journeyStart;});
+ var route=state.journey;
+ var btn='<div class="semantic-journey-actions"><button type="button" data-semantic-action="journey-start"'+(status!=='ready'?' disabled':'')+'>この星を出発点にする</button>';
+ if(start){
+  btn+='<button type="button" data-semantic-action="journey-connect"'+(status!=='ready'||start.id===w.id?' disabled':'')+'>出発点からこの星へ結ぶ</button>'+
+   '<button type="button" data-semantic-action="journey-clear">道筋を消す</button>';
+ }
+ btn+='</div>';
+ var summary=start?'<p class="semantic-journey-hint">出発点：<strong>'+safe(start.title)+'</strong>。別の星を選び、「この星へ結ぶ」を押してください。</p>':
+ '<p class="semantic-journey-hint">気になる一曲を出発点に設定し、次に別の星を選びます。</p>';
+ var routeHtml='';
+ if(route&&route.ids.length){
+  var first=all.find(function(x){return x.id===route.ids[0];});
+  var last=all.find(function(x){return x.id===route.ids[route.ids.length-1];});
+  routeHtml='<div class="semantic-journey-result" aria-live="polite"><strong>'+safe(first?.title||'出発の星')+' から '+safe(last?.title||'到着の星')+' へ</strong>'+
+   '<p>'+route.edges.length+'組の作品間比較をたどる最短の道筋です。作品を選ぶと個別の精読を確認できます。</p><ol>';
+  route.ids.forEach(function(id,i){
+   var item=all.find(function(x){return x.id===id;});
+   if(!item)return;
+   var e=i?route.edges[i-1]:null;
+   routeHtml+='<li>'+ (e?'<div class="semantic-journey-edge">比較のテーマ：'+safe(e.topic||'作品間の比較')+' <small>('+safe(e.kind==='counterpoint'?'対照':e.kind==='reframing'?'意味の変化':e.kind==='text_overlap'?'再用・別版':'共鳴・関係')+')</small></div>':'')+
+    '<button type="button" data-star-focus="'+safe(id)+'">'+(i+1)+'. '+safe(item.title)+'</button>'+
+    (e?'<details><summary>この二曲がつながる根拠</summary><p>'+safe(e.observation||'')+'</p><p>'+safe(e.interpretation||'')+'</p></details>':'')+
+    '</li>';
+  });
+  routeHtml+='</ol><p class="semantic-caution">これは登録された比較を最少本数でたどる経路です。制作意図や意味の近さを数値化した順位ではありません。</p></div>';
+ }else if(state.journeyMessage){
+  routeHtml='<p class="semantic-journey-hint" role="status">'+safe(state.journeyMessage)+'</p>';
+ }
+ return '<section class="semantic-journey-panel"><div class="eyebrow">STAR TO STAR / 星から星へ</div><h3>二曲のつながりを探す</h3>'+summary+btn+routeHtml+'</section>';
+}
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
  var available=userWorks(),w=available.find(function(x){return x.id===selected;})||available[0];if(!w)return '<div class="panel"><p class="desc">星を選ぶと、つながりの根拠が表示されます。非公開作品は本人ログイン後に読み込まれます。</p></div>';
@@ -311,7 +343,7 @@ selectedWorkCard=function(){
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
- thematic+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
+ thematic+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
  '<div class="semantic-panel-actions"><button class="btn primary" data-open="'+safe(w.id)+'">原文を読む</button><button class="btn" data-deep-work="'+safe(w.id)+'">精読を読む</button></div>'+
  '<h3>つながっている作品</h3>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
  (links.length>7?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-7)+'組を見る')+'</button>':'')+'</div>';
