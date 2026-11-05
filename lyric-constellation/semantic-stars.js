@@ -4,6 +4,7 @@
 'use strict';
 var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:false,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOpen:false,controlsExpanded:false,mapZoom:'fit',atlasOverlap:true,atlasNetworkOpen:false,atlasNetworkChoice:''};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewDrafts=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
+window.hasUnsavedStarReview=function(){return reviewDrafts.size>0;};
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
 
