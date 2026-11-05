@@ -365,6 +365,53 @@ function controls(){
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
+function atlasPanel(){
+ if(!cloudUser)return '';
+ var all=userWorks(),paths=normalizePaths(pathRows,all),member=membershipIndex(paths);
+ var sharedStars=[...member.values()].filter(function(a){return a.length>=2;}).length;
+ var filters=[['themes','思いの星座'],['collections','作品集の読解'],['star','この曲から'],['all','すべて']];
+ var chips=filters.map(function(f){var amount=atlasFiltered(paths,f[0],selected).length;
+  return '<button type="button" data-atlas-filter="'+f[0]+'" class="'+(state.atlasFilter===f[0]?'active':'')+'">'+safe(f[1])+' ('+amount+')</button>';
+ }).join('');
+ var list=atlasFiltered(paths,state.atlasFilter,selected),pageSize=5;
+ var start=Math.min(Math.max(0,state.atlasOffset),Math.max(0,list.length-pageSize));
+ var subset=list.slice(start,start+pageSize);
+ var cards=subset.map(function(p){
+  var crossings=p.ids.filter(function(id){return (member.get(id)||[]).length>=2;}).length;
+  var focus=p.ids.includes(selected),active=state.path===p.id;
+  return '<article class="semantic-atlas-card'+(active?' active':'')+'">'+
+   '<div class="semantic-atlas-card-meta"><span>'+safe(themeKind(p)==='collection'?'作品集を読む':'思いをたどる')+'</span><span>'+p.ids.length+'の星</span></div>'+
+   '<h3>'+safe(p.title)+'</h3><p>'+safe(p.question||'作品を結ぶ読解の問い')+'</p>'+
+   '<div class="semantic-atlas-card-bottom"><small>'+crossings+'作品が別の星座にも登場'+(focus?' ・いまの星を含む':'')+'</small>'+
+   '<button type="button" data-atlas-open="'+safe(p.id)+'">'+(active?'この星座をもう一度読む':'この星座をたどる')+'</button></div></article>';
+ }).join('');
+ var overlaps=intersectingConstellations(paths,state.path);
+ var other=state.path&&overlaps.length?'<div class="semantic-atlas-overlapping"><strong>選択中の星座から、別の星座へ</strong>'+
+  overlaps.slice(0,5).map(function(v){
+   var names=v.shared.slice(0,2).map(function(id){return all.find(function(w){return w.id===id;})?.title||'';}).filter(Boolean);
+   return '<button type="button" data-atlas-open="'+safe(v.path.id)+'">'+safe(v.path.title)+'<small>'+v.shared.length+'作品が重なる'+(names.length?'：'+safe(names.join('・')):'')+'</small></button>';
+  }).join('')+'</div>':'';
+ var empty=pathRows.length===0?'<p class="semantic-atlas-empty">ご本人の精読テーマを読み込み中です。ログイン後に複数の星座が表示されます。</p>':
+  '<p class="semantic-atlas-empty">この曲には、まだ横断的な星座がありません。別の曲を選ぶか、すべての星座をお選びください。</p>';
+ return '<section class="semantic-atlas" aria-label="星座図鑑"><div class="semantic-atlas-heading">'+
+  '<div><span class="semantic-atlas-kicker">CONSTELLATION ATLAS</span><h2>星座図鑑</h2>'+
+  '<p>同じ星も、見方を変えると別の星座になります。31の読解テーマから、根拠のある道筋を探します。</p></div>'+
+  '<div class="semantic-atlas-stats"><strong>'+paths.length+'</strong><span>複数作品の星座</span><strong>'+sharedStars+'</strong><span>二つ以上に属する星</span></div></div>'+
+  '<div class="semantic-atlas-toolbar"><div class="semantic-atlas-filters">'+chips+'</div>'+
+  '<button type="button" data-atlas-overlap="'+(state.atlasOverlap?'hide':'show')+'" class="semantic-atlas-overlap-toggle'+(state.atlasOverlap?' active':'')+'">'+(state.atlasOverlap?'重なる星を強調中':'重なる星を強調')+'</button></div>'+
+  (list.length?'<div class="semantic-atlas-carousel"><div class="semantic-atlas-cards">'+cards+'</div>'+
+  '<div class="semantic-atlas-pager"><span>'+(start+1)+'–'+(start+subset.length)+' / '+list.length+'星座</span>'+
+  '<button type="button" data-atlas-page="prev"'+(start===0?' disabled':'')+'>前の星座</button>'+
+  '<button type="button" data-atlas-page="next"'+(start+pageSize>=list.length?' disabled':'')+'>次の星座</button></div></div>':empty)+other+
+  '<p class="semantic-atlas-note">星座はAIによる文学的な読解仮説です。同じ作品が現れても、二つの星座の主題が同一であるとは限りません。</p></section>';
+}
+function membershipsPanel(work,all){
+ var paths=normalizePaths(pathRows,all).filter(function(p){return p.ids.includes(work.id);});
+ if(!paths.length)return '<div class="semantic-memberships"><h3>この星が属する星座</h3><p>この作品を含む横断的な星座は、まだありません。</p></div>';
+ return '<div class="semantic-memberships"><h3>この星が属する星座 <small>'+paths.length+'つ</small></h3><p>同じ作品の別の思いを読み比べられます。</p><div>'+
+ paths.map(function(p){return '<button type="button" data-atlas-open="'+safe(p.id)+'" class="'+(state.path===p.id?'active':'')+'">'+safe(p.title)+'</button>';}).join('')+
+ '</div></div>';
+}
 /* A reading encounter above the sky; all displayed quotes are source-bound
  * private comparison evidence. No personal lyrics are embedded in the public JS. */
 function discoveryPanel(){
@@ -488,7 +535,7 @@ selectedWorkCard=function(){
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
- thematic+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
+ thematic+membershipsPanel(w,available)+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
  '<div class="semantic-panel-actions"><button class="btn primary" data-open="'+safe(w.id)+'">原文を読む</button><button class="btn" data-deep-work="'+safe(w.id)+'">精読を読む</button></div>'+
  '<h3>つながっている作品</h3>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
  (links.length>7?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-7)+'組を見る')+'</button>':'')+'</div>';
@@ -496,7 +543,7 @@ selectedWorkCard=function(){
 viewConstellation=function(){
  var html=originalConstellation();
  if(sky!=='rap')return html;
- html=html.replace('<div class="constellation-scroll">',controls()+discoveryPanel()+'<div class="constellation-scroll semantic-star-viewport">');
+ html=html.replace('<div class="constellation-scroll">',controls()+atlasPanel()+discoveryPanel()+'<div class="constellation-scroll semantic-star-viewport">');
  html=html.replace(/代表40 \/ 全\d+ stars/g,userWorks().length+' stars');
  html=html.replace('<span>星図は代表40点。作品画面で全件を確認できます。</span>','<span>全作品を星として表示しています。</span>');
  html=html.replace('線＝主な共通語のつながり','線＝'+(state.mode==='meaning'?'精読による関係の仮説':'共通する文字列'));
