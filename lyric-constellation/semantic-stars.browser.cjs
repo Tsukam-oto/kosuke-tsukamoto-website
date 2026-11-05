@@ -28,7 +28,7 @@ async function run(mobile){
   assert.match(await page.locator('.starfield-empty').innerText(),/非公開/);
   assert.equal(await page.locator('.semantic-star').count(),0,'never reveal private stars when signed out');
   await page.evaluate(async()=>{
-   const catalog=[],texts=[],relations=[];
+   const catalog=[],texts=[],relations=[],themes=[];
    const uid='fictional-user';let n=168;
    for(let i=0;i<n;i++){
     const id='fictional-'+String(i).padStart(3,'0');
@@ -49,10 +49,13 @@ async function run(mobile){
      observation:'同じ日常への別の態度',interpretation:'仮説は一つではない',alternative:'異なる解釈'});
    relations.push({link_key:'bad',topic:'存在しない線',left_work_id:'fictional-000',right_work_id:'missing',
      evidence_left:'秘密',evidence_right:'秘密'});
-   cloudEpoch++;cloudUser={id:uid};const epoch=cloudEpoch;
+   themes.push({thread_key:'synthetic-care',title:'暮らしの星座',guiding_question:'ともに生きる時間はどう変わるのか？',
+      anchors:[{kind:'work',source_id:'fictional-000'},{kind:'work',source_id:'fictional-050'},
+        {kind:'note',source_id:'private-draft'},{kind:'work',source_id:'fictional-095'}]});
+    cloudEpoch++;cloudUser={id:uid};const epoch=cloudEpoch;
    cloudClient={from(table){return {select(){return this},eq(){return this},not(){return this},
     order(){return table==='lyric_master_works'?Promise.resolve({data:catalog,error:null}):this},
-    limit(){return Promise.resolve({data:table==='lyric_cross_readings'?relations:texts,error:null})}
+    limit(){return Promise.resolve({data:table==='lyric_cross_readings'?relations:table==='lyric_close_reading_paths'?themes:texts,error:null})}
    }}};
    await loadMasterReadingCorpus(cloudUser,epoch);
   });
@@ -78,19 +81,28 @@ async function run(mobile){
   await page.locator('#semanticStarSearch').fill('検証曲121');
   await page.locator('[data-semantic-action="search"]').click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/);
-  await page.locator('[data-semantic-mode="words"]').click();
+  await page.locator('#semanticPath').selectOption('synthetic-care');
+   assert.equal(await page.locator('.semantic-theme-route').count(),2,'guided path draws 2 dashed segments');
+   assert.equal(await page.locator('.semantic-star.in-theme').count(),3,'3 source-backed songs light up');
+   assert.match(await page.locator('.semantic-path-story').innerText(),/暮らしの星座/);
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/);
+   await page.locator('.semantic-path-story [data-semantic-action="next"]').click();
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/,'guided next song follows stored path order');
+   await page.locator('[data-semantic-mode="words"]').click();
   assert.match(await page.locator('.semantic-toolbar').innerText(),/共通語の線/);
   await page.locator('[data-semantic-mode="meaning"]').click();
   await page.locator('[data-semantic-action="reset"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168);
-  const after=await page.evaluate(()=>{
+  assert.equal(await page.locator('.semantic-theme-route').count(),0,'reset clears themed sky lines');
+   const after=await page.evaluate(()=>{
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();
    return {leak:document.getElementById('screen').textContent.includes('検証曲001'),
-    stored:local.includes('検証曲001'),remaining:document.querySelectorAll('.semantic-star').length};
+    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座'),remaining:document.querySelectorAll('.semantic-star').length};
   });
   assert.equal(after.leak,false,'private star names vanish after logout');
   assert.equal(after.stored,false,'private star data is not stored in local storage');
+   assert.equal(after.themeLeak,false,'private thematic path never remains on logout');
   assert.equal(after.remaining,0,'private stars vanish after logout');
   assert.equal(errors.length,0,'uncaught browser JS errors: '+errors.join(' | '));
   console.log('semantic starfield PASS '+(mobile?'mobile':'desktop')+
