@@ -1020,6 +1020,31 @@ async function startAuth(){try{const cli=ensureCloud();cli.auth.onAuthStateChang
 const {data,error}=await cli.auth.getSession();if(error)throw error;if(data?.session?.user)await startCloudSession(data.session.user);else setCloudStatus('端末内で利用中');
 }catch(err){console.warn('cloud auth initialization',err);setCloudStatus('ログイン機能を確認してください','pending');}}
 window.addEventListener('DOMContentLoaded',startAuth);
-if('serviceWorker' in navigator&&location.protocol==='https:')window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(err=>console.warn('SW registration',err)));
+if('serviceWorker' in navigator&&location.protocol==='https:'){
+ window.addEventListener('load',async()=>{
+  try{
+   const reg=await navigator.serviceWorker.register('./sw.js',{scope:'./',updateViaCache:'none'});
+   const notice=document.getElementById('appUpdate');
+   const showUpdate=()=>{if(notice)notice.hidden=false;};
+   let hadController=Boolean(navigator.serviceWorker.controller);
+   if(reg.waiting&&hadController)showUpdate();
+   navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(hadController)showUpdate();
+    hadController=true;
+   });
+   reg.addEventListener('updatefound',()=>{
+    const worker=reg.installing;
+    worker?.addEventListener('statechange',()=>{
+     if(worker.state==='installed'&&navigator.serviceWorker.controller)showUpdate();
+    });
+   });
+   notice?.addEventListener('click',()=>location.reload());
+   // A suspended tab can remain on an earlier version: check on return.
+   document.addEventListener('visibilitychange',()=>{
+    if(document.visibilityState==='visible')reg.update().catch(()=>{});
+   });
+  }catch(err){console.warn('SW registration',err);}
+ });
+}
 </script>
 </body></html>
