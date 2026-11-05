@@ -112,7 +112,7 @@ console.log('shortest journey: verified link-only two-hop route, no hallucinated
 assert.equal(stars.reviewChoiceLabel('confirmed'),'この思いはつながる');
 assert.equal(stars.reviewChoiceLabel('different'),'別の思いに見える');
 assert.equal(stars.reviewChoiceLabel('rejected'),'この線は違う');
-assert.equal(stars.reviewChoiceLabel('pending'),'まだ判断していない');
+assert.equal(stars.reviewChoiceLabel('pending'),'記録なし','an absent author note is not an unfinished task');
 assert.equal(stars.isJudgmentDecision('confirmed'),true);
 assert.equal(stars.isJudgmentDecision('rejected'),true);
 assert.equal(stars.isJudgmentDecision('invalid'),false);

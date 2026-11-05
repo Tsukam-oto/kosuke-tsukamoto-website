@@ -1,7 +1,7 @@
 /* Scoped to /lyric-constellation/. Private lyrics and auth/API requests are
  * NEVER intercepted. Prefer the network for code so stale JavaScript and CSS
  * cannot survive a manual page reload simply because old PWA assets exist. */
-const CACHE='lyric-constellation-v3.5';
+const CACHE='lyric-constellation-v3.6';
 const CORE=[
  './','./index.html','./deep-reading.js','./semantic-stars.js',
  './semantic-stars.css','./visual-refresh.css','./mummy-research.js',
