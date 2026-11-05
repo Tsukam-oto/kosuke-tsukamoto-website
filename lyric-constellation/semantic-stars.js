@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[]};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[],journeyStart:'',journey:null,journeyMessage:''};
 var records=[],pathRows=[],status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -131,6 +131,39 @@ function semanticPositions(all,links,paths){
  gravityCache={key:signature,geo:{pos:pos,labels:[],width:width,height:height,unlinked:outside.length}};
  return gravityCache.geo;
 }
+/* Breadth-first search: ONLY authenticated, evidence-backed work-to-work
+ * links are navigable. Route length counts comparison hops, not semantic distance. */
+function shortestRoute(edges,start,end){
+ if(!start||!end)return null;
+ if(start===end)return {ids:[start],edges:[]};
+ var adj=new Map();
+ (Array.isArray(edges)?edges:[]).forEach(function(e){
+  if(!e||!e.a||!e.b||e.a===e.b)return;
+  if(!adj.has(e.a))adj.set(e.a,[]);
+  if(!adj.has(e.b))adj.set(e.b,[]);
+  adj.get(e.a).push({id:e.b,via:e});
+  adj.get(e.b).push({id:e.a,via:e});
+ });
+ var visited=new Set([start]),parent=new Map(),queue=[start],cursor=0,found=false;
+ while(cursor<queue.length&&!found){
+  var at=queue[cursor++];
+  for(const n of adj.get(at)||[]){
+   if(visited.has(n.id))continue;
+   visited.add(n.id);parent.set(n.id,{from:at,via:n.via});
+   if(n.id===end){found=true;break;}
+   queue.push(n.id);
+  }
+ }
+ if(!found)return null;
+ var ids=[end],steps=[],cur=end;
+ while(cur!==start){
+  var p=parent.get(cur);
+  if(!p)return null;
+  ids.push(p.from);steps.push(p.via);cur=p.from;
+ }
+ ids.reverse();steps.reverse();
+ return {ids:ids,edges:steps};
+}
 function wordLinks(){
  return connections().slice(0,600).map(function(e){
   return {a:e.a,b:e.b,kind:'word',topic:e.shared.slice(0,3).join('・'),
@@ -166,7 +199,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
