@@ -320,7 +320,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,constellationNetwork:constellationNetwork,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,constellationNetwork:constellationNetwork,titleMatches:titleMatches,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
@@ -328,6 +328,19 @@ rawConnections=connections;
 connections=function(){var all=works(),signature=sky+'|'+db.customWords.join('|')+'|'+all.map(function(w){return w.id+':'+hash(w.lyrics||'')+':'+(w.sourceVersionNo||0);}).join(';');if(signature!==connectionCache.signature){connectionCache={signature:signature,links:rawConnections()};}return connectionCache.links;};
 function userWorks(){return works().filter(function(w){return w.sky==='rap'&&(cloudUser||w.sourceSystem!=='lyric_master');});}
 function activePath(all){return normalizePaths(pathRows,all).find(function(p){return p.id===state.path;})||null;}
+/* Search matches are choices, not a silent selection of the first title. */
+function titleMatches(all,query){
+ var q=String(query||'').normalize('NFKC').trim().toLocaleLowerCase('ja');
+ if(!q)return [];
+ var ordered=catalog(all);
+ function rank(w){
+  var t=String(w.title||'').normalize('NFKC').toLocaleLowerCase('ja');
+  return t===q?0:t.startsWith(q)?1:t.includes(q)?2:9;
+ }
+ return ordered.filter(function(w){return rank(w)!==9;})
+  .sort(function(a,b){return rank(a)-rank(b)||a.originalBookIndex-b.originalBookIndex||
+   String(a.title).localeCompare(String(b.title),'ja');});
+}
 function allCollections(all){
  var map=new Map();catalog(all).forEach(function(w){var c=w.collection||'その他・個人作品';map.set(c,(map.get(c)||0)+1);});return map;
 }
@@ -406,6 +419,13 @@ function controls(){
  var pathOptions=['<option value="">読解テーマを選んでたどる</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
  var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):
  status==='ready'?'根拠を保存した作品間比較 '+n+'組。'+(reviewStatus==='loading'?'ご本人の記録を読み込み中…':reviewStatus==='error'?'ご本人の記録を取得できません：'+safe(reviewError):'本人確認済み '+counts.confirmed+'組。ほかの比較はAIの読解仮説です。'):'ログインすると非公開の精読を表示します。';
+ var matches=titleMatches(all,state.search);
+ var searchResult=state.search?'<div class="semantic-title-results" role="group" aria-label="作品名検索の結果">'+
+  (matches.length?'<p>'+matches.length+'作品が見つかりました。読みたい曲を選んでください。</p>'+
+   matches.slice(0,8).map(function(w){return '<button type="button" data-search-work="'+safe(w.id)+'"'+(w.id===selected?' class="active"':'')+
+   '>'+safe(w.title)+' <small>'+safe(w.collection||'作品集未登録')+'</small></button>';}).join('')+
+   (matches.length>8?'<p>ほかに'+(matches.length-8)+'作品あります。曲名をもう少し入力すると絞り込めます。</p>':''):
+   '<p role="status">一致する作品名はありません。別の表記をお試しください。</p>')+'</div>':'';
  var advanced='<div class="semantic-intent-toolbar"><span>思いの確認</span><div class="semantic-switches"><button type="button" data-semantic-line-view="all" class="'+(state.lineView==='all'?'active':'')+'">すべての読解</button><button type="button" data-semantic-line-view="confirmed" class="'+(state.lineView==='confirmed'?'active':'')+'">本人確認済み（'+counts.confirmed+'）</button></div><small>読解仮説と、ご本人が確かめた解釈は分けて表示します。</small></div>'+
  '<div class="semantic-layout-toolbar"><span>星の配置</span><div class="semantic-switches"><button type="button" data-semantic-layout="album" class="'+(state.layout==='album'?'active':'')+'">作品集別</button><button type="button" data-semantic-layout="gravity" class="'+(state.layout==='gravity'?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>読解の関係</button></div><small>位置は閲覧用で、作品の価値や思いを点数化したものではありません。</small></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">全作品</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">選んだ作品の近く</button></div>'+
@@ -419,7 +439,7 @@ function controls(){
  '<button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">同じ一行</button></div></div>'+
  '<div class="semantic-primary-controls"><div class="semantic-quick-search">'+
  '<label for="semanticStarSearch">作品名から探す</label><div><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'">'+
- '<button type="button" data-semantic-action="search">探す</button></div></div>'+
+ '<button type="button" data-semantic-action="search">探す</button></div>'+searchResult+'</div>'+
  '<div class="semantic-path-control"><label for="semanticPath">読みたい星座を選ぶ</label>'+
  '<select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select></div></div>'+
  '<div class="semantic-toolbar-bottom"><button type="button" class="semantic-details-toggle" data-semantic-action="settings-toggle" aria-expanded="'+state.controlsExpanded+'">'+
@@ -773,7 +793,8 @@ document.addEventListener('input',function(event){
   (judgmentsByKey.has(key)?'本人の記録を保存済み':'未確認・保存されていません');
 });
 document.addEventListener('click',function(event){
- var target=event.target.closest('[data-atlas-toggle],[data-atlas-network-toggle],[data-atlas-network-select],[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ var target=event.target.closest('[data-search-work],[data-atlas-toggle],[data-atlas-network-toggle],[data-atlas-network-select],[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ if(target.hasAttribute('data-search-work')){var chosen=userWorks().find(function(w){return w.id===target.dataset.searchWork;});if(chosen)selectStar(chosen.id);return;}
  if(target.hasAttribute('data-atlas-toggle')){state.atlasOpen=target.dataset.atlasToggle==='show';repaint();return;}
  if(target.hasAttribute('data-atlas-network-toggle')){
   state.atlasNetworkOpen=target.dataset.atlasNetworkToggle==='show';repaint();return;
@@ -851,7 +872,7 @@ document.addEventListener('click',function(event){
   if(action==='reset'){state.collection='';state.search='';state.path='';state.atlasNetworkChoice='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
  if(action==='search'){
   state.search=document.getElementById('semanticStarSearch')?.value.trim()||'';
-  var found=userWorks().find(function(w){return w.title.toLocaleLowerCase('ja').includes(state.search.toLocaleLowerCase('ja'));});
+  var found=titleMatches(userWorks(),state.search)[0];
   if(found&&state.search)selected=found.id;
   repaint();if(found&&state.search)centerSelected();return;
  }
