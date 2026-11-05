@@ -117,3 +117,28 @@ assert.equal(stars.isJudgmentDecision('confirmed'),true);
 assert.equal(stars.isJudgmentDecision('rejected'),true);
 assert.equal(stars.isJudgmentDecision('invalid'),false);
 console.log('author intention: all decisions are explicit, no automatic confirmation');
+
+
+const demoWords=[
+ {id:'master-1',sky:'rap',title:'架空の旧作',collection:'一集'},
+ {id:'master-2',sky:'rap',title:'架空の新作',collection:'二集'},
+ {id:'master-3',sky:'rap',title:'架空の同集',collection:'一集'}
+];
+const discoveries=[
+ {link_key:'r',left_work_id:'1',right_work_id:'2',relation_type:'resonance',topic:'声が響く',evidence_left:'前の歌',evidence_right:'後の歌'},
+ {link_key:'c',left_work_id:'1',right_work_id:'3',relation_type:'counterpoint',topic:'矛盾がある',evidence_left:'旧作の話',evidence_right:'同じ集の話'},
+ {link_key:'bad',left_work_id:'2',right_work_id:'3',relation_type:'reframing',evidence_left:'',evidence_right:'要根拠'}
+];
+const unreviewed=stars.discoveryCandidates(discoveries,demoWords,new Map(),'all');
+assert.equal(unreviewed.length,2,'only saved two-sided evidence appears as a candidate');
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,new Map(),'across').length,1,'collection boundaries derived from metadata');
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,new Map(),'contrast').length,1,'contrast only offers counterpoints/reframing');
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,new Map(),'resonance').length,1,'resonance filter is distinct');
+assert.equal(unreviewed[0].key,'r','across-collection source-backed comparisons are introduced first');
+const approved=new Map([['r',{decision:'confirmed'}]]);
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,approved,'all').length,1,'confirmed pairs leave the unreviewed queue');
+const undecided=new Map([['r',{decision:'pending'}],['c',{decision:'different'}]]);
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,undecided,'all').length,1,'pending notes stay in queue; different-meaning judgments do not');
+const denied=new Map([['r',{decision:'rejected'}],['c',{decision:'rejected'}]]);
+assert.equal(stars.discoveryCandidates(discoveries,demoWords,denied,'all').length,0,'rejected ideas never re-enter the queue');
+console.log('feeling discovery: evidence-only comparisons, cross-album and contrast filters, no duplicate confirmed reviews');
