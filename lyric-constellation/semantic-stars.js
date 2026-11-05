@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:''};
-var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',status='signed_out',problem='';
+var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
 
@@ -294,7 +294,7 @@ function graphSVG(){
  }).join('');
  return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
-renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
+renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,counts=authorCounts(all),items=allCollections(all),paths=normalizePaths(pathRows,all);
  var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
@@ -347,14 +347,14 @@ function authorReviewMarkup(e){
  var note=judgment?.author_note||'',pending=reviewPending.has(e.key);
  var choices=[['confirmed','この思いはつながる'],['different','別の思いに見える'],['rejected','この線は違う'],['pending','保留へ戻す']];
  var buttons=choices.map(function(c){
-  return '<button type="button" data-author-decision="'+c[0]+'" class="'+(decision===c[0]?'selected':'')+'"'+(pending?' disabled':'')+'>'+safe(c[1])+'</button>';
+  return '<button type="button" data-author-decision="'+c[0]+'" class="'+(decision===c[0]?'selected':'')+'"'+(pending||reviewStatus!=='ready'?' disabled':'')+'>'+safe(c[1])+'</button>';
  }).join('');
  return '<div class="semantic-author-review" data-author-review="'+safe(e.key)+'">'+
  '<div class="semantic-author-review-heading"><strong>あなたが感じる「思い」のつながり</strong><span>'+safe(reviewChoiceLabel(decision))+'</span></div>'+
  '<p>この比較をどう感じますか。AIの読解はそのまま残り、ご本人の判断だけを別に記録します。</p>'+
  '<label>ご自身の言葉（任意）<textarea data-author-note maxlength="1500" rows="2" placeholder="この二曲の奥には、こんな思いがある…">'+safe(note)+'</textarea></label>'+
  '<div class="semantic-author-choices">'+buttons+'</div>'+
- '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
+ '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':reviewStatus==='loading'?'本人の記録を読み込み中…':reviewStatus==='error'?'本人の記録を取得できません':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
 }
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
@@ -398,13 +398,60 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();reviewStatus='signed_out';state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
   if(block&&grid&&grid.parentNode)grid.parentNode.insertBefore(block,grid.nextSibling);
  }
 };
+async function saveAuthorJudgment(linkKey,decision,panel){
+ var user=cloudUser,epoch=cloudEpoch;
+ var live=panel?.querySelector('.semantic-review-feedback');
+ function feedback(message){if(live)live.textContent=message;}
+ var note=panel?.querySelector('[data-author-note]')?.value?.trim()||'';
+ if(!user?.id||!cloudClient||status!=='ready'||reviewStatus!=='ready'){feedback('本人のログインと記録の読込を確認してください。');return;}
+ if(!isJudgmentDecision(decision)||note.length>1500){feedback('記録できない内容です。1500字以内で入力してください。');return;}
+ if(!records.some(function(r){return r.link_key===linkKey&&r.left_work_id&&r.right_work_id;})){
+  feedback('保存済みの作品間比較が見つかりません。');return;
+ }
+ if(reviewPending.has(linkKey))return;
+ reviewPending.add(linkKey);feedback('保存中…');
+ try{
+  var result=await cloudClient.from('lyric_author_link_judgments')
+   .upsert({user_id:user.id,link_key:linkKey,decision:decision,author_note:note,updated_at:new Date().toISOString()},
+    {onConflict:'user_id,link_key'})
+   .select('link_key,decision,author_note,updated_at');
+  if(result.error)throw result.error;
+  var row=Array.isArray(result.data)?result.data.find(function(x){return x.link_key===linkKey;}):null;
+  if(!row||row.decision!==decision||row.author_note!==note)throw new Error('記録を読み返せませんでした');
+  if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
+  judgmentsByKey.set(linkKey,row);reviewError='';repaint();
+ }catch(err){
+  if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
+  reviewError=err?.message||'保存できませんでした';
+  feedback('保存できませんでした：'+reviewError);
+  console.warn('private author intention save failed',err);
+ }finally{reviewPending.delete(linkKey);}
+}
+async function loadAuthorJudgments(user,epoch){
+ if(!user?.id||!cloudClient)return;
+ reviewStatus='loading';reviewError='';judgmentsByKey.clear();
+ try{
+  var result=await cloudClient.from('lyric_author_link_judgments')
+   .select('link_key,decision,author_note,updated_at').eq('user_id',user.id).limit(900);
+  if(result.error)throw result.error;
+  if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
+  (result.data||[]).forEach(function(row){
+   if(row?.link_key&&isJudgmentDecision(row.decision))judgmentsByKey.set(row.link_key,row);
+  });
+  reviewStatus='ready';render();
+ }catch(err){
+  if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
+  judgmentsByKey.clear();reviewStatus='error';reviewError=err?.message||'読み込みに失敗';
+  console.warn('private author judgments load failed',err);render();
+ }
+}
 async function loadLinks(user,epoch){
  if(!user?.id||!cloudClient)return;
  status='loading';records=[];state.journeyStart='';state.journey=null;state.journeyMessage='';problem='';render();
@@ -436,7 +483,7 @@ async function loadPaths(user,epoch){
 }
 loadMasterReadingCorpus=async function(user,epoch){
  await originalLoader(user,epoch);
- if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch)]);
+ if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch),loadAuthorJudgments(user,epoch)]);
 };
 document.addEventListener('click',function(event){
  var target=event.target.closest('[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
