@@ -69,7 +69,7 @@ main{max-width:var(--max);margin:auto;padding:56px 28px 110px}.kicker{font-size:
 <div class="field"><label for="category">希望する商品</label><select id="category"><option value="fanfare">ファンファーレ（参考1,000円）</option><option value="band-small">吹奏楽小品（参考2,000円）</option><option value="band">吹奏楽通常作品（参考3,000円）</option><option value="choral">合唱曲（参考3,000円）</option><option value="score">スコア単品（参考500円）</option></select></div>
 <div class="field"><label for="docs">必要な書類</label><select id="docs"><option value="見積書・納品書・請求書">見積書・納品書・請求書</option><option value="見積書・請求書">見積書・請求書</option><option value="見積書のみ">見積書のみ</option><option value="学校指定書式の確認が必要">学校指定書式の確認が必要</option></select></div>
 </div>
-<div class="field"><label for="work">作品名（仮題でも可）</label><input id="work" placeholder="例：ファンファーレ 空"></div>
+<div class="field"><label for="work">作品名（仮題でも可）</label><input id="work" placeholder="例：ファンファーレ 空"></div><div class="field"><label for="extraWorks">追加で検討中の作品（任意）</label><textarea id="extraWorks" rows="3" placeholder="複数曲をまとめて見積希望の場合、追加作品名・予定数量を1行ずつ入力してください。"></textarea><p class="help">追加作品の金額は自動計算されません。まとめ見積りの相談として転記します。</p></div>
 <div class="field"><label for="message">見積依頼メモ（コピー用）</label><textarea id="message" readonly aria-label="入力内容を反映した見積依頼文"></textarea></div>
 <div class="actions"><button class="btn" type="button" id="transfer">問い合わせフォームに転記</button><button class="btn secondary" type="button" id="copy">内容だけコピー</button><span id="copy-status" class="ok" role="status" aria-live="polite"></span></div>
 <p class="help">このメモは見積書ではありません。正式な見積書・取引条件は、販売開始後に個別に確認する必要があります。「転記」または「コピー」した内容は、お問い合わせの際に利用できます。正式な見積りの受付・発注はまだ開始していません。</p>
@@ -82,6 +82,7 @@ main{max-width:var(--max);margin:auto;padding:56px 28px 110px}.kicker{font-size:
 <details><summary>団員の人数に応じて追加料金が必要ですか？</summary><p>同一団体内で必要部数の印刷・配布を許可する方向です。異なる学校・団体への譲渡やPDFの一般公開は認めない予定です。商品の権利処理が確認できることが前提です。</p></details>
 <details><summary>演奏会で使用するための許諾も含まれますか？</summary><p>楽譜の団体内複製許諾と、演奏・録音・配信の権利は区別します。非営利・入場無料・無報酬などの条件により法令上の例外が適用される場合もあり、有料演奏会や収録・配信では別の手続きが必要になる場合があります。無条件ですべての演奏利用を許諾する商品ではありません。</p></details>
 <details><summary>公費で後払いできますか？</summary><p>見積・正式発注・PDF納品・請求書払いの順で受け付ける方式を準備中です。現時点での後払いの正式受付は開始しておらず、学校の規程や取引先登録に応じて可否を確認します。</p></details>
+<details><summary>自分が勤務する学校で、公費を使って購入できますか？</summary><p>販売者本人が勤務する学校・所属自治体との有償取引は、利益相反や教材選定・予算執行の公正性に関わるため、販売者本人が購入を決めないことを前提に、学校事務・所管部署へ事前に相談してください。許可や手続きが未確認の状態では販売しません。</p></details>
 <details><summary>参考音源は実際の吹奏楽・合唱演奏ですか？</summary><p>作品によって制作デモ音源を公開しています。Finale等によるコンピューター再生は参考音源として明記し、実際の演奏と混同しないようにします。</p></details>
 </section>
 <section>
@@ -97,7 +98,7 @@ main{max-width:var(--max);margin:auto;padding:56px 28px 110px}.kicker{font-size:
 "use strict";
 var price={fanfare:1000,"band-small":2000,band:3000,choral:3000,score:500};
 var labels={fanfare:"ファンファーレ","band-small":"吹奏楽小品",band:"吹奏楽通常作品",choral:"合唱曲",score:"スコア単品"};
-var ids=["org","person","category","docs","work"];
+var ids=["org","person","category","docs","work","extraWorks"];
 function el(id){return document.getElementById(id);}
 function update(){
 var kind=el("category").value;
@@ -107,6 +108,7 @@ var lines=[
 "学校・団体名："+(el("org").value.trim()||"（未記入）"),
 "担当者名："+(el("person").value.trim()||"（未記入）"),
 "希望作品："+(el("work").value.trim()||"（未記入）"),
+"追加で希望する作品："+(el("extraWorks").value.trim()||"（なし）"),
 "商品種類："+labels[kind],
 "参考価格："+price[kind].toLocaleString("ja-JP")+"円（税込・案）",
 "必要な書類："+el("docs").value,
