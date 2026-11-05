@@ -42,7 +42,7 @@
 .semantic-star.neighbor .semantic-star-core{filter:drop-shadow(0 0 9px #e6c5f6)}
 .semantic-star.dim-star{opacity:.22}
 .semantic-star-name{fill:#fdf0f8;font-family:'Zen Kaku Gothic New',sans-serif;font-size:11px;font-weight:650;paint-order:stroke;stroke:#181322;stroke-width:4px;stroke-linejoin:round;pointer-events:all;cursor:pointer}
-.semantic-star.chosen .semantic-star-name{fill:#ffedb7;font-weight:800;font-size:13px}
+.semantic-star-name.chosen{fill:#ffedb7;font-weight:800;font-size:13px}
 .semantic-star:focus-visible .semantic-star-core{stroke:#fff;stroke-width:3}
 .semantic-star-name:focus-visible{fill:#fff4d1;text-decoration:underline;outline:none}
 .starfield-empty{text-align:center;color:#e5d4ed;padding:110px 16px;font-size:12px;line-height:2}
