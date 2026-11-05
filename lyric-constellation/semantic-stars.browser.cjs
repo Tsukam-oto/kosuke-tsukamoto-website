@@ -238,7 +238,7 @@ async function run(mobile){
    await secondRelation.locator('.semantic-author-review [data-author-note]').fill('この線は、まだ違う意味に思えます。');
   await secondRelation.locator('[data-author-decision="different"]').click();
   assert.equal(await page.locator('.semantic-link.author-different').count(),1);
-  assert.match(await page.locator('.semantic-related').filter({hasText:'対照として読む'}).locator('.semantic-author-review-heading').innerText(),/別の思いに見える/);
+  assert.match(await page.locator('.semantic-related').filter({hasText:'対照として読む'}).locator('.semantic-review-disclosure>summary').innerText(),/別の思いに見える/,'saved judgment remains visible even when review controls are folded away');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/2\s*\/\s*2/);
   assert.match(await page.locator('.semantic-discovery-empty').innerText(),/すべて判断を記録済み/);
   const savedNote=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'}).locator('[data-author-note]');
