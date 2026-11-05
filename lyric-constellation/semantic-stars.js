@@ -140,7 +140,7 @@ function graphSVG(){
   var show=state.scope==='near'||active||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
   var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
-  var label=show?'<text class="semantic-star-name" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
+  var label=show?'<text class="semantic-star-name" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
   // hit bounding box into the empty sky, where the SVG background intercepts clicks.
   return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/><circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
@@ -234,7 +234,7 @@ document.addEventListener('change',function(event){
  if(event.target.id==='semanticCollection'){state.collection=event.target.value;repaint();}
 });
 document.addEventListener('keydown',function(event){
- if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-star[data-star-focus]')){event.preventDefault();selectStar(event.target.closest('[data-star-focus]').dataset.starFocus);}
+ if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-star[data-star-focus],.semantic-star-name[data-star-focus]')){event.preventDefault();selectStar(event.target.closest('[data-star-focus]').dataset.starFocus);}
  if(event.key==='Enter'&&event.target.id==='semanticStarSearch'&&!event.isComposing){event.preventDefault();document.querySelector('[data-semantic-action="search"]')?.click();}
 });
 render();
