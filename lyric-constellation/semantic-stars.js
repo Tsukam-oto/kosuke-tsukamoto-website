@@ -368,8 +368,9 @@ function discoveryPanel(){
     '<p>'+safe(e.observation||'')+'</p><details><summary>解釈と別の読み方を開く</summary>'+
     '<p>'+safe(e.interpretation||'')+'</p>'+(e.alternative?'<p>別の読み：'+safe(e.alternative)+'</p>':'')+
     '</details></div>'+authorReviewMarkup(e)+
-    '<div class="semantic-discovery-actions"><button type="button" data-semantic-action="discovery-next">別の思いを読む</button>'+
-    '<span>見送っても記録は変更されません。判断を選ぶと次の候補へ進みます。</span></div>'+
+    '<div class="semantic-discovery-actions">'+
+    (pool.length>1?'<button type="button" data-semantic-action="discovery-next">別の思いを読む</button>':'')+
+    '<span>'+(pool.length>1?'見送っても記録は変更されません。':'この条件では最後の一組です。')+'判断を選ぶと次の候補へ進みます。</span></div>'+
     '</article>';
   }
  }
