@@ -95,6 +95,24 @@ async function run(mobile){
   assert.equal(await page.locator('.semantic-discovery-card').count(),0,'reading room can collapse without data loss');
   await page.locator('[data-semantic-action="discovery-toggle"]').click();
   assert.equal(await page.locator('.semantic-discovery-card').count(),1);
+  // A rejected write must never appear as an author-confirmed connection.
+  await page.evaluate(()=>{
+    const from=cloudClient.from;
+    window.__restoreFeelingWrite=()=>{cloudClient.from=from;};
+    cloudClient.from=function(table){
+      const query=from.call(cloudClient,table);
+      if(table==='lyric_author_link_judgments'){
+        query.upsert=()=>({select:()=>Promise.resolve({data:null,error:{message:'架空の保存拒否'}})});
+      }
+      return query;
+    };
+  });
+  await page.locator('.semantic-discovery-card [data-author-note]').fill('保存されない仮の言葉');
+  await page.locator('.semantic-discovery-card [data-author-decision="confirmed"]').click();
+  await page.waitForFunction(()=>document.querySelector('.semantic-discovery-card .semantic-review-feedback')?.textContent?.includes('架空の保存拒否'));
+  assert.equal(await page.locator('.semantic-link.author-confirmed').count(),0,'failed save never creates a gold connection');
+  assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\\s*\\/\\s*2/,'failed write does not advance progress');
+  await page.evaluate(()=>window.__restoreFeelingWrite());
   assert.equal(await page.locator('.semantic-link.focused').count(),2,'selected star highlights two evidence-backed lines');
   assert.match(await page.locator('.semantic-focus-panel').innerText(),/日々の異なる見え方/);
   const targetRelation=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'});
