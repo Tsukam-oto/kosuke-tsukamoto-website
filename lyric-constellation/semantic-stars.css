@@ -176,3 +176,56 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
 .semantic-author-review .semantic-review-feedback{font-size:10px;color:#696075;margin-top:9px}
 @media(max-width:760px){.semantic-intent-toolbar{padding:10px}.semantic-intent-toolbar .semantic-switches{flex-basis:100%}.semantic-author-review{padding:10px}.semantic-author-choices button{flex-basis:42%}}
 @media(prefers-reduced-motion:reduce){.semantic-link.author-confirmed,.semantic-star.author-affirmed .semantic-star-core{filter:none}}
+
+
+/* 思いの発見室 — 読解の根拠と作者の声が並ぶ、本人専用の一組ずつの読書体験 */
+.semantic-discovery{background:linear-gradient(125deg,#21182f 0%,#302038 52%,#172535 100%);color:#f8f0fa;border:1px solid #64557d;border-radius:0 0 13px 13px;padding:16px 18px;margin:0 0 15px;box-sizing:border-box}
+.semantic-discovery-heading{display:flex;align-items:flex-start;gap:12px;justify-content:space-between;flex-wrap:wrap}
+.semantic-discovery-heading>div:first-child{flex:1 1 230px;min-width:0}
+.semantic-discovery-heading>div:first-child>span{display:block;letter-spacing:.13em;color:#d4bcf2;font-size:9px;font-weight:800}
+.semantic-discovery-heading h2{font-size:19px;color:#f9e9ff;margin:5px 0}
+.semantic-discovery-heading p{color:#e1d3eb;font-size:11px;line-height:1.7;margin:6px 0}
+.semantic-discovery-progress{display:flex;flex-direction:column;align-items:flex-end;flex:0 0 auto}
+.semantic-discovery-progress strong{font-size:23px;line-height:1.1;font-variant-numeric:tabular-nums;color:#f9dcaa}
+.semantic-discovery-progress strong small{font-size:12px;color:#cfc1df}
+.semantic-discovery-progress span{font-size:9px;color:#dbd0e4;line-height:1.6}
+.semantic-discovery-heading>button{border:1px solid #af91bd;background:#493456;color:#fff0ff;border-radius:8px;min-height:37px;padding:8px 12px;font-weight:750;font-size:11px}
+.semantic-discovery-body{padding-top:15px}
+.semantic-discovery-filters{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.semantic-discovery-filters button{border:1px solid #896e9e;background:#382846;color:#e9daf2;border-radius:9px;padding:8px 10px;min-height:37px;font-weight:750;font-size:10px}
+.semantic-discovery-filters button.active{background:#eadcf3;color:#463055;border-color:#eadcf3}
+.semantic-discovery-filters button:disabled{opacity:.45;cursor:not-allowed}
+.semantic-discovery-card{background:#fffafc;color:#342a3e;border:1px solid #d6bfdf;border-radius:13px;padding:15px;box-shadow:0 9px 26px #09040f35}
+.semantic-discovery-meta{display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.semantic-discovery-meta span:first-child{font-size:10px;font-weight:850;color:#714c81}
+.semantic-discovery-meta span:last-child{font-size:10px;color:#786982}
+.semantic-discovery-card h3{color:#45314e;font-size:15px;line-height:1.55;margin:9px 0 12px}
+.semantic-discovery-pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.semantic-discovery-pair>div{background:#f5eff9;border:1px solid #e7ddeb;border-radius:9px;padding:12px;min-width:0}
+.semantic-discovery-title{border:0;background:none;color:#4d3361;text-align:left;cursor:pointer;font-size:13px;line-height:1.5;font-weight:850;padding:0;overflow-wrap:anywhere}
+.semantic-discovery-title:hover{text-decoration:underline}
+.semantic-discovery-pair small{display:block;color:#8a728f;font-size:9px;margin:4px 0 7px;overflow-wrap:anywhere}
+.semantic-discovery-pair blockquote{white-space:pre-wrap;overflow-wrap:anywhere;border-left:3px solid #a68ab6;margin:4px 0 0;padding:7px 10px;font-size:12px;font-weight:650;line-height:1.8;color:#392b45}
+.semantic-discovery-reading{margin-top:12px;padding:9px 0 2px}
+.semantic-discovery-reading strong{font-size:10px;color:#6b5477}
+.semantic-discovery-reading>p{font-size:11px;line-height:1.8;color:#50435d;margin:7px 0}
+.semantic-discovery-reading details{border-top:1px solid #ece3ee;padding:8px 0}
+.semantic-discovery-reading summary{font-weight:750;cursor:pointer;font-size:11px;color:#654d72;line-height:1.5}
+.semantic-discovery-reading details p{font-size:10px;line-height:1.8;color:#66576b}
+.semantic-discovery-card .semantic-author-review{margin-top:10px}
+.semantic-discovery-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:12px}
+.semantic-discovery-actions button{min-height:40px;border:1px solid #795989;border-radius:8px;padding:9px 14px;background:#715184;color:#fff;font-size:11px;font-weight:800}
+.semantic-discovery-actions span{font-size:10px;color:#766783;line-height:1.6;flex:1 1 220px}
+.semantic-discovery-empty{padding:12px;color:#ecddf4;font-size:12px;line-height:1.8}
+.semantic-discovery button:focus-visible,.semantic-discovery summary:focus-visible{outline:2px solid #eacba8;outline-offset:3px}
+@media(max-width:760px){
+ .semantic-discovery{padding:12px;margin-bottom:12px}
+ .semantic-discovery-heading h2{font-size:17px}
+ .semantic-discovery-progress{align-items:flex-start}
+ .semantic-discovery-filters button{flex:1 1 44%;font-size:10px;min-height:41px}
+ .semantic-discovery-card{padding:12px}
+ .semantic-discovery-pair{grid-template-columns:minmax(0,1fr);gap:8px}
+ .semantic-discovery-pair>div{padding:10px}
+ .semantic-discovery-pair blockquote{font-size:12px;padding:7px 8px}
+ .semantic-discovery-actions button{width:100%}
+}
