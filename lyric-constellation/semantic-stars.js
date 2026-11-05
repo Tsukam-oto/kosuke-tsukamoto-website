@@ -889,5 +889,8 @@ document.addEventListener('keydown',function(event){
  if((event.key==='Enter'||event.key===' ')&&event.target.closest('.semantic-star[data-star-focus],.semantic-star-name[data-star-focus]')){event.preventDefault();selectStar(event.target.closest('[data-star-focus]').dataset.starFocus);}
  if(event.key==='Enter'&&event.target.id==='semanticStarSearch'&&!event.isComposing){event.preventDefault();document.querySelector('[data-semantic-action="search"]')?.click();}
 });
+window.addEventListener('beforeunload',function(event){
+ if(cloudUser&&reviewDrafts.size){event.preventDefault();event.returnValue='';}
+});
 render();
 })();
