@@ -2,8 +2,8 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,history:[],journeyStart:'',journey:null,journeyMessage:''};
-var records=[],pathRows=[],status='signed_out',problem='';
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:''};
+var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
 
@@ -173,8 +173,22 @@ function wordLinks(){
  });
 }
 function related(edges,id){return edges.filter(function(e){return e.a===id||e.b===id;});}
+function semanticEdges(all){
+ return normalize(records,all).map(function(e){
+  var j=judgmentsByKey.get(e.key);
+  return Object.assign({},e,{authorDecision:j?.decision||'pending'});
+ });
+}
 function edgeList(all){
- return state.mode==='words'?wordLinks():normalize(records,all);
+ if(state.mode==='words')return wordLinks();
+ var edges=semanticEdges(all);
+ return state.lineView==='confirmed'?edges.filter(function(e){return e.authorDecision==='confirmed';}):edges;
+}
+function authorCounts(all){
+ var edges=semanticEdges(all);
+ return {all:edges.length,confirmed:edges.filter(function(e){return e.authorDecision==='confirmed';}).length,
+  different:edges.filter(function(e){return e.authorDecision==='different';}).length,
+  rejected:edges.filter(function(e){return e.authorDecision==='rejected';}).length};
 }
 function currentModeWorks(all,edges,selection){
  if(state.scope==='all')return catalog(all);
@@ -195,11 +209,16 @@ function nearPositions(all,selection){
  });
  return {pos:pos,labels:[],width:width,height:height};
 }
+function reviewChoiceLabel(decision){
+ return decision==='confirmed'?'この思いはつながる':decision==='different'?'別の思いに見える':
+  decision==='rejected'?'この線は違う':'まだ判断していない';
+}
+function isJudgmentDecision(v){return ['pending','confirmed','different','rejected'].includes(v);}
 function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
@@ -232,7 +251,7 @@ function graphSVG(){
  var all=userWorks(),picked=all.find(function(w){return w.id===selected;})||all[0];
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
- var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,normalize(records,all),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
+ var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,semanticEdges(all).filter(function(e){return e.authorDecision!=='rejected';}),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
  var path=activePath(all),inPath=new Set(path?path.ids:[]),onJourney=new Set(state.journey?state.journey.ids:[]);
  var available=new Set(nodes.map(function(w){return w.id;}));
  var filtered=edges.filter(function(e){return available.has(e.a)&&available.has(e.b);});
@@ -241,14 +260,16 @@ function graphSVG(){
  var wanted=new Set(nodes.filter(function(w){
   return (!state.collection||(w.collection||'その他・個人作品')===state.collection)&&(!search||w.title.toLocaleLowerCase('ja').includes(search));
  }).map(function(w){return w.id;}));
- var draw=state.scope==='near'?filtered:filtered.slice(0,state.mode==='words'?155:420);
+ var draw=(state.scope==='near'?filtered:filtered.slice(0,state.mode==='words'?155:420)).slice();
+ draw.sort(function(a,b){return Number(a.authorDecision==='confirmed')-Number(b.authorDecision==='confirmed');});
  var lines=draw.map(function(e){
   var a=geo.pos.get(e.a),b=geo.pos.get(e.b);if(!a||!b)return '';
   var focus=e.a===picked?.id||e.b===picked?.id;
   var style=focus?'focused':state.scope==='near'?'near-link':'ambient';
   var contrast=e.kind==='counterpoint'?' contrast':e.kind==='text_overlap'?' version-link':'';
   var dim=state.collection&&!wanted.has(e.a)&&!wanted.has(e.b);
-  return '<line class="semantic-link '+style+contrast+(dim?' dim-link':'')+'" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/>';
+  var intentClass=e.authorDecision==='confirmed'?' author-confirmed':e.authorDecision==='rejected'?' author-rejected':e.authorDecision==='different'?' author-different':'';
+  return '<line class="semantic-link '+style+contrast+intentClass+(dim?' dim-link':'')+'" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/>';
  }).join('');
  var route=path?path.ids.filter(function(id){return geo.pos.has(id);}).map(function(id){return geo.pos.get(id);}):[];
  var pathLines=route.slice(1).map(function(p,i){var a=route[i];return '<line class="semantic-theme-route" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'"/>';}).join('');
@@ -262,8 +283,9 @@ function graphSVG(){
   var p=geo.pos.get(w.id);if(!p)return '';
   var active=w.id===picked?.id,neighbor=chosenNeighbors.has(w.id),match=wanted.has(w.id);
   var onPath=inPath.has(w.id),inJourney=onJourney.has(w.id);
+  var endorsed=state.mode!=='words'&&related(semanticEdges(all).filter(function(e){return e.authorDecision==='confirmed';}),w.id).length>0;
   var show=state.scope==='near'||active||onPath||inJourney||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
-  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
+  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(endorsed?' author-affirmed':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
   var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
@@ -272,7 +294,7 @@ function graphSVG(){
  }).join('');
  return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
-renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
+renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];judgmentsByKey.clear();reviewPending.clear();status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,items=allCollections(all),paths=normalizePaths(pathRows,all);
  var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
