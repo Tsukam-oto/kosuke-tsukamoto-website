@@ -229,3 +229,61 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
  .semantic-discovery-pair blockquote{font-size:12px;padding:7px 8px}
  .semantic-discovery-actions button{width:100%}
 }
+
+
+/* 星座図鑑: 一つの作品が複数の読解へ属することを隠さない。 */
+.semantic-atlas{margin:14px 0 16px;padding:15px;border:1px solid #857097;background:linear-gradient(150deg,#261a32,#171a2e);border-radius:13px;color:#f6eafa;box-sizing:border-box}
+.semantic-atlas-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:11px}
+.semantic-atlas-heading>div:first-child{flex:1 1 290px}
+.semantic-atlas-kicker{display:block;letter-spacing:.13em;font-size:9px;color:#ceb2ee;font-weight:850}
+.semantic-atlas-heading h2{margin:5px 0 6px;font-size:19px;color:#faeafa}
+.semantic-atlas-heading p{font-size:11px;line-height:1.7;color:#ddd0e6;max-width:670px}
+.semantic-atlas-stats{display:grid;grid-template-columns:auto auto;align-items:baseline;gap:2px 8px}
+.semantic-atlas-stats strong{font-size:21px;color:#ffe4bb;font-variant-numeric:tabular-nums;text-align:right}
+.semantic-atlas-stats span{font-size:9px;color:#dccbe9}
+.semantic-atlas-toolbar{margin:13px 0;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.semantic-atlas-filters{display:flex;flex-wrap:wrap;gap:6px;flex:1 1 340px}
+.semantic-atlas-filters button,.semantic-atlas-overlap-toggle{padding:8px 10px;min-height:36px;font-size:10px;color:#e7d7ef;border:1px solid #755c87;background:#382642;border-radius:8px;font-weight:750}
+.semantic-atlas-filters button.active,.semantic-atlas-overlap-toggle.active{background:#e7d5fa;border-color:#e7d5fa;color:#38224c}
+.semantic-atlas-cards{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.semantic-atlas-card{min-width:0;display:flex;flex-direction:column;gap:8px;background:#fcf9fe;color:#3d2d46;border:1px solid #ded1e7;border-radius:10px;padding:11px;min-height:174px}
+.semantic-atlas-card.active{border:2px solid #bb9665;background:#fff8ed}
+.semantic-atlas-card-meta{display:flex;justify-content:space-between;align-items:center;gap:5px;color:#765c88;font-size:9px}
+.semantic-atlas-card-meta span:first-child{font-weight:850}
+.semantic-atlas-card h3{font-size:12px;line-height:1.5;color:#422d53;margin:0;overflow-wrap:anywhere}
+.semantic-atlas-card>p{font-size:10px;line-height:1.55;color:#64556f;margin:0;flex:1}
+.semantic-atlas-card-bottom{display:flex;flex-wrap:wrap;gap:8px}
+.semantic-atlas-card-bottom small{color:#746781;font-size:9px;line-height:1.6;width:100%}
+.semantic-atlas-card-bottom button{background:#6d4c81;border:1px solid #6d4c81;color:white;border-radius:8px;padding:8px 9px;min-height:36px;font-size:10px;font-weight:750;width:100%}
+.semantic-atlas-pager{display:flex;justify-content:flex-end;align-items:center;gap:8px;margin-top:9px}
+.semantic-atlas-pager span{font-size:10px;color:#ddcae7;margin-right:auto;font-variant-numeric:tabular-nums}
+.semantic-atlas-pager button{font-size:10px;color:#f0e3f8;background:#483250;border:1px solid #9075a0;border-radius:8px;min-height:35px;padding:7px 10px;font-weight:750}
+.semantic-atlas-pager button:disabled{opacity:.38}
+.semantic-atlas-overlapping{display:flex;gap:8px;align-items:flex-start;flex-wrap:wrap;border-top:1px solid #806789;margin-top:14px;padding-top:11px}
+.semantic-atlas-overlapping>strong{color:#fff0c9;font-size:10px;flex:1 1 100%}
+.semantic-atlas-overlapping button{flex:1 1 155px;background:#302b4c;color:#f2e5fc;border:1px solid #71658d;border-radius:9px;padding:9px;min-height:48px;text-align:left;font-size:10px;line-height:1.5}
+.semantic-atlas-overlapping button small{display:block;color:#cfc0e6;font-size:9px;line-height:1.5;margin-top:5px}
+.semantic-atlas-note{font-size:9px;color:#d2c2de;line-height:1.65;margin:10px 0 0}
+.semantic-atlas-empty{font-size:11px;color:#ded1ec;line-height:1.8;padding:12px}
+.semantic-overlap-ring{fill:none;stroke:#b6a0ff;stroke-width:1.55;stroke-dasharray:2 3;pointer-events:none;opacity:.92;filter:drop-shadow(0 0 3px #b6a0ff)}
+.semantic-star.constellation-crossing .semantic-star-halo{opacity:.26}
+.semantic-memberships{margin:15px 0;padding:12px;background:#f1eaf9;border:1px solid #dfceea;border-radius:11px}
+.semantic-memberships h3{font-size:12px;color:#4d315f;margin:0 0 6px}
+.semantic-memberships h3 small{font-size:10px;color:#846b96}
+.semantic-memberships p{font-size:10px;color:#755f85;line-height:1.6;margin:0 0 9px}
+.semantic-memberships>div{display:flex;flex-wrap:wrap;gap:6px}
+.semantic-memberships button{border:1px solid #c8b0d7;border-radius:8px;background:#fff;color:#59406b;padding:7px 9px;font-size:10px;font-weight:700;line-height:1.5}
+.semantic-memberships button.active{background:#e7d8f5;border-color:#9575b3}
+.semantic-atlas button:focus-visible,.semantic-memberships button:focus-visible{outline:2px solid #c5a2ff;outline-offset:2px}
+@media(max-width:900px){.semantic-atlas-cards{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){
+ .semantic-atlas{padding:11px}
+ .semantic-atlas-heading h2{font-size:17px}
+ .semantic-atlas-stats{grid-template-columns:auto auto}
+ .semantic-atlas-filters button{flex:1 1 41%;font-size:10px}
+ .semantic-atlas-overlap-toggle{width:100%}
+ .semantic-atlas-cards{grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(230px,80vw);overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:7px}
+ .semantic-atlas-card{scroll-snap-align:start;min-height:175px}
+ .semantic-atlas-overlapping button{flex:1 1 100%}
+}
+@media(prefers-reduced-motion:reduce){.semantic-overlap-ring{filter:none}}

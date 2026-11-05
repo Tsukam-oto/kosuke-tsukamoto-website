@@ -142,3 +142,29 @@ assert.equal(stars.discoveryCandidates(discoveries,demoWords,undecided,'all').le
 const denied=new Map([['r',{decision:'rejected'}],['c',{decision:'rejected'}]]);
 assert.equal(stars.discoveryCandidates(discoveries,demoWords,denied,'all').length,0,'rejected ideas never re-enter the queue');
 console.log('feeling discovery: evidence-only comparisons, cross-album and contrast filters, no duplicate confirmed reviews');
+
+
+/* Intersections are shared works, not automatically new direct-lyric comparisons. */
+const atlasPaths=stars.normalizePaths([
+ {thread_key:'rap-album-mock',title:'架空の作品集読解',anchors:[
+  {kind:'work',source_id:'1'},{kind:'work',source_id:'2'}]},
+ {thread_key:'hope',title:'希望の星座',anchors:[
+  {kind:'work',source_id:'1'},{kind:'work',source_id:'4'},{kind:'work',source_id:'6'}]},
+ {thread_key:'memory',title:'記憶の星座',anchors:[
+  {kind:'work',source_id:'4'},{kind:'work',source_id:'6'}]}
+],works);
+assert.equal(atlasPaths.length,3,'all multi-work thematic views are represented');
+const membership=stars.membershipIndex(atlasPaths);
+assert.equal(membership.get('master-1').length,2,'one work may belong to two constellations');
+assert.equal(membership.get('master-4').length,2,'another work overlaps two different themes');
+assert.equal(membership.get('master-7'),undefined,'do not invent membership for an unrelated song');
+const overlaps=stars.intersectingConstellations(atlasPaths,'hope');
+assert.equal(overlaps.length,2);
+assert.equal(overlaps[0].path.id,'memory','the strongest source-work overlap ranks first');
+assert.deepEqual(Array.from(overlaps[0].shared),['master-4','master-6']);
+assert.equal(stars.intersectingConstellations(atlasPaths,'invalid').length,0,'unknown theme cannot create an overlap');
+assert.equal(stars.atlasFiltered(atlasPaths,'themes','master-1').length,2,'theme filter excludes album-only lenses');
+assert.equal(stars.atlasFiltered(atlasPaths,'collections','master-1').length,1,'collection filter stays distinct');
+assert.equal(stars.atlasFiltered(atlasPaths,'star','master-1').length,2,'selected-star view follows membership');
+assert.equal(stars.atlasFiltered(atlasPaths,'star','master-7').length,0,'no related path is manufactured');
+console.log('constellation atlas: shared-song overlaps, distinct thematic lenses and honest empty states');

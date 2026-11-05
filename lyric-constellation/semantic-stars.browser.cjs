@@ -55,6 +55,14 @@ async function run(mobile){
        {kind:'work',source_id:'fictional-050',quote:'二人の時間と明日',observation:'第二の星の読み',technique:'未来への転換'},
        {kind:'note',source_id:'private-draft'},
        {kind:'work',source_id:'fictional-095',quote:'音楽のある生活が続く',observation:'第三の星の読み',technique:'反復'}]});
+    themes.push({thread_key:'synthetic-memory',title:'記憶の星座',guiding_question:'消えそうな記憶に何を残すか？',
+      core_hypothesis:'歌の記憶には別の読みがある',
+      anchors:[{kind:'work',source_id:'fictional-000',quote:'この歌は架空の歌詞です',observation:'第一の記憶'},
+       {kind:'work',source_id:'fictional-095',quote:'音楽のある生活が続く',observation:'違う時間'},
+       {kind:'work',source_id:'fictional-121',quote:'二人の時間と明日',observation:'二人の記憶'}]});
+    themes.push({thread_key:'rap-ep1-fictional',title:'架空EPの読解',guiding_question:'作品集はどう変わる？',
+      anchors:[{kind:'work',source_id:'fictional-050',quote:'この歌は架空の歌詞です'},
+       {kind:'work',source_id:'fictional-075',quote:'二人の時間と明日'}]});
     cloudEpoch++;cloudUser={id:uid};const epoch=cloudEpoch;
    cloudClient={from(table){return {
     pendingWrite:null,
@@ -79,6 +87,19 @@ async function run(mobile){
   });
   assert.equal(await page.locator('.semantic-star').count(),168,'all 168 songs must appear as stars');
   assert.match(await page.locator('.semantic-status').innerText(),/2組/,'links come from semantic data');
+  assert.equal(await page.locator('.semantic-atlas-card').count(),2,'two thematic lenses initially visible');
+  assert.match(await page.locator('.semantic-atlas-stats').innerText(),/3/,'atlas counts three multi-work constellations');
+  assert.equal(await page.locator('.semantic-star.constellation-crossing').count(),3,'shared stars have a separate ring');
+  assert.equal(await page.locator('.semantic-overlap-ring').count(),3);
+  await page.locator('[data-atlas-filter="all"]').click();
+  assert.equal(await page.locator('.semantic-atlas-card').count(),3,'including a collection-level reading');
+  await page.locator('[data-atlas-filter="collections"]').click();
+  assert.equal(await page.locator('.semantic-atlas-card').count(),1);
+  await page.locator('[data-atlas-filter="themes"]').click();
+  await page.locator('[data-atlas-overlap="hide"]').click();
+  assert.equal(await page.locator('.semantic-overlap-ring').count(),0,'overlap rings can be hidden');
+  await page.locator('[data-atlas-overlap="show"]').click();
+  assert.equal(await page.locator('.semantic-overlap-ring').count(),3,'overlap rings return');
   assert.equal(await page.locator('.semantic-discovery-card').count(),1,'show one comparison, not 210 stacked forms');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/0\s*\/\s*2/);
   const titlesBefore=await page.locator('.semantic-discovery-card h3').innerText();
@@ -158,9 +179,15 @@ async function run(mobile){
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/);
   await page.locator('[data-semantic-layout="gravity"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168,'meaning layout retains the whole catalog');
-  assert.equal(await page.locator('.semantic-star.no-relation').count(),165,'no invented lines for unrelated songs');
+  assert.equal(await page.locator('.semantic-star.no-relation').count(),163,'five source-backed stars connected through two direct comparisons and three thematic routes');
   assert.match(await page.locator('[data-semantic-layout="gravity"]').getAttribute('class'),/active/);
   const beforeCoord=await page.locator('.semantic-star[data-star-focus="master-fictional-000"] .semantic-star-core').getAttribute('cx');
+  await page.locator('[data-atlas-open="synthetic-memory"]').click();
+  assert.match(await page.locator('.semantic-path-story').innerText(),/記憶の星座/);
+  assert.match(await page.locator('.semantic-atlas-overlapping').innerText(),/暮らしの星座/);
+  assert.match(await page.locator('.semantic-atlas-overlapping').innerText(),/2作品が重なる/);
+  await page.locator('.semantic-atlas-overlapping [data-atlas-open="synthetic-care"]').click();
+  assert.match(await page.locator('.semantic-path-story').innerText(),/暮らしの星座/);
   await page.locator('#semanticPath').selectOption('synthetic-care');
    assert.equal(await page.locator('.semantic-theme-route').count(),2,'guided path draws 2 dashed segments');
    assert.equal(await page.locator('.semantic-star.in-theme').count(),3,'3 source-backed songs light up');
@@ -177,6 +204,13 @@ async function run(mobile){
    assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/,'go back to previous source-backed song');
    await page.locator('.semantic-path-story [data-semantic-action="next"]').click();
    assert.equal(await page.locator('.semantic-star[data-star-focus="master-fictional-000"] .semantic-star-core').getAttribute('cx'),beforeCoord,'meaning positions are stable when choosing another star');
+   assert.match(await page.locator('.semantic-memberships').innerText(),/暮らしの星座/);
+   assert.match(await page.locator('.semantic-memberships').innerText(),/架空EPの読解/);
+   await page.locator('.semantic-memberships [data-atlas-open="rap-ep1-fictional"]').click();
+   assert.match(await page.locator('.semantic-path-story').innerText(),/架空EPの読解/,'one song opens a different constellation');
+   assert.equal(await page.locator('.semantic-theme-route').count(),1);
+   await page.locator('.semantic-memberships [data-atlas-open="synthetic-care"]').click();
+   assert.match(await page.locator('.semantic-path-story').innerText(),/暮らしの星座/);
    await page.locator('[data-semantic-mode="words"]').click();
   assert.match(await page.locator('.semantic-toolbar').innerText(),/共通語の線/);
   await page.locator('[data-semantic-mode="meaning"]').click();
@@ -203,7 +237,7 @@ async function run(mobile){
    const local=JSON.stringify(localStorage);
    masterReadingWorks=[];cloudUser=null;render();
    return {leak:document.getElementById('screen').textContent.includes('検証曲001'),
-    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),reviewLeak:document.getElementById('screen').textContent.includes('原文を見て、私はこの思い'),remaining:document.querySelectorAll('.semantic-star').length};
+    stored:local.includes('検証曲001'),themeLeak:document.getElementById('screen').textContent.includes('記憶の星座')||document.getElementById('screen').textContent.includes('暮らしの星座')||document.getElementById('screen').textContent.includes('第一の星の読み'),reviewLeak:document.getElementById('screen').textContent.includes('原文を見て、私はこの思い'),remaining:document.querySelectorAll('.semantic-star').length};
   });
   assert.equal(after.leak,false,'private star names vanish after logout');
   assert.equal(after.stored,false,'private star data is not stored in local storage');
