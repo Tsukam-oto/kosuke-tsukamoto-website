@@ -302,7 +302,7 @@ function controls(){
  var options=['<option value="">すべての作品集</option>'].concat([...items].map(function(e){return '<option value="'+safe(e[0])+'"'+(state.collection===e[0]?' selected':'')+'>'+safe(e[0])+'（'+e[1]+'）</option>'; })).join('');
  var pathOptions=['<option value="">星座を選ぶ（テーマを横断して読む）</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
  var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):
- status==='ready'?'AIによる比較 '+n+'組。ご本人がつながりを確認した思い '+counts.confirmed+'組。見直したい線 '+counts.different+'組、違うと判断した線 '+counts.rejected+'組。':'ログインすると精読でつながります';
+ status==='ready'?'AIによる比較 '+n+'組。'+(reviewStatus==='loading'?'ご本人の記録を読み込み中…':reviewStatus==='error'?'ご本人の記録を取得できません：'+safe(reviewError):'ご本人がつながりを確認した思い '+counts.confirmed+'組。別の思いに見える線 '+counts.different+'組、違うと判断した線 '+counts.rejected+'組。'):'ログインすると精読でつながります';
  return '<div class="semantic-toolbar"><div class="semantic-toolbar-main"><div><strong>全作品の星空</strong><small>'+all.length+'の星が浮かびます。星を選んで言葉のつながりをたどれます。</small></div><div class="semantic-switches"><button type="button" data-semantic-mode="meaning" class="'+(state.mode==='meaning'?'active':'')+'">精読の線</button><button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">共通語の線</button></div></div>'+
  '<div class="semantic-intent-toolbar"><span>思いの見方</span><div class="semantic-switches"><button type="button" data-semantic-line-view="all" class="'+(state.lineView==='all'?'active':'')+'">精読から見つけた線</button><button type="button" data-semantic-line-view="confirmed" class="'+(state.lineView==='confirmed'?'active':'')+'">私が確かめた思い（'+counts.confirmed+'）</button></div><small>初期状態ではAIの読解仮説です。ご本人が確認した線だけが特別に光ります。</small></div>'+
  '<div class="semantic-layout-toolbar"><span>星の並び方</span><div class="semantic-switches"><button type="button" data-semantic-layout="album" class="'+(state.layout==='album'?'active':'')+'">作品集ごと</button><button type="button" data-semantic-layout="gravity" class="'+(state.layout==='gravity'?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>意味の星空</button></div><small>'+(state.layout==='gravity'?'精読の直接比較と星座の順路をもとに配置。線のない作品は外周に残します。':'収録作品集の位置関係です。')+'</small></div>'+
@@ -426,7 +426,7 @@ async function saveAuthorJudgment(linkKey,decision,panel){
   var row=Array.isArray(result.data)?result.data.find(function(x){return x.link_key===linkKey;}):null;
   if(!row||row.decision!==decision||row.author_note!==note)throw new Error('記録を読み返せませんでした');
   if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
-  judgmentsByKey.set(linkKey,row);reviewError='';repaint();
+  judgmentsByKey.set(linkKey,row);reviewError='';reviewPending.delete(linkKey);repaint();
  }catch(err){
   if(cloudEpoch!==epoch||cloudUser?.id!==user.id)return;
   reviewError=err?.message||'保存できませんでした';
