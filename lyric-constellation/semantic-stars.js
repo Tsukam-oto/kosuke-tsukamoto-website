@@ -233,7 +233,7 @@ function graphSVG(){
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
  var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,normalize(records,all),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
- var path=activePath(all),inPath=new Set(path?path.ids:[]);
+ var path=activePath(all),inPath=new Set(path?path.ids:[]),onJourney=new Set(state.journey?state.journey.ids:[]);
  var available=new Set(nodes.map(function(w){return w.id;}));
  var filtered=edges.filter(function(e){return available.has(e.a)&&available.has(e.b);});
  var hot=related(filtered,picked?.id),chosenNeighbors=new Set(hot.map(function(e){return e.a===picked.id?e.b:e.a;}));
@@ -252,6 +252,7 @@ function graphSVG(){
  }).join('');
  var route=path?path.ids.filter(function(id){return geo.pos.has(id);}).map(function(id){return geo.pos.get(id);}):[];
  var pathLines=route.slice(1).map(function(p,i){var a=route[i];return '<line class="semantic-theme-route" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'"/>';}).join('');
+ var journeyLines=state.journey?state.journey.ids.slice(1).map(function(id,i){var a=geo.pos.get(state.journey.ids[i]),b=geo.pos.get(id);return a&&b?'<line class="semantic-journey-route" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+b.x.toFixed(1)+'" y2="'+b.y.toFixed(1)+'"/>':'';}).join(''):'';
  var trail=state.history.slice(-7).filter(function(id){return geo.pos.has(id);}).map(function(id){return geo.pos.get(id);});
  var traces=trail.slice(1).map(function(p,i){var a=trail[i];return '<line class="semantic-trail" x1="'+a.x.toFixed(1)+'" y1="'+a.y.toFixed(1)+'" x2="'+p.x.toFixed(1)+'" y2="'+p.y.toFixed(1)+'"/>';}).join('');
  var labels=geo.labels.map(function(g,i){
@@ -260,18 +261,18 @@ function graphSVG(){
  var stars=nodes.map(function(w){
   var p=geo.pos.get(w.id);if(!p)return '';
   var active=w.id===picked?.id,neighbor=chosenNeighbors.has(w.id),match=wanted.has(w.id);
-  var onPath=inPath.has(w.id);
-  var show=state.scope==='near'||active||onPath||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
-  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(path&&!onPath&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
+  var onPath=inPath.has(w.id),inJourney=onJourney.has(w.id);
+  var show=state.scope==='near'||active||onPath||inJourney||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
+  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+(path&&!onPath&&!inJourney&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
-  var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
+  var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+(inJourney?' in-journey':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
   // hit bounding box into the empty sky, where the SVG background intercepts clicks.
   return '<g class="'+classes+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ"><title>'+safe(w.title)+'</title><circle class="semantic-star-hit" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="19"/><circle class="semantic-star-halo" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?20:neighbor?14:11)+'"/><circle class="semantic-star-core tone-'+(p.group%5)+'" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(active?7:neighbor?5:3.4)+'"/></g>'+label;
  }).join('');
- return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+traces+stars+'</svg>';
+ return '<svg class="semantic-stars-svg" data-scope="'+state.scope+'" viewBox="0 0 '+geo.width+' '+geo.height+'" role="group" aria-label="木乃伊の星空。作品の星を選び、精読に基づく関係をたどれます。" xmlns="http://www.w3.org/2000/svg"><defs><radialGradient id="semanticNebula"><stop offset="0%" stop-color="#52366b" stop-opacity=".6"/><stop offset="100%" stop-color="#120f20" stop-opacity="0"/></radialGradient></defs><ellipse cx="490" cy="330" rx="520" ry="400" fill="url(#semanticNebula)"/>'+labels+lines+pathLines+journeyLines+traces+stars+'</svg>';
 }
-renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';}return graphSVG();};
+renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';}return graphSVG();};
 function controls(){
  var all=userWorks(),edges=normalize(records,all),n=edges.length,items=allCollections(all),paths=normalizePaths(pathRows,all);
  var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
@@ -325,7 +326,7 @@ viewConstellation=function(){
  return html;
 };
 render=function(){
- if(!cloudUser){records=[];pathRows=[];state.path='';state.history=[];gravityCache={key:'',geo:null};status='signed_out';problem='';}
+ if(!cloudUser){records=[];pathRows=[];state.path='';state.history=[];state.journeyStart='';state.journey=null;state.journeyMessage='';gravityCache={key:'',geo:null};status='signed_out';problem='';}
  originalRender();
  if(sky==='rap'&&view==='constellation'){
   var block=document.querySelector('.rap-discovery'),grid=document.querySelector('#screen .grid-2');
@@ -334,7 +335,7 @@ render=function(){
 };
 async function loadLinks(user,epoch){
  if(!user?.id||!cloudClient)return;
- status='loading';records=[];problem='';render();
+ status='loading';records=[];state.journeyStart='';state.journey=null;state.journeyMessage='';problem='';render();
  try{
   var res=await cloudClient.from('lyric_cross_readings')
    .select('link_key,topic,relation_type,left_work_id,right_work_id,evidence_left,evidence_right,observation,interpretation,alternative')
@@ -376,6 +377,14 @@ document.addEventListener('click',function(event){
  if(target.hasAttribute('data-semantic-scope')){state.scope=target.dataset.semanticScope==='near'?'near':'all';repaint();centerSelected();return;}
  var action=target.dataset.semanticAction;
  if(action==='more'){state.expanded=!state.expanded;repaint();return;}
+ if(action==='journey-start'){state.journeyStart=selected;state.journey=null;state.journeyMessage='';repaint();return;}
+ if(action==='journey-clear'){state.journeyStart='';state.journey=null;state.journeyMessage='';repaint();return;}
+ if(action==='journey-connect'){
+  if(status!=='ready'||!state.journeyStart||state.journeyStart===selected)return;
+  state.journey=shortestRoute(normalize(records,userWorks()),state.journeyStart,selected);
+  state.journeyMessage=state.journey?'':'この二曲をつなぐ直接比較の道筋は、まだ見つかりません。';
+  state.scope='all';state.mode='meaning';repaint();centerSelected();return;
+ }
  if(action==='prev'){
   var path=activePath(userWorks());if(path){
    var i=path.ids.indexOf(selected);selectStar(path.ids[(i+path.ids.length-1)%path.ids.length]);
@@ -396,7 +405,7 @@ document.addEventListener('click',function(event){
   if(!options.length)options=all.map(function(w){return w.id;}).filter(function(id){return id!==selected;});
   if(options.length)selectStar(options[Math.floor(Math.random()*options.length)]);return;
  }
- if(action==='reset'){state.collection='';state.search='';state.path='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
+ if(action==='reset'){state.collection='';state.search='';state.path='';state.journeyStart='';state.journey=null;state.journeyMessage='';state.scope='all';state.expanded=false;state.history=[];selected=userWorks()[0]?.id||null;repaint();return;}
  if(action==='search'){
   state.search=document.getElementById('semanticStarSearch')?.value.trim()||'';
   var found=userWorks().find(function(w){return w.title.toLocaleLowerCase('ja').includes(state.search.toLocaleLowerCase('ja'));});
