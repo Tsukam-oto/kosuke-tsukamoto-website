@@ -334,6 +334,54 @@ function controls(){
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="unlinked"'+(status==='ready'?'':' disabled')+'>未比較の星を探す</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
+/* A reading encounter above the sky; all displayed quotes are source-bound
+ * private comparison evidence. No personal lyrics are embedded in the public JS. */
+function discoveryPanel(){
+ if(!cloudUser)return '';
+ var all=userWorks(),pool=discoveryCandidates(records,all,judgmentsByKey,state.discoveryFilter);
+ var total=normalize(records,all).length,remaining=discoveryCandidates(records,all,judgmentsByKey,'all').length;
+ var done=total-remaining;
+ var buttons=[['all','まだ確かめていない思い'],['resonance','響き合い'],['contrast','変化と対照'],['across','作品集を越えて']].map(function(t){
+  return '<button type="button" data-discovery-filter="'+t[0]+'" class="'+(state.discoveryFilter===t[0]?'active':'')+'"'+(status!=='ready'||reviewStatus!=='ready'?' disabled':'')+'>'+t[1]+'</button>';
+ }).join('');
+ var content='';
+ if(status==='loading'||reviewStatus==='loading'){
+  content='<p class="semantic-discovery-empty">精読と、ご本人の確認記録を読み込んでいます。</p>';
+ }else if(status==='error'||reviewStatus==='error'){
+  content='<p class="semantic-discovery-empty" role="status">比較または確認記録を読み込めませんでした。確認できるまでは未確認の件数を確定しません。</p>';
+ }else if(!pool.length){
+  content='<p class="semantic-discovery-empty">'+(remaining===0&&total>0?'現在の比較は、すべて判断を記録済みです。':'この条件でまだ読んでいない比較はありません。')+'</p>';
+ }else{
+  var e=pool[((state.discoveryIndex%pool.length)+pool.length)%pool.length];
+  var left=all.find(function(w){return w.id===e.a;}),right=all.find(function(w){return w.id===e.b;});
+  if(left&&right){
+   var tag=e.kind==='counterpoint'?'対照':e.kind==='reframing'?'意味の変化':e.kind==='text_overlap'?'言葉の再用':'響き合い';
+   content='<article class="semantic-discovery-card" data-discovery-current="'+safe(e.key)+'">'+
+    '<div class="semantic-discovery-meta"><span>'+safe(tag)+'</span><span>この条件の '+pool.length+'組から一つを表示</span></div>'+
+    '<h3>'+safe(e.topic||'二つの作品を読み比べる')+'</h3>'+
+    '<div class="semantic-discovery-pair">'+
+    '<div><button type="button" data-star-focus="'+safe(left.id)+'" class="semantic-discovery-title">'+safe(left.title)+'</button>'+
+    '<small>'+safe(left.collection||'作品集未登録')+'</small><blockquote>'+safe(e.left)+'</blockquote></div>'+
+    '<div><button type="button" data-star-focus="'+safe(right.id)+'" class="semantic-discovery-title">'+safe(right.title)+'</button>'+
+    '<small>'+safe(right.collection||'作品集未登録')+'</small><blockquote>'+safe(e.right)+'</blockquote></div></div>'+
+    '<div class="semantic-discovery-reading"><strong>精読から見つけたつながり（仮説）</strong>'+
+    '<p>'+safe(e.observation||'')+'</p><details><summary>解釈と別の読み方を開く</summary>'+
+    '<p>'+safe(e.interpretation||'')+'</p>'+(e.alternative?'<p>別の読み：'+safe(e.alternative)+'</p>':'')+
+    '</details></div>'+authorReviewMarkup(e)+
+    '<div class="semantic-discovery-actions"><button type="button" data-semantic-action="discovery-next">別の思いを読む</button>'+
+    '<span>見送っても記録は変更されません。判断を選ぶと次の候補へ進みます。</span></div>'+
+    '</article>';
+  }
+ }
+ return '<section class="semantic-discovery" aria-label="思いの発見室">'+
+  '<div class="semantic-discovery-heading"><div><span>FEELING CONSTELLATIONS</span><h2>思いの発見室</h2>'+
+  '<p>二曲の言葉を見比べ、同じ願い・変化・矛盾を、ご自身の感覚で確かめます。</p></div>'+
+  '<div class="semantic-discovery-progress"><strong>'+done+' <small>/ '+total+'</small></strong>'+
+  '<span>判断を記録した比較</span></div>'+
+  '<button type="button" data-semantic-action="discovery-toggle" aria-expanded="'+state.discoveryOpen+'">'+(state.discoveryOpen?'閉じる':'開く')+'</button></div>'+
+  (state.discoveryOpen?'<div class="semantic-discovery-body"><div class="semantic-discovery-filters">'+buttons+'</div>'+content+'</div>':'')+
+  '</section>';
+}
 function journeyPanel(w,all){
  var start=all.find(function(x){return x.id===state.journeyStart;});
  var route=state.journey;
@@ -416,7 +464,7 @@ selectedWorkCard=function(){
 viewConstellation=function(){
  var html=originalConstellation();
  if(sky!=='rap')return html;
- html=html.replace('<div class="constellation-scroll">',controls()+'<div class="constellation-scroll semantic-star-viewport">');
+ html=html.replace('<div class="constellation-scroll">',controls()+discoveryPanel()+'<div class="constellation-scroll semantic-star-viewport">');
  html=html.replace(/代表40 \/ 全\d+ stars/g,userWorks().length+' stars');
  html=html.replace('<span>星図は代表40点。作品画面で全件を確認できます。</span>','<span>全作品を星として表示しています。</span>');
  html=html.replace('線＝主な共通語のつながり','線＝'+(state.mode==='meaning'?'精読による関係の仮説':'共通する文字列'));
