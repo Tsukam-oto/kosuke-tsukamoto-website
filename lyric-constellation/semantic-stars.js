@@ -350,7 +350,7 @@ function nearPositions(all,selection){
 }
 function reviewChoiceLabel(decision){
  return decision==='confirmed'?'この思いはつながる':decision==='different'?'別の思いに見える':
-  decision==='rejected'?'この線は違う':'まだ判断していない';
+  decision==='rejected'?'この線は違う':'記録なし';
 }
 function isJudgmentDecision(v){return ['pending','confirmed','different','rejected'].includes(v);}
 function buildGraphModel(all,rows,selection,scope,mode){
@@ -462,7 +462,7 @@ function controls(){
  var options=['<option value="">すべての作品集</option>'].concat([...items].map(function(e){return '<option value="'+safe(e[0])+'"'+(state.collection===e[0]?' selected':'')+'>'+safe(e[0])+'（'+e[1]+'）</option>'; })).join('');
  var pathOptions=['<option value="">読解テーマを選んでたどる</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
  var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):
- status==='ready'?'根拠を保存した作品間比較 '+n+'組。'+(reviewStatus==='loading'?'ご本人の記録を読み込み中…':reviewStatus==='error'?'ご本人の記録を取得できません：'+safe(reviewError):'本人確認済み '+counts.confirmed+'組。ほかの比較はAIの読解仮説です。'):'ログインすると非公開の精読を表示します。';
+ status==='ready'?'原文に根拠を持つ作品間比較 '+n+'組。AIの読解仮説として読めます。作者による確認や判定は必要ありません。':'ログインすると非公開の精読を表示します。';
  var matches=titleMatches(all,state.search);
  var searchResult=state.search?'<div class="semantic-title-results" role="group" aria-label="作品名検索の結果">'+
   (matches.length?'<p>'+matches.length+'作品が見つかりました。読みたい曲を選んでください。</p>'+
@@ -598,26 +598,26 @@ function membershipsPanel(work,all){
  * private comparison evidence. No personal lyrics are embedded in the public JS. */
 function discoveryPanel(){
  if(!cloudUser)return '';
- var all=userWorks(),pool=discoveryCandidates(records,all,judgmentsByKey,state.discoveryFilter);
- var total=normalize(records,all).length,remaining=discoveryCandidates(records,all,judgmentsByKey,'all').length;
- var done=total-remaining;
- var buttons=[['all','まだ確かめていない思い'],['resonance','響き合い'],['contrast','変化と対照'],['across','作品集を越えて']].map(function(t){
-  return '<button type="button" data-discovery-filter="'+t[0]+'" class="'+(state.discoveryFilter===t[0]?'active':'')+'"'+(status!=='ready'||reviewStatus!=='ready'?' disabled':'')+'>'+t[1]+'</button>';
+ var all=userWorks(),pool=discoveryCandidates(records,all,null,state.discoveryFilter);
+ var total=discoveryCandidates(records,all,null,'all').length;
+ var buttons=[['all','すべての比較'],['resonance','響き合い'],['contrast','変化と対照'],['across','作品集を越えて']].map(function(t){
+  return '<button type="button" data-discovery-filter="'+t[0]+'" class="'+(state.discoveryFilter===t[0]?'active':'')+'"'+(status!=='ready'?' disabled':'')+'>'+t[1]+'</button>';
  }).join('');
  var content='';
- if(status==='loading'||reviewStatus==='loading'){
-  content='<p class="semantic-discovery-empty">精読と、ご本人の確認記録を読み込んでいます。</p>';
- }else if(status==='error'||reviewStatus==='error'){
-  content='<p class="semantic-discovery-empty" role="status">比較または確認記録を読み込めませんでした。確認できるまでは未確認の件数を確定しません。</p>';
+ if(status==='loading'){
+  content='<p class="semantic-discovery-empty">原文に基づく作品間比較を読み込み中です。</p>';
+ }else if(status==='error'){
+  content='<p class="semantic-discovery-empty" role="status">作品間比較を読み込めませんでした。原文と比較のデータを再取得してください。</p>';
  }else if(!pool.length){
-  content='<p class="semantic-discovery-empty">'+(remaining===0&&total>0?'現在の比較は、すべて判断を記録済みです。':'この条件でまだ読んでいない比較はありません。')+'</p>';
+  content='<p class="semantic-discovery-empty">この条件で表示できる原文付きの比較はありません。</p>';
  }else{
-  var e=pool[((state.discoveryIndex%pool.length)+pool.length)%pool.length];
+  var current=((state.discoveryIndex%pool.length)+pool.length)%pool.length;
+  var e=pool[current];
   var left=all.find(function(w){return w.id===e.a;}),right=all.find(function(w){return w.id===e.b;});
   if(left&&right){
    var tag=e.kind==='counterpoint'?'対照':e.kind==='reframing'?'意味の変化':e.kind==='text_overlap'?'言葉の再用':'響き合い';
    content='<article class="semantic-discovery-card" data-discovery-current="'+safe(e.key)+'">'+
-    '<div class="semantic-discovery-meta"><span>'+safe(tag)+'</span><span>この条件の '+pool.length+'組から一つを表示</span></div>'+
+    '<div class="semantic-discovery-meta"><span>'+safe(tag)+'</span><span>比較 '+(current+1)+' / '+pool.length+'</span></div>'+
     '<h3>'+safe(e.topic||'二つの作品を読み比べる')+'</h3>'+
     '<div class="semantic-discovery-pair">'+
     '<div><button type="button" data-star-focus="'+safe(left.id)+'" class="semantic-discovery-title">'+safe(left.title)+'</button>'+
@@ -627,18 +627,18 @@ function discoveryPanel(){
     '<div class="semantic-discovery-reading"><strong>精読から見つけたつながり（仮説）</strong>'+
     '<p>'+safe(e.observation||'')+'</p><details><summary>解釈と別の読み方を開く</summary>'+
     '<p>'+safe(e.interpretation||'')+'</p>'+(e.alternative?'<p>別の読み：'+safe(e.alternative)+'</p>':'')+
-    '</details></div>'+authorReviewMarkup(e)+
+    '</details></div><details class="semantic-discovery-author-optional"><summary>作者メモ（任意・閲覧には不要）</summary>'+authorReviewMarkup(e)+'</details>'+
     '<div class="semantic-discovery-actions">'+
-    (pool.length>1?'<button type="button" data-semantic-action="discovery-next">別の思いを読む</button>':'')+
-    '<span>'+(pool.length>1?'見送っても記録は変更されません。':'この条件では最後の一組です。')+'判断を選ぶと次の候補へ進みます。</span></div>'+
+    (pool.length>1?'<button type="button" data-semantic-action="discovery-next">次の比較を読む</button>':'')+
+    '<span>読むだけで利用できます。判定やメモは不要です。</span></div>'+
     '</article>';
   }
  }
  return '<section class="semantic-discovery" aria-label="思いの発見室">'+
-  '<div class="semantic-discovery-heading"><div><span>FEELING CONSTELLATIONS</span><h2>思いの発見室</h2>'+
-  '<p>二曲の言葉を見比べ、同じ願い・変化・矛盾を、ご自身の感覚で確かめます。</p></div>'+
-  '<div class="semantic-discovery-progress"><strong>'+done+' <small>/ '+total+'</small></strong>'+
-  '<span>判断を記録した比較</span></div>'+
+  '<div class="semantic-discovery-heading"><div><span>FEELING CONSTELLATIONS</span><h2>二作品の読み比べ</h2>'+
+  '<p>二曲の原文と読解を並べて読みます。比較の解釈はAIによる仮説で、作者の判定は必要ありません。</p></div>'+
+  '<div class="semantic-discovery-progress"><strong>'+total+' <small>組</small></strong>'+
+  '<span>原文の根拠がある比較</span></div>'+
   '<button type="button" data-semantic-action="discovery-toggle" aria-expanded="'+state.discoveryOpen+'">'+(state.discoveryOpen?'閉じる':'開く')+'</button></div>'+
   (state.discoveryOpen?'<div class="semantic-discovery-body"><div class="semantic-discovery-filters">'+buttons+'</div>'+content+'</div>':'')+
   '</section>';
@@ -684,8 +684,8 @@ function authorReviewMarkup(e){
   return '<button type="button" data-author-decision="'+c[0]+'" class="'+(decision===c[0]?'selected':'')+'"'+(pending||reviewStatus!=='ready'?' disabled':'')+'>'+safe(c[1])+'</button>';
  }).join('');
  return '<div class="semantic-author-review" data-author-review="'+safe(e.key)+'">'+
- '<div class="semantic-author-review-heading"><strong>あなたが感じる「思い」のつながり</strong><span>'+safe(reviewChoiceLabel(decision))+'</span></div>'+
- '<p>この比較をどう感じますか。AIの読解はそのまま残り、ご本人の判断だけを別に記録します。</p>'+
+ '<div class="semantic-author-review-heading"><strong>作者メモ（任意）</strong><span>'+safe(reviewChoiceLabel(decision))+'</span></div>'+
+ '<p>閲覧に入力は不要です。既存の作者メモを確認・編集したい場合のみ使用します。AIの読解とは別に保存されます。</p>'+
  '<label>ご自身の言葉（任意）<textarea data-author-note maxlength="1500" rows="2" placeholder="この二曲の奥には、こんな思いがある…">'+safe(note)+'</textarea></label>'+
  '<div class="semantic-author-choices">'+buttons+'</div>'+
  '<p class="semantic-review-feedback" aria-live="polite">'+(pending?'保存中…':reviewStatus==='loading'?'本人の記録を読み込み中…':reviewStatus==='error'?'本人の記録を取得できません':(draft!==undefined&&draft!==savedNote||reviewChoiceDrafts.has(e.key))?'未保存の入力があります。判断を選んで保存してください。':judgment?'本人の記録を保存済み':'未確認・保存されていません')+'</p></div>';
@@ -717,13 +717,13 @@ selectedWorkCard=function(){
   var quote1=isLeft?e.left:e.right,quote2=isLeft?e.right:e.left;
   return '<article class="semantic-related"><div class="semantic-related-head"><button type="button" data-star-focus="'+safe(other.id)+'">✦ '+safe(other.title)+'</button><small>'+tag+'</small></div><div class="semantic-related-theme">'+safe(e.topic||'作品のつながり')+'</div><p class="semantic-related-observation">'+safe(e.observation||'')+'</p><details class="semantic-evidence-details"><summary>原文の根拠と別の読みを開く</summary>'+(quote1?'<blockquote>この曲：'+safe(quote1)+'</blockquote>':'')+(quote2?'<blockquote>相手の曲：'+safe(quote2)+'</blockquote>':'')+'<p>'+safe(e.interpretation||'')+'</p>'+(e.alternative?'<p>別の読み：'+safe(e.alternative)+'</p>':'')+'<p class="semantic-caution">これは精読による仮説です。作者が確認した制作意図ではありません。</p></details>'+
  (e.kind==='word'?'<p class="semantic-caution">一行の一致は原文検索の手がかりです。作者確認済みのつながりとは数えません。</p>':
- '<details class="semantic-review-disclosure"><summary>この関係を判断する <span>'+safe(reviewChoiceLabel(judgmentsByKey.get(e.key)?.decision||'pending'))+((reviewDrafts.has(e.key)||reviewChoiceDrafts.has(e.key))?'・未保存':'')+'</span></summary>'+authorReviewMarkup(e)+'</details>')+'</article>';
+ '<details class="semantic-review-disclosure"><summary>作者メモ（任意） <span>'+safe(reviewChoiceLabel(judgmentsByKey.get(e.key)?.decision||'pending'))+((reviewDrafts.has(e.key)||reviewChoiceDrafts.has(e.key))?'・未保存':'')+'</span></summary>'+authorReviewMarkup(e)+'</details>')+'</article>';
  }).join('');
  var history=state.history.slice(-6).map(function(id){var item=getWork(id);return item?'<button type="button" data-star-focus="'+safe(id)+'">'+safe(item.title)+'</button>':'';}).join('');
  return '<div class="panel semantic-focus-panel"><div class="eyebrow">SELECTED STAR / いま見ている作品</div><h2>'+safe(w.title)+'</h2><p class="desc">'+safe(w.collection||'収録先未登録')+'</p><div class="semantic-focus-total">'+links.length+' <span>本の線が、この星から伸びています</span></div>'+
  sequence+thematic+membershipsPanel(w,available)+journeyPanel(w,available)+(history?'<div class="semantic-history"><small>たどった星</small><div>'+history+'</div></div>':'')+
  '<div class="semantic-panel-actions"><button class="btn primary" data-open="'+safe(w.id)+'">原文を読む</button><button class="btn" data-deep-work="'+safe(w.id)+'">精読を読む</button></div>'+
- '<h3>つながっている作品</h3><p class="semantic-reading-hint">原文の根拠と別の読みを確認し、判断したいときだけ確認欄を開けます。</p>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
+ '<h3>つながっている作品</h3><p class="semantic-reading-hint">原文の根拠と別の読みを参照できます。作品を読むのに作者メモや判定は必要ありません。</p>'+(list||'<p class="desc">この表示方法では、まだ線がありません。別の星または共通語の線をお試しください。</p>')+
  (links.length>3?'<button type="button" class="semantic-show-more" data-semantic-action="more">'+(state.expanded?'少なく表示する':'残り'+(links.length-3)+'組を見る')+'</button>':'')+'</div>';
 };
 viewConstellation=function(){
@@ -743,7 +743,7 @@ render=function(){
   var sidebar=document.querySelector('.sidebar-bottom p:first-child');
   if(sidebar)sidebar.textContent=cloudUser?'本人専用の木乃伊アーカイブ：'+userWorks().length+'作品':'木乃伊の作品は本人ログイン後に表示します';
   var footer=typeof document.getElementById==='function'?document.getElementById('constellationFooter'):null;
-  if(footer)footer.textContent='原文の歌詞は非公開です。作品同士の関係は、根拠のある読解仮説として表示します。本人の確認とAIの解釈は別に保存します。';
+  if(footer)footer.textContent='原文の歌詞は非公開です。作品間の関係は原文に根拠を持つAIの読解仮説であり、作者の制作意図と断定しません。閲覧・読書に本人の判定は不要です。';
  }
 };
 async function saveAuthorJudgment(linkKey,decision,panel){
