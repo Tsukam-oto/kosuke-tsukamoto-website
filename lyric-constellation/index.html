@@ -259,6 +259,7 @@ body.sky-rap .rap-empty,body.sky-rap .rap-discovery-caveat{color:#baafc7}
 </style>
 <link rel="stylesheet" href="./mummy-research.css">
 <link rel="stylesheet" href="./semantic-stars.css">
+<link rel="stylesheet" href="./visual-refresh.css">
 <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.96.0/dist/umd/supabase.js"></script>
 <script defer src="./deep-reading.js"></script>
 <script defer src="./semantic-stars.js"></script>
@@ -334,7 +335,7 @@ const safeId=()=>`u-${Date.now().toString(36)}-${Math.random().toString(36).slic
 let db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};let localWorks=[];
 let masterReadingWorks=[],masterPendingWorks=[],masterReadStatus='signed_out';
 let rapResearchSource=null,rapResearchPassages=[],rapResearchConnections=[],rapSongReadings=[],rapSongDialogues=[],rapResearchStatus='signed_out';
-let sky='choir',view='constellation',selected=null,term='',query='',visibility='all',order='new',editing=null,pairIds=[];
+let sky='choir',view='constellation',selected=null,term='',query='',visibility='all',order='new',editing=null,pairIds=[],wordResultLimit=12;
 function cleanWork(w){if(!w||typeof w!=='object')return null;const title=String(w.title||'').trim().slice(0,140),lyrics=String(w.lyrics??w.text??'').slice(0,120000);if(!title||!lyrics.trim())return null;return {id:String(w.id||safeId()).slice(0,90),title,lyrics,year:Number(w.year)||null,credit:String(w.credit||'').slice(0,250),kind:String(w.kind||'その他').slice(0,70),tags:Array.isArray(w.tags)?w.tags.map(t=>String(t).slice(0,30)).slice(0,30):[],sky:resolveSky(w),origin:'private',updatedAt:String(w.updatedAt||new Date().toISOString())};}
 
 /* v3 author-review journal: strictly separate the reader's interpretation from the author's testimony.
@@ -531,50 +532,63 @@ function save(){try{db.updatedAt=new Date().toISOString();localStorage.setItem(S
 function works(){return [...PUBLIC,...db.userWorks,...masterReadingWorks].filter(w=>resolveSky(w)===sky)}
 function getWork(id){return works().find(w=>w.id===id)}
 
-/* Exact fragments, observed locally. Never infer or generate lyrics. */
+/* Explicit search terms are complete expressions, never slices of Japanese text.
+ * Japanese morphological units cannot be inferred by a fixed-width substring. */
+const RAP_SEARCH_GROUPS=[
+ {label:'呼びかけ',terms:['あなた','君','僕','俺','お前','あんた']},
+ {label:'心の動き',terms:['愛してる','ありがとう','ごめんね','幸せ','会いたい','後悔','忘れない']},
+ {label:'暮らしと風景',terms:['帰り道','誕生日','コンビニ','コーヒー','夏休み','春','夏','秋','冬']},
+ {label:'音楽と創作',terms:['音楽','ピアノ','ラップ','歌詞','曲を書く','新曲','マイク']}
+];
+/* Only the ENTIRE original line can be detected as a repeated phrase.
+ * A match is a textual observation, not proof of a common meaning. */
 let rapPhraseMemo={key:null,rows:[]};
 function rapRepeatedPhrases(){
  if(sky!=='rap')return [];
- const corpus=works().slice(0,200);
- const key=corpus.map(w=>w.id+':'+(w.updatedAt||'')+':'+w.lyrics.length+':'+w.lyrics.slice(0,16)).join('|');
+ const corpus=works().slice(0,300);
+ const key=corpus.map(w=>w.id+':'+(w.updatedAt||'')+':'+hashText(w.lyrics)).join('|');
  if(rapPhraseMemo.key===key)return rapPhraseMemo.rows;
  const inverted=new Map();
  for(const w of corpus){
-  const seen=new Set();let budget=4200;
-  for(const line of w.lyrics.split(/\r?\n/).slice(0,150)){
-   if(budget<=0)break;
-   const t=norm(line).slice(0,125);
-   for(let len=4;len<=8&&budget>0;len++){
-    for(let i=0;i+len<=t.length&&budget>0;i++){
-     budget--;
-     const part=t.slice(i,i+len);
-     if(!/^[\p{L}]+$/u.test(part))continue;
-     seen.add(part);
-    }
-   }
+  const seen=new Map();
+  for(const originalLine of w.lyrics.split(/\r?\n/).slice(0,400)){
+   const line=originalLine.trim().replace(/[ \t　]+/g,' ');
+   if(line.length<6||line.length>105||!/[\p{L}]{3}/u.test(line))continue;
+   if(/^([※☆★\-_=〜~\s]+|(?:chorus|verse|hook)(?:\s*\d+)?)$/i.test(line))continue;
+   const normalized=norm(line);
+   if(!seen.has(normalized))seen.set(normalized,line);
   }
-  for(const part of seen){if(!inverted.has(part))inverted.set(part,new Set());inverted.get(part).add(w.id);}
+  for(const [normalized,text]of seen){
+   if(!inverted.has(normalized))inverted.set(normalized,{text,ids:new Set()});
+   inverted.get(normalized).ids.add(w.id);
+  }
  }
- const raw=[...inverted].filter(([t,ids])=>ids.size>=2).map(([text,ids])=>({text,ids:[...ids],count:ids.size,quality:ids.size*Math.log2(text.length+1)}));
- raw.sort((a,b)=>b.text.length-a.text.length||b.count-a.count||a.text.localeCompare(b.text,'ja'));
- const kept=[];
- for(const p of raw){if(kept.some(l=>{if(!p.ids.every(id=>l.ids.includes(id)))return false;if(l.text.includes(p.text))return true;for(let i=0;i+5<=p.text.length;i++)if(l.text.includes(p.text.slice(i,i+5)))return true;return false;}))continue;kept.push(p);if(kept.length>=32)break;}
- kept.sort((a,b)=>b.quality-a.quality||b.text.length-a.text.length||a.text.localeCompare(b.text,'ja'));
- rapPhraseMemo={key,rows:kept.slice(0,24)};
+ const found=[...inverted.values()].filter(x=>x.ids.size>=2)
+  .map(x=>({text:x.text,ids:[...x.ids],count:x.ids.size}))
+  .sort((a,b)=>b.count-a.count||b.text.length-a.text.length||a.text.localeCompare(b.text,'ja'));
+ rapPhraseMemo={key,rows:found.slice(0,24)};
  return rapPhraseMemo.rows;
 }
-function words(){return [...new Set([...DEFAULT_WORDS,...db.customWords,...(sky==='rap'?rapRepeatedPhrases().map(x=>x.text):[])])].filter(Boolean)}
+function hashText(text){
+ let h=2166136261;
+ for(let i=0;i<text.length;i++){h^=text.charCodeAt(i);h=Math.imul(h,16777619)>>>0;}
+ return h;
+}
+function words(){
+ const catalog=sky==='rap'?RAP_SEARCH_GROUPS.flatMap(group=>group.terms):DEFAULT_WORDS;
+ return [...new Set([...catalog,...db.customWords])].filter(Boolean);
+}
 function tokens(w){const t=norm(w.lyrics);return words().filter(x=>t.includes(norm(x))).sort((a,b)=>b.length-a.length)}
 function occurrences(text,needle){if(!needle)return 0;const a=norm(text),b=norm(needle);let count=0,at=0;while((at=a.indexOf(b,at))!==-1){count++;at+=b.length}return count;}
 function wordDF(){const arr=works(),map=new Map();for(const word of words()){let df=0,ct=0;for(const w of arr){const n=occurrences(w.lyrics,word);if(n){df++;ct+=n}}if(df)map.set(word,{df,count:ct})}return map}
-function connections(){const all=works(),df=wordDF(),n=all.length,arr=[],sets=all.map(w=>new Set(tokens(w)));for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const b=sets[j],shared=[...sets[i]].filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
+function connections(){if(sky==='rap')return [];const all=works(),df=wordDF(),n=all.length,arr=[],sets=all.map(w=>new Set(tokens(w)));for(let i=0;i<all.length;i++)for(let j=i+1;j<all.length;j++){const b=sets[j],shared=[...sets[i]].filter(x=>b.has(x));if(!shared.length)continue;let score=shared.reduce((sum,x)=>sum+(Math.log(1+n/(df.get(x)?.df||n))+(x.length>=3?.16:0)),0);arr.push({a:all[i].id,b:all[j].id,shared,score});}return arr.sort((x,y)=>y.score-x.score)}
 function formatTags(w){const arr=tokens(w).filter(x=>x.length>=2).slice(0,3);return arr.length?arr.map(x=>`<span>${esc(x)}</span>`).join(''):'<span>未分類</span>'}
 function summary(){const all=works(),conn=connections(),df=wordDF();return {all,conn,df,nwords:df.size,lines:all.reduce((s,w)=>s+w.lyrics.split('\n').filter(Boolean).length,0),private:db.userWorks.length};}
 function toast(message){const x=$('#toast');x.textContent=message;x.classList.add('show');clearTimeout(toast.timer);toast.timer=setTimeout(()=>x.classList.remove('show'),3000)}
 function go(to){if(to==='strata'||to==='research')closeWork();if(to==='research')sky='rap';view=to;query='';visibility='all';try{const target=location.pathname+location.search+(to==='strata'?'#strata':to==='research'?'#mummy-research':'');history.replaceState(null,'',target)}catch{}window.scrollTo({top:0,behavior:'instant'});render()}
 function header(title,sub){const out=title==='書いた言葉は、星座になる。'?'<span class="headline-segment">書いた言葉は、</span><span class="headline-segment">星座になる。</span>':esc(title);return `<h1 class="heading">${out}</h1><p class="lede">${esc(sub)}</p>`}
 function switchSky(next){if(next!=='rap'&&next!=='choir')return;if(next==='choir'&&view==='research')view='works';sky=next;term='';query='';visibility='all';selected=works()[0]?.id||null;try{localStorage.setItem(SKY_PREF,sky)}catch{}closeWork();render();window.scrollTo({top:0,behavior:'instant'})}
-function skySwitch(){return `<div class="sky-switch" role="group" aria-label="創作名義と星座の切替"><button data-sky="choir" class="${sky==='choir'?'active':''}" aria-pressed="${sky==='choir'}"><strong>✧ 合唱・詩の空</strong><small>束元康介</small></button><button data-sky="rap" class="${sky==='rap'?'active rap-selected':''}" aria-pressed="${sky==='rap'}"><strong>✦ 木乃伊の空</strong><small>ラップ／余白</small></button></div><div class="sky-help">${sky==='rap'?'木乃伊のリリックだけを読みます。合唱作品との共通語やつながりは集計しません。':'合唱・詩の作品だけを読みます。木乃伊の星座とは分けて表示します。'}</div>`}
+function skySwitch(){return `<div class="sky-switch" role="group" aria-label="作品の名義を切り替える"><button data-sky="choir" class="${sky==='choir'?'active':''}" aria-pressed="${sky==='choir'}"><strong>合唱・詩</strong><small>束元康介の作品</small></button><button data-sky="rap" class="${sky==='rap'?'active rap-selected':''}" aria-pressed="${sky==='rap'}"><strong>木乃伊</strong><small>ラップの作品</small></button></div><div class="sky-help">${sky==='rap'?'現在は木乃伊名義の作品だけを表示しています。合唱・詩の作品とは混在しません。':'現在は合唱・詩の作品だけを表示しています。木乃伊名義とは混在しません。'}</div>`}
 function statStrip(){const s=summary();return `<div class="stats"><div class="stat"><b>${s.all.length}</b><span>収録作品</span></div><div class="stat"><b>${s.nwords}</b><span>見つかった観察語</span></div><div class="stat"><b>${s.conn.length}</b><span>言葉で結ばれる作品ペア</span></div><div class="stat"><b>${s.lines}</b><span>原文の行数</span></div></div>`}
 function topTerms(limit=18){return [...wordDF()].sort((a,b)=>b[1].df-a[1].df||b[1].count-a[1].count||b[0].length-a[0].length).slice(0,limit)}
 function pills(){return `<div class="pillbar"><button class="pill ${!term?'active':''}" data-term="">すべての言葉</button>${topTerms(23).map(([t,o])=>`<button class="pill ${term===t?'active':''}" data-term="${esc(t)}">${esc(t)} · ${o.df}作品</button>`).join('')}</div>`}
@@ -583,44 +597,36 @@ function positions(ws){const out=new Map();const n=ws.length;ws.forEach((w,i)=>{
 function renderGraph(){const all=graphWorks().slice().sort((a,b)=>(a.year||0)-(b.year||0)||a.title.localeCompare(b.title,'ja'));const present=new Set(all.map(w=>w.id));const pos=positions(all),edges=connections().filter(e=>present.has(e.a)&&present.has(e.b));const labeled=new Set([selected,...edges.filter(e=>e.a===selected||e.b===selected).slice(0,6).flatMap(e=>[e.a,e.b])]);const hot=term?new Set(all.filter(w=>tokens(w).includes(term)).map(w=>w.id)):new Set(all.map(w=>w.id));const mainEdges=term?edges.filter(e=>e.shared.includes(term)).slice(0,22):sky==='rap'?edges.slice(0,28):[...edges.filter(e=>e.shared.length>=2).slice(0,17),...edges.filter(e=>e.a===selected||e.b===selected).slice(0,8)];const uniqueEdges=[...new Map(mainEdges.map(e=>[e.a+'|'+e.b,e])).values()];const lines=uniqueEdges.sort((a,b)=>a.score-b.score).map(e=>{const a=pos.get(e.a),b=pos.get(e.b),isHot=(term?e.shared.includes(term):e.a===selected||e.b===selected),deem=term&&!e.shared.includes(term);const width=clamp(e.score/6,.55,2.8);return `<line class="star-link ${isHot?'hot':''} ${deem?'faded':''}" x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke-width="${width.toFixed(1)}"></line>`}).join('');const nodes=all.map(w=>{const p=pos.get(w.id),sx=p.x>530?1:-1,active=w.id===selected,isDim=!hot.has(w.id);return `<g class="star-node ${active?'selected':''} ${isDim?'dim':''}" data-open="${esc(w.id)}" role="button" tabindex="0" aria-label="${esc(w.title)}を開く"><title>${esc(w.title)}</title><circle class="halo" cx="${p.x}" cy="${p.y}" r="22"></circle><circle class="core" cx="${p.x}" cy="${p.y}" r="${active?8:6}"></circle>${all.length<=18||labeled.has(w.id)?`<text class="star-label" x="${p.x+sx*15}" y="${p.y-3}" text-anchor="${sx>0?'start':'end'}">${esc(w.title)}</text><text class="star-year" x="${p.x+sx*15}" y="${p.y+14}" text-anchor="${sx>0?'start':'end'}">${w.year||'年不詳'} ${w.origin==='private'?'· 非公開':''}</text>`:''} </g>`}).join('');return `<svg class="stars-svg" viewBox="0 0 1060 650" aria-label="歌詞の星座。作品を選ぶと全文が開きます" role="img">${lines}${nodes}</svg>`}
 function selectedWorkCard(){const w=getWork(selected)||works()[0];if(!w)return '';const list=connections().filter(c=>c.a===w.id||c.b===w.id).slice(0,5);return `<div class="panel"><div class="eyebrow">SELECTED WORK</div><h2 style="font-size:25px;margin:6px 0">${esc(w.title)}</h2><p class="desc">${w.year||'制作年未登録'}年 · ${w.origin==='official'?'公式公開作品':'非公開の個人作品'}</p><p class="panel-sub">この作品に出てくる言葉</p><div class="word-cloud">${tokens(w).slice(0,14).map(x=>`<button class="word" data-term="${esc(x)}">${esc(x)}</button>`).join('')}</div><div class="section-top"><h2>言葉でつながる作品</h2></div>${list.map(c=>{const other=getWork(c.a===w.id?c.b:c.a);return `<div class="pair" data-open="${esc(other.id)}"><strong>${esc(other.title)}</strong><small>共通する表記 ${c.shared.length}語</small><div class="shared">${c.shared.slice(0,5).map(t=>`<span class="tag">${esc(t)}</span>`).join('')}</div></div>`}).join('')||'<div class="desc">共通語が見つかっていません。</div>'}<div style="margin-top:19px"><button class="btn primary" data-open="${esc(w.id)}">全文を読む →</button> <button class="btn" data-deep-work="${esc(w.id)}">歌詞を深く読む</button></div></div>`}
 
-/* Mokunoi-only observations: no cross-sky edges and no generated lines. */
-function rapFindings(){
- const all=works(),edges=connections(),phrases=rapRepeatedPhrases();
- const pset=new Set(phrases.map(p=>p.text));
- const strong=edges.filter(e=>e.shared.some(w=>pset.has(w))||e.shared.filter(w=>w.length>=2).length>=2);
- const parent=new Map(all.map(w=>[w.id,w.id]));
- const root=id=>{while(parent.get(id)!==id)id=parent.get(id);return id;};
- for(const edge of strong){const a=root(edge.a),b=root(edge.b);if(a!==b)parent.set(b,a);}
- const groups=new Map();
- for(const w of all){const k=root(w.id);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(w);}
- const clusters=[...groups.values()].filter(g=>g.length>=2).sort((a,b)=>b.length-a.length);
- const connected=new Set(strong.flatMap(e=>[e.a,e.b]));
- return {all,edges,strong,phrases,clusters,isolated:all.filter(w=>!connected.has(w.id)),candidates:(strong.length?strong:edges).slice(0,4)};
-}
+/* The original-line repetition view is a search aid only.
+ * Source-backed interpretation and true multi-song comparisons live in the star atlas. */
 function rapDiscovery(){
- if(sky!=='rap')return '';
- const r=rapFindings();
- if(!r.all.length)return '';
- const candidates=r.candidates.map(edge=>{
-  const a=getWork(edge.a),b=getWork(edge.b);
-  if(!a||!b)return '';
-  const full=edge.shared.filter(t=>r.phrases.some(p=>p.text===t));
-  const terms=(full.length?full:edge.shared).slice(0,3);
-  return `<div class="rap-pair"><div class="rap-pair-label">${full.length?'繰り返す表現':'共通する観察語'}</div><div class="rap-pair-titles">《${esc(a.title)}》<span>×</span>《${esc(b.title)}》</div><div class="rap-phrase-list">${terms.map(t=>`<button type="button" class="rap-phrase" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}">原文を並べる</button></div>`;
- }).join('');
- const recurring=r.phrases.length?`<div class="rap-phrase-list">${r.phrases.slice(0,10).map(p=>`<button type="button" class="rap-phrase" data-term="${esc(p.text)}">${esc(p.text)} <small>${p.count}篇</small></button>`).join('')}</div>`:'<p class="rap-empty">異なる原文に同じ4〜8文字の連続表現が現れると、ここに並びます。</p>';
- const alone=r.isolated.length?`<div class="rap-alone">${r.isolated.slice(0,6).map(w=>`<button type="button" data-open="${esc(w.id)}">✧ ${esc(w.title)}</button>`).join('')}</div>`:'<p class="rap-empty">登録済みの断片は、すべて少なくとも一つの星座候補につながっています。</p>';
- return `<section class="rap-discovery" aria-label="木乃伊の原文の発見">
- <div class="rap-discovery-intro"><div><div class="eyebrow">MOKUNOI / FINDINGS</div><h2>断片が増えるほど、見えてくるもの。</h2><p>自分の原文に現れた言葉の反復を探し、断片同士の距離を確かめます。</p></div>
- <div class="rap-metrics"><div><b>${r.clusters.length}</b><small>星座の候補</small></div><div><b>${r.phrases.length}</b><small>繰り返す表現</small></div><div><b>${r.isolated.length}</b><small>強い一致のない星</small></div></div></div>
- <div class="rap-discovery-grid">
- <article class="rap-discovery-box"><h3>つながりの兆し</h3>${candidates||'<p class="rap-empty">まだ観察語の一致がありません。断片を増やすと、言葉のつながりがここに現れます。</p>'}</article>
- <article class="rap-discovery-box"><h3>繰り返し現れた表現</h3>${recurring}<h3 class="rap-subhead">強い一致がまだない星</h3>${alone}</article>
- </div>
- <p class="rap-discovery-caveat">星座の候補は文字列の一致による観察です。意味・韻・作者の意図を推測で断定せず、原文を開いて読み比べられます。AIが新しい歌詞を作ることはありません。</p>
- </section>`;
+ if(sky!=='rap'||!works().length)return '';
+ const repeated=rapRepeatedPhrases().slice(0,6);
+ return '<section class="rap-discovery rap-evidence-only" aria-label="原文で一致した一行">'+
+  '<div class="rap-discovery-intro"><div><div class="eyebrow">ORIGINAL TEXT / EXACT LINE</div>'+
+  '<h2>同じ一行が、別の曲にも。</h2>'+
+  '<p>言葉の途中では切りません。原文の一行が別の作品にも同じ形で現れた場合だけ表示します。</p></div></div>'+
+  (repeated.length?'<div class="rap-discovery-box"><div class="rap-phrase-list">'+repeated.map(p=>
+  '<button type="button" class="rap-phrase" data-term="'+esc(p.text)+'">'+esc(p.text)+'<small>'+p.count+'作品</small></button>').join('')+'</div></div>':
+  '<p class="rap-empty">別の作品と一致する一行は、現在見つかっていません。無理に言葉をつなげません。</p>')+
+  '<p class="rap-discovery-caveat">これは行単位の文字列一致です。意味のつながりは星座の精読で原文とともに検証します。</p>'+
+  '</section>';
 }
-function viewConstellation(){const s=summary(),most=s.conn[0],a=most?getWork(most.a):null,b=most?getWork(most.b):null;return header(sky==='rap'?'木乃伊の空。':'書いた言葉は、星座になる。',sky==='rap'?'余白から取り込んだ本人の言葉が、もう一つの星座になります。合唱の空とは交わりません。':'11篇の公開作品と、これから書く言葉。繰り返し現れる語を辿り、作品同士を読み直します。')+statStrip()+rapDiscovery()+(sky==='rap'&&!s.all.length?`<div class="rap-welcome"><strong>木乃伊の星座を、ここから。</strong><p>「余白 LYRIC NOTE」に記録した原文を取り込むか、リリックを新しく登録してください。元の記録は変更しません。</p><button id="importRap" class="btn primary">余白の原文を取り込む</button> <button id="addWorkSmall" class="btn">原文を登録</button></div>`:'')+`<div class="grid-2"><div><div class="dark-card"><div class="dark-head"><div><div class="eyebrow" style="color:#e1c894">CONSTELLATION / 言葉の連なり</div><h2>言葉で結ばれた作品</h2><p>星を選ぶと、作品と関連語が開きます。</p></div><span style="font:italic 18px Georgia,serif;color:#c7b187">${sky==='rap'&&s.all.length>40?'代表40 / 全'+s.all.length:s.all.length} stars</span></div><div class="constellation-scroll">${renderGraph()}</div><div class="dark-bottom"><span>● 星＝作品</span><span>― 線＝主な共通語のつながり</span>${sky==='rap'&&s.all.length>40?'<span>星図は代表40点。作品画面で全件を確認できます。</span>':''}<span>${term?'強調する言葉：':''}<b>${esc(term||'全体')}</b></span></div></div>${pills()}<div class="insight">この地図は歌詞の文字列一致に基づいています。似た意味の語の自動統合や、作品の思想の判定は行っていません。</div></div><div>${selectedWorkCard()}<div class="panel" style="margin-top:18px"><div class="eyebrow">OBSERVATION / 今回の発見</div><h2>最も言葉が重なる組</h2>${most?`<p style="font-weight:800">《${esc(a.title)}》 と 《${esc(b.title)}》</p><div class="word-cloud">${most.shared.slice(0,14).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><p class="notice">観察語が多く共起した組です。似た意味の作品だと断定するものではありません。</p><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}" style="margin-top:12px">並べて読み比べる</button>`:'<p>作品を追加すると、共通語が見つかります。</p>'}</div></div></div>`}
+function viewRapConstellation(){
+ const all=works(),lines=all.reduce((n,w)=>n+w.lyrics.split('\n').filter(Boolean).length,0);
+ return header('木乃伊の作品と、そのつながり。','共通する単語ではなく、原文の根拠と読解をたどる星図です。')+
+  '<div class="rap-overview"><div><strong>'+all.length+'</strong><span>収録作品</span></div>'+
+  '<div><strong>'+lines+'</strong><span>原文の行数</span></div>'+
+  '<p>作品間の線は精読の仮説です。原文を確認し、異なる読みも残していきます。</p></div>'+
+  '<div class="grid-2 rap-stars-layout"><div><div class="dark-card">'+
+  '<div class="dark-head"><div><div class="eyebrow">LYRIC CONSTELLATION</div>'+
+  '<h2>作品を結ぶ星空</h2><p>星を選ぶと作品が開きます。つながる理由も原文から確認できます。</p></div></div>'+
+  '<div class="constellation-scroll">'+renderGraph()+'</div>'+
+  '<div class="dark-bottom"><span>星＝作品</span><span>線＝精読による関係の仮説</span>'+
+  '<span>確認済みの思いは、別の光り方で表示します。</span></div></div></div>'+
+  '<div>'+selectedWorkCard()+'</div></div>'+rapDiscovery();
+}
+function viewConstellation(){if(sky==='rap')return viewRapConstellation();const s=summary(),most=s.conn[0],a=most?getWork(most.a):null,b=most?getWork(most.b):null;return header(sky==='rap'?'木乃伊の作品と、そのつながり。':'書いた言葉は、星座になる。',sky==='rap'?'原文と精読を手がかりに、作品に繰り返し現れる思いをたどります。':'11篇の公開作品と、これから書く言葉。繰り返し現れる語を辿り、作品同士を読み直します。')+statStrip()+rapDiscovery()+(sky==='rap'&&!s.all.length?`<div class="rap-welcome"><strong>木乃伊の星座を、ここから。</strong><p>「余白 LYRIC NOTE」に記録した原文を取り込むか、リリックを新しく登録してください。元の記録は変更しません。</p><button id="importRap" class="btn primary">余白の原文を取り込む</button> <button id="addWorkSmall" class="btn">原文を登録</button></div>`:'')+`<div class="grid-2"><div><div class="dark-card"><div class="dark-head"><div><div class="eyebrow" style="color:#e1c894">CONSTELLATION / 言葉の連なり</div><h2>言葉で結ばれた作品</h2><p>星を選ぶと、作品と関連語が開きます。</p></div><span style="font:italic 18px Georgia,serif;color:#c7b187">${sky==='rap'&&s.all.length>40?'代表40 / 全'+s.all.length:s.all.length} stars</span></div><div class="constellation-scroll">${renderGraph()}</div><div class="dark-bottom"><span>● 星＝作品</span><span>― 線＝主な共通語のつながり</span>${sky==='rap'&&s.all.length>40?'<span>星図は代表40点。作品画面で全件を確認できます。</span>':''}<span>${term?'強調する言葉：':''}<b>${esc(term||'全体')}</b></span></div></div>${pills()}<div class="insight">この地図は歌詞の文字列一致に基づいています。似た意味の語の自動統合や、作品の思想の判定は行っていません。</div></div><div>${selectedWorkCard()}<div class="panel" style="margin-top:18px"><div class="eyebrow">OBSERVATION / 今回の発見</div><h2>最も言葉が重なる組</h2>${most?`<p style="font-weight:800">《${esc(a.title)}》 と 《${esc(b.title)}》</p><div class="word-cloud">${most.shared.slice(0,14).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><p class="notice">観察語が多く共起した組です。似た意味の作品だと断定するものではありません。</p><button class="btn sm" data-compare="${esc(a.id)}|${esc(b.id)}" style="margin-top:12px">並べて読み比べる</button>`:'<p>作品を追加すると、共通語が見つかります。</p>'}</div></div></div>`}
 function sortWorks(list){return list.sort((a,b)=>order==='old'?(a.year||9999)-(b.year||9999):order==='az'?a.title.localeCompare(b.title,'ja'):(b.year||0)-(a.year||0))}
 function masterReadNotice(){
  if(sky==='rap'&&!cloudUser)return '<div class="notice">木乃伊の歌詞は非公開です。ご本人のアカウントでログインすると、原文を読み込めます。</div>';
@@ -636,11 +642,65 @@ function viewRapResearch(){return skySwitch()+header('木乃伊の歌詞を、�
 function viewWorks(){const all=sortWorks(works().filter(w=>(visibility==='all'||(visibility==='official'?w.origin==='official':w.origin==='private'))&&(!query||norm(w.title+' '+w.lyrics+' '+w.credit).includes(norm(query)))));return header('作品を読む。',sky==='rap'?'木乃伊名義の原文と断片だけを表示します。合唱・詩は別の空です。':'公開歌詞11篇を原文・作者表記付きで収録。木乃伊のリリックとは分けています。')+`<div class="panel"><div class="control-row"><input class="search" id="searchWorks" type="search" placeholder="作品名・歌詞・作者から検索" value="${esc(query)}"><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filterWorks" class="search" style="width:auto"><option value="all" ${visibility==='all'?'selected':''}>すべて</option><option value="official" ${visibility==='official'?'selected':''}>公開作品のみ</option><option value="private" ${visibility==='private'?'selected':''}>非公開のみ</option></select><select id="sortWorks" class="search" style="width:auto"><option value="new" ${order==='new'?'selected':''}>新しい順</option><option value="old" ${order==='old'?'selected':''}>古い順</option><option value="az" ${order==='az'?'selected':''}>作品名順</option></select></div></div><div class="notice">公式公開版の原文は読み取り専用。作品を開いて「作品を深く読む」を選ぶと、問い・反復・人称・別解を原文の行番号とともに確認できます。分析結果は推測として示し、原文を書き換えません。</div></div>${masterReadNotice()}${readingReviewDashboard()}<div class="section-top"><h2>収録作品 <span class="small-muted">${all.length}篇</span></h2><button class="btn sm" id="addWorkSmall">＋ 作品を追加</button></div><div class="works-list">${all.map(w=>`<button class="work-card ${w.origin==='private'?'private':''}" data-open="${esc(w.id)}"><span class="eyebrow">${w.year||'—'} / ${w.origin==='official'?'PUBLISHED':w.sourceSystem==='lyric_master'?'PRIVATE SOURCE':'PRIVATE'}</span><strong>《${esc(w.title)}》</strong><small>${esc(w.credit||'作者表記なし')}</small>${w.sourceSystem==='lyric_master'?'<small class="master-provenance">'+esc(w.sourceStatus==='unverified_pdf_extract'?'PDF抽出・未校正':'作者原本')+'</small>':''}<div class="tags">${formatTags(w)}</div></button>`).join('')}</div>${all.length?'':'<div class="empty">該当する作品がありません。</div>'}`}
 function findInText(text,word){const idx=norm(text).indexOf(norm(word));if(idx<0)return '';const arr=text.split('\n');let at=0;for(let i=0;i<arr.length;i++){if(norm(arr[i]).includes(norm(word))){return arr.slice(Math.max(0,i-1),Math.min(arr.length,i+2)).join('\n').trim()}}return ''}
 function highlight(text,word){if(!word)return esc(text);const a=String(text),na=norm(a),nb=norm(word);let idx=na.indexOf(nb);if(idx<0)return esc(a);if(na.length!==a.length)return esc(a);let out='',start=0;while(idx>=0){out+=esc(a.slice(start,idx))+'<mark>'+esc(a.slice(idx,idx+word.length))+'</mark>';start=idx+word.length;idx=na.indexOf(nb,start)}return out+esc(a.slice(start));}
-function viewWords(){const df=wordDF(),sorted=[...df].sort((a,b)=>b[1].df-a[1].df||b[1].count-a[1].count),chosen=term||sorted[0]?.[0]||'',results=works().filter(w=>occurrences(w.lyrics,chosen)>0);return header('言葉を、見つけ直す。','同じ言葉は、別の作品ではどんな場所に置かれているのでしょう。文字列の出現を原文の前後と一緒に辿れます。')+`<div class="grid-2"><div class="panel"><div class="section-top" style="margin-top:0"><h2>観察語の索引</h2><span class="desc">登場する作品数の多い順</span></div><div class="word-cloud">${sorted.map(([t,info])=>`<button data-term="${esc(t)}" class="word ${chosen===t?'active':''}"><strong>${esc(t)}</strong><small>${info.df}作品 · ${info.count}回</small></button>`).join('')}</div><div class="section-top"><h2>言葉の追加</h2></div><div class="control-row"><input id="newWord" class="search" placeholder="観察したい言葉を入力"><button id="addWord" class="btn sm">＋ 追加</button></div><p class="desc">単語ではなく「文字列」を探しています。「風」は「風景」「南風」の中にも数えられます。形態素解析ではありません。</p></div><div class="panel"><div class="eyebrow">KEYWORD IN CONTEXT</div><h2 style="font-size:30px;margin:4px 0">${esc(chosen||'—')}</h2><p class="panel-sub">${results.length}作品に登場 / 合計 ${results.reduce((s,w)=>s+occurrences(w.lyrics,chosen),0)}回</p><div class="metric-bar"><i style="width:${Math.round(results.length/Math.max(1,works().length)*100)}%"></i></div><p class="desc">頻度は文章の長さや繰り返しにも影響されます。</p></div></div><div class="section-top"><h2>実際に使われている箇所</h2><span class="desc">初めに見つかった箇所を表示</span></div><div class="term-results">${results.map(w=>`<div class="term-result"><h3>《${esc(w.title)}》 <small>${w.year||'—'}</small></h3><div class="eyebrow">${occurrences(w.lyrics,chosen)} OCCURRENCES</div><blockquote>${highlight(findInText(w.lyrics,chosen),chosen)}</blockquote><button class="btn sm" data-open="${esc(w.id)}" style="margin-top:11px">全文で確かめる</button></div>`).join('')}</div>`}
+/* 木乃伊の言葉: full user-selected strings in the ORIGINAL source, never n-grams. */
+function viewRapWords(){
+ const index=wordDF(),chosen=term.trim(),all=works();
+ const matched=chosen?all.filter(w=>occurrences(w.lyrics,chosen)>0):[];
+ const total=matched.reduce((n,w)=>n+occurrences(w.lyrics,chosen),0);
+ const curated=new Set(RAP_SEARCH_GROUPS.flatMap(g=>g.terms));
+ const section=RAP_SEARCH_GROUPS.map(group=>{
+  const terms=group.terms.filter(x=>index.has(x)).map(x=>{
+   const info=index.get(x);
+   return '<button type="button" class="word-index-term'+(chosen===x?' active':'')+'" data-term="'+esc(x)+'">'+
+    '<strong>'+esc(x)+'</strong><small>'+info.df+'作品</small></button>';
+  }).join('');
+  return '<section class="word-index-group"><h3>'+esc(group.label)+'</h3><div class="word-index-terms">'+
+   (terms||'<p>該当する作品はありません。</p>')+'</div></section>';
+ }).join('');
+ const custom=[...new Set(db.customWords)].filter(x=>!curated.has(x));
+ const saved=custom.length?'<section class="word-index-group word-index-saved"><h3>自分で登録した検索語</h3><div class="word-index-terms">'+
+  custom.map(x=>'<button type="button" class="word-index-term'+(chosen===x?' active':'')+'" data-term="'+esc(x)+'">'+
+   '<strong>'+esc(x)+'</strong><small>'+(index.get(x)?.df||0)+'作品</small></button>').join('')+
+  '</div></section>':'';
+ const results=matched.slice(0,wordResultLimit);
+ const hits=results.map(w=>{
+  const count=occurrences(w.lyrics,chosen);
+  const excerpt=findInText(w.lyrics,chosen);
+  return '<article class="word-source-card"><div class="word-source-meta"><span>原文引用</span><span>'+count+'回一致</span></div>'+
+   '<h3>《'+esc(w.title)+'》</h3>'+
+   '<blockquote>'+highlight(excerpt,chosen)+'</blockquote>'+
+   '<div class="word-source-actions"><button type="button" data-open="'+esc(w.id)+'">原文を読む</button>'+
+   '<button type="button" data-deep-work="'+esc(w.id)+'">精読を開く</button></div></article>';
+ }).join('');
+ return header('言葉を、原文から探す。','言葉を勝手に切り分けません。自分が気になった表現を探し、作品の前後関係まで読み比べます。')+
+ '<div class="word-workbench"><section class="word-workbench-search" aria-label="原文から検索">'+
+ '<div class="word-workbench-label">SEARCH THE ORIGINAL / 原文検索</div>'+
+ '<label for="wordSearch">気になった言葉や一節を入力</label>'+
+ '<div class="word-search-form"><input id="wordSearch" type="search" autocomplete="off" maxlength="100" placeholder="例：なんでもない日を歌にしたい" value="'+esc(chosen)+'">'+
+ '<button type="button" id="findWord">原文から探す</button></div>'+
+ '<p>歌詞本文の文字列をそのまま探します。検索結果は部分一致であり、単語の品詞や意味が一致した証明ではありません。</p></section>'+
+ '<div class="word-workbench-body"><aside class="word-workbench-index" aria-label="検索の入口">'+
+ '<div class="word-workbench-title"><h2>検索の入口</h2><span>あらかじめ選んだ、意味のある単語・表現のみ</span></div>'+
+ '<div class="word-index-groups">'+section+saved+'</div>'+
+ '<div class="word-index-add"><label for="newWord">自分の検索語を追加</label>'+
+ '<div><input id="newWord" class="search" maxlength="40" placeholder="自分が探したい表現">'+
+ '<button type="button" id="addWord">保存</button></div>'+
+ '<p>追加した言葉は本人の検索設定に保存します。原文や精読の結果は変更しません。</p></div></aside>'+
+ '<section class="word-workbench-results" aria-label="原文の検索結果">'+
+ '<div class="word-workbench-title"><h2>原文で確かめる</h2><span>表現の前後を含めて読む</span></div>'+
+ (chosen?'<div class="word-current-term"><span>検索した表現</span><strong>'+esc(chosen)+'</strong>'+
+ '<p>'+matched.length+'作品・'+total+'回一致 <small>文字列としての一致</small></p></div>':
+ '<div class="word-empty-selection"><strong>まず一つ、言葉を選んでください。</strong>'+
+ '<p>左側の言葉から始めても、ご自身で気になる一節を検索しても構いません。</p></div>')+
+ (chosen?(hits||'<div class="word-no-hits">一致する原文はありません。<br>勝手に似た言葉や別の意味へ置き換えることはしません。</div>'):'')+
+ (matched.length>wordResultLimit?'<button type="button" class="word-more-results" id="moreWordResults">さらに原文を表示する（残り'+(matched.length-wordResultLimit)+'作品）</button>':'')+
+ '</section></div></div>';
+}
+function viewWords(){if(sky==='rap')return viewRapWords();const df=wordDF(),sorted=[...df].sort((a,b)=>b[1].df-a[1].df||b[1].count-a[1].count),chosen=term||sorted[0]?.[0]||'',results=works().filter(w=>occurrences(w.lyrics,chosen)>0);return header('言葉を、見つけ直す。','同じ言葉は、別の作品ではどんな場所に置かれているのでしょう。文字列の出現を原文の前後と一緒に辿れます。')+`<div class="grid-2"><div class="panel"><div class="section-top" style="margin-top:0"><h2>観察語の索引</h2><span class="desc">登場する作品数の多い順</span></div><div class="word-cloud">${sorted.map(([t,info])=>`<button data-term="${esc(t)}" class="word ${chosen===t?'active':''}"><strong>${esc(t)}</strong><small>${info.df}作品 · ${info.count}回</small></button>`).join('')}</div><div class="section-top"><h2>言葉の追加</h2></div><div class="control-row"><input id="newWord" class="search" placeholder="観察したい言葉を入力"><button id="addWord" class="btn sm">＋ 追加</button></div><p class="desc">単語ではなく「文字列」を探しています。「風」は「風景」「南風」の中にも数えられます。形態素解析ではありません。</p></div><div class="panel"><div class="eyebrow">KEYWORD IN CONTEXT</div><h2 style="font-size:30px;margin:4px 0">${esc(chosen||'—')}</h2><p class="panel-sub">${results.length}作品に登場 / 合計 ${results.reduce((s,w)=>s+occurrences(w.lyrics,chosen),0)}回</p><div class="metric-bar"><i style="width:${Math.round(results.length/Math.max(1,works().length)*100)}%"></i></div><p class="desc">頻度は文章の長さや繰り返しにも影響されます。</p></div></div><div class="section-top"><h2>実際に使われている箇所</h2><span class="desc">初めに見つかった箇所を表示</span></div><div class="term-results">${results.map(w=>`<div class="term-result"><h3>《${esc(w.title)}》 <small>${w.year||'—'}</small></h3><div class="eyebrow">${occurrences(w.lyrics,chosen)} OCCURRENCES</div><blockquote>${highlight(findInText(w.lyrics,chosen),chosen)}</blockquote><button class="btn sm" data-open="${esc(w.id)}" style="margin-top:11px">全文で確かめる</button></div>`).join('')}</div>`}
 function viewTimeline(){const all=works().slice().sort((a,b)=>(a.year||9999)-(b.year||9999)),grps=new Map();for(const w of all){const k=w.year||'年不詳';if(!grps.has(k))grps.set(k,[]);grps.get(k).push(w);}let groupHtml=[...grps].map(([y,ws])=>`<div class="timeline-year">${esc(y)}</div><div class="timeline-content">${ws.map(w=>`<div class="timeline-item"><button data-open="${esc(w.id)}">《${esc(w.title)}》</button><small>${w.origin==='official'?'公式公開版':'非公開'}</small><span style="margin-left:auto" class="small-muted">${tokens(w).length}語が該当</span></div>`).join('')}</div>`).join('');const byYear=[...grps].map(([y,ws])=>({year:y,works:ws.length,terms:ws.reduce((s,w)=>s+tokens(w).length,0)}));return header('言葉が生まれた時間。',sky==='rap'?'木乃伊の記録を時系列で振り返ります。合唱作品の年表とは別です。':'公開作品を制作年で並べると、同じ言葉がどの時期に現れるのかを見直せます。')+`<div class="panel"><div class="eyebrow">CHRONOLOGY</div><h2>作品年表</h2><div class="timeline">${groupHtml}</div></div><div class="section-top"><h2>年ごとの収録数</h2></div><div class="panel">${byYear.map(r=>`<div class="control-row"><strong>${esc(r.year)}年</strong><span class="desc">${r.works}作品</span></div><div class="metric-bar"><i style="width:${Math.round(r.works/Math.max(...byYear.map(x=>x.works))*100)}%"></i></div>`).join('')}<p class="notice">この年表は、現在収録されている作品のみを表します。未収録の曲や未公開稿を含む全創作史ではありません。</p></div>`}
 function viewSettings(){const meg=(JSON.stringify(db).length/1024).toFixed(1);return header('自分の言葉を、守る。','公開作品と非公開の原稿を分離し、データを確実に引き継ぐための管理画面です。')+`<div class="panel"><div class="eyebrow">STORAGE / PRIVATE</div><h2>データとバックアップ</h2><div class="settings-row"><div><strong>JSONバックアップを作成</strong><small>非公開の歌詞・メモ・観察語・精読の本人確認を含みます。安全な場所に保管してください。</small></div><button id="exportSettings" class="btn primary">書き出す</button></div><div class="settings-row"><div><strong>バックアップを読み込む</strong><small>このアプリのJSON、以前の「三つの観測室」のJSONから個人作品を取り込めます。現在の記録は保持して追加します。</small></div><button id="importSettings" class="btn">JSONを選ぶ</button></div><div class="settings-row"><div><strong>以前の「三つの観測室」を確認</strong><small>同一ブラウザ・同じ保存元でアクセスした場合、旧アプリの保存データを引き継げます。</small></div><button id="migrateOld" class="btn">旧データを探す</button></div><div class="settings-row"><div><strong>個人作品をテキストから追加</strong><small>.txt の内容を原文として登録します。作者名や制作年は後から入力できます。</small></div><button id="importText" class="btn">テキストを選ぶ</button></div><div class="settings-row"><div><strong>個人データを端末から消去</strong><small>公式公開11篇は残ります。この操作は取り消せません。</small></div><button id="erasePrivate" class="btn danger">消去</button></div><p class="status">現在：非公開作品 ${db.userWorks.length}件／個人メモ ${Object.values(db.notes).filter(Boolean).length}件／精読の本人確認 ${Object.keys(db.readingReviews||{}).length}件／追加観察語 ${db.customWords.length}件／保存データ 約${meg}KB</p></div><div class="panel" style="margin-top:20px"><h2>保存の範囲について</h2><p class="desc">未ログイン時は端末内保存です。「余白」と同じ本人認証でログインすればSupabaseの本人専用領域に保存・同期できます。重要な原文は同期完了表示の確認とJSONバックアップを推奨します。</p><p class="desc">公開作品の原文は2026年11月4日に公式サイトの詩集を確認し収録しました。授業用の他の作詞家による歌詞は取り込んでいません。作品《これから》《あなたと》の共作者も明記しています。</p><p class="desc">ログインして同期する場合は、本人の原文を本人専用クラウドへ送信します。公開11作品はログイン不要です。合唱の空と木乃伊の空は分析上分離しています。</p></div>`}
 function render(){const inStrata=view==='strata';const names={constellation:'星座',works:'作品',words:'言葉',timeline:'時間',settings:'管理',strata:'地層',research:'研究'};
- const researchNav=document.querySelector('.nav [data-view="research"]');if(researchNav)researchNav.hidden=sky!=='rap';$('#breadcrumb').textContent=inStrata?'言葉の地層 / 創作メモ':(sky==='rap'?'木乃伊の空':'合唱・詩の空')+' / '+names[view];document.body.classList.toggle('sky-rap',sky==='rap'&&!inStrata);$$('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-current',b.dataset.view===view?'page':'false')});$('#screen').hidden=inStrata;$('#strataHost').hidden=!inStrata;document.querySelector('.top-actions').hidden=inStrata;$('#constellationFooter').hidden=inStrata;if(inStrata)return;let html=view==='constellation'?viewConstellation():view==='works'?viewWorks():view==='words'?viewWords():view==='timeline'?viewTimeline():view==='research'?viewRapResearch():viewSettings();$('#screen').innerHTML=skySwitch()+html;}
+ const researchNav=document.querySelector('.nav [data-view="research"]');if(researchNav)researchNav.hidden=sky!=='rap';$('#breadcrumb').textContent=inStrata?'言葉の地層 / 創作メモ':(sky==='rap'?'木乃伊':'合唱・詩')+' / '+names[view];document.body.classList.toggle('sky-rap',sky==='rap'&&!inStrata);$$('[data-view]').forEach(b=>{b.classList.toggle('active',b.dataset.view===view);b.setAttribute('aria-current',b.dataset.view===view?'page':'false')});$('#screen').hidden=inStrata;$('#strataHost').hidden=!inStrata;document.querySelector('.top-actions').hidden=inStrata;$('#constellationFooter').hidden=inStrata;if(inStrata)return;let html=view==='constellation'?viewConstellation():view==='works'?viewWorks():view==='words'?viewWords():view==='timeline'?viewTimeline():view==='research'?viewRapResearch():viewSettings();$('#screen').innerHTML=skySwitch()+html;}
 
 function deepQuote(item){
  return '<blockquote class="deep-quote"><small>L'+Number(item.line||item.number||0)+'</small><span>'+esc(item.text||'')+'</span></blockquote>';
@@ -788,9 +848,11 @@ if(target.hasAttribute('data-reading-filter')){
  }
  return;
 }
+if(target.id==='findWord'){term=$('#wordSearch')?.value.trim().slice(0,100)||'';wordResultLimit=12;render();return}
+if(target.id==='moreWordResults'){wordResultLimit+=12;render();return}
 if(target.hasAttribute('data-open-reading')){openDeepReading(target.dataset.openReading,target.dataset.readingTopic);return}
-if(target.hasAttribute('data-save-reading')){saveReadingReview(target.dataset.saveReading,target.closest('.author-review'));return}if(target.hasAttribute('data-clear-reading')){clearReadingReview(target.dataset.clearReading,target.closest('.author-review'));return}if(target.hasAttribute('data-deep-work')){openDeepReading(target.dataset.deepWork);return}if(target.hasAttribute('data-open')){openWork(target.dataset.open);return}if(target.hasAttribute('data-term')){term=target.dataset.term;view=target.closest('#drawer')?view:(view==='words'?'words':'constellation');render();if(target.closest('#drawer'))openWork(selected);return}if(target.hasAttribute('data-compare')){const [a,b]=target.dataset.compare.split('|');compare(a,b);return}switch(target.id){case'backupTop':case'exportSettings':exportBackup();break;case'addTop':case'addWorkSmall':openEditor();break;case'closeDrawer':closeWork();break;case'closeEditor':case'cancelEditor':$('#editor').close();break;case'importSettings':$('#importFile').click();break;case'importText':$('#textFile').click();break;case'addWord':{const val=$('#newWord')?.value.trim().slice(0,40);if(val&&!words().includes(val)){db.customWords.push(val);save();term=val;render();toast('観察語に追加しました')}else toast('未入力か、既に登録されています');break}case'migrateOld':migrateOld();break;case'erasePrivate':{if(!confirm('非公開作品・個人メモ・精読の本人確認・追加観察語をすべて削除します。事前にバックアップを取ってください。続けますか？'))break;if(!confirm('本当に削除しますか？ この操作は取り消せません。'))break;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};save();render();closeWork();toast('個人データを端末内から消去しました');break}case'saveNote':{const w=getWork(target.dataset.id);if(w){db.notes[w.id]=$('#noteText').value;save();toast('自分のメモを保存しました')}break}default:if(target.hasAttribute('data-edit')){const id=target.dataset.edit;closeWork();openEditor(id)}else if(target.hasAttribute('data-clone')){const id=target.dataset.clone;closeWork();openEditor(id,true)}else if(target.hasAttribute('data-delete')){const id=target.dataset.delete;const w=getWork(id);if(w?.origin==='private'&&!w.readOnly&&confirm(`《${w.title}》を削除しますか？`)){db.userWorks=db.userWorks.filter(x=>x.id!==id);delete db.notes[id];save();closeWork();render();toast('非公開作品を削除しました')}}break}});
-document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.star-node[data-open]')){e.preventDefault();openWork(e.target.dataset.open)}if(e.key==='Escape')closeWork()});
+if(target.hasAttribute('data-save-reading')){saveReadingReview(target.dataset.saveReading,target.closest('.author-review'));return}if(target.hasAttribute('data-clear-reading')){clearReadingReview(target.dataset.clearReading,target.closest('.author-review'));return}if(target.hasAttribute('data-deep-work')){openDeepReading(target.dataset.deepWork);return}if(target.hasAttribute('data-open')){openWork(target.dataset.open);return}if(target.hasAttribute('data-term')){term=target.dataset.term;wordResultLimit=12;view=target.closest('#drawer')?view:(view==='words'?'words':'constellation');render();if(target.closest('#drawer'))openWork(selected);return}if(target.hasAttribute('data-compare')){const [a,b]=target.dataset.compare.split('|');compare(a,b);return}switch(target.id){case'backupTop':case'exportSettings':exportBackup();break;case'addTop':case'addWorkSmall':openEditor();break;case'closeDrawer':closeWork();break;case'closeEditor':case'cancelEditor':$('#editor').close();break;case'importSettings':$('#importFile').click();break;case'importText':$('#textFile').click();break;case'addWord':{const val=$('#newWord')?.value.trim().slice(0,40);if(val&&!words().includes(val)){db.customWords.push(val);save();term=val;render();toast('観察語に追加しました')}else toast('未入力か、既に登録されています');break}case'migrateOld':migrateOld();break;case'erasePrivate':{if(!confirm('非公開作品・個人メモ・精読の本人確認・追加観察語をすべて削除します。事前にバックアップを取ってください。続けますか？'))break;if(!confirm('本当に削除しますか？ この操作は取り消せません。'))break;db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};save();render();closeWork();toast('個人データを端末内から消去しました');break}case'saveNote':{const w=getWork(target.dataset.id);if(w){db.notes[w.id]=$('#noteText').value;save();toast('自分のメモを保存しました')}break}default:if(target.hasAttribute('data-edit')){const id=target.dataset.edit;closeWork();openEditor(id)}else if(target.hasAttribute('data-clone')){const id=target.dataset.clone;closeWork();openEditor(id,true)}else if(target.hasAttribute('data-delete')){const id=target.dataset.delete;const w=getWork(id);if(w?.origin==='private'&&!w.readOnly&&confirm(`《${w.title}》を削除しますか？`)){db.userWorks=db.userWorks.filter(x=>x.id!==id);delete db.notes[id];save();closeWork();render();toast('非公開作品を削除しました')}}break}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.id==='wordSearch'&&!e.isComposing){e.preventDefault();document.getElementById('findWord')?.click();return}if((e.key==='Enter'||e.key===' ')&&e.target.matches('.star-node[data-open]')){e.preventDefault();openWork(e.target.dataset.open)}if(e.key==='Escape')closeWork()});
 $('#scrim').addEventListener('click',closeWork);
 $('#editForm').addEventListener('submit',e=>{e.preventDefault();const f=e.target;const row=cleanWork({id:editing||safeId(),title:f.elements.title.value,lyrics:f.elements.lyrics.value,year:f.elements.year.value,credit:f.elements.credit.value,kind:f.elements.kind.value,sky:f.elements.sky.value,tags:f.elements.tags.value.split(/[、,\n]/).map(x=>x.trim()).filter(Boolean)});if(!row)return toast('タイトルと原文を入力してください');const k=db.userWorks.findIndex(w=>w.id===row.id);if(k>=0)db.userWorks[k]=row;else db.userWorks.push(row);save();$('#editor').close();sky=row.sky;try{localStorage.setItem(SKY_PREF,sky)}catch{}selected=row.id;view='works';render();openWork(row.id);toast('原文をそのまま保存しました')});
 $('#importFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{if(file.size>15_000_000)throw Error('ファイルが大きすぎます');const data=JSON.parse(await file.text());const backup=JSON.stringify(db);let s=mergeImported(data);render();toast(`${s.added}作品を追加しました。元の原文は上書きしていません。`)}catch(err){toast('読み込みできませんでした：'+err.message)}e.target.value=''});
