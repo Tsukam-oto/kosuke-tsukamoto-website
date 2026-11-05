@@ -641,7 +641,26 @@ loadMasterReadingCorpus=async function(user,epoch){
  if(epoch===cloudEpoch&&cloudUser?.id===user?.id)await Promise.all([loadLinks(user,epoch),loadPaths(user,epoch),loadAuthorJudgments(user,epoch)]);
 };
 document.addEventListener('click',function(event){
- var target=event.target.closest('[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ var target=event.target.closest('[data-atlas-open],[data-atlas-filter],[data-atlas-page],[data-atlas-overlap],[data-discovery-filter],[data-author-decision],[data-star-focus],[data-semantic-mode],[data-semantic-line-view],[data-semantic-layout],[data-semantic-scope],[data-semantic-action]');if(!target)return;
+ if(target.hasAttribute('data-atlas-filter')){
+  state.atlasFilter=['themes','collections','star','all'].includes(target.dataset.atlasFilter)?target.dataset.atlasFilter:'themes';
+  state.atlasOffset=0;repaint();return;
+ }
+ if(target.hasAttribute('data-atlas-page')){
+  var paths=atlasFiltered(normalizePaths(pathRows,userWorks()),state.atlasFilter,selected);
+  if(target.dataset.atlasPage==='next')state.atlasOffset=Math.min(Math.max(0,paths.length-5),state.atlasOffset+5);
+  else state.atlasOffset=Math.max(0,state.atlasOffset-5);
+  repaint();return;
+ }
+ if(target.hasAttribute('data-atlas-overlap')){
+  state.atlasOverlap=target.dataset.atlasOverlap==='show';repaint();return;
+ }
+ if(target.hasAttribute('data-atlas-open')){
+  var id=target.dataset.atlasOpen,path=normalizePaths(pathRows,userWorks()).find(function(p){return p.id===id;});
+  if(!path)return;
+  state.path=path.id;state.scope='all';state.mode='meaning';state.discoveryOpen=false;
+  state.atlasOffset=0;selectStar(path.ids[0]);return;
+ }
  if(target.hasAttribute('data-author-decision')){var panel=target.closest('[data-author-review]');if(panel)saveAuthorJudgment(panel.getAttribute('data-author-review'),target.dataset.authorDecision,panel);return;}
  if(target.hasAttribute('data-discovery-filter')){state.discoveryFilter=target.dataset.discoveryFilter;state.discoveryIndex=0;repaint();return;}
  if(target.hasAttribute('data-star-focus')){selectStar(target.dataset.starFocus);return;}
