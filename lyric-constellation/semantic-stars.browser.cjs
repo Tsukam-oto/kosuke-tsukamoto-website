@@ -218,6 +218,7 @@ async function run(mobile){
    assert.match(await review.innerText(),/未確認・保存されていません/);
    await review.locator('[data-author-note]').fill('まだ送信していない、途中のメモ');
    assert.match(await review.locator('.semantic-review-feedback').innerText(),/未保存/);
+   assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),true,'a pending note blocks silent logout');
    await page.locator('[data-semantic-action="map-zoom"]').click();
    await targetRelation.locator('.semantic-review-disclosure>summary').click();
    assert.equal(await review.locator('[data-author-note]').inputValue(),'まだ送信していない、途中のメモ','author note survives starfield rerender');
@@ -226,6 +227,7 @@ async function run(mobile){
   await review.locator('[data-author-decision="confirmed"]').click();
   assert.match(await page.locator('.semantic-status').innerText(),/本人確認済み 1組/);
   assert.equal(await page.locator('.semantic-link.author-confirmed').count(),1,'only explicitly affirmed link receives gold');
+   assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),false,'successful verified save clears the unsaved-note guard');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/1\s*\/\s*2/);
   assert.ok(!(await page.locator('.semantic-discovery-card').innerText()).includes('日々の異なる見え方'),'confirmed card automatically leaves the reading queue');
   assert.equal(await page.locator('.semantic-star.author-affirmed').count(),2,'both endpoints of the affirmed feeling shine');
