@@ -147,6 +147,7 @@ function currentModeWorks(all,edges,selection){
  if(state.scope==='all')return catalog(all);
  var chosen=new Set(selection?[selection]:[]);
  related(edges,selection).slice(0,13).forEach(function(e){chosen.add(e.a===selection?e.b:e.a);});
+ var path=activePath(all);if(path)path.ids.forEach(function(id){chosen.add(id);});
  if(chosen.size<=1){var focus=all.find(function(w){return w.id===selection;});all.filter(function(w){return w.collection===focus?.collection&&w.id!==selection;}).slice(0,10).forEach(function(w){chosen.add(w.id);});}
  return catalog(all).filter(function(w){return chosen.has(w.id);});
 }
@@ -198,7 +199,7 @@ function graphSVG(){
  var all=userWorks(),picked=all.find(function(w){return w.id===selected;})||all[0];
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
- var geo=state.scope==='all'?makePositions(all):nearPositions(nodes,picked?.id);
+ var geo=state.scope==='all'?(state.layout==='gravity'&&status==='ready'?semanticPositions(all,normalize(records,all),normalizePaths(pathRows,all)):makePositions(all)):nearPositions(nodes,picked?.id);
  var path=activePath(all),inPath=new Set(path?path.ids:[]);
  var available=new Set(nodes.map(function(w){return w.id;}));
  var filtered=edges.filter(function(e){return available.has(e.a)&&available.has(e.b);});
@@ -228,7 +229,7 @@ function graphSVG(){
   var active=w.id===picked?.id,neighbor=chosenNeighbors.has(w.id),match=wanted.has(w.id);
   var onPath=inPath.has(w.id);
   var show=state.scope==='near'||active||onPath||neighbor&&chosenNeighbors.size<=12||search&&w.title.toLocaleLowerCase('ja').includes(search);
-  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(path&&!onPath&&!active?' outside-theme':'')+(!match?' dim-star':'');
+  var classes='semantic-star'+(active?' chosen':'')+(neighbor?' neighbor':'')+(onPath?' in-theme':'')+(path&&!onPath&&!active?' outside-theme':'')+(p.unlinked?' no-relation':'')+(!match?' dim-star':'');
   var sx=p.x>geo.width*.67?-1:1;
   var label=show?'<text class="semantic-star-name'+(active?' chosen':'')+(onPath?' in-theme':'')+'" data-star-focus="'+safe(w.id)+'" role="button" tabindex="0" aria-label="'+safe(w.title)+'を選ぶ" x="'+(p.x+sx*13).toFixed(1)+'" y="'+(p.y-10).toFixed(1)+'" text-anchor="'+(sx===1?'start':'end')+'">'+safe(w.title.slice(0,21))+'</text>':'';
   // Keep labels outside the focusable SVG group: long labels otherwise stretch its
@@ -239,11 +240,13 @@ function graphSVG(){
 }
 renderGraph=function(){if(sky!=='rap')return originalGraph();if(!cloudUser){records=[];pathRows=[];status='signed_out';state.path='';}return graphSVG();};
 function controls(){
- var all=userWorks(),n=normalize(records,all).length,items=allCollections(all),paths=normalizePaths(pathRows,all);
+ var all=userWorks(),edges=normalize(records,all),n=edges.length,items=allCollections(all),paths=normalizePaths(pathRows,all);
+ var linked=new Set();edges.forEach(function(e){linked.add(e.a);linked.add(e.b);});
+ var orphanCount=all.filter(function(w){return !linked.has(w.id);}).length;
  var options=['<option value="">すべての作品集</option>'].concat([...items].map(function(e){return '<option value="'+safe(e[0])+'"'+(state.collection===e[0]?' selected':'')+'>'+safe(e[0])+'（'+e[1]+'）</option>'; })).join('');
  var pathOptions=['<option value="">星座を選ぶ（テーマを横断して読む）</option>'].concat(paths.map(function(p){return '<option value="'+safe(p.id)+'"'+(state.path===p.id?' selected':'')+'>'+safe(p.title)+'（'+p.ids.length+'作品）</option>';})).join('');
- var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):status==='ready'?'精読で結ばれた線 '+n+'組・作者未確認の読解仮説':'ログインすると精読でつながります';
- return '<div class="semantic-toolbar"><div class="semantic-toolbar-main"><div><strong>全作品の星空</strong><small>'+all.length+'の星が、作品集ごとに浮かびます。星を選ぶと関係が光ります。</small></div><div class="semantic-switches"><button type="button" data-semantic-mode="meaning" class="'+(state.mode==='meaning'?'active':'')+'">精読の線</button><button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">共通語の線</button></div></div>'+
+ var info=status==='loading'?'精読のつながりを読み込み中…':status==='error'?'精読データを取得できません：'+safe(problem):status==='ready'?'作品同士の直接比較 '+n+'組。まだ直接比較のない星 '+orphanCount+'作品。線は暫定的な読解です。':'ログインすると精読でつながります';
+ return '<div class="semantic-toolbar"><div class="semantic-toolbar-main"><div><strong>全作品の星空</strong><small>'+all.length+'の星が浮かびます。星を選んで言葉のつながりをたどれます。</small></div><div class="semantic-switches"><button type="button" data-semantic-mode="meaning" class="'+(state.mode==='meaning'?'active':'')+'">精読の線</button><button type="button" data-semantic-mode="words" class="'+(state.mode==='words'?'active':'')+'">共通語の線</button></div></div>'+
  '<div class="semantic-path-control"><label for="semanticPath">星座を探す</label><select id="semanticPath" aria-label="精読テーマから星座を選ぶ"'+(!paths.length?' disabled':'')+'>'+pathOptions+'</select><span>点線＝複数作品をたどる読解の道筋。実線＝二作品の直接比較。</span></div>'+
  '<div class="semantic-controls"><div class="semantic-switches"><button type="button" data-semantic-scope="all" class="'+(state.scope==='all'?'active':'')+'">星空全体</button><button type="button" data-semantic-scope="near" class="'+(state.scope==='near'?'active':'')+'">この星の近く</button></div><label class="semantic-search-label" for="semanticStarSearch">作品を探す</label><input id="semanticStarSearch" autocomplete="off" placeholder="曲名を入力" value="'+safe(state.search)+'"><button type="button" data-semantic-action="search">探す</button><select id="semanticCollection" aria-label="作品集を強調">'+options+'</select><button type="button" data-semantic-action="next">次の星へ</button><button type="button" data-semantic-action="reset">全体に戻す</button></div><p class="semantic-status" aria-live="polite">'+info+'</p></div>';
 }
