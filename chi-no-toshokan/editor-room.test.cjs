@@ -15,7 +15,7 @@ check('rulebook linked only in auth-gated area',html.indexOf('103erzlFgvoIIsvBHx
 check('rulebook reference and published policies are grounded',editorialPolicy.rulebookUrl==='https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit'&&editorialPolicy.schemaVersion===1);
 check('unattended auto-publication cannot run',editorialPolicy.unattended_publication===false&&editorialPolicy.mode==='private_drafts_only');
 check('source presence never counts as claim verification',editorialPolicy.rulebookVersion==='2.7'&&editorialPolicy.evidenceGate.required&&editorialPolicy.evidenceGate.verifyEachFactualClaim&&editorialPolicy.evidenceGate.blockIf.includes('unverified'));
-check('editor explains evidence hold',html.includes('発信方針 v1.1・公開管理ルール v2.7')&&html.includes('未検証の原稿は公開しません'));
+check('editor explains evidence hold',html.includes('発信方針 v1.2・公開管理ルール v2.7')&&html.includes('未検証の原稿は公開しません'));
 check('private data excluded from automatic source policy',editorialPolicy.sourcePolicy.prohibitedWithoutApproval.includes('entire ChatGPT conversation archive'));
 check('legacy magazine IDs are preserved for old drafts',editorialPolicy.magazines.length===5&&editorialPolicy.magazines.every(x=>x.legacyClassification===true));
 check('author identity and four editorial entrances',editorialPolicy.editorialIdentity.author==='束元康介'&&editorialPolicy.editorialEntrances.length===4);
