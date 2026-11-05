@@ -321,3 +321,34 @@ body.sky-rap button:focus-visible,body.sky-rap input:focus-visible{
 @media(prefers-reduced-motion:reduce){
  body.sky-rap .word-index-term,body.sky-rap .word-source-actions button{transition:none}
 }
+
+
+/* Dedicated rap constellation view: reduce duplicate keyword dashboards. */
+body.sky-rap .rap-overview{
+ display:flex;align-items:stretch;flex-wrap:wrap;gap:12px;background:transparent;margin:2px 0 18px
+}
+body.sky-rap .rap-overview>div{
+ display:flex;align-items:baseline;gap:9px;padding:14px 18px;border:1px solid #cbddeb;
+ background:#fff;border-radius:11px;min-width:132px
+}
+body.sky-rap .rap-overview strong{
+ color:#0a5da7;font-size:27px;font-weight:900;font-variant-numeric:tabular-nums
+}
+body.sky-rap .rap-overview span{font-size:11px;color:#5e778b;font-weight:750}
+body.sky-rap .rap-overview>p{
+ font-size:11px;line-height:1.8;color:#496a80;margin:0;align-self:center;flex:1 1 260px
+}
+body.sky-rap .rap-stars-layout{grid-template-columns:minmax(0,1.8fr) minmax(240px,.82fr);align-items:start;gap:17px}
+body.sky-rap .rap-selected-work{padding:21px}
+body.sky-rap .rap-selected-work h2{
+ font-size:20px;color:#143d5e;margin:10px 0;line-height:1.5;overflow-wrap:anywhere
+}
+body.sky-rap .rap-selected-work>p{font-size:12px;line-height:1.9;color:#4f6b7f}
+body.sky-rap .rap-selected-work-actions{display:grid;gap:8px;margin-top:18px}
+body.sky-rap .rap-selected-work-actions .btn{min-height:42px}
+body.sky-rap .dark-head .eyebrow{color:#5fc7ff}
+body.sky-rap .dark-head p{color:#c4e1f5}
+@media(max-width:1080px){
+ body.sky-rap .rap-stars-layout{grid-template-columns:minmax(0,1fr)}
+ body.sky-rap .rap-selected-work-actions{display:flex;flex-wrap:wrap}
+}
