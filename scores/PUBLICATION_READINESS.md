@@ -274,3 +274,17 @@ GAS審査集計ライトとファンファーレ第4番「朝」を並行して�
 - 教育公務員特例法第17条（県費負担教職員の場合、市町村・特別区教育委員会）：https://laws.e-gov.go.jp/law/324AC0000000001
 - 地方公務員法第38条：https://laws.e-gov.go.jp/law/325AC0000000261
 - BOOTH現行手数料：https://booth.pixiv.help/hc/ja/articles/115004576874-
+
+
+## 2026-11-05｜音源の販売経路：iTunes Storeでの購入とApple Music配信の両立
+
+**販売経路の方針を更新**：オリジナル正式音源は、ストリーミング再生（Apple Music等）と単曲・アルバムのダウンロード購入（iTunes Store等）を、同じ配信代行サービスから並行して提供するのを基本に検討する。Apple Music自体を「曲を買うストア」と記載しない。独自ショップへのMP3二重出品は初期必須条件としない。
+
+- DistroKidはApple MusicとiTunesを配信先に掲載：https://support.distrokid.com/hc/ja/articles/360013649093-
+- narasuはApple Musicをストリーミング、iTunes Storeをダウンロードとして掲載：https://narasu.jp/client/static/store-detail
+- Appleの価格・配信権の説明では、iTunes Storeの購入可否と価格帯は納品元の権利・販売地域・価格設定に依存する：https://itunespartner.apple.com/ja-jp/music/support/5222-rights-pricing-basics
+- 個人サイトは「Apple Musicで聴く」「iTunes Storeで購入」の二つのリンクを公開後に案内。Spotify等への配信があれば別にまとめる。実URLは各ストアへの掲載を確認してから追加。公開前に架空の購入URLを作らない。
+- iTunes Storeで音源を購入しても、動画制作・団体への二次配布・商用BGM利用・編曲などの権利を一括取得するわけではない。個別利用許諾とは分けて説明する。
+- 初回シングル『あなたと、これから、これからも』について、録音マスター、作詞作曲、演奏・録音関係者、学校等の関与、兼業の要件を確認。DistroKid/narasuの配信実務・手数料・ジャンル登録条件を比較し、同一音源を両社から同時納品して重複登録することは避ける。
+
+**現在の状態**：販売経路を検討した段階。配信代行業者は未確定、リリースのストア掲載・ダウンロード販売は未確認。発売前に必要な服務・権利・契約の確認を完了させる。
