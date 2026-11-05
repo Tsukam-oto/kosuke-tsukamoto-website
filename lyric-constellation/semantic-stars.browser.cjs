@@ -123,6 +123,17 @@ async function run(mobile){
   assert.equal(await page.locator('.semantic-discovery-card').count(),0,'two-song reading room is collapsed by default');
   assert.equal(await page.locator('.dark-card .semantic-toolbar').count(),0,'reading controls must not push the actual sky offscreen inside the canvas');
   assert.equal(await page.locator('.semantic-stars-svg').count(),1,'starfield remains immediately visible');
+  const geometry=await page.evaluate(()=>{
+    const graph=document.querySelector('.semantic-star-viewport').getBoundingClientRect();
+    const atlas=document.querySelector('.semantic-atlas').getBoundingClientRect();
+    const toolbar=document.querySelector('.semantic-toolbar').getBoundingClientRect();
+    return {graphY:graph.y,atlasY:atlas.y,toolbarY:toolbar.y,overflow:document.documentElement.scrollWidth-window.innerWidth};
+  });
+  assert.ok(geometry.toolbarY<geometry.graphY&&geometry.graphY<geometry.atlasY,'reading order is tools → actual stars → optional themes');
+  if(mobile)assert.ok(geometry.overflow<=3,'phone should not have page-level horizontal overflow');
+  assert.equal(await page.locator('#appUpdate').isVisible(),false,'new-version notice is not shown without an update');
+  assert.match(await page.locator('.nav [data-view="words"]').innerText(),/原文を探す/);
+
   const skyWidth=await page.locator('.semantic-stars-svg').evaluate(el=>el.getBoundingClientRect().width);
   const parentWidth=await page.locator('.semantic-star-viewport').evaluate(el=>el.getBoundingClientRect().width);
   assert.ok(skyWidth<=parentWidth+2,'the 168-star constellation first fits its desktop or mobile viewport');
