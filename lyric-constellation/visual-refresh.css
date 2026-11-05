@@ -578,3 +578,24 @@ body.sky-rap .semantic-title-results button:hover{background:#24618b}
  body.sky-rap .semantic-related-observation{-webkit-line-clamp:4}
  body.sky-rap .semantic-review-disclosure .semantic-author-choices button{flex:1 1 42%;min-height:43px}
 }
+
+
+/* Guided corpus-order navigation stays compact on a phone. */
+body.sky-rap .semantic-sequence{
+ display:flex;justify-content:space-between;align-items:center;gap:12px;
+ background:#ecf5fc;border:1px solid #c9dfef;border-radius:10px;
+ margin:13px 0;padding:11px 13px
+}
+body.sky-rap .semantic-sequence span{font-size:12px;font-weight:750;color:#2b5777}
+body.sky-rap .semantic-sequence>div{display:flex;gap:7px;flex-wrap:wrap}
+body.sky-rap .semantic-sequence button{
+ border:1px solid #85b0d0;background:#fff;border-radius:7px;
+ color:#155d8d;min-height:38px;padding:7px 11px;
+ font-family:inherit;font-weight:750;font-size:12px;cursor:pointer
+}
+body.sky-rap .semantic-sequence button:focus-visible{outline:3px solid #4f9ccc;outline-offset:2px}
+@media(max-width:760px){
+ body.sky-rap .semantic-sequence{align-items:flex-start;flex-direction:column}
+ body.sky-rap .semantic-sequence>div{width:100%}
+ body.sky-rap .semantic-sequence button{flex:1}
+}
