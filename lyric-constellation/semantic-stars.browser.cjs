@@ -219,6 +219,7 @@ async function run(mobile){
    await review.locator('[data-author-note]').fill('まだ送信していない、途中のメモ');
    assert.match(await review.locator('.semantic-review-feedback').innerText(),/未保存/);
    assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),true,'a pending note blocks silent logout');
+   assert.equal(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('lyric-review-tab-v1:fictional-user')).notes.length),1,'draft is stored for tab-local reload recovery');
    await page.locator('[data-semantic-action="map-zoom"]').click();
    await targetRelation.locator('.semantic-review-disclosure>summary').click();
    assert.equal(await review.locator('[data-author-note]').inputValue(),'まだ送信していない、途中のメモ','author note survives starfield rerender');
@@ -241,6 +242,7 @@ async function run(mobile){
   await secondRelation.locator('[data-author-decision="different"]').click();
   assert.equal(await page.locator('.semantic-link.author-different').count(),1);
    assert.equal(await page.evaluate(()=>window.hasUnsavedStarReview()),false,'once both comparisons are confirmed and saved, the unsaved-note guard clears');
+   assert.equal(await page.evaluate(()=>sessionStorage.getItem('lyric-review-tab-v1:fictional-user')),null,'verified saves remove all tab-local drafts');
   assert.match(await page.locator('.semantic-related').filter({hasText:'対照として読む'}).locator('.semantic-review-disclosure>summary').innerText(),/別の思いに見える/,'saved judgment remains visible even when review controls are folded away');
   assert.match(await page.locator('.semantic-discovery-progress').innerText(),/2\s*\/\s*2/);
   assert.match(await page.locator('.semantic-discovery-empty').innerText(),/すべて判断を記録済み/);
@@ -258,9 +260,11 @@ async function run(mobile){
   assert.ok(await page.locator('.semantic-star').count()<168,'near view limits the visible neighborhood');
   await page.locator('[data-semantic-scope="all"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168);
-  await page.locator('#semanticStarSearch').fill('検証曲05');
+  await page.locator('.semantic-star-name[data-star-focus="master-fictional-000"]').click();
+   await page.locator('#semanticStarSearch').fill('検証曲05');
    await page.locator('[data-semantic-action="search"]').click();
    assert.ok(await page.locator('.semantic-title-results button').count()>1,'similar titles show multiple choices');
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲001/,'ambiguous search does not silently change selected work');
    await page.locator('.semantic-title-results [data-search-work="master-fictional-050"]').click();
    assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲051/);
    await page.locator('#semanticStarSearch').fill('存在しない曲名');
@@ -269,6 +273,11 @@ async function run(mobile){
    await page.locator('#semanticStarSearch').fill('検証曲121');
   await page.locator('[data-semantic-action="search"]').click();
   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/);
+   assert.match(await page.locator('.semantic-sequence').innerText(),/121 \/ 168作品/,'source-order reading progress is visible');
+   await page.locator('.semantic-sequence [data-semantic-action="next"]').click();
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲122/,'next follows original corpus order');
+   await page.locator('.semantic-sequence [data-semantic-action="prev"]').click();
+   assert.match(await page.locator('.semantic-focus-panel h2').innerText(),/検証曲121/,'previous returns to the original work');
   await page.locator('[data-semantic-layout="gravity"]').click();
   assert.equal(await page.locator('.semantic-star').count(),168,'meaning layout retains the whole catalog');
   assert.equal(await page.locator('.semantic-star.no-relation').count(),163,'five source-backed stars connected through two direct comparisons and three thematic routes');
