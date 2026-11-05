@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOverlap:true};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0,atlasFilter:'themes',atlasOffset:0,atlasOverlap:true,atlasNetworkOpen:true,atlasNetworkChoice:''};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -96,6 +96,36 @@ function atlasFiltered(paths,filter,starId){
   if(filter==='star')return p.ids.includes(starId);
   return true;
  });
+}
+/* A map OF constellations. Two reading themes have an overlap only if they
+ * cite at least one of the SAME actual songs. These are not song-to-song
+ * comparison links, nor verified authorial intentions. */
+function constellationNetwork(paths){
+ var indexed=Array.isArray(paths)?paths.slice():[];
+ var kinds=['theme','collection'];
+ var width=1100,height=680,cx=width/2,cy=height/2+5,geo=new Map(),nodes=[];
+ kinds.forEach(function(kind){
+  var group=indexed.filter(function(p){return themeKind(p)===kind;})
+    .slice().sort(function(a,b){return a.id.localeCompare(b.id);});
+  group.forEach(function(p,i){
+   var angle=-Math.PI/2+(i/group.length)*Math.PI*2+(kind==='collection'?.08:0);
+   var rx=kind==='theme'?490:253,ry=kind==='theme'?271:136;
+   var point={id:p.id,title:p.title,question:p.question,n:p.ids.length,kind:kind,
+    x:cx+rx*Math.cos(angle),y:cy+ry*Math.sin(angle)};
+   nodes.push(point);geo.set(p.id,point);
+  });
+ });
+ var edges=[];
+ for(var i=0;i<indexed.length;i++)for(var j=i+1;j<indexed.length;j++){
+  var one=indexed[i],two=indexed[j],ids=new Set(one.ids);
+  var shared=two.ids.filter(function(id){return ids.has(id);});
+  if(shared.length)edges.push({a:one.id,b:two.id,shared:shared,n:shared.length});
+ }
+ edges.sort(function(a,b){return b.n-a.n||a.a.localeCompare(b.a)||a.b.localeCompare(b.b);});
+ var degree=new Map(nodes.map(function(n){return [n.id,0];}));
+ edges.forEach(function(e){degree.set(e.a,degree.get(e.a)+1);degree.set(e.b,degree.get(e.b)+1);});
+ return {nodes:nodes,edges:edges,position:geo,width:width,height:height,
+  isolated:nodes.filter(function(n){return degree.get(n.id)===0;}).map(function(n){return n.id;})};
 }
 /* Deterministic force-directed layout. Coordinates reflect sourced links, NOT a claim
  * of mathematical similarity or verified authorial intention. Unlinked works remain
@@ -274,7 +304,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,themeKind:themeKind,membershipIndex:membershipIndex,intersectingConstellations:intersectingConstellations,atlasFiltered:atlasFiltered,constellationNetwork:constellationNetwork,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
