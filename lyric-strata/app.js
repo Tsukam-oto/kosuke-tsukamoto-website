@@ -706,7 +706,8 @@ function sourceAuditPanel(){
  if(!user)return '<p class="muted">原本校正の記録は本人ログイン後に表示されます。</p>';
  const audited=[...masterWorks.values()].filter(w=>w.sky==='rap'&&(w.source_review_note||'').includes('PDF一次照合2026-11-05'));
  if(!audited.length)return '<p class="muted">PDF原本の照合記録はまだ読み込まれていません。</p>';
- const corrected=audited.filter(w=>(w.source_review_note||'').includes('【部分校正2026-11-05】'));
+ const corrected=audited.filter(w=>/【(?:部分校正|作者提供本文による修復)2026-11-05】/.test(w.source_review_note||''));
+ const checkedWithAuthor=audited.filter(w=>(w.source_review_note||'').includes('【作者提供抜粋照合2026-11-05】'));
  const extractOnly=audited.filter(w=>(w.source_review_note||'').includes('【照合分類2026-11-05】'));
   const flagged=audited.filter(w=>w.source_review_note.includes('差異あり ['))
   .sort((a,b)=>(a.original_book_index??999)-(b.original_book_index??999));
@@ -715,10 +716,11 @@ function sourceAuditPanel(){
  return '<section class="source-audit"><h2>PDF原本の校正記録</h2>'+
   '<p>木乃伊の歌詞集について、保存本文とPDFの文字層を照合した一次監査です。'+
   '空白・改行・全半角の差を除いて一致した資料は '+ok+' / '+audited.length+' 件、'+
-  '一次監査で差異があった資料は '+flagged.length+' 件。そのうち部分校正v2保存は '+corrected.length+' 件、文字抽出・Unicode表記の違いとして確認したのは '+extractOnly.length+' 件、未修復・要確認は '+pending.length+' 件です。文字層の差異は印刷原本の誤字と同義ではありません。</p>'+
-  '<details><summary>要確認の'+flagged.length+'作品を表示</summary>'+
+  '一次監査で差異があった資料は '+flagged.length+' 件。そのうち部分校正v2保存は '+corrected.length+' 件、文字抽出・Unicode表記の違いとして確認したのは '+extractOnly.length+' 件、未修復・要確認は '+pending.length+' 件です。文字層の差異は印刷原本の誤字と同義ではありません。</p>'+ 
+   '<p><strong>作者提供テキストによる抜粋照合：</strong>'+checkedWithAuthor.length+' / '+audited.length+' 作品。各作品の代表句を保存本文と照合した結果であり、歌詞全文・改行・句読点の校正完了を意味しません。</p>'+
+  '<details><summary>PDF一次監査で差異が見つかった'+flagged.length+'作品の処理履歴</summary>'+
   '<ol>'+flagged.map(w=>{
-   const audit=(w.source_review_note||'').split('PDF一次照合2026-11-05：').at(-1).split(/【(?:部分校正|照合分類|照合保留)2026-11-05】/)[0].trim();
+   const audit=(w.source_review_note||'').split('PDF一次照合2026-11-05：').at(-1).split(/【(?:部分校正|照合分類|照合保留|作者提供本文による修復|作者提供抜粋照合)2026-11-05】/)[0].trim();
    const fixed=corrected.includes(w),extract=extractOnly.includes(w);
    return '<li><strong>'+esc(w.title)+'</strong>'+
     '<span>収録順 '+String((w.original_book_index??-1)+1)+' ／ PDF '+esc(w.source_page_start??'?')+'ページ</span>'+
