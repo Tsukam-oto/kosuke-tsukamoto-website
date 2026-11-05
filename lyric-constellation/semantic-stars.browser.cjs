@@ -60,8 +60,9 @@ async function run(mobile){
   assert.match(await page.locator('.semantic-status').innerText(),/2組/,'links come from semantic data');
   assert.equal(await page.locator('.semantic-link.focused').count(),2,'selected star highlights two evidence-backed lines');
   assert.match(await page.locator('.semantic-focus-panel').innerText(),/日々の異なる見え方/);
-  await page.locator('.semantic-related details summary').first().click();
-  assert.match(await page.locator('.semantic-related details').first().innerText(),/架空の精読仮説/);
+  const targetRelation=page.locator('.semantic-related').filter({hasText:'日々の異なる見え方'});
+  await targetRelation.locator('details summary').click();
+  assert.match(await targetRelation.locator('details').innerText(),/架空の精読仮説/);
   assert.equal(await page.locator('.semantic-stars-svg img').count(),0,'private title must not become an HTML image element');
   assert.match(await page.locator('.semantic-stars-svg').innerHTML(),/&lt;img/,'unsafe characters must be escaped');
   await page.locator('[data-star-focus="master-fictional-050"]').first().click();
