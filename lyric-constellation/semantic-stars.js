@@ -2,7 +2,7 @@
  * 素材は認証後にRLSで取得。精読の線は「仮説」であり、作者の承認とは別です。 */
 (function(){
 'use strict';
-var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:''};
+var state={mode:'meaning',layout:'album',scope:'all',collection:'',search:'',path:'',expanded:false,lineView:'all',history:[],journeyStart:'',journey:null,journeyMessage:'',discoveryOpen:true,discoveryFilter:'all',discoveryIndex:0};
 var records=[],pathRows=[],judgmentsByKey=new Map(),reviewPending=new Set(),reviewError='',reviewStatus='signed_out',status='signed_out',problem='';
 var originalGraph,originalCard,originalConstellation,originalRender,originalLoader;
 var rawConnections,connectionCache={signature:'',links:[]},gravityCache={key:'',geo:null};
@@ -164,6 +164,31 @@ function shortestRoute(edges,start,end){
  ids.reverse();steps.reverse();
  return {ids:ids,edges:steps};
 }
+/* An invitation to read, never an automated verdict.
+ * Candidate ranking is deterministic and only grounded in saved source-backed comparisons.
+ * The user's own confirmed/different/rejected judgment removes a pair from the unreviewed queue. */
+function discoveryCandidates(rows,all,judgments,filter){
+ var byId=new Map(all.map(function(w){return [w.id,w];}));
+ var choices=normalize(rows,all).filter(function(e){
+  var decision=judgments?.get(e.key)?.decision||'pending';
+  if(decision!=='pending')return false;
+  var a=byId.get(e.a),b=byId.get(e.b);
+  if(!a||!b||!e.left||!e.right)return false;
+  if(filter==='resonance'&&e.kind!=='resonance')return false;
+  if(filter==='contrast'&&e.kind!=='counterpoint'&&e.kind!=='reframing')return false;
+  if(filter==='across'&&(a.collection||'')===(b.collection||''))return false;
+  return true;
+ });
+ var priority=function(e){
+  var a=byId.get(e.a),b=byId.get(e.b);
+  var across=(a.collection||'')!==(b.collection||'');
+  // No subjective AI-based "importance" or inferred chronology: use only corpus metadata.
+  return (across?8:0)+(e.kind==='counterpoint'?4:e.kind==='reframing'?3:0);
+ };
+ return choices.sort(function(a,b){
+  return priority(b)-priority(a)||(hash(a.key)%8191)-(hash(b.key)%8191)||a.key.localeCompare(b.key);
+ });
+}
 function wordLinks(){
  return connections().slice(0,600).map(function(e){
   return {a:e.a,b:e.b,kind:'word',topic:e.shared.slice(0,3).join('・'),
@@ -218,7 +243,7 @@ function buildGraphModel(all,rows,selection,scope,mode){
  var e=normalize(rows,all),nodes=scope==='near'?currentModeWorks(all,e,selection):catalog(all);
  return {nodes:nodes,links:e.filter(function(x){return nodes.some(function(n){return n.id===x.a;})&&nodes.some(function(n){return n.id===x.b;});})};
 }
-window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,buildGraphModel:buildGraphModel,safe:safe};
+window.LyricStarfield={makePositions:makePositions,normalize:normalize,normalizePaths:normalizePaths,semanticPositions:semanticPositions,shortestRoute:shortestRoute,reviewChoiceLabel:reviewChoiceLabel,isJudgmentDecision:isJudgmentDecision,discoveryCandidates:discoveryCandidates,buildGraphModel:buildGraphModel,safe:safe};
 if(typeof renderGraph!=='function'||typeof viewConstellation!=='function'||typeof render!=='function')return;
 originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=viewConstellation;originalRender=render;originalLoader=loadMasterReadingCorpus;
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
