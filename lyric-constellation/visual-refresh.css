@@ -599,3 +599,18 @@ body.sky-rap .semantic-sequence button:focus-visible{outline:3px solid #4f9ccc;o
  body.sky-rap .semantic-sequence>div{width:100%}
  body.sky-rap .semantic-sequence button{flex:1}
 }
+
+/* Author annotations are archival metadata, not a task before reading. */
+body.sky-rap .semantic-discovery-author-optional{
+ margin-top:12px;border-top:1px solid #d6e6f2;padding:9px 0 0
+}
+body.sky-rap .semantic-discovery-author-optional>summary{
+ color:#416e8e;font-size:12px;line-height:1.8;font-weight:700;
+ cursor:pointer;padding:7px 3px
+}
+body.sky-rap .semantic-discovery-author-optional>summary:focus-visible{
+ outline:3px solid #3b94c7;outline-offset:2px
+}
+body.sky-rap .semantic-discovery-author-optional:not([open]) .semantic-author-review{
+ display:none
+}
