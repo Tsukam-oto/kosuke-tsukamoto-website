@@ -4,30 +4,30 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#193e32">
 <meta name="robots" content="noindex,nofollow,noarchive">
-<meta name="description" content="知の図書館：教員・作曲家のAI活用実践を本人専用で記録し、発信候補へ育てる編集室。">
+<meta name="description" content="束元康介の非公開編集室。AIを使って試したこと、使いにくさを直した過程、創作や調査の発見を記録し、発信に育てる。">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self';script-src 'self' https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;font-src 'self' https://fonts.gstatic.com;connect-src 'self' https://nroyxwozdxwnrqyierjx.supabase.co wss://nroyxwozdxwnrqyierjx.supabase.co;img-src 'self' data:;object-src 'none';base-uri 'none';upgrade-insecure-requests">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="./editor-room.css">
-<title>知の図書館｜AI実践と発信の編集室</title>
+<title>束元康介｜発信の編集室（本人専用）</title>
 <script defer src="./editor-magazines.js"></script>
 <script defer src="./editor-note-package.js"></script>
 <script defer src="./editor-room.js"></script>
 </head><body>
-<header class="header"><a href="./" class="brand">◈ 知の図書館</a><span>編集室｜本人専用</span><a href="./research-dossiers.html">研究の調査票</a></header>
+<header class="header"><a href="/" class="brand">束元康介</a><span>編集室｜本人専用</span><a href="./research-dossiers.html">研究の調査票</a></header>
 <main class="wrap">
 <section class="intro"><div class="kicker">PRIVATE EDITORIAL STUDIO · AI WORK LOG</div>
-<h1>仕事で試したことを、<wbr>伝えられる知識に。</h1>
-<p>教員・作曲家としての日々の仕事や創作で、AIをどう使い、何が変わったか。失敗も含めて記録し、noteの記事や教材・ツールの発信候補へ育てる非公開の編集室です。</p></section>
+<h1>面白いから試す。<wbr>使いにくいから直す。</h1>
+<p>AIと一緒に作ってみたもの、使ううちに見つけた不便さ、その改善。音楽・創作・日々の好奇心も含めて、実際の記録から読みものを育てる本人専用の編集室です。記事の本数は目標にせず、確かめられる内容だけを発信します。</p></section>
 <section class="privacy" aria-label="公開と取り扱いの注意"><strong>学校の内部資料や生徒・保護者の個人情報は入力しないでください。</strong>
 学年・クラス・氏名・メールアドレス・非公開の録音・評価・名簿などは、ここへ貼り付けず、一般化した仕事内容と手順だけを記録します。記録はnoteへ自動投稿されません。最終的な公開判断は別に必要です。</section>
 <section class="auth" id="auth-status" role="status" aria-live="polite">ログイン状態を確認しています。</section>
 <section id="private-app" hidden>
  <section class="editor-rulebook" aria-label="編集ルールブックと自動化状況">
-  <div><strong>編集ルールブック v1.1</strong><p>記事の文章・画像・出典・公開条件をGoogleドキュメントで一元管理しています。通常時の操作ゼロを目指します。出典は主張ごとに照合し、未検証の原稿は公開しません。</p></div>
-  <div><a href="https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit" target="_blank" rel="noopener noreferrer">Googleドライブの正本</a><a href="./editorial-policy.json" target="_blank" rel="noopener noreferrer">実行系ルール設定</a></div>
+  <div><strong>発信方針 v1.1・公開管理ルール v2.7</strong><p>記事の文章・画像・出典・公開条件をGoogleドキュメントで一元管理しています。通常時の操作ゼロを目指します。出典は主張ごとに照合し、未検証の原稿は公開しません。</p></div>
+  <div><a href="https://docs.google.com/document/d/1D6LS2uhaD5v12Ky_DtAIh1pRRrfUlBEPabatDqp_A-U/edit" target="_blank" rel="noopener noreferrer">発信の編集方針</a><a href="https://docs.google.com/document/d/103erzlFgvoIIsvBHxd0ZgdfHcnP7vf2utMxaVsrqtOA/edit" target="_blank" rel="noopener noreferrer">公開管理ルール</a><a href="./editorial-policy.json" target="_blank" rel="noopener noreferrer">実行系ルール設定</a></div>
   <p class="rulebook-status">現在の稼働範囲：非公開の素材・原稿の保存、見出し画像の作成、資料候補の提示。会話全体からの自動収集・AI本文の定期執筆・noteへの自動投稿は未接続です。公開停止条件を満たす記事は保留します。</p>
  </section>
  <div class="stats" aria-label="編集候補の記録状況"><div><strong id="total-count">0</strong><span>非公開の記録</span></div><div><strong id="candidate-count">0</strong><span>記事候補</span></div><div><strong id="published-count">0</strong><span>公開後の記録</span></div></div>
@@ -38,9 +38,18 @@
   <small>一言メモは「AI活用・ICT」の素材として本人専用クラウドに保存され、後から分類・追記できます。</small>
  </section>
  <section class="magazine-panel" aria-labelledby="magazine-title">
- <div class="panel-head"><h2 id="magazine-title">5つのマガジンと投稿計画</h2><span class="small-note">公開作業は本人が確認</span></div>
- <div id="magazine-list" class="magazine-list"></div>
- <details class="cadence-details"><summary>毎日どれくらい投稿できる？｜見込みを試算する</summary>
+ <div class="panel-head"><h2 id="magazine-title">発信の4つの入口（仮）</h2><span class="small-note">記事の本数より、面白さと事実を優先</span></div>
+ <div class="magazine-list" aria-label="発信の4つの編集上の入口">
+  <article class="magazine-card"><strong>01｜つくってみた</strong><p>AIと考え、WebサイトやGASなどの仕組みを実際に作った過程を紹介します。</p></article>
+  <article class="magazine-card"><strong>02｜使いにくいから、直してみた</strong><p>失敗や不便さを見つけ、修正し、どこまで解決できたかを記録します。</p></article>
+  <article class="magazine-card"><strong>03｜作ること、考えること</strong><p>作曲・作詞・教育と、創作する本人の判断や考えを扱います。</p></article>
+  <article class="magazine-card"><strong>04｜気になったから、調べてみた</strong><p>映画や音楽、歴史など、実際に生まれた疑問を根拠から探究します。</p></article>
+ </div>
+ <details class="cadence-details"><summary>以前の5分類（保存データとの互換用）</summary>
+  <p class="small-note">既存の記録をそのまま使えるよう、保存用の分類IDは変更していません。ここに表示する分類は新しい発信メディア名ではありません。</p>
+  <div id="magazine-list" class="magazine-list"></div>
+ </details>
+ <details class="cadence-details"><summary>参考：旧・投稿作業量の試算（現在の目標ではありません）</summary>
  <p>AIの原稿生成本数、根拠確認で通過する割合、本人の確認時間を仮定した試算です。現在の自動生成実績ではありません。</p>
  <div class="cadence-inputs">
   <label for="drafts-per-week">AIが作成する初稿（週） <strong id="draft-value">10</strong>本<input id="drafts-per-week" type="range" min="0" max="28" step="1" value="10"></label>
@@ -50,7 +59,7 @@
  <div id="cadence-output" class="cadence-output" aria-live="polite"></div>
  <p class="small-note">試算では1本あたり25分（事実・権利・個人情報チェックと投稿操作の合計）を仮定します。専門記事はさらに時間が必要です。</p>
  </details>
- <details class="cadence-details"><summary>毎日1本の場合の曜日別ローテーション</summary><div class="weekly-table" id="weekly-table"></div><p class="small-note">これは7本/週に移行した場合の例です。初期目標は4本/週。5マガジンを毎日それぞれ更新する計画ではありません。</p></details>
+ <details class="cadence-details"><summary>参考：旧・曜日別分類案（現在の投稿計画ではありません）</summary><div class="weekly-table" id="weekly-table"></div><p class="small-note">過去のモデルを互換確認のため残しています。現在は週4本・毎日1本などの公開本数をノルマにしていません。</p></details>
  <details class="cadence-details"><summary>記事の長さ別｜公開7日間の反応を比較</summary>
  <p>noteのダッシュボードで公開後7日間にそろえた数値を手入力し、形式別に比較します。現在はnoteからの自動取得ではありません。</p>
  <div id="format-outcomes" class="format-outcomes"></div>
@@ -58,7 +67,7 @@
  </details>
  </section>
  <details class="research-inbox">
- <summary>知の図書館からの記事候補｜調査票を自動取得</summary>
+ <summary>調査メモからの記事候補（旧研究資料）</summary>
  <p>定期更新される研究準備票から、題材になりそうな問いを表示します。論文・原典の本文照合は未完了です。ここで選ぶだけでは記事は執筆・公開されません。</p>
  <div id="research-ideas" class="research-ideas">ログイン後に調査票を読み込みます。</div>
  </details>
@@ -68,7 +77,7 @@
    <form id="editor-form">
     <input type="hidden" id="record-id">
     <label for="kind">どの活動から生まれた記録ですか</label>
-    <select id="kind"><option value="education">音楽教育・授業研究</option><option value="workflow">AI活用・ICT・校務改善</option><option value="composition">作曲・編曲・録音</option><option value="research">知の図書館・知識探究</option></select>
+    <select id="kind"><option value="education">音楽教育・授業研究</option><option value="workflow">AI活用・ICT・校務改善</option><option value="composition">作曲・編曲・録音</option><option value="research">映画・音楽・知識探究</option></select>
     <label for="magazine">掲載を検討するマガジン</label>
     <select id="magazine" aria-label="掲載先マガジン"></select>
     <div id="magazine-advice" class="magazine-advice" aria-live="polite"></div>
