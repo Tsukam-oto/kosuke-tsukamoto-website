@@ -86,7 +86,7 @@ originalGraph=renderGraph;originalCard=selectedWorkCard;originalConstellation=vi
 /* Cache the large lexical comparison: selecting a star should never rerun every pairwise comparison. */
 rawConnections=connections;
 connections=function(){var all=works(),signature=sky+'|'+db.customWords.join('|')+'|'+all.map(function(w){return w.id+':'+hash(w.lyrics||'')+':'+(w.sourceVersionNo||0);}).join(';');if(signature!==connectionCache.signature){connectionCache={signature:signature,links:rawConnections()};}return connectionCache.links;};
-function userWorks(){return works().filter(function(w){return w.sky==='rap';});}
+function userWorks(){return works().filter(function(w){return w.sky==='rap'&&(cloudUser||w.sourceSystem!=='lyric_master');});}
 function allCollections(all){
  var map=new Map();catalog(all).forEach(function(w){var c=w.collection||'その他・個人作品';map.set(c,(map.get(c)||0)+1);});return map;
 }
@@ -109,7 +109,7 @@ function centerSelected(){
  if(Number.isFinite(x)&&Number.isFinite(y))box.scrollTo({left:Math.max(0,x-box.clientWidth/2),top:Math.max(0,y-box.clientHeight/2),behavior:'instant'});
 }
 function graphSVG(){
- var all=userWorks(),picked=getWork(selected)||all[0];
+ var all=userWorks(),picked=all.find(function(w){return w.id===selected;})||all[0];
  if(!all.length)return '<div class="starfield-empty">'+(!cloudUser?'木乃伊の星空は非公開です。本人アカウントでログインすると表示されます。':'登録された作品がありません。')+'</div>';
  var edges=edgeList(all),nodes=currentModeWorks(all,edges,picked?.id);
  var geo=state.scope==='all'?makePositions(all):nearPositions(nodes,picked?.id);
@@ -155,7 +155,7 @@ function controls(){
 }
 selectedWorkCard=function(){
  if(sky!=='rap')return originalCard();
- var w=getWork(selected)||userWorks()[0];if(!w)return originalCard();
+ var available=userWorks(),w=available.find(function(x){return x.id===selected;})||available[0];if(!w)return '<div class="panel"><p class="desc">星を選ぶと、つながりの根拠が表示されます。非公開作品は本人ログイン後に読み込まれます。</p></div>';
  var links=related(edgeList(userWorks()),w.id).sort(function(a,b){return a.kind==='counterpoint'?-1:b.kind==='counterpoint'?1:0;});
  var max=state.expanded?links.length:7;
  var list=links.slice(0,max).map(function(e){
