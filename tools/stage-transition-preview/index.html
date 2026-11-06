@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#1e3533">
+<meta name="description" content="ステージ転換・配置計画プランナーの試作。架空データで配置と転換差分を確認できます。端末内のみで動作します。">
+<title>ステージ転換プランナー｜試作版</title>
+<style>
+:root{--paper:#f7f8f5;--ink:#193532;--muted:#5b6c67;--line:#d9e3dd;--green:#0d6d61;--pale:#eaf4f0;--blue:#e9f0fa;--orange:#fdf0df;--white:#fff;--bad:#a73f27}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{font-family:'Zen Kaku Gothic New','Hiragino Kaku Gothic ProN','Noto Sans JP',system-ui,sans-serif;background:var(--paper);color:var(--ink);margin:0;line-height:1.65;font-size:14px}
+button,input,select{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid #7ab8ae;outline-offset:3px}button:disabled{opacity:.4;cursor:not-allowed}
+.wrap{width:min(1160px,calc(100% - 28px));margin:auto}.top{background:#fff;border-bottom:1px solid var(--line)}.top .wrap{padding:14px 0;display:flex;justify-content:space-between;gap:20px;align-items:center}.brand{font-weight:850;letter-spacing:.03em;font-size:16px}.badge{border:1px solid #abccc2;border-radius:100px;background:#eaf6ee;color:#1b6b52;font-weight:750;font-size:11px;padding:4px 10px}.hero{padding:40px 0 22px}.hero h1{font-size:clamp(27px,4vw,40px);line-height:1.3;margin:12px 0}.hero p{font-size:14px;color:var(--muted);max-width:800px}.layout{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:start}.card{background:var(--white);border:1px solid var(--line);border-radius:17px;padding:20px;box-shadow:0 7px 25px #153e2a09}.section-title{font-size:17px;margin:0 0 9px;font-weight:850}.hint{color:var(--muted);font-size:12px;margin:0 0 14px}.tabs,.quick,.actions{display:flex;flex-wrap:wrap;gap:8px}.tab,.pill,.secondary,.primary{border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 13px;font-weight:750;min-height:40px}.tab[aria-selected="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}.primary{background:var(--ink);color:#fff;border-color:var(--ink)}.secondary{background:var(--pale);border-color:#ccded4}.pill{font-size:12px;min-height:36px;padding:7px 11px}.pill:hover,.secondary:hover{background:#dceee6}.stage-outer{margin:14px 0 8px;border-radius:13px;padding:14px 12px 9px;background:#eff2ed;border:1px solid var(--line)}.stage{width:100%;aspect-ratio:1.8;position:relative;overflow:hidden;background:linear-gradient(#ffffff99,#ffffffcc),repeating-linear-gradient(0deg,#edf2ef 0,#edf2ef 1px,transparent 1px,transparent 10%);border:2px solid #738882;border-radius:5px 5px 24px 24px;touch-action:pan-y}.stage::before{content:'舞 台 奥';position:absolute;left:50%;top:4px;transform:translateX(-50%);font-size:10px;letter-spacing:.25em;color:#9aaba4;pointer-events:none}.front{text-align:center;font-size:11px;color:#53645d;letter-spacing:.25em;margin-top:8px}.object{position:absolute;transform:translate(-50%,-50%);padding:6px 7px;min-width:57px;max-width:110px;border-radius:10px;border:1px solid #86b7ac;background:#e3f5ee;box-shadow:0 2px 4px #263e3514;text-align:center;color:#174339;line-height:1.2;touch-action:none;user-select:none;cursor:grab}.object:active{cursor:grabbing}.object b{display:block;font-size:11px;white-space:normal;overflow-wrap:anywhere}.object small{font-size:10px;opacity:.72}.object.winds{background:#eaf0fa;border-color:#93b2d9;color:#243f65}.object.equipment{background:var(--orange);border-color:#e0b985;color:#694725}.object.selected{outline:3px solid #0d7564;outline-offset:2px;z-index:10}.mini-note{font-size:11px;color:var(--muted)}.editor{display:grid;gap:9px}.field{display:grid;gap:4px;font-size:12px;font-weight:700}.field input,.field select{width:100%;padding:10px;border:1px solid #b8cbc0;border-radius:8px;background:#fff;color:var(--ink);min-width:0}.field small{font-weight:400;color:var(--muted)}.numbers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-top:15px}.divider{border:0;border-top:1px solid var(--line);margin:20px 0}.print-title{display:none}.overview{margin-top:18px}.counts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.count{background:#f4f7f4;border-radius:10px;padding:11px 8px;text-align:center}.count strong{display:block;font-size:22px;line-height:1.3;font-variant-numeric:tabular-nums}.count span{font-size:11px;color:var(--muted)}.change-list{margin:5px 0 0;padding-left:20px}.change-list li{margin-bottom:6px}.ok{color:#087756}.warning{color:var(--bad)}.status{min-height:25px;color:var(--muted);font-size:12px;margin:8px 0}.footer{font-size:12px;color:var(--muted);padding:35px 0 55px}.side.sticky{position:sticky;top:14px}.side h2{margin:0 0 7px;font-size:17px}.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px}.hidden{display:none!important}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.side.sticky{position:static}.card{padding:16px}.hero{padding-top:22px}.stage{aspect-ratio:1.24}.object{min-width:44px;max-width:83px;padding:6px 4px}.object b{font-size:10px}.object small{font-size:9px}.counts{gap:5px}.top .wrap{align-items:flex-start}}
+@media(min-width:801px){.stage{aspect-ratio:1.85}}
+@page{size:A4 landscape;margin:10mm}@media print{body{background:white;font-size:11px}.top,.hero .badge,.hero p,.tabs,.quick,.toolbar,.side,.footer,.hint,.status,.no-print,.actions{display:none!important}.wrap{width:100%;margin:0}.hero{padding:0 0 6px}.hero h1{display:none}.layout{display:block}.card{box-shadow:none;border:0;padding:0}.stage-outer{max-width:760px;padding:6px;margin:3px auto 8px}.stage{aspect-ratio:1.85;print-color-adjust:exact;-webkit-print-color-adjust:exact}.print-title{display:block;font-size:19px;font-weight:850;margin:0 0 8px}.overview{margin-top:8px;break-inside:avoid}.counts{grid-template-columns:repeat(6,1fr)}.count{padding:4px}.count strong{font-size:14px}.object{print-color-adjust:exact;-webkit-print-color-adjust:exact;box-shadow:none}.divider{margin:8px 0}.change-list{columns:2}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><span class="brand">ステージ転換プランナー</span><span class="badge">試作版 · 販売準備中</span></div></header>
+<main class="wrap">
+<section class="hero"><span class="badge">スマホで配置を作り、転換を確認</span><h1>配置図だけでなく、<br>「何を動かすか」まで。</h1><p>合唱から吹奏楽へ。2つの場面を並べて、椅子・譜面台・マイクなどの差分を自動計算する独立試作品です。架空データのみで起動します。</p></section>
+<div class="layout">
+<div>
+<section class="card" aria-labelledby="work-title">
+<h2 class="section-title" id="work-title">ステージ配置</h2>
+<div class="tabs" role="tablist" aria-label="転換場面"><button class="tab" data-scene="0" role="tab" aria-selected="true">① 合唱</button><button class="tab" data-scene="1" role="tab" aria-selected="false">② 吹奏楽</button></div>
+<p class="hint">部品を指で動かせます。タップすると人数と備品数を編集できます。キーボードの矢印キーでも配置を調整できます。</p>
+<div class="stage-outer"><div class="stage" id="stage" aria-label="配置編集エリア"></div><div class="front">客 席 側</div></div>
+<p class="print-title" id="print-title"></p>
+<div class="quick no-print"><button class="pill" type="button" data-add="choir">＋ 合唱パート</button><button class="pill" type="button" data-add="winds">＋ 楽器パート</button><button class="pill" type="button" data-add="chair">＋ 椅子</button><button class="pill" type="button" data-add="stand">＋ 譜面台</button><button class="pill" type="button" data-add="mic">＋ マイク</button><button class="pill" type="button" data-add="piano">＋ ピアノ</button><button class="pill" type="button" data-add="riser">＋ ひな壇</button></div>
+<p class="status" id="status" role="status" aria-live="polite"></p>
+<div class="toolbar no-print"><button class="secondary" id="example" type="button">架空の例に戻す</button><button class="secondary" id="savejson" type="button">配置を保存（JSON）</button><button class="secondary" id="importjson" type="button">保存データを読み込む</button><input class="hidden" id="file" type="file" accept=".json,application/json"><button class="primary" id="print" type="button">A4横で印刷・PDF保存</button></div>
+</section>
+<section class="card overview" aria-labelledby="inventory-title">
+<h2 class="section-title" id="inventory-title">備品集計</h2><p class="hint">集計は各部品に設定した数の合計です。会場の実数・安全性は現場で確認してください。</p>
+<div class="counts" id="counts"></div>
+<hr class="divider"><h2 class="section-title">転換チェック：① 合唱 → ② 吹奏楽</h2><p class="hint">数の差分を示します。実際の移動経路や設営時間は自動計算していません。</p><ul class="change-list" id="changes"></ul>
+</section>
+</div>
+<aside class="card side sticky" aria-labelledby="edit-heading">
+<h2 id="edit-heading">部品の設定</h2><p class="hint" id="selectedhelp">ステージ上の部品をタップしてください。</p>
+<div class="editor hidden" id="editor">
+<label class="field">名称<input id="label" maxlength="20" placeholder="例：クラリネット"></label>
+<label class="field">分類<select id="kind"><option value="choir">合唱</option><option value="winds">吹奏楽</option><option value="equipment">備品</option></select></label>
+<div class="numbers"><label class="field">人数<input type="number" min="0" max="300" step="1" id="people"></label><label class="field">椅子<input type="number" min="0" max="300" step="1" id="chairs"></label><label class="field">譜面台<input type="number" min="0" max="300" step="1" id="stands"></label><label class="field">マイク<input type="number" min="0" max="300" step="1" id="mics"></label><label class="field">ピアノ<input type="number" min="0" max="10" step="1" id="pianos"></label><label class="field">ひな壇<input type="number" min="0" max="50" step="1" id="risers"></label></div>
+<button class="secondary" type="button" id="remove">この部品を削除する</button>
+</div><hr class="divider"><h2>この試作で確認すること</h2><p class="hint">転換の指示が伝わるか、印刷して使えるか。無料の配置図アプリとの差は転換チェック機能です。</p><p class="mini-note">学校名簿・氏名・実際の行事予定は入力しないでください。データはこの端末内に保存され、外部へ送信しません。JSONのダウンロードは利用者の操作時だけ行われます。</p>
+</aside>
+</div>
+</main><footer class="wrap footer">© 束元康介｜個人制作の試作版。学校用コード・実名簿・生徒データは使用していません。販売・発注は受け付けていません。</footer>
+<script>
+'use strict';
+const STORE='private-stage-transition-v01';
+const KEYS=[['people','出演者'],['chairs','椅子'],['stands','譜面台'],['mics','マイク'],['pianos','ピアノ'],['risers','ひな壇']];
+const defaults=()=>({version:1,active:0,scenes:[
+ {name:'合唱',items:[
+  {id:'c1',name:'ソプラノ',kind:'choir',x:18,y:34,people:12,chairs:0,stands:0,mics:0,pianos:0,risers:0},
+  {id:'c2',name:'アルト',kind:'choir',x:40,y:34,people:12,chairs:0,stands:0,mics:0,pianos:0,risers:0},
+  {id:'c3',name:'テノール',kind:'choir',x:62,y:34,people:8,chairs:0,stands:0,mics:0,pianos:0,risers:0},
+  {id:'c4',name:'バス',kind:'choir',x:82,y:34,people:8,chairs:0,stands:0,mics:0,pianos:0,risers:0},
+  {id:'c5',name:'ピアノ',kind:'equipment',x:15,y:75,people:1,chairs:1,stands:0,mics:0,pianos:1,risers:0},
+  {id:'c6',name:'指揮台',kind:'equipment',x:52,y:80,people:1,chairs:0,stands:1,mics:0,pianos:0,risers:0},
+  {id:'c7',name:'集音マイク',kind:'equipment',x:74,y:76,people:0,chairs:0,stands:0,mics:2,pianos:0,risers:0},
+ ]},
+ {name:'吹奏楽',items:[
+  {id:'w1',name:'フルート',kind:'winds',x:20,y:26,people:7,chairs:7,stands:4,mics:0,pianos:0,risers:0},
+  {id:'w2',name:'クラリネット',kind:'winds',x:47,y:24,people:9,chairs:9,stands:5,mics:0,pianos:0,risers:0},
+  {id:'w3',name:'サックス',kind:'winds',x:76,y:28,people:5,chairs:5,stands:3,mics:0,pianos:0,risers:0},
+  {id:'w4',name:'ホルン',kind:'winds',x:20,y:56,people:4,chairs:4,stands:2,mics:0,pianos:0,risers:0},
+  {id:'w5',name:'トランペット',kind:'winds',x:45,y:52,people:6,chairs:6,stands:3,mics:0,pianos:0,risers:0},
+  {id:'w6',name:'低音金管',kind:'winds',x:73,y:54,people:6,chairs:6,stands:4,mics:0,pianos:0,risers:0},
+  {id:'w7',name:'打楽器',kind:'winds',x:80,y:13,people:4,chairs:1,stands:2,mics:0,pianos:0,risers:0},
+  {id:'w8',name:'指揮台',kind:'equipment',x:49,y:84,people:1,chairs:0,stands:1,mics:0,pianos:0,risers:0}
+ ]}
+]});
+const $=id=>document.getElementById(id);
+const MAX_ITEMS=100;
+let state=defaults();let selectedId=null;let drag=null;
+function clamp(n,lo,hi){return Math.min(hi,Math.max(lo,n));}
+function safeCount(v,limit=300){const n=Number(v);return Number.isInteger(n)&&n>=0&&n<=limit?n:null;}
+function clean(item,i){if(!item||typeof item!=='object')throw Error('部品データが不正です');const counts={};for(const [k] of KEYS){const v=safeCount(item[k],k==='pianos'?10:k==='risers'?50:300);if(v===null)throw Error('備品数が不正です');counts[k]=v;}return {id:String(item.id||`item-${i}`).slice(0,80),name:String(item.name||'部品').slice(0,20),kind:['choir','winds','equipment'].includes(item.kind)?item.kind:'equipment',x:clamp(Number(item.x)||0,4,96),y:clamp(Number(item.y)||0,7,93),...counts};}
+function cleanState(x){if(!x||x.version!==1||!Array.isArray(x.scenes)||x.scenes.length!==2)throw Error('対応していない保存形式です');let ids=new Set();const scenes=x.scenes.map((scene,si)=>{if(!Array.isArray(scene.items)||scene.items.length>MAX_ITEMS)throw Error('部品が多すぎます');const items=scene.items.map((v,i)=>{const item=clean(v,i);if(ids.has(item.id))throw Error('部品IDが重複しています');ids.add(item.id);return item;});return {name:si===0?'合唱':'吹奏楽',items};});return {version:1,active:x.active===1?1:0,scenes};}
+function readSaved(){try{const raw=localStorage.getItem(STORE);if(raw)state=cleanState(JSON.parse(raw));}catch(e){state=defaults();}}
+function persist(){try{localStorage.setItem(STORE,JSON.stringify(state));$('status').textContent='この端末に保存しました';}catch(e){$('status').textContent='端末への自動保存は利用できません。JSON保存を使用してください。';}}
+function items(){return state.scenes[state.active].items;}
+function selected(){return items().find(x=>x.id===selectedId)||null;}
+function tallies(scene){const total=Object.fromEntries(KEYS.map(([k])=>[k,0]));for(const item of scene.items)for(const [k] of KEYS)total[k]+=item[k];return total;}
+function el(tag,cl,txt){const o=document.createElement(tag);if(cl)o.className=cl;if(txt!==undefined)o.textContent=String(txt);return o;}
+function updateCounts(){const current=tallies(state.scenes[state.active]);const counts=$('counts');counts.replaceChildren();for(const [key,label] of KEYS){const box=el('div','count');box.append(el('strong','',current[key]),el('span','',label));counts.append(box);}const from=tallies(state.scenes[0]),to=tallies(state.scenes[1]);const list=$('changes');list.replaceChildren();for(const [key,label] of KEYS){if(key==='people')continue;const delta=to[key]-from[key];const line=el('li',delta>0?'warning':delta<0?'ok':'',delta>0?`${label}を ${delta} 個追加（${from[key]} → ${to[key]}）`:delta<0?`${label}を ${-delta} 個撤去（${from[key]} → ${to[key]}）`:`${label}は同数（${from[key]} 個）`);list.append(line);}}
+function paint(){for(const t of document.querySelectorAll('.tab'))t.setAttribute('aria-selected',String(Number(t.dataset.scene)===state.active));const stage=$('stage');stage.replaceChildren();for(const item of items()){
+ const btn=el('button','object '+item.kind+(selectedId===item.id?' selected':''));btn.type='button';btn.style.left=`${item.x}%`;btn.style.top=`${item.y}%`;btn.dataset.id=item.id;btn.setAttribute('aria-label',`${item.name}、出演者${item.people}人、位置を移動できます`);btn.append(el('b','',item.name),el('small','',item.people?`${item.people}人`:item.mics?`マイク${item.mics}`:item.risers?`ひな壇${item.risers}`:'備品'));
+ btn.addEventListener('pointerdown',e=>{if(e.button!==0)return;selectedId=item.id;drag={id:item.id,x:e.clientX,y:e.clientY,startX:item.x,startY:item.y};btn.setPointerCapture(e.pointerId);renderEditor();stage.querySelectorAll('.object').forEach(x=>x.classList.toggle('selected',x.dataset.id===item.id));});
+ btn.addEventListener('pointermove',e=>{if(!drag||drag.id!==item.id)return;const rect=stage.getBoundingClientRect();item.x=clamp(drag.startX+100*(e.clientX-drag.x)/rect.width,5,95);item.y=clamp(drag.startY+100*(e.clientY-drag.y)/rect.height,8,92);btn.style.left=`${item.x}%`;btn.style.top=`${item.y}%`;});
+ btn.addEventListener('pointerup',()=>{if(drag){drag=null;persist();}});btn.addEventListener('pointercancel',()=>{drag=null;persist();});
+ btn.addEventListener('click',()=>{selectedId=item.id;renderEditor();stage.querySelectorAll('.object').forEach(x=>x.classList.toggle('selected',x.dataset.id===item.id));});
+ btn.addEventListener('keydown',e=>{const ds={ArrowLeft:[-2,0],ArrowRight:[2,0],ArrowUp:[0,-2],ArrowDown:[0,2]};if(!ds[e.key])return;e.preventDefault();item.x=clamp(item.x+ds[e.key][0],5,95);item.y=clamp(item.y+ds[e.key][1],8,92);btn.style.left=`${item.x}%`;btn.style.top=`${item.y}%`;persist();});stage.append(btn);
+ }$('print-title').textContent=`配置図：${state.scenes[state.active].name}（架空の例）`;renderEditor();updateCounts();}
+function renderEditor(){const v=selected();$('editor').classList.toggle('hidden',!v);$('selectedhelp').textContent=v?`選択中：${v.name}。値は自動保存されます。`:'ステージ上の部品をタップしてください。';if(!v)return;$('label').value=v.name;$('kind').value=v.kind;for(const [k] of KEYS)$(k).value=v[k];}
+function changed(){const v=selected();if(!v)return;const next=String($('label').value).trim();if(!next){$('status').textContent='名称は空欄にできません';return;}const counts={};for(const [k] of KEYS){const n=safeCount($(k).value,k==='pianos'?10:k==='risers'?50:300);if(n===null){$('status').textContent='備品数は0以上の整数にしてください';return;}counts[k]=n;}v.name=next.slice(0,20);v.kind=$('kind').value;Object.assign(v,counts);paint();persist();}
+function add(kind){if(items().length>=MAX_ITEMS){$('status').textContent='1場面につき100部品までです';return;}const k={choir:['合唱パート','choir',{people:8}],winds:['楽器パート','winds',{people:4,chairs:4,stands:2}],chair:['椅子','equipment',{chairs:1}],stand:['譜面台','equipment',{stands:1}],mic:['マイク','equipment',{mics:1}],piano:['ピアノ','equipment',{pianos:1,chairs:1}],riser:['ひな壇','equipment',{risers:1}]}[kind];if(!k)return;const id=`new-${Date.now()}-${Math.floor(Math.random()*1e9)}`;const v={id,name:k[0],kind:k[1],x:clamp(20+items().length*7,10,85),y:clamp(24+items().length*6,16,86),...Object.fromEntries(KEYS.map(([k])=>[k,0])),...k[2]};items().push(v);selectedId=id;paint();persist();}
+function downloadJson(){const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=el('a');a.href=url;a.download='ステージ転換_配置バックアップ.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+readSaved();
+for(const t of document.querySelectorAll('.tab'))t.addEventListener('click',()=>{state.active=Number(t.dataset.scene);selectedId=null;paint();persist();});
+for(const b of document.querySelectorAll('[data-add]'))b.addEventListener('click',()=>add(b.dataset.add));
+for(const k of ['label','kind',...KEYS.map(x=>x[0])])$(k).addEventListener('change',changed);
+$('remove').addEventListener('click',()=>{if(!selected())return;state.scenes[state.active].items=items().filter(v=>v.id!==selectedId);selectedId=null;paint();persist();});
+$('example').addEventListener('click',()=>{if(!window.confirm('保存済みの配置を消して、架空の例に戻しますか？'))return;state=defaults();selectedId=null;paint();persist();});
+$('savejson').addEventListener('click',downloadJson);
+$('importjson').addEventListener('click',()=>$('file').click());
+$('file').addEventListener('change',async e=>{const f=e.target.files[0];if(!f)return;try{if(f.size>250000)throw Error('ファイルが大きすぎます');const data=JSON.parse(await f.text());const next=cleanState(data);state=next;selectedId=null;paint();persist();$('status').textContent='保存データを読み込みました';}catch(err){$('status').textContent=`読み込み失敗：${err.message}`;}finally{e.target.value='';}});
+$('print').addEventListener('click',()=>window.print());
+paint();
+// This read-only diagnostic object supports repeatable automated checks without exposing user data.
+window.__stageDemo={tallies:()=>state.scenes.map(tallies),setScene:(i)=>{state.active=i;selectedId=null;paint();},getState:()=>JSON.parse(JSON.stringify(state)),reset:()=>{state=defaults();selectedId=null;paint();}};
+</script>
+</body></html>
