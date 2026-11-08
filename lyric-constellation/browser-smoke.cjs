@@ -192,7 +192,7 @@ async function runMummyResearchScenario(browser,base,{mobile}){
  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
  try{
   await page.goto(base+'/lyric-constellation/#mummy-research',{waitUntil:'domcontentloaded'});
-  assert.match(await page.locator('#screen').innerText(),/本人専用の精読室/);
+  assert.match(await page.locator('#screen').innerText(),/束元康介名義の公開作品/,'guest cannot enter the private research URL');
   assert.equal(await page.locator('#screen .mummy-essay').count(),0,'private essay hidden without login');
   const report=await page.evaluate(()=>{
    const sourceText='音楽はここで終わる。\n楽譜はまだ開かれていない本だ。\nそれでも私は演奏する。';
@@ -218,6 +218,7 @@ async function runMummyResearchScenario(browser,base,{mobile}){
     version_a:1,version_b:1,heading:'検証用の楽曲間比較',
     evidence_a:'音楽をまだ聴きたい',evidence_b:'友達と歌う',
     interpretation:'楽曲間の語り',alternative:'似ているとは限らない',inquiry:'どう違いますか。'}];
+   cloudUser={id:'synthetic-owner'};
    rapResearchStatus='ready';sky='rap';view='research';render();
    return {works:masterReadingWorks.length,essayChars:rapResearchSource.original_text.length};
   });
