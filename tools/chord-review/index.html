@@ -235,6 +235,28 @@ body.easy-mode #workloadPanel{display:block!important}
  .mobile-bar-nav button{min-width:43px}
 }
 
+
+/* Keep the original two-column layout on Mac. Quick harmonic choices sit above auto chords. */
+@media(min-width:900px){
+ .quick-harmony{grid-column:2;grid-row:2}
+ .phrase-section{grid-column:2;grid-row:3}
+ .edit-section{grid-column:2;grid-row:4}
+ .navline{grid-column:2;grid-row:5}
+ .list-section{grid-column:2;grid-row:6}
+ .score-section{grid-column:1;grid-row:2/7}
+ .advanced-toggle{display:none}
+}
+@media(min-width:701px) and (max-width:899px){
+ .advanced-toggle{display:none}
+}
+#scoreFullscreen{border:1px solid #b5cec6;color:#275d53;background:#eaf4ee;min-height:36px;padding:7px 10px;font-weight:800;font-size:12px}
+body.score-fullscreen .score-section{position:fixed!important;inset:0!important;z-index:45!important;margin:0!important;border-radius:0!important;display:flex!important;flex-direction:column!important;background:#fff}
+body.score-fullscreen .score-section .score-head{flex:none;padding:12px}
+body.score-fullscreen .score-section .score-area{height:auto!important;min-height:0!important;flex:1!important;overscroll-behavior:contain}
+body.score-fullscreen .score-section .score-bottom{flex:none}
+body.score-fullscreen footer{display:none!important}
+body.score-fullscreen .score-center{align-items:center}
+
 </style></head><body>
 <section class="gate" id="accessGate"><div class="gate-card"><h1>♩ コード確認室 <small style="font-size:12px;color:#538079">v9.0</small></h1><p>11曲の原譜とコード進行を、スマホで確認する専用画面です。楽譜と回答は本人ログイン後に表示されます。</p><label for="gateEmail">メールアドレス</label><input id="gateEmail" autocomplete="email" inputmode="email" type="email" placeholder="メールアドレス"><label for="gatePassword">パスワード</label><input id="gatePassword" type="password" autocomplete="current-password" placeholder="既存アカウントのパスワード"><button id="gateLogin">ログインして確認を開始</button><button class="secondary" id="gateSendEmail">認証メールを送る</button><label for="gateOtp">メールに届いた認証コード</label><input id="gateOtp" autocomplete="one-time-code" inputmode="numeric" placeholder="認証コード"><button class="secondary" id="gateVerify">コードでログイン</button>
 <details id="rescueDetails"><summary>メールのリンクが localhost:3000 で開けない場合</summary>
@@ -249,7 +271,7 @@ body.easy-mode #workloadPanel{display:block!important}
 <div class="mobile-bar-nav"><button type="button" id="mobilePrev" aria-label="前の小節">‹</button><button type="button" id="mobileNext" aria-label="次の小節">›</button></div>
 <div class="priority-switch" style="display:flex;gap:5px"><button id="priorityBtn">重点61</button><button id="allBtn">全913</button></div></div>
 <div class="tonebar"><div><b id="toneNow">調：未設定</b><span id="toneRelative">転調があるときは小節から設定できます</span></div><button id="toneOpen">調・転調</button></div>
-<section class="section score-section" id="scoreSection"><div class="score-head"><div><strong>原曲の楽譜</strong> <small id="scoreInfo">歌・ピアノ</small></div><div class="score-tools"><button id="zoomOut" aria-label="縮小">−</button><span id="zoomLabel">100%</span><button id="zoomIn" aria-label="拡大">＋</button></div></div><div class="score-area" id="scoreScroll"><div class="score-center" id="scoreDisplay"><div class="no-score">楽譜を読み込んでいます…</div></div></div><div class="score-bottom"><span>横に動かして確認できます</span><span id="scoreRef">原曲MusicXML照合用</span></div></section>
+<section class="section score-section" id="scoreSection"><div class="score-head"><div><strong>原曲の楽譜</strong> <small id="scoreInfo">歌・ピアノ</small></div><div class="score-tools"><button id="zoomOut" aria-label="縮小">−</button><span id="zoomLabel">100%</span><button id="zoomIn" aria-label="拡大">＋</button><button id="scoreFullscreen" type="button" aria-pressed="false" aria-label="楽譜を全画面表示">全画面</button></div></div><div class="score-area" id="scoreScroll"><div class="score-center" id="scoreDisplay"><div class="no-score">楽譜を読み込んでいます…</div></div></div><div class="score-bottom"><span>横に動かして確認できます</span><span id="scoreRef">原曲MusicXML照合用</span></div></section>
 <section class="section quick-harmony" id="quickHarmony" aria-label="小節の和声の扱い">
  <div class="quick-head"><strong>この小節はどう扱いますか？</strong><span id="quickState" role="status">未判断</span></div>
  <p class="quick-hint">和音がない小節は、無理にコードを付けずに記録できます。</p>
@@ -990,6 +1012,14 @@ function setAdvancedPanel(isOpen){
  if(isOpen&&easyMode){document.body.classList.remove('easy-mode')}
  else if(!isOpen&&easyMode){document.body.classList.add('easy-mode')}
 }
+function toggleScoreFullscreen(){
+ const open=!document.body.classList.contains('score-fullscreen');
+ document.body.classList.toggle('score-fullscreen',open);
+ $('scoreFullscreen').textContent=open?'閉じる':'全画面';
+ $('scoreFullscreen').setAttribute('aria-pressed',String(open));
+ $('scoreFullscreen').setAttribute('aria-label',open?'全画面表示を終了':'楽譜を全画面表示');
+ if(open)$('scoreScroll').scrollTop=0;
+}
 function updateHarmonicChoice(){
  const type=currentReview()?.harmonicIntent;
  $('markMelody').setAttribute('aria-pressed',String(type==='melody'));
@@ -1264,6 +1294,7 @@ function bind(){bindRepeat();bindTone();bindSmart();bindPhrase();bindNote();$('s
  $('markMelody').onclick=()=>recordHarmonicIntent('melody');$('markNC').onclick=()=>recordHarmonicIntent('nc');
  $('advancedToggle').onclick=()=>setAdvancedPanel(!document.body.classList.contains('mobile-advanced'));
  $('mobilePrev').onclick=()=>move(-1);$('mobileNext').onclick=()=>move(1);
+ $('scoreFullscreen').onclick=toggleScoreFullscreen;
  $('nextUnchecked').onclick=()=>jumpToUnchecked();$('resumeHelp').onclick=showWorkflowHelp;$('downloadCSV').onclick=exportReviewCSV;SONGS.forEach((s,i)=>$('songSelect').add(new Option(s.name+' · '+s.total+'小節',i)));$('songSelect').onchange=e=>{sn=Number(e.target.value);bn=nFor(current())[0]||1;slot=0;render()};$('priorityBtn').onclick=()=>{priority=true;bn=nFor(current())[0]||1;slot=0;render()};$('allBtn').onclick=()=>{priority=false;render()};$('prev').onclick=()=>move(-1);$('next').onclick=()=>move(1);$('okBtn').onclick=()=>setStatus('ok');$('badBtn').onclick=()=>setStatus('issue');$('holdBtn').onclick=()=>setStatus('hold');$('undoBtn').onclick=undo;$('openEdit').onclick=openEdit;$('editBtn').onclick=openEdit;$('modalBeats').onclick=e=>{const b=e.target.closest('[data-slot]');if(b)chooseModalBeat(Number(b.dataset.slot))};$('beatbar').onclick=e=>{const b=e.target.closest('[data-slot]');if(!b)return;slot=Number(b.dataset.slot);openEdit()};$('beatEdits').onclick=e=>{const b=e.target.closest('[data-slot]');if(!b)return;slot=Number(b.dataset.slot);openEdit()};$('scoreDisplay').onclick=()=>{notice('拍を選んでから「コード修正」を押してください')};$('editMode').onclick=e=>{const b=e.target.closest('[data-mode]');if(b){editKind=b.dataset.mode;paintEdit()}};['root','quality','bass','duration'].forEach(id=>$(id).onchange=paintEdit);$('saveEdit').onclick=()=>writeEdit(false);$('saveNextEdit').onclick=()=>writeEdit(true);$('deleteEdit').onclick=eraseEdit;$('closeEdit').onclick=()=>closeModal('editShade');$('editShade').onclick=e=>{if(e.target.id==='editShade')closeModal('editShade')};$('zoomIn').onclick=()=>{zoom=Math.min(180,zoom+20);displayScore()};$('zoomOut').onclick=()=>{zoom=Math.max(60,zoom-20);displayScore()};$('search').oninput=renderBars;$('filter').onchange=renderBars;$('bars').onclick=e=>{const b=e.target.closest('[data-bar]');if(b)changeBar(Number(b.dataset.bar))};$('backupBtn').onclick=exportJSON;$('downloadJSON').onclick=exportJSON;$('restoreBtn').onclick=()=>{$('resultsShade').hidden=false;$('fileInput').click()};$('fileInput').onchange=e=>importJSON(e.target.files[0]);$('summaryBtn').onclick=showResults;$('dataBtn').onclick=showResults;$('closeResults').onclick=()=>closeModal('resultsShade');$('copyResults').onclick=()=>navigator.clipboard.writeText($('resultsText').value).then(()=>notice('確認結果をコピーしました'),()=>notice('コピーできません。手動で選択してください'));$('cloudBtn').onclick=()=>{$('cloudShade').hidden=false;drawCloud()};$('closeCloud').onclick=()=>closeModal('cloudShade');$('signIn').onclick=async()=>{try{$('cloudMessage').textContent='ログイン中…';await signIn($('email').value.trim(),$('password').value);closeModal('cloudShade')}catch(e){drawCloud(e.message)}};$('sendOtp').onclick=async()=>{try{await sendEmail($('email').value.trim())}catch(e){drawCloud(e.message)}};$('verifyOtp').onclick=async()=>{try{await verifyEmail($('email').value.trim(),$('otp').value.trim());closeModal('cloudShade')}catch(e){drawCloud(e.message)}};$('syncNow').onclick=syncAll;$('signOut').onclick=()=>{storeSession(null);location.reload()};window.addEventListener('keydown',e=>{if(e.key==='Escape'){for(const id of ['editShade','cloudShade','resultsShade','repeatShade','toneShade','noteShade'])closeModal(id);if(!$('smartShade').hidden)closeSmart();if(!$('phraseShade').hidden)closePhrase()};if((e.metaKey||e.ctrlKey)&&e.key==='z'){e.preventDefault();undo()}});window.addEventListener('online',()=>{if(session)syncAll()})}
 function renderBeatOnly(){const ed=currentReview()?.beatEdits||[];document.querySelectorAll('#beatbar button').forEach(x=>x.classList.toggle('active',Number(x.dataset.slot)===slot));$('editHint').textContent=posLabel(slot,currentBar().meter)}
 fillSelect('root',NOTES.map(n=>[n,n]));fillSelect('bass',[['none','なし（ルート音）'],...NOTES.map(n=>[n,n])]);fillSelect('quality',QUALITIES);fillSelect('toneRoot',NOTES.map(x=>[x,x]));
