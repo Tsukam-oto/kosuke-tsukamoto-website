@@ -39,6 +39,20 @@ async function runScenario(browser,base,{mobile}){
  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
  try{
   await page.goto(base+'/lyric-constellation/',{waitUntil:'domcontentloaded',timeout:15000});
+  // Public visitors must never be shown the private pseudonym catalogue or research UI.
+  const publicOnly=await page.evaluate(()=>{
+   go('research');switchSky('rap');
+   return {sky,view,html:document.querySelector('#screen')?.innerText||'',
+    researchHidden:document.querySelector('[data-view="research"]')?.hidden,
+    privateOptionDisabled:document.querySelector('#skyF option[value="rap"]')?.disabled,
+    privateSwitchVisible:!!document.querySelector('#screen [data-sky="rap"]')};
+  });
+  assert.equal(publicOnly.sky,'choir','guest cannot switch to private identity');
+  assert.equal(publicOnly.view,'constellation','guest cannot open private research');
+  assert.equal(publicOnly.researchHidden,true,'guest research nav is hidden');
+  assert.equal(publicOnly.privateOptionDisabled,true,'guest cannot select private identity when editing');
+  assert.equal(publicOnly.privateSwitchVisible,false,'guest switch button is absent');
+  assert.doesNotMatch(publicOnly.html,/木乃伊/,'guest sees official-name works only');
   await page.locator('nav [data-view="works"]').click();
   await page.locator('button.work-card').filter({hasText:'朝になったら'}).first().click();
   await page.locator('#drawer .deep-entry [data-deep-work]').click();
