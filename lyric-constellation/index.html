@@ -335,7 +335,7 @@ const clamp=(a,min,max)=>Math.max(min,Math.min(max,a));
 const safeId=()=>`u-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,9)}`;
 let db={version:1,userWorks:[],notes:{},readingReviews:{},customWords:[],updatedAt:null};let localWorks=[];
 let masterReadingWorks=[],masterPendingWorks=[],masterReadStatus='signed_out';
-let rapResearchSource=null,rapResearchPassages=[],rapResearchConnections=[],rapSongReadings=[],rapSongDialogues=[],rapResearchStatus='signed_out';
+let rapResearchSource=null,rapResearchPassages=[],rapResearchConnections=[],rapSongReadings=[],rapSongDialogues=[],rapReadingChallenges=[],rapResearchStatus='signed_out',rapResearchPendingSelect=null;
 let sky='choir',view='constellation',selected=null,term='',query='',visibility='all',order='new',editing=null,pairIds=[],wordResultLimit=12;
 function cleanWork(w){if(!w||typeof w!=='object')return null;const title=String(w.title||'').trim().slice(0,140),lyrics=String(w.lyrics??w.text??'').slice(0,120000);if(!title||!lyrics.trim())return null;return {id:String(w.id||safeId()).slice(0,90),title,lyrics,year:Number(w.year)||null,credit:String(w.credit||'').slice(0,250),kind:String(w.kind||'その他').slice(0,70),tags:Array.isArray(w.tags)?w.tags.map(t=>String(t).slice(0,30)).slice(0,30):[],sky:resolveSky(w),origin:'private',updatedAt:String(w.updatedAt||new Date().toISOString())};}
 
@@ -589,6 +589,23 @@ function toast(message){const x=$('#toast');x.textContent=message;x.classList.ad
 function go(to){if(to==='words'&&view!=='words'){term='';wordResultLimit=12;}if(to==='strata'||to==='research')closeWork();if(to==='research')sky='rap';view=to;query='';visibility='all';try{const target=location.pathname+location.search+(to==='strata'?'#strata':to==='research'?'#mummy-research':'');history.replaceState(null,'',target)}catch{}window.scrollTo({top:0,behavior:'instant'});render()}
 function header(title,sub){const out=title==='書いた言葉は、星座になる。'?'<span class="headline-segment">書いた言葉は、</span><span class="headline-segment">星座になる。</span>':esc(title);return `<h1 class="heading">${out}</h1><p class="lede">${esc(sub)}</p>`}
 function switchSky(next){if(next!=='rap'&&next!=='choir')return;if(next==='choir'&&view==='research')view='works';sky=next;term='';query='';visibility='all';selected=works()[0]?.id||null;try{localStorage.setItem(SKY_PREF,sky)}catch{}closeWork();render();window.scrollTo({top:0,behavior:'instant'})}
+function focusPendingReread(){
+ if(!rapResearchPendingSelect||rapResearchStatus!=='ready'||!cloudUser)return;
+ const target=rapResearchPendingSelect;
+ const pane=document.getElementById('mummySelectedReading');
+ if(!pane)return;
+ window.MummyResearchView.selectWork(target);
+ pane.innerHTML=window.MummyResearchView.selection();
+ rapResearchPendingSelect=null;
+ pane.scrollIntoView({block:'start',behavior:'smooth'});
+}
+function openRereadFromWork(workId){
+ const work=getWork(workId);
+ if(!cloudUser||!work||work.sky!=='rap'||work.sourceSystem!=='lyric_master')return;
+ rapResearchPendingSelect=workId;
+ go('research');
+ focusPendingReread();
+}
 function skySwitch(){return `<div class="sky-switch" role="group" aria-label="作品の名義を切り替える"><button data-sky="choir" class="${sky==='choir'?'active':''}" aria-pressed="${sky==='choir'}"><strong>合唱・詩</strong><small>束元康介の作品</small></button><button data-sky="rap" class="${sky==='rap'?'active rap-selected':''}" aria-pressed="${sky==='rap'}"><strong>木乃伊</strong><small>ラップの作品</small></button></div><div class="sky-help">${sky==='rap'?'現在は木乃伊名義の作品だけを表示しています。合唱・詩の作品とは混在しません。':'現在は合唱・詩の作品だけを表示しています。木乃伊名義とは混在しません。'}</div>`}
 function statStrip(){const s=summary();return `<div class="stats"><div class="stat"><b>${s.all.length}</b><span>収録作品</span></div><div class="stat"><b>${s.nwords}</b><span>見つかった観察語</span></div><div class="stat"><b>${s.conn.length}</b><span>言葉で結ばれる作品ペア</span></div><div class="stat"><b>${s.lines}</b><span>原文の行数</span></div></div>`}
 function topTerms(limit=18){return [...wordDF()].sort((a,b)=>b[1].df-a[1].df||b[1].count-a[1].count||b[0].length-a[0].length).slice(0,limit)}
@@ -639,7 +656,7 @@ function masterReadNotice(){
  return '<div class="notice">本人専用アーカイブ：原文 '+loaded.length+'件'+(pending.length?' ／ 原文待ち '+pending.length+'件：'+pending.map(x=>'《'+esc(x.title)+'》').join('・'):'')+
  '。PDF抽出の歌詞は未校正であり、完成・公開を意味しません。共作の意図・権利は断定しません。</div>';
 }
-function viewRapResearch(){return skySwitch()+header('木乃伊の歌詞を、一曲ずつ。','一つの作品をほかの作品の説明に使わず、原文から独立して読み解く。')+window.MummyResearchView.build({status:rapResearchStatus,source:rapResearchSource,passages:rapResearchPassages,connections:rapResearchConnections,works:masterReadingWorks,songReadings:rapSongReadings,songDialogues:rapSongDialogues});}
+function viewRapResearch(){return skySwitch()+header('木乃伊の歌詞を、一曲ずつ。','一つの作品をほかの作品の説明に使わず、原文から独立して読み解く。')+window.MummyResearchView.build({status:rapResearchStatus,source:rapResearchSource,passages:rapResearchPassages,connections:rapResearchConnections,works:masterReadingWorks,songReadings:rapSongReadings,songDialogues:rapSongDialogues,readingChallenges:rapReadingChallenges});}
 function viewWorks(){const all=sortWorks(works().filter(w=>(visibility==='all'||(visibility==='official'?w.origin==='official':w.origin==='private'))&&(!query||norm(w.title+' '+w.lyrics+' '+w.credit).includes(norm(query)))));return header('作品を読む。',sky==='rap'?'木乃伊名義の原文と断片だけを表示します。合唱・詩は別の空です。':'公開歌詞11篇を原文・作者表記付きで収録。木乃伊のリリックとは分けています。')+`<div class="panel"><div class="control-row"><input class="search" id="searchWorks" type="search" placeholder="作品名・歌詞・作者から検索" value="${esc(query)}"><div style="display:flex;gap:8px;flex-wrap:wrap"><select id="filterWorks" class="search" style="width:auto"><option value="all" ${visibility==='all'?'selected':''}>すべて</option><option value="official" ${visibility==='official'?'selected':''}>公開作品のみ</option><option value="private" ${visibility==='private'?'selected':''}>非公開のみ</option></select><select id="sortWorks" class="search" style="width:auto"><option value="new" ${order==='new'?'selected':''}>新しい順</option><option value="old" ${order==='old'?'selected':''}>古い順</option><option value="az" ${order==='az'?'selected':''}>作品名順</option></select></div></div><div class="notice">公式公開版の原文は読み取り専用。作品を開いて「作品を深く読む」を選ぶと、問い・反復・人称・別解を原文の行番号とともに確認できます。分析結果は推測として示し、原文を書き換えません。</div></div>${masterReadNotice()}${readingReviewDashboard()}<div class="section-top"><h2>収録作品 <span class="small-muted">${all.length}篇</span></h2><button class="btn sm" id="addWorkSmall">＋ 作品を追加</button></div><div class="works-list">${all.map(w=>`<button class="work-card ${w.origin==='private'?'private':''}" data-open="${esc(w.id)}"><span class="eyebrow">${w.year||'—'} / ${w.origin==='official'?'PUBLISHED':w.sourceSystem==='lyric_master'?'PRIVATE SOURCE':'PRIVATE'}</span><strong>《${esc(w.title)}》</strong><small>${esc(w.credit||'作者表記なし')}</small>${w.sourceSystem==='lyric_master'?'<small class="master-provenance">'+esc(w.sourceStatus==='unverified_pdf_extract'?'PDF抽出・未校正':'作者原本')+'</small>':''}<div class="tags">${formatTags(w)}</div></button>`).join('')}</div>${all.length?'':'<div class="empty">該当する作品がありません。</div>'}`}
 function findInText(text,word){const idx=norm(text).indexOf(norm(word));if(idx<0)return '';const arr=text.split('\n');let at=0;for(let i=0;i<arr.length;i++){if(norm(arr[i]).includes(norm(word))){return arr.slice(Math.max(0,i-1),Math.min(arr.length,i+2)).join('\n').trim()}}return ''}
 function highlight(text,word){if(!word)return esc(text);const a=String(text),na=norm(a),nb=norm(word);let idx=na.indexOf(nb);if(idx<0)return esc(a);if(na.length!==a.length)return esc(a);let out='',start=0;while(idx>=0){out+=esc(a.slice(start,idx))+'<mark>'+esc(a.slice(idx,idx+word.length))+'</mark>';start=idx+word.length;idx=na.indexOf(nb,start)}return out+esc(a.slice(start));}
@@ -819,7 +836,7 @@ function openDeepReading(id,topicKey=''){
  }
 }
 
-function openWork(id){const w=getWork(id);if(!w)return;selected=id;const lex=term;const credit=w.credit||'作者表記なし';const plain=w.lyrics.split(/\n\s*\n/).map(p=>`<p>${highlight(p,lex)}</p>`).join('');$('#drawer').innerHTML=`<div class="drawer-top"><span class="eyebrow">${w.origin==='official'?'PUBLISHED ARCHIVE':'PRIVATE ARCHIVE'}</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div><div class="eyebrow">${esc(w.year||'YEAR UNKNOWN')} / ${esc(w.kind)}</div><h2>《${esc(w.title)}》</h2><div class="reading-stat">${w.lyrics.split('\n').filter(Boolean).length}行 · ${tokens(w).length}種類の観察語</div><div class="deep-entry"><button class="btn primary" data-deep-work="${esc(w.id)}">この作品を深く読む</button><small>原文の根拠、繰り返し、違う読み方まで。</small></div><div class="word-cloud" style="margin:14px 0 24px">${tokens(w).slice(0,16).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="poem-text">${plain}</div>${w.sourceSystem==='lyric_master'?`<p class="master-source-warning">${w.sourceStatus==='unverified_pdf_extract'?'PDFから抽出した未校正テキストです。文字や行の区切りに誤りが残る可能性があります。':'本人専用の作品原文です。'} ${w.authorshipStatus&&w.authorshipStatus!=='sole_author'?'共作・著作者の確認が必要な場合があります。':''}原本を公開したり、本人の制作意図を確定したりしません。${esc(w.sourceBook||'')}</p>`:''}<p class="reading-meta" style="font-size:11px;color:#728092;border-top:1px solid #e5e7e7;padding-top:16px">${esc(credit)}<br>${w.origin==='official'?'<a href="https://kosuke-tsukamoto-website.pages.dev/lyrics/" target="_blank" rel="noopener noreferrer">公式サイト掲載版</a>':'ご自身だけの非公開作品'}</p><div class="note-box"><h3>この作品についての自分のメモ（非公開）</h3><textarea id="noteText" placeholder="制作意図、後から気付いたこと、変化の記録など。原文は変更しません。">${esc(db.notes[w.id]||'')}</textarea><div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="${esc(w.id)}">メモを保存</button></div></div><div class="form-actions" style="justify-content:start;margin-top:22px">${w.origin==='private'&&!w.readOnly?`<button class="btn" data-edit="${esc(w.id)}">編集</button><button class="btn danger" data-delete="${esc(w.id)}">削除</button>`:`<button class="btn" data-clone="${esc(w.id)}">非公開の複製を作る</button>`}</div><footer>歌詞の新規生成は行いません。関連性は原文の語句と手動のメモをもとに確認できます。</footer>`;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');if(view==='constellation')render();}
+function openWork(id){const w=getWork(id);if(!w)return;selected=id;const lex=term;const credit=w.credit||'作者表記なし';const plain=w.lyrics.split(/\n\s*\n/).map(p=>`<p>${highlight(p,lex)}</p>`).join('');$('#drawer').innerHTML=`<div class="drawer-top"><span class="eyebrow">${w.origin==='official'?'PUBLISHED ARCHIVE':'PRIVATE ARCHIVE'}</span><button class="close" id="closeDrawer" aria-label="閉じる">×</button></div><div class="eyebrow">${esc(w.year||'YEAR UNKNOWN')} / ${esc(w.kind)}</div><h2>《${esc(w.title)}》</h2><div class="reading-stat">${w.lyrics.split('\n').filter(Boolean).length}行 · ${tokens(w).length}種類の観察語</div><div class="deep-entry"><button class="btn primary" data-deep-work="${esc(w.id)}">この作品を深く読む</button>${w.sourceSystem==='lyric_master'&&w.sky==='rap'&&cloudUser?'<button class="btn" data-mummy-reread="'+esc(w.id)+'">精読の再検討を読む</button>':''}<small>原文の根拠、繰り返し、違う読み方まで。</small></div><div class="word-cloud" style="margin:14px 0 24px">${tokens(w).slice(0,16).map(t=>`<button class="word" data-term="${esc(t)}">${esc(t)}</button>`).join('')}</div><div class="poem-text">${plain}</div>${w.sourceSystem==='lyric_master'?`<p class="master-source-warning">${w.sourceStatus==='unverified_pdf_extract'?'PDFから抽出した未校正テキストです。文字や行の区切りに誤りが残る可能性があります。':'本人専用の作品原文です。'} ${w.authorshipStatus&&w.authorshipStatus!=='sole_author'?'共作・著作者の確認が必要な場合があります。':''}原本を公開したり、本人の制作意図を確定したりしません。${esc(w.sourceBook||'')}</p>`:''}<p class="reading-meta" style="font-size:11px;color:#728092;border-top:1px solid #e5e7e7;padding-top:16px">${esc(credit)}<br>${w.origin==='official'?'<a href="https://kosuke-tsukamoto-website.pages.dev/lyrics/" target="_blank" rel="noopener noreferrer">公式サイト掲載版</a>':'ご自身だけの非公開作品'}</p><div class="note-box"><h3>この作品についての自分のメモ（非公開）</h3><textarea id="noteText" placeholder="制作意図、後から気付いたこと、変化の記録など。原文は変更しません。">${esc(db.notes[w.id]||'')}</textarea><div class="form-actions"><button class="btn sm primary" id="saveNote" data-id="${esc(w.id)}">メモを保存</button></div></div><div class="form-actions" style="justify-content:start;margin-top:22px">${w.origin==='private'&&!w.readOnly?`<button class="btn" data-edit="${esc(w.id)}">編集</button><button class="btn danger" data-delete="${esc(w.id)}">削除</button>`:`<button class="btn" data-clone="${esc(w.id)}">非公開の複製を作る</button>`}</div><footer>歌詞の新規生成は行いません。関連性は原文の語句と手動のメモをもとに確認できます。</footer>`;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');if(view==='constellation')render();}
 function closeWork(){$('#drawer').classList.remove('open');$('#drawer').setAttribute('aria-hidden','true');$('#scrim').classList.remove('show')}
 function openEditor(id=null,clone=false,sourceText=null){const w=id?getWork(id):null;if(w?.readOnly&&!clone){toast('歌詞集の原本はここから変更できません。非公開の複製を作って編集してください。');return;}editing=id&&!clone?id:null;const f=$('#editForm');f.reset();f.elements.id.value=editing||'';f.elements.sky.value=w?resolveSky(w):sky;f.elements.kind.value=sky==='rap'?'ラップ（木乃伊）':'合唱・詩';if(w){f.elements.title.value=clone?w.title+'（下書き）':w.title;f.elements.year.value=w.year||'';f.elements.credit.value=w.credit||'';f.elements.kind.value=w.kind||'その他';f.elements.lyrics.value=w.lyrics;f.elements.tags.value=(w.tags||[]).join('、')}if(sourceText){f.elements.lyrics.value=sourceText;f.elements.title.value=sourceText.slice(0,12).split('\n')[0]||'無題'}$('#modal-title').textContent=editing?'作品を編集':clone?'公開作品から非公開の下書きを作成':'新しい作品を登録';$('#editor').showModal();}
 function exportBackup(){const data={app:'lyric-constellation',version:3,exportedAt:new Date().toISOString(),source:'official 11 poems',userWorks:db.userWorks,notes:db.notes,readingReviews:cleanReadingReviews(db.readingReviews),customWords:db.customWords};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`歌詞の星座_バックアップ_${new Date().toISOString().slice(0,10)}.json`;document.body.append(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);toast('バックアップを書き出しました。安全な場所に保存してください。')}
@@ -827,6 +844,7 @@ function mergeImported(d){const source=Array.isArray(d)?d:Array.isArray(d.userWo
 function migrateOld(){let restored=0;for(const key of ['three_observatories_release_v1','three_observatory_proto_v01']){try{const d=JSON.parse(localStorage.getItem(key));if(d&&Array.isArray(d.works)){const o=mergeImported(d);restored+=o.added}}catch(e){}}render();toast(restored?`旧データから${restored}作品を取り込みました。`:'引き継げる旧データが見つかりませんでした。旧版のJSONも読み込めます。')}
 function compare(a,b){const A=getWork(a),B=getWork(b);if(!A||!B)return;const comm=tokens(A).filter(x=>tokens(B).includes(x));selected=a;term=comm[0]||'';const panel=`<div class="drawer-top"><span class="eyebrow">COMPARE / 2篇を読む</span><button class="close" id="closeDrawer">×</button></div><h2 style="font-size:22px">《${esc(A.title)}》<br>と《${esc(B.title)}》</h2><p class="desc">共通する表記：${comm.length}種類</p><div class="word-cloud">${comm.map(w=>`<button class="word" data-term="${esc(w)}">${esc(w)}</button>`).join('')}</div><div class="term-results" style="grid-template-columns:1fr;margin-top:22px">${[A,B].map(w=>`<div class="term-result"><h3>${esc(w.title)}</h3><div class="poem-text" style="white-space:pre-line;line-height:1.9;font-size:12px">${highlight(w.lyrics.slice(0,1700),term)}</div></div>`).join('')}</div><p class="notice">共通する語を読んで、作品の内容がどう異なるかをご自身で確かめられます。</p>`;$('#drawer').innerHTML=panel;$('#drawer').classList.add('open');$('#drawer').setAttribute('aria-hidden','false');$('#scrim').classList.add('show');}
 document.addEventListener('click',async e=>{const target=e.target.closest('button,[data-open],[data-term],[data-compare]');if(!target)return;if(target.matches('[data-sky]')){switchSky(target.dataset.sky);return}if(target.matches('[data-view]')){go(target.dataset.view);return}
+if(target.hasAttribute('data-mummy-reread')){openRereadFromWork(target.dataset.mummyReread);return;}
 if(target.hasAttribute('data-mummy-mode')){window.MummyResearchView.chooseMode(target.dataset.mummyMode);render();return}
 if(target.hasAttribute('data-mummy-select')){window.MummyResearchView.selectWork(target.dataset.mummySelect);const pane=document.getElementById('mummySelectedReading');if(pane){pane.innerHTML=window.MummyResearchView.selection();pane.scrollIntoView({block:'start',behavior:'smooth'});}return}
 if(target.hasAttribute('data-mummy-theme')){window.MummyResearchView.chooseTheme(target.dataset.mummyTheme);render();return}
@@ -947,7 +965,7 @@ async function loadMummyResearch(user,epoch){
  if(!user?.id||!cloudClient)return;
  rapResearchStatus='loading';
  try{
-  const [a,b,c,d,e]=await Promise.all([
+  const [a,b,c,d,e,f]=await Promise.all([
    cloudClient.from('lyric_research_sources').select('id,source_key,title,author_credit,date_label,date_precision,original_text,provenance,verification_status')
     .eq('user_id',user.id).eq('source_key','essay:2022-08:sakui-musa').limit(1),
    cloudClient.from('lyric_research_passages').select('id,source_id,section_key,heading,evidence_a,evidence_b,interpretation,alternative,inquiry,assessment_status')
@@ -957,29 +975,34 @@ async function loadMummyResearch(user,epoch){
    cloudClient.from('lyric_song_readings').select('id,work_id,reading_key,heading,evidence_a,evidence_b,observation,interpretation,alternative,inquiry,source_version_no,assessment_status')
     .eq('user_id',user.id).order('created_at',{ascending:true}).limit(1000),
    cloudClient.from('lyric_song_dialogues').select('id,work_a_id,work_b_id,dialogue_key,heading,evidence_a,evidence_b,interpretation,alternative,inquiry,version_a,version_b,assessment_status')
-    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(1000)
+    .eq('user_id',user.id).order('created_at',{ascending:true}).limit(1000),
+   cloudClient.from('lyric_reading_challenges')
+    .select('challenge_key,work_id,evidence,quoted_source_version,challenged_assumption,observation,revised_reading,alternative,limit_note,assessment_status')
+    .eq('user_id',user.id).not('work_id','is',null).order('created_at',{ascending:false}).limit(500)
   ]);
   if(a.error)throw a.error;
   if(b.error)throw b.error;
   if(c.error)throw c.error;
   if(d.error)throw d.error;
   if(e.error)throw e.error;
+  // A revision-read error must never disable the existing private lyric reader.
+  if(f.error)console.warn('private reread records unavailable');
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
   rapResearchSource=a.data?.[0]||null;
   rapResearchPassages=(b.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
   rapResearchConnections=(c.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
-  rapSongReadings=d.data||[];rapSongDialogues=e.data||[];
+  rapSongReadings=d.data||[];rapSongDialogues=e.data||[];rapReadingChallenges=f.error?[]:(f.data||[]);
   rapResearchStatus='ready';
-  render();
+  render();focusPendingReread();
  }catch(err){
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
-  rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];
+  rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];rapReadingChallenges=[];
   rapResearchStatus='error';console.warn('owner-only rap research load failed',err);render();
  }
 }
 function clearMummyResearch(){
- rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];
- rapResearchStatus='signed_out';window.MummyResearchView?.reset?.();
+ rapResearchSource=null;rapResearchPassages=[];rapResearchConnections=[];rapSongReadings=[];rapSongDialogues=[];rapReadingChallenges=[];
+ rapResearchStatus='signed_out';rapResearchPendingSelect=null;window.MummyResearchView?.reset?.();
 }
 
 async function startCloudSession(user){if(!user?.id)return;if(cloudUser?.id===user.id)return;const epoch=++cloudEpoch;masterReadingWorks=[];masterPendingWorks=[];masterReadStatus='loading';clearMummyResearch();rapResearchStatus='loading';cloudUser=user;cloudBusy=true;cloudDirty=false;cloudBlocked=false;previousLocal=JSON.parse(JSON.stringify(db));setCloudStatus('クラウド読込中…','pending');cloudButton().textContent='同期中';try{

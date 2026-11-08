@@ -3,10 +3,10 @@
 (function(root){
 'use strict';
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const state={works:[],readings:[],dialogues:[],theme:'all',query:'',limit:36,
+const state={works:[],readings:[],dialogues:[],challenges:[],challengeDiscarded:0,theme:'all',query:'',limit:36,
  mode:'all',selectedId:null,source:null,passages:[],essayLinks:[]};
 function reset(){
- state.works=[];state.readings=[];state.dialogues=[];state.theme='all';state.query='';
+ state.works=[];state.readings=[];state.dialogues=[];state.challenges=[];state.challengeDiscarded=0;state.theme='all';state.query='';
  state.limit=36;state.mode='all';state.selectedId=null;state.source=null;
  state.passages=[];state.essayLinks=[];
 }
@@ -16,6 +16,40 @@ function more(){state.limit+=36;}
 function chooseMode(next){if(['all','studied','awaiting'].includes(next)){state.mode=next;state.limit=36;}}
 function selectWork(id){if(state.works.some(w=>w.id===id))state.selectedId=id;}
 const worksWithReadings=()=>new Set(state.readings.map(x=>x.work.id));
+// Private-only research updates. Never accept a note unless its exact source
+// version and quoted evidence are present in the owner's currently loaded corpus.
+function verifyChallenges(items,works){
+ const byId=new Map(works.map(w=>[w.id,w]));
+ const verified=[];let discarded=0;
+ for(const item of items||[]){
+  const work=byId.get('master-'+String(item?.work_id||''));
+  const evidence=String(item?.evidence||'');
+  if(!work||!evidence||
+     Number(item.quoted_source_version)!==Number(work.sourceVersionNo)||
+     !String(work.lyrics||'').includes(evidence)){
+   discarded++;continue;
+  }
+  verified.push({...item,workId:work.id});
+ }
+ return {verified,discarded};
+}
+function challengeCards(work){
+ const entries=state.challenges.filter(item=>item.workId===work.id);
+ if(!entries.length)return '';
+ return '<section class="mummy-section mummy-reading-revisions">'+
+  '<h4>読みの更新・反証</h4>'+
+  '<p class="desc">以前の解釈を何によって見直したかを示す本人専用の研究記録です。AIの仮説であり、作者の意図を確定するものではありません。</p>'+
+  '<div class="mummy-reading-grid">'+entries.map(item=>
+   '<article class="mummy-reading-card"><div class="eyebrow">RE-READING / 暫定</div>'+
+   '<blockquote>'+esc(item.evidence)+'</blockquote>'+
+   '<div class="mummy-reading-sub"><b>従来の読みで再検討すること</b><p>'+esc(item.challenged_assumption)+'</p></div>'+
+   '<div class="mummy-reading-sub"><b>原文からの観察</b><p>'+esc(item.observation)+'</p></div>'+
+   '<div class="mummy-reading-sub"><b>今回の読み直し</b><p>'+esc(item.revised_reading)+'</p></div>'+
+   (item.alternative?'<details><summary>別の読み方</summary><p>'+esc(item.alternative)+'</p></details>':'')+
+   (item.limit_note?'<details><summary>まだ確定できないこと</summary><p>'+esc(item.limit_note)+'</p></details>':'')+
+   '</article>').join('')+'</div></section>';
+}
+
 function list(){
  if(!root.MummyResearch)return '<p>検索エンジンを読み込めませんでした。</p>';
  const result=root.MummyResearch.searchWorks(state.works,state.query,state.theme,500);
@@ -60,7 +94,7 @@ function selection(){
  return '<div class="mummy-selected-head"><div><small>'+esc(w.collection||'')+'</small><h3>《'+esc(w.title)+'》</h3></div>'+
  '<button class="btn sm" data-open="'+esc(w.id)+'">歌詞全文を開く</button></div>'+issue+
  (notes.length?'<div class="mummy-reading-grid">'+notes.map(readingCard).join('')+'</div>':
-  '<div class="mummy-empty-reading">この作品の個別精読はまだ登録していません。原文全文と語句検索は利用できます。自動的に内容を決めつけません。</div>');
+  '<div class="mummy-empty-reading">この作品の個別精読はまだ登録していません。原文全文と語句検索は利用できます。自動的に内容を決めつけません。</div>')+challengeCards(w);
 }
 function dialogueCards(){
  if(!state.dialogues.length)return '<p class="desc">原文の両方を確認できた作品間比較はまだありません。</p>';
@@ -97,7 +131,7 @@ function documentDetails(){
   '<button class="btn sm" data-mummy-select="'+esc(c.work.id)+'">歌詞を読む</button></article>').join('')+
   '</details>':'')+'</details></section>';
 }
-function build({status,source=null,passages=[],connections=[],works=[],songReadings=[],songDialogues=[]}){
+function build({status,source=null,passages=[],connections=[],works=[],songReadings=[],songDialogues=[],readingChallenges=[]}){
  if(status==='signed_out')return '<div class="panel mummy-locked"><h2>本人専用の精読室</h2>'+
  '<p>木乃伊の歌詞・独立したエッセイ・精読メモは非公開です。本人アカウントでログインすると閲覧できます。公開コードに原文は含めていません。</p>'+
  '<button class="btn primary" id="cloudLogin">本人アカウントでログイン</button></div>';
@@ -107,16 +141,19 @@ function build({status,source=null,passages=[],connections=[],works=[],songReadi
  const verified=root.MummyResearch?.verifySongs(songReadings,songDialogues,state.works)||
   {readings:[],dialogues:[],discarded:0,studiedCount:0};
  state.readings=verified.readings;state.dialogues=verified.dialogues;
+ const challengeReport=verifyChallenges(readingChallenges,state.works);
+ state.challenges=challengeReport.verified;state.challengeDiscarded=challengeReport.discarded;
  state.source=source;
  const essayChecked=source?root.MummyResearch?.verify(source,passages,connections,state.works):null;
  state.passages=essayChecked?.passages||[];state.essayLinks=essayChecked?.connections||[];
  const studied=worksWithReadings();
  const stats='<div class="mummy-stats">'+[
   ['収録歌詞',state.works.length],['個別精読済み作品',studied.size],['根拠付き精読',state.readings.length],
-  ['作品間の比較',state.dialogues.length]
+  ['作品間の比較',state.dialogues.length],['精読の再検討',state.challenges.length]
  ].map(([k,v])=>'<div><b>'+v+'</b><small>'+esc(k)+'</small></div>').join('')+'</div>';
- const statusWarning=verified.discarded?'<p class="notice">現行版との引用や本文の版が一致しない精読 '+
-  verified.discarded+'件は表示していません。</p>':'';
+ const statusWarning=(verified.discarded?'<p class="notice">現行版との引用や本文の版が一致しない精読 '+
+  verified.discarded+'件は表示していません。</p>':'')+
+  (state.challengeDiscarded?'<p class="notice">原文引用または版が一致しない再読記録 '+state.challengeDiscarded+'件は表示していません。</p>':'');
  const details='<section class="mummy-section" id="mummy-reading-entry"><div class="eyebrow">SONG BY SONG / 歌詞の個別精読</div>'+
  '<h2>一曲ずつ、原文から読む</h2><p class="desc">作品を思想の例に当てはめるのではなく、一曲ごとに語りの変化、具体的な言葉、矛盾や別の読み方を確かめます。'+
  (state.works.length-studied.size)+'作品は個別精読待ちです。これらを未完成や価値が低い作品とは扱いません。</p>'+
