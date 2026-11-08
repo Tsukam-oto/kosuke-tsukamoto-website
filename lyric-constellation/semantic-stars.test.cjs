@@ -76,6 +76,16 @@ assert.equal(selectedPaths.length,1,'exclude incomplete themes and note-only anc
 assert.equal(selectedPaths[0].ids.join(','),'master-1,master-4','theme uses distinct known song ids');
 assert.equal(selectedPaths[0].question,'誰の言葉がつながるか？');
 assert.equal(stars.normalizePaths([{thread_key:'bad',anchors:'not an array'}],works).length,0);
+const curatedDemo=stars.normalizePaths([{thread_key:'rap-curated-demo',
+ title:'架空の読書ルート',guiding_question:'これはどのように変わるか。',
+ anchors:[{kind:'work',source_id:'1',quote:'架空の文1'},
+ {kind:'work',source_id:'4',quote:'架空の文2'},
+ {kind:'work',source_id:'6',quote:'架空の文3'},
+ {kind:'work',source_id:'9',quote:'架空の文4'}]}],works);
+assert.equal(curatedDemo.length,1,'curated private reading route is a valid four-work path');
+assert.equal(curatedDemo[0].ids.length,4,'all four original works remain available in order');
+assert.ok(code.includes('semantic-atlas-pilot-grid'),'owner-only featured routes section is installed');
+assert.ok(code.includes("data-atlas-open"),'existing star-atlas navigation remains the click target');
 console.log('thematic path normalization: verified source work ids only');
 
 
