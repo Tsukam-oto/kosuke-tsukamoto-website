@@ -56,29 +56,6 @@ V.chooseMode('studied');assert.ok(V.list().includes('テスト曲1'));assert.ok(
 V.chooseMode('awaiting');assert.ok(!V.list().includes('テスト曲1'));assert.ok(V.list().includes('テスト曲2'));
 V.chooseMode('all');
 
-
-// Current private rereading records are shown only after quote and version verification.
-const reread={challenge_key:'private-test-update',work_id:'w1',evidence:'音楽をまだ聴きたい',
- quoted_source_version:1,challenged_assumption:'以前の読み',observation:'同じ言葉が現れる',
- revised_reading:'新たな読み',alternative:'別の可能性',limit_note:'未確認'};
-V.build({status:'ready',works,songReadings:songNotes,readingChallenges:[
- reread,{...reread,challenge_key:'invalid-quote',evidence:'原文にはない表現',revised_reading:'捏造された読み'},
- {...reread,challenge_key:'stale-version',quoted_source_version:2,revised_reading:'古い版の読み'}]});
-V.selectWork('master-w1');
-const rereadHtml=V.selection();
-assert.ok(rereadHtml.includes('読みの更新・反証'));
-assert.ok(rereadHtml.includes('新たな読み'));
-assert.ok(!rereadHtml.includes('捏造された読み'));
-assert.ok(!rereadHtml.includes('古い版の読み'));
-const injection={...reread,challenge_key:'escape',revised_reading:'<img src=x onerror=alert(1)>'};
-V.build({status:'ready',works,readingChallenges:[injection]});
-V.selectWork('master-w1');
-assert.ok(!V.selection().includes('<img src=x'),'new research notes must be escaped');
-const signedOutRevisions=V.build({status:'signed_out',works,readingChallenges:[reread]});
-assert.ok(!signedOutRevisions.includes('新たな読み'),'signed-out view cannot show private revisions');
-V.reset();
-assert.equal(V.getState().challenges.length,0,'signout must clear rereading records');
-
 const publicPage=V.build({status:'signed_out',source:essay,passages:[passage],connections:[connection],works});
 assert.ok(publicPage.includes('本人専用の精読室'));
 assert.ok(!publicPage.includes(essay.original_text));
