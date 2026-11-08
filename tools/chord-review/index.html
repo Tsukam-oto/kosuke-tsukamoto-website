@@ -737,7 +737,7 @@ function updateWorkloadPanel(){
  const pending=notePendingRisks();$('noteRiskCount').textContent=NOTE_EVIDENCE?'残り '+pending.length+'小節／全'+NOTE_RISK.length+'小節':'ログイン後に原譜を参照';$('noteRiskNext').disabled=!pending.length;
 }
 function riskReason(song,e){
- if(reviews[KEY(song.name,e.n)]?.status!=='ok'&&noteHasRisk(song.name,e.n))return '原譜と候補コードの低音に照合差';
+ if(reviews[KEY(song.name,e.n)]?.status!=='ok'&&!reviews[KEY(song.name,e.n)]?.harmonicIntent&&noteHasRisk(song.name,e.n))return '原譜と候補コードの低音に照合差';
  if(!isReviewed(reviews[KEY(song.name,e.n)]?.status)){
   if(!parseC(e.a)||!parseC(e.b))return 'コード候補に未確定・特殊表記あり';
   const t=toneAt(song.name,e.n),before=toneAt(song.name,e.n-1);
@@ -848,7 +848,7 @@ function noteName(midi){return midi===255?'不明':NOTE_PC[midi%12]+(Math.floor(
 function notePitchSet(mask){return NOTE_PC.filter((name,i)=>(mask&(1<<i))!==0).join('、')||'ピアノ音なし'}
 function noteAt(song,bar){return NOTE_BY_BAR.get(KEY(song,bar))}
 function noteHasRisk(song,bar){return !!noteAt(song,bar)?.warnings.length}
-function notePendingRisks(){return NOTE_RISK.filter(x=>reviews[KEY(x.song,x.bar)]?.status!=='ok')}
+function notePendingRisks(){return NOTE_RISK.filter(x=>{const r=reviews[KEY(x.song,x.bar)];return r?.status!=='ok'&&!r?.harmonicIntent})}
 function parseNoteEvidence(resource){
  NOTE_EVIDENCE=null;NOTE_BY_BAR=new Map();NOTE_RISK=[];
  if(!resource||Number(resource.version)!==2||!resource.sources)return false;
@@ -884,20 +884,21 @@ function renderNoteEvidence(){
   box.classList.remove('flagged');heading.textContent='原譜の音符根拠は未取得';
   text.textContent=' ｜ 従来どおり原譜を見てご判断ください。';target.textContent='';detail.open=false;return;
  }
- box.classList.toggle('flagged',entry.warnings.length>0);
- heading.textContent=entry.warnings.length?'低音の照合差：原譜を再確認':'MusicXMLのピアノ音（参考）';
- text.textContent=entry.warnings.length?' ｜ '+entry.warnings.length+'区間で違いがあります':' ｜ コード候補と最低音の比較では差なし（和声の正否は未判定）';
+ const decided=harmonicLabel(currentReview());
+ box.classList.toggle('flagged',!decided&&entry.warnings.length>0);
+ heading.textContent=decided?decided:entry.warnings.length?'低音の照合差：原譜を再確認':'MusicXMLのピアノ音（参考）';
+ text.textContent=decided?' ｜ 自動推定コードは採用していません。最低音の数値だけから和声を判定しません。':entry.warnings.length?' ｜ '+entry.warnings.length+'区間で違いがあります':' ｜ コード候補と最低音の比較では差なし（和声の正否は未判定）';
  target.innerHTML=entry.halves.map(x=>'<div class="half"><b>'+(x.half===1?'前半':'後半')+'</b>：原譜低音 '+esc(noteName(x.bass))+
   ' ／ 候補 '+esc(x.chordText)+(x.unknown?'（ピアノ音なし）':x.conflict?'（照合差あり）':'')+
   '<div>ピアノで検出：'+esc(notePitchSet(x.mask))+'</div></div>').join('');
- detail.open=entry.warnings.length>0;
+ detail.open=!decided&&entry.warnings.length>0;
 }
 function nextNoteRisk(){
  const all=SONGS.flatMap((s,i)=>s.entries.map(e=>({song:s.name,n:e.n,i})));
  const currentIndex=all.findIndex(x=>x.i===sn&&x.n===bn);
  for(let k=1;k<=all.length;k++){
   const item=all[(Math.max(0,currentIndex)+k)%all.length];
-  if(!noteHasRisk(item.song,item.n)||reviews[KEY(item.song,item.n)]?.status==='ok')continue;
+  if(!noteHasRisk(item.song,item.n)||reviews[KEY(item.song,item.n)]?.status==='ok'||reviews[KEY(item.song,item.n)]?.harmonicIntent)continue;
   sn=item.i;bn=item.n;slot=0;priority=false;render();focusAfterNavigation();
   notice('原譜低音と候補コードを再照合してください');return;
  }
@@ -1097,9 +1098,11 @@ async function displayScore(){const e=currentBar(),req=++scoreReq,k=e.score;$('s
 function render(){const s=current(),e=currentBar(),r=currentReview();const scoreSignature=s.name+'|'+e.n;if(scoreSignature!==lastScoreKey){lastScoreKey=scoreSignature;$('scoreScroll').scrollLeft=0;$('scoreScroll').scrollTop=0}$('songSelect').value=String(sn);$('location').innerHTML='第'+e.n+'小節 <small>'+esc(e.meter)+'</small>';$('lyricText').textContent=e.lyric?'歌詞：「'+e.lyric+'」':'ピアノ・間奏部分';$('chordA').textContent=e.a||'—';$('chordB').textContent=e.b||'—';$('bassA').textContent='低音 '+(e.bassA||'—');$('bassB').textContent='低音 '+(e.bassB||'—');$('altChords').textContent='別候補：'+(e.altA||'—')+' ／ '+(e.altB||'—')+'（未確定）';updateToneBar();clickBadge();updateHarmonicChoice();renderNoteEvidence();$('okBtn').disabled=!e.score||!!s.mismatch;$('okBtn').title=(!e.score||s.mismatch)?'原譜との対応が未確認のため承認できません':'';const length=slots(e);slot=Math.max(0,Math.min(slot,length-1));$('beatbar').dataset.count=String(length);$('beatbar').style.gridTemplateColumns='repeat('+length+',minmax(0,1fr))';$('beatbar').innerHTML=Array.from({length},(_,i)=>'<button data-slot="'+i+'" class="'+(i===slot?'active ':'')+((r?.beatEdits||[]).some(x=>x.slot===i)?'changed':'')+'">'+esc(posLabel(i,e.meter))+'</button>').join('');$('editHint').textContent=posLabel(slot,e.meter);$('beatEdits').innerHTML=(r?.beatEdits||[]).map(x=>'<button data-slot="'+x.slot+'">'+esc(posLabel(x.slot,e.meter))+' '+esc(x.value||x.bass||'変更')+'</button>').join('');$('priorityBtn').style.background=priority?'#dcefe8':'#fff';$('allBtn').style.background=!priority?'#dcefe8':'#fff';$('priorityBtn').textContent='重点'+priorityBars().length;$('allBtn').textContent='全'+SONGS.reduce((n,s)=>n+s.entries.length,0);const done=SONGS.reduce((n,s)=>n+s.entries.filter(e=>isReviewed(reviews[KEY(s.name,e.n)]?.status)).length,0);
 $('progress').textContent='判断記録 '+done+' / 913';const suggestions=findMatches(s,e,false).length;$('smartCount').textContent='この曲で未確認 '+suggestions+'小節';const thisDone=s.entries.filter(e=>isReviewed(reviews[KEY(s.name,e.n)]?.status)).length;
 const thisOK=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.status==='ok').length;
-const thisIssue=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.status==='issue').length;
-const thisHold=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.status==='hold').length;
-$('songProgress').textContent=s.name+' ｜ 未確認 '+(s.total-thisDone)+'小節・問題なし '+thisOK+'・要修正 '+thisIssue+'・保留 '+thisHold;updateWorkloadPanel();
+const thisIssue=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.status==='issue'&&!reviews[KEY(s.name,e.n)]?.harmonicIntent).length;
+const thisHold=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.status==='hold'&&!reviews[KEY(s.name,e.n)]?.harmonicIntent).length;
+const thisMelody=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.harmonicIntent==='melody').length;
+const thisNC=s.entries.filter(e=>reviews[KEY(s.name,e.n)]?.harmonicIntent==='nc').length;
+$('songProgress').textContent=s.name+' ｜ 未確認 '+(s.total-thisDone)+'小節・候補OK '+thisOK+'・要修正 '+thisIssue+'・保留 '+thisHold+'・旋律のみ '+thisMelody+'・N.C. '+thisNC;updateWorkloadPanel();
 const oldIndex=$('songSelect').selectedIndex;
 SONGS.forEach((x,i)=>{const d=x.entries.filter(e=>isReviewed(reviews[KEY(x.name,e.n)]?.status)).length;const op=$('songSelect').options[i];if(op)op.textContent=x.name+' · '+d+'/'+x.total+'小節'});
 $('songSelect').selectedIndex=sn;savePosition();renderBars();displayScore()}
@@ -1120,7 +1123,7 @@ let toastTimer;function notice(t){const el=$('toast');el.textContent=t;el.hidden
 const NOTES=['C','C♯','D♭','D','D♯','E♭','E','F','F♯','G♭','G','G♯','A♭','A','A♯','B♭','B'];
 const QUALITIES=[['','メジャー'],['m','マイナー'],['7','7'],['maj7','maj7'],['m7','m7'],['m7♭5','m7♭5'],['dim','dim'],['dim7','dim7'],['aug','aug'],['sus4','sus4'],['sus2','sus2'],['add9','add9'],['m(add9)','m(add9)'],['6','6'],['m6','m6'],['9','9'],['m9','m9'],['7sus4','7sus4'],['maj9','maj9']];
 function fillSelect(id,items){$(id).innerHTML=items.map(([v,lab])=>'<option value="'+esc(v)+'">'+esc(lab)+'</option>').join('')}
-function showResults(){const valid=new Set(SONGS.flatMap(s=>s.entries.map(e=>KEY(s.name,e.n))));const rows=Object.entries(reviews).filter(([k,v])=>valid.has(k)&&v&&isReviewed(v.status));const counts={ok:0,issue:0,hold:0,melody:0,nc:0};rows.forEach(([,v])=>{counts[v.status]++;if(v.harmonicIntent==='melody')counts.melody++;if(v.harmonicIntent==='nc')counts.nc++});$('resultsCounts').textContent='候補OK '+counts.ok+' ／ 要修正 '+counts.issue+' ／ 保留 '+counts.hold+'（うち旋律のみ '+counts.melody+'・N.C. '+counts.nc+'） ／ 記録 '+rows.length+'小節';const lines=rows.filter(([,v])=>v.status!=='ok').map(([k,v])=>{const [s,n]=k.split('|');const meter=SONGS.find(x=>x.name===s)?.entries.find(x=>x.n===Number(n))?.meter||'4/4';const edits=(v.beatEdits||[]).map(e=>posLabel(e.slot,meter)+': '+e.value+' ('+e.duration+')').join('、');return s+' 第'+n+'小節：'+(harmonicLabel(v)||(v.status==='hold'?'保留':'修正'))+(edits?' '+edits:'')+(v.note?' '+v.note:'')});$('resultsText').value=lines.length?lines.join('\n'):'現在、修正または保留の小節はありません。';$('resultsShade').hidden=false}
+function showResults(){const valid=new Set(SONGS.flatMap(s=>s.entries.map(e=>KEY(s.name,e.n))));const rows=Object.entries(reviews).filter(([k,v])=>valid.has(k)&&v&&isReviewed(v.status));const counts={ok:0,issue:0,hold:0,melody:0,nc:0};rows.forEach(([,v])=>{counts[v.status]++;if(v.harmonicIntent==='melody')counts.melody++;if(v.harmonicIntent==='nc')counts.nc++});$('resultsCounts').textContent='候補OK '+counts.ok+' ／ コード要修正 '+(counts.issue-counts.nc)+' ／ 保留 '+(counts.hold-counts.melody)+' ／ 旋律のみ '+counts.melody+' ／ N.C. '+counts.nc+' ／ 記録 '+rows.length+'小節';const lines=rows.filter(([,v])=>v.status!=='ok').map(([k,v])=>{const [s,n]=k.split('|');const meter=SONGS.find(x=>x.name===s)?.entries.find(x=>x.n===Number(n))?.meter||'4/4';const edits=(v.beatEdits||[]).map(e=>posLabel(e.slot,meter)+': '+e.value+' ('+e.duration+')').join('、');return s+' 第'+n+'小節：'+(harmonicLabel(v)||(v.status==='hold'?'保留':'修正'))+(edits?' '+edits:'')+(v.note?' '+v.note:'')});$('resultsText').value=lines.length?lines.join('\n'):'現在、修正または保留の小節はありません。';$('resultsShade').hidden=false}
 
 function exportReviewCSV(){
  const escCSV=v=>'"'+String(v??'').replace(/"/g,'""')+'"';
