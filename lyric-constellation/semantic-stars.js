@@ -546,19 +546,10 @@ function atlasNetworkPanel(paths,all){
 function atlasPanel(){
  if(!cloudUser)return '';
  var all=userWorks(),paths=normalizePaths(pathRows,all),member=membershipIndex(paths);
- // Titles/questions are loaded from owner-only Supabase, never bundled in public source.
- var pilot=paths.filter(function(p){return /^rap-curated-/.test(p.id);}).slice(0,3);
- var pilotHtml=pilot.length?'<div class="semantic-atlas-pilot" aria-label="精読から選んだ三つの読みの道筋">'+
-  '<div class="semantic-atlas-pilot-head"><strong>精読から選んだ読みの道筋</strong>'+
-  '<small>本人専用・暫定の読解です。作品の意味を確定しません。</small></div>'+
-  '<div class="semantic-atlas-pilot-grid">'+pilot.map(function(p){
-   return '<button type="button" data-atlas-open="'+safe(p.id)+'"><strong>'+safe(p.title)+'</strong>'+
-    '<span>'+safe(p.question)+'</span><small>'+p.ids.length+'作品を順に読む</small></button>';
-  }).join('')+'</div></div>':'';
  if(!state.atlasOpen)return '<section class="semantic-atlas semantic-atlas-collapsed" aria-label="星座図鑑">'+
   '<div class="semantic-atlas-collapsed-inner"><div><span class="semantic-atlas-kicker">CONSTELLATION ATLAS</span><h2>思いの星座を読む</h2>'+
   '<p>'+paths.length+'の読解テーマから、同じ作品の異なる表情を探せます。</p></div>'+
-  '<button type="button" data-atlas-toggle="show" aria-expanded="false">星座図鑑を開く</button></div>'+pilotHtml+'</section>';
+  '<button type="button" data-atlas-toggle="show" aria-expanded="false">星座図鑑を開く</button></div></section>';
  var sharedStars=[...member.values()].filter(function(a){return a.length>=2;}).length;
  var filters=[['themes','思いの星座'],['collections','作品集の読解'],['star','この曲から'],['all','すべて']];
  var chips=filters.map(function(f){var amount=atlasFiltered(paths,f[0],selected).length;
