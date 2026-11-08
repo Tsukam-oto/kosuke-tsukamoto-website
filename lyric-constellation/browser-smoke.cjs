@@ -175,7 +175,7 @@ async function runPrivateCatalogScenario(browser,base,{mobile}){
   });
   assert.equal(leak.hasPrivate,false);
   assert.equal(leak.stored,false,'private master lyrics must not be cached in localStorage');
-  assert.equal(leak.visible,0,'private rap disappears after sign-out');
+  assert.equal(leak.visible,11,'after sign-out only the eleven official works remain visible');
   console.log('PASS private master '+(mobile?'mobile':'desktop')+': 168 rap songs, 1 personal, missing-text catalog, reading, owner-only clearing');
  }finally{await context.close()}
 }
