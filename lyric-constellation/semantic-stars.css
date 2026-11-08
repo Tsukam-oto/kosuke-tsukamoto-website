@@ -233,17 +233,6 @@ body.sky-rap .semantic-focus-panel .btn:not(.primary){color:#634f70;background:#
 
 /* 星座図鑑: 一つの作品が複数の読解へ属することを隠さない。 */
 .semantic-atlas{margin:14px 0 16px;padding:15px;border:1px solid #857097;background:linear-gradient(150deg,#261a32,#171a2e);border-radius:13px;color:#f6eafa;box-sizing:border-box}
-.semantic-atlas-pilot{margin-top:15px;padding-top:15px;border-top:1px solid #665477}
-.semantic-atlas-pilot-head{display:flex;justify-content:space-between;gap:6px 14px;align-items:baseline;flex-wrap:wrap;margin-bottom:10px}
-.semantic-atlas-pilot-head strong{font-size:13px;color:#f6ebfc}
-.semantic-atlas-pilot-head small{font-size:10px;color:#d3c3df}
-.semantic-atlas-pilot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.semantic-atlas-pilot-grid button{display:flex;flex-direction:column;align-items:flex-start;gap:7px;text-align:left;background:#f9f6fc;border:1px solid #bbaac8;color:#3e2c4b;padding:13px;border-radius:9px;min-height:133px;cursor:pointer}
-.semantic-atlas-pilot-grid button:hover{background:#efe5f5;border-color:#d4bded}
-.semantic-atlas-pilot-grid button strong{font-size:12px;line-height:1.5}
-.semantic-atlas-pilot-grid button span{font-size:10px;line-height:1.6;flex:1}
-.semantic-atlas-pilot-grid button small{font-size:10px;color:#6c507b}
-@media(max-width:760px){.semantic-atlas-pilot-grid{grid-template-columns:1fr}.semantic-atlas-pilot-grid button{min-height:0}}
 .semantic-atlas-heading{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:11px}
 .semantic-atlas-heading>div:first-child{flex:1 1 290px}
 .semantic-atlas-kicker{display:block;letter-spacing:.13em;font-size:9px;color:#ceb2ee;font-weight:850}
