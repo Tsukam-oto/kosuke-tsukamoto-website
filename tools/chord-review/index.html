@@ -520,9 +520,9 @@ function topRepeatGroup(){
  return best;
 }
 function jumpReviewStatus(status){
- const all=SONGS.flatMap((song,i)=>song.entries.map(e=>({song:i,bar:e.n,status:reviews[KEY(song.name,e.n)]?.status})));
+ const all=SONGS.flatMap((song,i)=>song.entries.map(e=>({song:i,bar:e.n,status:reviews[KEY(song.name,e.n)]?.status,intent:reviews[KEY(song.name,e.n)]?.harmonicIntent})));
  const at=all.findIndex(x=>x.song===sn&&x.bar===bn);
- for(let j=1;j<=all.length;j++){const x=all[(Math.max(at,0)+j)%all.length];if(x.status===status){
+ for(let j=1;j<=all.length;j++){const x=all[(Math.max(at,0)+j)%all.length];if(x.status===status&&!x.intent){
   sn=x.song;bn=x.bar;priority=false;slot=0;render();focusAfterNavigation();return true
  }}
  notice(status==='hold'?'保留の小節はありません':'要修正の小節はありません');return false;
@@ -1072,7 +1072,7 @@ function changeBar(n){bn=n;slot=0;render()};function setStatus(status){
  if(status==='ok'){delete r.beatEdits;delete r.copiedFrom;}
  reviews[k]=r;saveLocal();scheduleSync(k);
  notice({ok:'問題なしとして記録',issue:'違う箇所として記録',hold:'保留として記録'}[status]);
- if(status==='issue'&&easyMode){render();openEdit()}
+ if(status==='issue'&&(easyMode||window.matchMedia?.('(max-width:700px)').matches)){render();openEdit()}
  else if(status==='ok'&&easyMode&&smartAutoEnabled&&findMatches(current(),currentBar(),false).length>=2){render();openSmart(true)}
  else jumpToUnchecked()
 }
