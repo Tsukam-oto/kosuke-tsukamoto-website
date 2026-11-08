@@ -24,9 +24,15 @@ async function run(mobile){
  try{
   const url='http://127.0.0.1:'+server.address().port+'/lyric-constellation/';
   await page.goto(url,{waitUntil:'domcontentloaded'});
+  assert.equal(await page.locator('[data-sky="rap"]').count(),0,
+   'anonymous viewers cannot open private rap switch');
+  assert.equal(await page.locator('.semantic-star').count(),0,
+   'never reveal private stars when signed out');
+  // This is an ephemeral synthetic owner; no real session or remote data is used.
+  await page.evaluate(()=>{cloudUser={id:'fictional-test-owner'};render();});
   await page.locator('[data-sky="rap"]').first().click();
-  assert.match(await page.locator('.starfield-empty').innerText(),/非公開/);
-  assert.equal(await page.locator('.semantic-star').count(),0,'never reveal private stars when signed out');
+  assert.equal(await page.locator('.semantic-star').count(),0,
+   'fictional owner has no songs until private source is loaded');
   await page.evaluate(async()=>{
    const catalog=[],texts=[],relations=[],themes=[],judgments=[];
    const uid='fictional-user';let n=168;

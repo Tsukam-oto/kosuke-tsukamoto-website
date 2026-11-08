@@ -39,6 +39,20 @@ async function runScenario(browser,base,{mobile}){
  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
  try{
   await page.goto(base+'/lyric-constellation/',{waitUntil:'domcontentloaded',timeout:15000});
+  // Public visitors must never be shown the private pseudonym catalogue or research UI.
+  const publicOnly=await page.evaluate(()=>{
+   go('research');switchSky('rap');
+   return {sky,view,html:document.querySelector('#screen')?.innerText||'',
+    researchHidden:document.querySelector('[data-view="research"]')?.hidden,
+    privateOptionDisabled:document.querySelector('#skyF option[value="rap"]')?.disabled,
+    privateSwitchVisible:!!document.querySelector('#screen [data-sky="rap"]')};
+  });
+  assert.equal(publicOnly.sky,'choir','guest cannot switch to private identity');
+  assert.equal(publicOnly.view,'constellation','guest cannot open private research');
+  assert.equal(publicOnly.researchHidden,true,'guest research nav is hidden');
+  assert.equal(publicOnly.privateOptionDisabled,true,'guest cannot select private identity when editing');
+  assert.equal(publicOnly.privateSwitchVisible,false,'guest switch button is absent');
+  assert.doesNotMatch(publicOnly.html,/木乃伊/,'guest sees official-name works only');
   await page.locator('nav [data-view="works"]').click();
   await page.locator('button.work-card').filter({hasText:'朝になったら'}).first().click();
   await page.locator('#drawer .deep-entry [data-deep-work]').click();
@@ -161,7 +175,7 @@ async function runPrivateCatalogScenario(browser,base,{mobile}){
   });
   assert.equal(leak.hasPrivate,false);
   assert.equal(leak.stored,false,'private master lyrics must not be cached in localStorage');
-  assert.equal(leak.visible,0,'private rap disappears after sign-out');
+  assert.equal(leak.visible,11,'after sign-out only the eleven official works remain visible');
   console.log('PASS private master '+(mobile?'mobile':'desktop')+': 168 rap songs, 1 personal, missing-text catalog, reading, owner-only clearing');
  }finally{await context.close()}
 }
@@ -178,7 +192,7 @@ async function runMummyResearchScenario(browser,base,{mobile}){
  await page.route(/^https?:\/\/(?!127\.0\.0\.1)/,route=>route.abort());
  try{
   await page.goto(base+'/lyric-constellation/#mummy-research',{waitUntil:'domcontentloaded'});
-  assert.match(await page.locator('#screen').innerText(),/本人専用の精読室/);
+  assert.match(await page.locator('#screen').innerText(),/束元康介名義の公開作品/,'guest cannot enter the private research URL');
   assert.equal(await page.locator('#screen .mummy-essay').count(),0,'private essay hidden without login');
   const report=await page.evaluate(()=>{
    const sourceText='音楽はここで終わる。\n楽譜はまだ開かれていない本だ。\nそれでも私は演奏する。';
@@ -204,6 +218,7 @@ async function runMummyResearchScenario(browser,base,{mobile}){
     version_a:1,version_b:1,heading:'検証用の楽曲間比較',
     evidence_a:'音楽をまだ聴きたい',evidence_b:'友達と歌う',
     interpretation:'楽曲間の語り',alternative:'似ているとは限らない',inquiry:'どう違いますか。'}];
+   cloudUser={id:'synthetic-owner'};
    rapResearchStatus='ready';sky='rap';view='research';render();
    return {works:masterReadingWorks.length,essayChars:rapResearchSource.original_text.length};
   });
