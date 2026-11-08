@@ -967,12 +967,13 @@ async function loadMummyResearch(user,epoch){
   if(c.error)throw c.error;
   if(d.error)throw d.error;
   if(e.error)throw e.error;
-  if(f.error)throw f.error;
+  // A revision-read error must never disable the existing private lyric reader.
+  if(f.error)console.warn('private reread records unavailable');
   if(epoch!==cloudEpoch||cloudUser?.id!==user.id)return;
   rapResearchSource=a.data?.[0]||null;
   rapResearchPassages=(b.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
   rapResearchConnections=(c.data||[]).filter(x=>x.source_id===rapResearchSource?.id);
-  rapSongReadings=d.data||[];rapSongDialogues=e.data||[];rapReadingChallenges=f.data||[];
+  rapSongReadings=d.data||[];rapSongDialogues=e.data||[];rapReadingChallenges=f.error?[]:(f.data||[]);
   rapResearchStatus='ready';
   render();
  }catch(err){
