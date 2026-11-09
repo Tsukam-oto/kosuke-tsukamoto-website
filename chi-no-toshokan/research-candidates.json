@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastRunAt": "2026-11-05T10:59:54+00:00",
+  "lastRunAt": "2026-11-09T11:38:41+00:00",
   "editorialPolicy": "これは検索APIから得た候補資料と書誌情報です。本文・研究結果・原典の該当箇所は未照合です。記事の根拠として承認していません。",
   "automation": {
     "frequency": "週2回（GitHub Actions）",
@@ -8,62 +8,38 @@
   },
   "runSummary": {
     "topicsSearched": [
-      "care",
-      "habit-formation",
-      "bronze-collapse",
-      "oral-epic",
-      "microbiome",
-      "city",
-      "beethoven5",
-      "ravelbolero"
+      "memory",
+      "adler",
+      "ancient-writing",
+      "odyssey-xenia",
+      "roman-concrete",
+      "exoplanets",
+      "bachcello",
+      "music-emotion"
     ],
-    "providerCallsSucceeded": 14,
+    "providerCallsSucceeded": 15,
     "errors": [
       {
-        "source": "OpenAlex",
-        "topicId": "bronze-collapse",
+        "source": "Europe PMC",
+        "topicId": "memory",
         "errorType": "HTTPError",
         "httpStatus": 503
       },
       {
-        "source": "OpenAlex",
-        "topicId": "microbiome",
+        "source": "Europe PMC",
+        "topicId": "adler",
         "errorType": "HTTPError",
         "httpStatus": 503
       },
       {
-        "source": "OpenAlex",
-        "topicId": "beethoven5",
+        "source": "Europe PMC",
+        "topicId": "music-emotion",
         "errorType": "HTTPError",
         "httpStatus": 503
       }
     ]
   },
   "items": [
-    {
-      "id": "openalex:W2949233698",
-      "kind": "research-metadata",
-      "title": "Therapeutic Processes in Equine Assisted Psychotherapy: An exploratory qualitative study",
-      "url": "https://openalex.org/W2949233698",
-      "area": "心理・臨床",
-      "topicIds": [
-        "care"
-      ],
-      "providers": [
-        "OpenAlex"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2017,
-      "authors": [
-        "Anna Nina Lee"
-      ],
-      "publication": "eScholarship (California Digital Library)",
-      "recordType": "dissertation",
-      "doi": "",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
     {
       "id": "met:247308",
       "kind": "museum-object",
@@ -86,7 +62,7 @@
       "imageRights": "Met Open Access / CC0",
       "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
+      "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
       "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
@@ -105,7 +81,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
+      "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
       "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
@@ -124,7 +100,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
+      "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
       "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
@@ -143,7 +119,7 @@
       "recordType": "Ballet",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
+      "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
       "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
@@ -162,6 +138,852 @@
       "recordType": "",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.5703/1288284317973",
+      "kind": "research-metadata",
+      "title": "Activation of self-healing in pozzolanic natural hydraulic lime-based self-compacting concrete under cyclic compression",
+      "url": "https://doi.org/10.5703/1288284317973",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": null,
+      "authors": [
+        "Ángel De La Rosa",
+        "Gonzalo Ruiz"
+      ],
+      "publication": "Proceedings of the C3 Symposium 2025",
+      "recordType": "proceedings-article",
+      "doi": "10.5703/1288284317973",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.56578/jche030205",
+      "kind": "research-metadata",
+      "title": "Evolving Durability Strategies in Concrete Structures from the Roman Era to Today",
+      "url": "https://doi.org/10.56578/jche030205",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [
+        "Luca Piancastelli",
+        "Enrico C Lorenzini"
+      ],
+      "publication": "Journal of Civil and Hydraulic Engineering",
+      "recordType": "article",
+      "doi": "10.56578/jche030205",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.5642/perfpr.200914.01.11",
+      "kind": "research-metadata",
+      "title": "\"Trills in the Bach Cello Suites\" by Jerome Carrington",
+      "url": "https://doi.org/10.5642/perfpr.200914.01.11",
+      "area": "音楽",
+      "topicIds": [
+        "bachcello"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2009,
+      "authors": [
+        "Marc Vanscheeuwijck"
+      ],
+      "publication": "Performance Practice Review",
+      "recordType": "article",
+      "doi": "10.5642/perfpr.200914.01.11",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.5167/uzh-152367",
+      "kind": "research-metadata",
+      "title": "Studia Alphabetica: On the Origin and Early History of the Northwest Semitic, South Semitic and Greek Alphabets",
+      "url": "https://doi.org/10.5167/uzh-152367",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1991,
+      "authors": [
+        "Sass, Benjamin"
+      ],
+      "publication": "Zurich Open Repository and Archive (University of Zurich)",
+      "recordType": "book",
+      "doi": "10.5167/uzh-152367",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.47743/saa-2013-19-9",
+      "kind": "research-metadata",
+      "title": "Greeks, Phoenicians and the alphabet",
+      "url": "https://doi.org/10.47743/saa-2013-19-9",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Iulia PETRARIU"
+      ],
+      "publication": "STUDIA ANTIQUA ET ARCHAEOLOGICA",
+      "recordType": "article",
+      "doi": "10.47743/saa-2013-19-9",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-8",
+      "kind": "research-metadata",
+      "title": "Adlerian family counselling and family psychotherapy",
+      "url": "https://doi.org/10.4324/9781315820262-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-8",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-7",
+      "kind": "research-metadata",
+      "title": "Adlerian counselling and psychotherapy today",
+      "url": "https://doi.org/10.4324/9781315820262-7",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-7",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.4324/9781315820262-6",
+      "kind": "research-metadata",
+      "title": "Classical Adlerian Psychology",
+      "url": "https://doi.org/10.4324/9781315820262-6",
+      "area": "心理・臨床",
+      "topicIds": [
+        "adler"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2014,
+      "authors": [],
+      "publication": "Adlerian Psychotherapy",
+      "recordType": "book-chapter",
+      "doi": "10.4324/9781315820262-6",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.36871/hon.202203006",
+      "kind": "research-metadata",
+      "title": "J. S. BACH'S CELLO SUITES FOR GUITAR, ARRANGED BY KOJIRO KOBUNE: COMPARATIVE ANALYSIS",
+      "url": "https://doi.org/10.36871/hon.202203006",
+      "area": "音楽",
+      "topicIds": [
+        "bachcello"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [
+        "D. Yu. Tatarkin"
+      ],
+      "publication": "Arts education and science",
+      "recordType": "article",
+      "doi": "10.36871/hon.202203006",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.3389/fnbeh.2011.00024",
+      "kind": "research-metadata",
+      "title": "Does Reconsolidation Occur in Humans?",
+      "url": "https://doi.org/10.3389/fnbeh.2011.00024",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2011,
+      "authors": [
+        "Daniela Schiller",
+        "Elizabeth A. Phelps"
+      ],
+      "publication": "Frontiers in Behavioral Neuroscience",
+      "recordType": "article",
+      "doi": "10.3389/fnbeh.2011.00024",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1680/macr.2007.59.2.97",
+      "kind": "research-metadata",
+      "title": "Development of high-volume low-lime and high-lime fly-ash-incorporated self-consolidating concrete",
+      "url": "https://doi.org/10.1680/macr.2007.59.2.97",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2007,
+      "authors": [
+        "M. Şahmaran",
+        "Ö. Yaman",
+        "M. Tokyay"
+      ],
+      "publication": "Magazine of Concrete Research",
+      "recordType": "journal-article",
+      "doi": "10.1680/macr.2007.59.2.97",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.14418/wes01.1.684",
+      "kind": "research-metadata",
+      "title": "The Cello Suites of Bach and Britten: History, Form and Performance",
+      "url": "https://doi.org/10.14418/wes01.1.684",
+      "area": "音楽",
+      "topicIds": [
+        "bachcello"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": null,
+      "authors": [
+        "Lucia Jones Strother"
+      ],
+      "publication": "",
+      "recordType": "dissertation",
+      "doi": "10.14418/wes01.1.684",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.11648/j.history.20251301.16",
+      "kind": "research-metadata",
+      "title": "Alphabet: From Linear B to the Greek 27-Letter Alphanumeric System and the Phoenician Abjad",
+      "url": "https://doi.org/10.11648/j.history.20251301.16",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [
+        "Pliakos Ap"
+      ],
+      "publication": "History Research",
+      "recordType": "journal-article",
+      "doi": "10.11648/j.history.20251301.16",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1126/sciadv.add1602",
+      "kind": "research-metadata",
+      "title": "Hot mixing: Mechanistic insights into the durability of ancient Roman concrete",
+      "url": "https://doi.org/10.1126/sciadv.add1602",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2023,
+      "authors": [
+        "Linda M. Seymour",
+        "Janille Maria Maragh",
+        "Paolo Sabatini"
+      ],
+      "publication": "Science Advances",
+      "recordType": "article",
+      "doi": "10.1126/sciadv.add1602",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780198844914.002.0008",
+      "kind": "research-metadata",
+      "title": "The Greek alphabet",
+      "url": "https://doi.org/10.1093/oso/9780198844914.002.0008",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [],
+      "publication": "The Oxford Linear Algebra for Scientists",
+      "recordType": "other",
+      "doi": "10.1093/oso/9780198844914.002.0008",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280596",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280596",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1980,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Oxford World's Classics: Homer: The Odyssey",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280596",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280567",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280567",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2018,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Oxford World's Classics: Homer: The Odyssey",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280567",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1093/oseo/instance.00280463",
+      "kind": "research-metadata",
+      "title": "Odyssey",
+      "url": "https://doi.org/10.1093/oseo/instance.00280463",
+      "area": "神話・歴史",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2018,
+      "authors": [
+        "Homer"
+      ],
+      "publication": "Homer: Odyssey, Book 1",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oseo/instance.00280463",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1093/acprof:oso/9780199230143.003.0021",
+      "kind": "research-metadata",
+      "title": "Musical Expectancy and Thrills",
+      "url": "https://doi.org/10.1093/acprof:oso/9780199230143.003.0021",
+      "area": "音楽",
+      "topicIds": [
+        "music-emotion"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [
+        "David Huron",
+        "Elizabeth Hellmuth Margulis"
+      ],
+      "publication": "Handbook of Music and Emotion: Theory, Research, Applications",
+      "recordType": "book-chapter",
+      "doi": "10.1093/acprof:oso/9780199230143.003.0021",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1080/87565640903526504",
+      "kind": "research-metadata",
+      "title": "Event-Related Potentials, Emotion, and Emotion Regulation: An Integrative Review",
+      "url": "https://doi.org/10.1080/87565640903526504",
+      "area": "音楽",
+      "topicIds": [
+        "music-emotion"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [
+        "Greg Hajcak",
+        "Annmarie MacNamara",
+        "Doreen M. Olvet"
+      ],
+      "publication": "Developmental Neuropsychology",
+      "recordType": "journal-article",
+      "doi": "10.1080/87565640903526504",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1038/s41578-023-00539-z",
+      "kind": "research-metadata",
+      "title": "Self-healing Roman concrete",
+      "url": "https://doi.org/10.1038/s41578-023-00539-z",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2023,
+      "authors": [
+        "Charlotte Allard"
+      ],
+      "publication": "Nature Reviews Materials",
+      "recordType": "journal-article",
+      "doi": "10.1038/s41578-023-00539-z",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1038/s41550-020-01210-1",
+      "kind": "research-metadata",
+      "title": "Earth as a transit exoplanet",
+      "url": "https://doi.org/10.1038/s41550-020-01210-1",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2020,
+      "authors": [
+        "May Chiao"
+      ],
+      "publication": "Nature Astronomy",
+      "recordType": "journal-article",
+      "doi": "10.1038/s41550-020-01210-1",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1017/cbo9780511552700.006",
+      "kind": "research-metadata",
+      "title": "Argument from the history of writing: How writing worked before the Greek alphabet",
+      "url": "https://doi.org/10.1017/cbo9780511552700.006",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1991,
+      "authors": [],
+      "publication": "Homer and the Origin of the Greek Alphabet",
+      "recordType": "book-chapter",
+      "doi": "10.1017/cbo9780511552700.006",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1017/9781009053839.006",
+      "kind": "research-metadata",
+      "title": "Transmission, Performance, and Reception: After c. 1900",
+      "url": "https://doi.org/10.1017/9781009053839.006",
+      "area": "音楽",
+      "topicIds": [
+        "bachcello"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [],
+      "publication": "Bach: The Cello Suites",
+      "recordType": "book-chapter",
+      "doi": "10.1017/9781009053839.006",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1017/9781009053839.005",
+      "kind": "research-metadata",
+      "title": "Transmission, Performance, and Reception: 1720–c. 1900",
+      "url": "https://doi.org/10.1017/9781009053839.005",
+      "area": "音楽",
+      "topicIds": [
+        "bachcello"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [],
+      "publication": "Bach: The Cello Suites",
+      "recordType": "book-chapter",
+      "doi": "10.1017/9781009053839.005",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.ynstr.2019.100194",
+      "kind": "research-metadata",
+      "title": "Pharmacological interventions during the process of reconsolidation of aversive memories: A systematic review",
+      "url": "https://doi.org/10.1016/j.ynstr.2019.100194",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Lívia Maria Bolsoni",
+        "Antônio Waldo Zuardi"
+      ],
+      "publication": "Neurobiology of Stress",
+      "recordType": "review",
+      "doi": "10.1016/j.ynstr.2019.100194",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.newast.2009.09.001",
+      "kind": "research-metadata",
+      "title": "Exoplanet Transit Database. Reduction and processing of the photometric data of exoplanet transits",
+      "url": "https://doi.org/10.1016/j.newast.2009.09.001",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [
+        "Stanislav Poddaný",
+        "Luboš Brát",
+        "Ondřej Pejcha"
+      ],
+      "publication": "New Astronomy",
+      "recordType": "journal-article",
+      "doi": "10.1016/j.newast.2009.09.001",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.ascom.2024.100816",
+      "kind": "research-metadata",
+      "title": "Synthetic light curves of exoplanet transit using nanosatellite data",
+      "url": "https://doi.org/10.1016/j.ascom.2024.100816",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [
+        "A. Fuentes",
+        "M. Solar"
+      ],
+      "publication": "Astronomy and Computing",
+      "recordType": "journal-article",
+      "doi": "10.1016/j.ascom.2024.100816",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00012-3",
+      "kind": "research-metadata",
+      "title": "Disrupting Consolidation and Reconsolidation of Human Emotional Memory with Propranolol",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00012-3",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Michelle H. Lonergan",
+        "Alain Brunet",
+        "Lening A. Olivera-Figueroa"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00012-3",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00006-8",
+      "kind": "research-metadata",
+      "title": "Memory Reconsolidation Versus Extinction",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00006-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Satoshi Kida"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00006-8",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00001-9",
+      "kind": "research-metadata",
+      "title": "The Discovery of Memory Reconsolidation",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00001-9",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Karim Nader"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00001-9",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "doi:10.1007/springerreference_302560",
+      "kind": "research-metadata",
+      "title": "Neuropsychology of Emotion",
+      "url": "https://doi.org/10.1007/springerreference_302560",
+      "area": "音楽",
+      "topicIds": [
+        "music-emotion"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": null,
+      "authors": [],
+      "publication": "SpringerReference",
+      "recordType": "reference-entry",
+      "doi": "10.1007/springerreference_302560",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "anchor:zeus-titans",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Theogony (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "anchor:odyssey-xenia",
+      "kind": "curated-reference-path",
+      "title": "Homer, Odyssey, Book VI (translated text)",
+      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "anchor:human-ages",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Works and Days (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "human-ages"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-09T11:38:41+00:00"
+    },
+    {
+      "id": "openalex:W2949233698",
+      "kind": "research-metadata",
+      "title": "Therapeutic Processes in Equine Assisted Psychotherapy: An exploratory qualitative study",
+      "url": "https://openalex.org/W2949233698",
+      "area": "心理・臨床",
+      "topicIds": [
+        "care"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2017,
+      "authors": [
+        "Anna Nina Lee"
+      ],
+      "publication": "eScholarship (California Digital Library)",
+      "recordType": "dissertation",
+      "doi": "",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
       "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
@@ -940,60 +1762,6 @@
       "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
-      "id": "anchor:zeus-titans",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Theogony (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "zeus-titans"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "anchor:odyssey-xenia",
-      "kind": "curated-reference-path",
-      "title": "Homer, Odyssey, Book VI (translated text)",
-      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "anchor:human-ages",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Works and Days (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "human-ages"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
       "id": "openalex:W2966849946",
       "kind": "research-metadata",
       "title": "From China to South Korea: Two Perspectives on Adlerian Psychology in Asia",
@@ -1019,56 +1787,6 @@
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
-      "id": "doi:10.5703/1288284317973",
-      "kind": "research-metadata",
-      "title": "Activation of self-healing in pozzolanic natural hydraulic lime-based self-compacting concrete under cyclic compression",
-      "url": "https://doi.org/10.5703/1288284317973",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": null,
-      "authors": [
-        "Ángel De La Rosa",
-        "Gonzalo Ruiz"
-      ],
-      "publication": "Proceedings of the C3 Symposium 2025",
-      "recordType": "proceedings-article",
-      "doi": "10.5703/1288284317973",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.56578/jche030205",
-      "kind": "research-metadata",
-      "title": "Evolving Durability Strategies in Concrete Structures from the Roman Era to Today",
-      "url": "https://doi.org/10.56578/jche030205",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "OpenAlex"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2025,
-      "authors": [
-        "Luca Piancastelli",
-        "Enrico C Lorenzini"
-      ],
-      "publication": "Journal of Civil and Hydraulic Engineering",
-      "recordType": "article",
-      "doi": "10.56578/jche030205",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
       "id": "doi:10.5406/j.ctvpj7j1r.17",
       "kind": "research-metadata",
       "title": "Twelve-Step Equal Temperament",
@@ -1087,72 +1805,6 @@
       "publication": "The Arithmetic of Listening",
       "recordType": "book-chapter",
       "doi": "10.5406/j.ctvpj7j1r.17",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.4324/9781315820262-8",
-      "kind": "research-metadata",
-      "title": "Adlerian family counselling and family psychotherapy",
-      "url": "https://doi.org/10.4324/9781315820262-8",
-      "area": "心理・臨床",
-      "topicIds": [
-        "adler"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2014,
-      "authors": [],
-      "publication": "Adlerian Psychotherapy",
-      "recordType": "book-chapter",
-      "doi": "10.4324/9781315820262-8",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.4324/9781315820262-7",
-      "kind": "research-metadata",
-      "title": "Adlerian counselling and psychotherapy today",
-      "url": "https://doi.org/10.4324/9781315820262-7",
-      "area": "心理・臨床",
-      "topicIds": [
-        "adler"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2014,
-      "authors": [],
-      "publication": "Adlerian Psychotherapy",
-      "recordType": "book-chapter",
-      "doi": "10.4324/9781315820262-7",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.4324/9781315820262-6",
-      "kind": "research-metadata",
-      "title": "Classical Adlerian Psychology",
-      "url": "https://doi.org/10.4324/9781315820262-6",
-      "area": "心理・臨床",
-      "topicIds": [
-        "adler"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2014,
-      "authors": [],
-      "publication": "Adlerian Psychotherapy",
-      "recordType": "book-chapter",
-      "doi": "10.4324/9781315820262-6",
       "firstSeen": "2026-11-04T10:07:48+00:00",
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
@@ -1304,32 +1956,6 @@
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
-      "id": "doi:10.1680/macr.2007.59.2.97",
-      "kind": "research-metadata",
-      "title": "Development of high-volume low-lime and high-lime fly-ash-incorporated self-consolidating concrete",
-      "url": "https://doi.org/10.1680/macr.2007.59.2.97",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2007,
-      "authors": [
-        "M. Şahmaran",
-        "Ö. Yaman",
-        "M. Tokyay"
-      ],
-      "publication": "Magazine of Concrete Research",
-      "recordType": "journal-article",
-      "doi": "10.1680/macr.2007.59.2.97",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
       "id": "doi:10.1631/jzus.b2500701",
       "kind": "research-metadata",
       "title": "Therapeutic alliance across delivery modalities: a systematic narrative review of alliance strength and outcome prediction in face-to-face, online, and blended psychotherapy.",
@@ -1436,32 +2062,6 @@
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
-      "id": "doi:10.1126/sciadv.add1602",
-      "kind": "research-metadata",
-      "title": "Hot mixing: Mechanistic insights into the durability of ancient Roman concrete",
-      "url": "https://doi.org/10.1126/sciadv.add1602",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "OpenAlex"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2023,
-      "authors": [
-        "Linda M. Seymour",
-        "Janille Maria Maragh",
-        "Paolo Sabatini"
-      ],
-      "publication": "Science Advances",
-      "recordType": "article",
-      "doi": "10.1126/sciadv.add1602",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
       "id": "doi:10.1097/md.0000000000041315",
       "kind": "research-metadata",
       "title": "Effectiveness of psychotherapy for Hwa-Byung: A systematic review of interventional studies.",
@@ -1538,78 +2138,6 @@
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
-      "id": "doi:10.1093/oseo/instance.00280596",
-      "kind": "research-metadata",
-      "title": "Odyssey",
-      "url": "https://doi.org/10.1093/oseo/instance.00280596",
-      "area": "神話・歴史",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1980,
-      "authors": [
-        "Homer"
-      ],
-      "publication": "Oxford World's Classics: Homer: The Odyssey",
-      "recordType": "book-chapter",
-      "doi": "10.1093/oseo/instance.00280596",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1093/oseo/instance.00280567",
-      "kind": "research-metadata",
-      "title": "Odyssey",
-      "url": "https://doi.org/10.1093/oseo/instance.00280567",
-      "area": "神話・歴史",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2018,
-      "authors": [
-        "Homer"
-      ],
-      "publication": "Oxford World's Classics: Homer: The Odyssey",
-      "recordType": "book-chapter",
-      "doi": "10.1093/oseo/instance.00280567",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1093/oseo/instance.00280463",
-      "kind": "research-metadata",
-      "title": "Odyssey",
-      "url": "https://doi.org/10.1093/oseo/instance.00280463",
-      "area": "神話・歴史",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2018,
-      "authors": [
-        "Homer"
-      ],
-      "publication": "Homer: Odyssey, Book 1",
-      "recordType": "book-chapter",
-      "doi": "10.1093/oseo/instance.00280463",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
       "id": "doi:10.1093/gmo/9781561592630.article.11968",
       "kind": "research-metadata",
       "title": "Guido of Arezzo",
@@ -1655,54 +2183,6 @@
       "recordType": "edited-book",
       "doi": "10.1093/actrade/9780199538317.book.1",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1038/s41578-023-00539-z",
-      "kind": "research-metadata",
-      "title": "Self-healing Roman concrete",
-      "url": "https://doi.org/10.1038/s41578-023-00539-z",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2023,
-      "authors": [
-        "Charlotte Allard"
-      ],
-      "publication": "Nature Reviews Materials",
-      "recordType": "journal-article",
-      "doi": "10.1038/s41578-023-00539-z",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1038/s41550-020-01210-1",
-      "kind": "research-metadata",
-      "title": "Earth as a transit exoplanet",
-      "url": "https://doi.org/10.1038/s41550-020-01210-1",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2020,
-      "authors": [
-        "May Chiao"
-      ],
-      "publication": "Nature Astronomy",
-      "recordType": "journal-article",
-      "doi": "10.1038/s41550-020-01210-1",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
@@ -1769,57 +2249,6 @@
       "recordType": "journal-article",
       "doi": "10.1037/a0021175.supp",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1016/j.newast.2009.09.001",
-      "kind": "research-metadata",
-      "title": "Exoplanet Transit Database. Reduction and processing of the photometric data of exoplanet transits",
-      "url": "https://doi.org/10.1016/j.newast.2009.09.001",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2010,
-      "authors": [
-        "Stanislav Poddaný",
-        "Luboš Brát",
-        "Ondřej Pejcha"
-      ],
-      "publication": "New Astronomy",
-      "recordType": "journal-article",
-      "doi": "10.1016/j.newast.2009.09.001",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-04T10:44:48+00:00"
-    },
-    {
-      "id": "doi:10.1016/j.ascom.2024.100816",
-      "kind": "research-metadata",
-      "title": "Synthetic light curves of exoplanet transit using nanosatellite data",
-      "url": "https://doi.org/10.1016/j.ascom.2024.100816",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2024,
-      "authors": [
-        "A. Fuentes",
-        "M. Solar"
-      ],
-      "publication": "Astronomy and Computing",
-      "recordType": "journal-article",
-      "doi": "10.1016/j.ascom.2024.100816",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
       "lastSeen": "2026-11-04T10:44:48+00:00"
     },
     {
