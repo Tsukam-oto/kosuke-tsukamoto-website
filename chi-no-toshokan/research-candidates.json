@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "lastRunAt": "2026-11-12T11:20:01+00:00",
+  "lastRunAt": "2026-11-16T11:27:49+00:00",
   "editorialPolicy": "これは検索APIから得た候補資料と書誌情報です。本文・研究結果・原典の該当箇所は未照合です。記事の根拠として承認していません。",
   "automation": {
     "frequency": "週2回（GitHub Actions）",
@@ -8,42 +8,61 @@
   },
   "runSummary": {
     "topicsSearched": [
-      "therapeutic-alliance",
-      "care",
-      "zeus-titans",
-      "bronze-collapse",
-      "microbiome",
-      "city",
-      "notation",
-      "temperament"
+      "habit-formation",
+      "memory",
+      "oral-epic",
+      "ancient-writing",
+      "roman-concrete",
+      "exoplanets",
+      "beethoven5",
+      "ravelbolero"
     ],
-    "providerCallsSucceeded": 17,
-    "errors": []
+    "providerCallsSucceeded": 14,
+    "errors": [
+      {
+        "source": "OpenAlex",
+        "topicId": "habit-formation",
+        "errorType": "HTTPError",
+        "httpStatus": 429
+      },
+      {
+        "source": "OpenAlex",
+        "topicId": "oral-epic",
+        "errorType": "HTTPError",
+        "httpStatus": 429
+      },
+      {
+        "source": "OpenAlex",
+        "topicId": "roman-concrete",
+        "errorType": "HTTPError",
+        "httpStatus": 429
+      }
+    ]
   },
   "items": [
     {
-      "id": "openalex:W830314902",
+      "id": "openalex:W812715996",
       "kind": "research-metadata",
-      "title": "Hesiod's 'Theogony'",
-      "url": "https://openalex.org/W830314902",
-      "area": "神話・歴史",
+      "title": "The Eroica Symphony of Beethoven.",
+      "url": "https://openalex.org/W812715996",
+      "area": "音楽",
       "topicIds": [
-        "zeus-titans"
+        "beethoven5"
       ],
       "providers": [
         "OpenAlex"
       ],
       "reviewStatus": "未照合",
       "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2006,
+      "year": 1911,
       "authors": [
-        "Samantha Newington"
+        "Baron von der Pfordten"
       ],
-      "publication": "Durham e-Theses (Durham University)",
-      "recordType": "dissertation",
+      "publication": "The Open Court",
+      "recordType": "article",
       "doi": "",
-      "firstSeen": "2026-11-12T11:20:01+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
+      "firstSeen": "2026-11-16T11:27:49+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
     },
     {
       "id": "met:247308",
@@ -67,7 +86,7 @@
       "imageRights": "Met Open Access / CC0",
       "note": "画像の公開範囲は公式APIのisPublicDomainフラグを確認して判断しました。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
+      "lastSeen": "2026-11-16T11:27:49+00:00"
     },
     {
       "id": "mb-work:bae1d18e-2c26-42f0-9e19-fe1a7e5d622a",
@@ -86,7 +105,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
+      "lastSeen": "2026-11-16T11:27:49+00:00"
     },
     {
       "id": "mb-work:adcdc472-8b19-4e6f-aa4e-be8c6aea5f8a",
@@ -105,7 +124,7 @@
       "recordType": "Symphony",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
+      "lastSeen": "2026-11-16T11:27:49+00:00"
     },
     {
       "id": "mb-work:487527b9-a525-33f4-b948-ea41b9a2672f",
@@ -124,7 +143,7 @@
       "recordType": "Ballet",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
+      "lastSeen": "2026-11-16T11:27:49+00:00"
     },
     {
       "id": "mb-work:005f669d-00d1-4b64-b7ea-dca40e57c32f",
@@ -143,6 +162,833 @@
       "recordType": "",
       "note": "作品IDの候補です。特定の録音やApple Musicの再生先を保証しません。",
       "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.5703/1288284317973",
+      "kind": "research-metadata",
+      "title": "Activation of self-healing in pozzolanic natural hydraulic lime-based self-compacting concrete under cyclic compression",
+      "url": "https://doi.org/10.5703/1288284317973",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": null,
+      "authors": [
+        "Ángel De La Rosa",
+        "Gonzalo Ruiz"
+      ],
+      "publication": "Proceedings of the C3 Symposium 2025",
+      "recordType": "proceedings-article",
+      "doi": "10.5703/1288284317973",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.5040/9781350932289",
+      "kind": "research-metadata",
+      "title": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
+      "url": "https://doi.org/10.5040/9781350932289",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2021,
+      "authors": [],
+      "publication": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
+      "recordType": "other",
+      "doi": "10.5040/9781350932289",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.5040/9781350882836",
+      "kind": "research-metadata",
+      "title": "Ravel: Bolero",
+      "url": "https://doi.org/10.5040/9781350882836",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2009,
+      "authors": [],
+      "publication": "Ravel: Bolero",
+      "recordType": "other",
+      "doi": "10.5040/9781350882836",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.48550/arxiv.2005.10539",
+      "kind": "research-metadata",
+      "title": "An approach to Beethoven's 10th Symphony",
+      "url": "https://doi.org/10.48550/arxiv.2005.10539",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2020,
+      "authors": [
+        "Paula Muñoz-Lago",
+        "Gonzalo Méndez"
+      ],
+      "publication": "arXiv (Cornell University)",
+      "recordType": "preprint",
+      "doi": "10.48550/arxiv.2005.10539",
+      "firstSeen": "2026-11-16T11:27:49+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.3389/fcogn.2026.1868072",
+      "kind": "research-metadata",
+      "title": "Disrupting emotional memory: PASER as a potential reconsolidation-based intervention in stressful experiences.",
+      "url": "https://doi.org/10.3389/fcogn.2026.1868072",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Petrone JE, Romero LD, Oliva Montaudo A, Evans LA, Piñeyro DR."
+      ],
+      "publication": "Frontiers in cognition",
+      "recordType": "indexed-publication",
+      "doi": "10.3389/fcogn.2026.1868072",
+      "pmid": "42630240",
+      "publicationTypes": [
+        "brief-report",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-16T11:27:49+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.3138/9781442653382-006",
+      "kind": "research-metadata",
+      "title": "4. The Biblical Psalms and Oral Formulaic Composition",
+      "url": "https://doi.org/10.3138/9781442653382-006",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1967,
+      "authors": [],
+      "publication": "Oral Formulaic Language in the Biblical Psalms",
+      "recordType": "book-chapter",
+      "doi": "10.3138/9781442653382-006",
+      "firstSeen": "2026-11-16T11:27:49+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.3138/9781442653382-005",
+      "kind": "research-metadata",
+      "title": "3. Oral Formulaic Composition and Texts",
+      "url": "https://doi.org/10.3138/9781442653382-005",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1967,
+      "authors": [],
+      "publication": "Oral Formulaic Language in the Biblical Psalms",
+      "recordType": "book-chapter",
+      "doi": "10.3138/9781442653382-005",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.3138/9781442653382-003",
+      "kind": "research-metadata",
+      "title": "1. Oral Formulaic Composition",
+      "url": "https://doi.org/10.3138/9781442653382-003",
+      "area": "神話・歴史",
+      "topicIds": [
+        "oral-epic"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1967,
+      "authors": [],
+      "publication": "Oral Formulaic Language in the Biblical Psalms",
+      "recordType": "book-chapter",
+      "doi": "10.3138/9781442653382-003",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.2196/98961",
+      "kind": "research-metadata",
+      "title": "From Prediction to Interaction: A Behavioral Informatics Framework for AI in Preventive Health.",
+      "url": "https://doi.org/10.2196/98961",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Gavai A, Heringa J."
+      ],
+      "publication": "Journal of medical Internet research",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/98961",
+      "pmid": "42950341",
+      "publicationTypes": [
+        "research-article",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.2196/82857",
+      "kind": "research-metadata",
+      "title": "Multicomponent Behavior Change Technique Intervention for Caregivers of People With Alzheimer Disease and Related Dementias: Protocol for a Single-Arm, Personalized Behavioral Trial to Disrupt Sedentary Time.",
+      "url": "https://doi.org/10.2196/82857",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Miller D, Lambert S, Jordan L, Butler MJ, Sinvani L, Perrin A, Cheung YK, Cheung YK, Davidson KW, Goodwin AM."
+      ],
+      "publication": "JMIR research protocols",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/82857",
+      "pmid": "42263197",
+      "publicationTypes": [
+        "Clinical Trial Protocol",
+        "research-article",
+        "Journal Article",
+        "Research Support, N.I.H., Extramural"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.2196/104227",
+      "kind": "research-metadata",
+      "title": "Digital Behavioral Infrastructure for Glucagon-Like Peptide-1 Pharmacotherapy: Viewpoint on Persistence, Tolerability, and Postcessation Durability.",
+      "url": "https://doi.org/10.2196/104227",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Cook G."
+      ],
+      "publication": "Journal of medical Internet research",
+      "recordType": "indexed-publication",
+      "doi": "10.2196/104227",
+      "pmid": "42709474",
+      "publicationTypes": [
+        "research-article",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1680/macr.2007.59.2.97",
+      "kind": "research-metadata",
+      "title": "Development of high-volume low-lime and high-lime fly-ash-incorporated self-consolidating concrete",
+      "url": "https://doi.org/10.1680/macr.2007.59.2.97",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2007,
+      "authors": [
+        "M. Şahmaran",
+        "Ö. Yaman",
+        "M. Tokyay"
+      ],
+      "publication": "Magazine of Concrete Research",
+      "recordType": "journal-article",
+      "doi": "10.1680/macr.2007.59.2.97",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1378/chest.62.6.683",
+      "kind": "research-metadata",
+      "title": "The “Bolero” by Ravel",
+      "url": "https://doi.org/10.1378/chest.62.6.683",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1972,
+      "authors": [],
+      "publication": "Chest",
+      "recordType": "journal-article",
+      "doi": "10.1378/chest.62.6.683",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.11648/j.history.20251301.16",
+      "kind": "research-metadata",
+      "title": "Alphabet: From Linear B to the Greek 27-Letter Alphanumeric System and the Phoenician Abjad",
+      "url": "https://doi.org/10.11648/j.history.20251301.16",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2025,
+      "authors": [
+        "Pliakos Ap"
+      ],
+      "publication": "History Research",
+      "recordType": "journal-article",
+      "doi": "10.11648/j.history.20251301.16",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1101/2021.07.29.454400",
+      "kind": "research-metadata",
+      "title": "Habit formation viewed as structural change in the behavioral network",
+      "url": "https://doi.org/10.1101/2021.07.29.454400",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2021,
+      "authors": [
+        "Kota Yamada",
+        "Koji Toda"
+      ],
+      "publication": "",
+      "recordType": "posted-content",
+      "doi": "10.1101/2021.07.29.454400",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780198844914.002.0008",
+      "kind": "research-metadata",
+      "title": "The Greek alphabet",
+      "url": "https://doi.org/10.1093/oso/9780198844914.002.0008",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2022,
+      "authors": [],
+      "publication": "The Oxford Linear Algebra for Scientists",
+      "recordType": "other",
+      "doi": "10.1093/oso/9780198844914.002.0008",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1093/oso/9780195063776.003.0003",
+      "kind": "research-metadata",
+      "title": "Beethoven: Fifth Symphony",
+      "url": "https://doi.org/10.1093/oso/9780195063776.003.0003",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1997,
+      "authors": [
+        "Gunther Schuller"
+      ],
+      "publication": "The Compleat Conductor",
+      "recordType": "book-chapter",
+      "doi": "10.1093/oso/9780195063776.003.0003",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1093/obo/9780199828340-0232",
+      "kind": "research-metadata",
+      "title": "Habit Formation and Behavior Change",
+      "url": "https://doi.org/10.1093/obo/9780199828340-0232",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Benjamin Gardner",
+        "Amanda L Rebar"
+      ],
+      "publication": "Oxford Bibliographies in Psychology",
+      "recordType": "reference-entry",
+      "doi": "10.1093/obo/9780199828340-0232",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1093/acrefore/9780190236557.013.129",
+      "kind": "research-metadata",
+      "title": "Habit Formation and Behavior Change",
+      "url": "https://doi.org/10.1093/acrefore/9780190236557.013.129",
+      "area": "心理・臨床",
+      "topicIds": [
+        "habit-formation"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2019,
+      "authors": [
+        "Benjamin Gardner",
+        "Amanda L Rebar"
+      ],
+      "publication": "Oxford Research Encyclopedia of Psychology",
+      "recordType": "reference-entry",
+      "doi": "10.1093/acrefore/9780190236557.013.129",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1038/s41578-023-00539-z",
+      "kind": "research-metadata",
+      "title": "Self-healing Roman concrete",
+      "url": "https://doi.org/10.1038/s41578-023-00539-z",
+      "area": "科学・社会",
+      "topicIds": [
+        "roman-concrete"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2023,
+      "authors": [
+        "Charlotte Allard"
+      ],
+      "publication": "Nature Reviews Materials",
+      "recordType": "journal-article",
+      "doi": "10.1038/s41578-023-00539-z",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1038/s41550-020-01210-1",
+      "kind": "research-metadata",
+      "title": "Earth as a transit exoplanet",
+      "url": "https://doi.org/10.1038/s41550-020-01210-1",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2020,
+      "authors": [
+        "May Chiao"
+      ],
+      "publication": "Nature Astronomy",
+      "recordType": "journal-article",
+      "doi": "10.1038/s41550-020-01210-1",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1017/cbo9781139235976.004",
+      "kind": "research-metadata",
+      "title": "Haydn, orchestration, and re-orchestration",
+      "url": "https://doi.org/10.1017/cbo9781139235976.004",
+      "area": "音楽",
+      "topicIds": [
+        "ravelbolero"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [],
+      "publication": "The Orchestral Revolution",
+      "recordType": "book-chapter",
+      "doi": "10.1017/cbo9781139235976.004",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1017/cbo9780511552700.006",
+      "kind": "research-metadata",
+      "title": "Argument from the history of writing: How writing worked before the Greek alphabet",
+      "url": "https://doi.org/10.1017/cbo9780511552700.006",
+      "area": "神話・歴史",
+      "topicIds": [
+        "ancient-writing"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 1991,
+      "authors": [],
+      "publication": "Homer and the Origin of the Greek Alphabet",
+      "recordType": "book-chapter",
+      "doi": "10.1017/cbo9780511552700.006",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1017/9781805432036.007",
+      "kind": "research-metadata",
+      "title": "Motivic Intensity: The Fifth Symphony, Op. 67",
+      "url": "https://doi.org/10.1017/9781805432036.007",
+      "area": "音楽",
+      "topicIds": [
+        "beethoven5"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [],
+      "publication": "The Creation of Beethoven's Nine Symphonies",
+      "recordType": "other",
+      "doi": "10.1017/9781805432036.007",
+      "firstSeen": "2026-11-05T10:59:54+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.newast.2009.09.001",
+      "kind": "research-metadata",
+      "title": "Exoplanet Transit Database. Reduction and processing of the photometric data of exoplanet transits",
+      "url": "https://doi.org/10.1016/j.newast.2009.09.001",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2010,
+      "authors": [
+        "Stanislav Poddaný",
+        "Luboš Brát",
+        "Ondřej Pejcha"
+      ],
+      "publication": "New Astronomy",
+      "recordType": "journal-article",
+      "doi": "10.1016/j.newast.2009.09.001",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.neurom.2026.05.016",
+      "kind": "research-metadata",
+      "title": "Rewriting Reactivated Memories? A Systematic Review of Transcranial Magnetic Stimulation and Memory Reactivation and Reconsolidation Paradigms.",
+      "url": "https://doi.org/10.1016/j.neurom.2026.05.016",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Europe PMC"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2026,
+      "authors": [
+        "Virto-Farfan H, Tafet GE."
+      ],
+      "publication": "Neuromodulation : journal of the International Neuromodulation Society",
+      "recordType": "indexed-publication",
+      "doi": "10.1016/j.neurom.2026.05.016",
+      "pmid": "42536010",
+      "publicationTypes": [
+        "Review",
+        "Journal Article"
+      ],
+      "abstractAvailable": true,
+      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
+      "firstSeen": "2026-11-16T11:27:49+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/j.ascom.2024.100816",
+      "kind": "research-metadata",
+      "title": "Synthetic light curves of exoplanet transit using nanosatellite data",
+      "url": "https://doi.org/10.1016/j.ascom.2024.100816",
+      "area": "科学・社会",
+      "topicIds": [
+        "exoplanets"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2024,
+      "authors": [
+        "A. Fuentes",
+        "M. Solar"
+      ],
+      "publication": "Astronomy and Computing",
+      "recordType": "journal-article",
+      "doi": "10.1016/j.ascom.2024.100816",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00012-3",
+      "kind": "research-metadata",
+      "title": "Disrupting Consolidation and Reconsolidation of Human Emotional Memory with Propranolol",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00012-3",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Michelle H. Lonergan",
+        "Alain Brunet",
+        "Lening A. Olivera-Figueroa"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00012-3",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00006-8",
+      "kind": "research-metadata",
+      "title": "Memory Reconsolidation Versus Extinction",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00006-8",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Satoshi Kida"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00006-8",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "doi:10.1016/b978-0-12-386892-3.00001-9",
+      "kind": "research-metadata",
+      "title": "The Discovery of Memory Reconsolidation",
+      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00001-9",
+      "area": "心理・臨床",
+      "topicIds": [
+        "memory"
+      ],
+      "providers": [
+        "Crossref"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2013,
+      "authors": [
+        "Karim Nader"
+      ],
+      "publication": "Memory Reconsolidation",
+      "recordType": "book-chapter",
+      "doi": "10.1016/b978-0-12-386892-3.00001-9",
+      "firstSeen": "2026-11-09T11:38:41+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "anchor:zeus-titans",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Theogony (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "anchor:odyssey-xenia",
+      "kind": "curated-reference-path",
+      "title": "Homer, Odyssey, Book VI (translated text)",
+      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "odyssey-xenia"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:07:48+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "anchor:human-ages",
+      "kind": "curated-reference-path",
+      "title": "Hesiod, Works and Days (translated text)",
+      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
+      "area": "原典・翻訳",
+      "topicIds": [
+        "human-ages"
+      ],
+      "providers": [
+        "事前登録リンク"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
+      "firstSeen": "2026-11-04T10:13:01+00:00",
+      "lastSeen": "2026-11-16T11:27:49+00:00"
+    },
+    {
+      "id": "openalex:W830314902",
+      "kind": "research-metadata",
+      "title": "Hesiod's 'Theogony'",
+      "url": "https://openalex.org/W830314902",
+      "area": "神話・歴史",
+      "topicIds": [
+        "zeus-titans"
+      ],
+      "providers": [
+        "OpenAlex"
+      ],
+      "reviewStatus": "未照合",
+      "evidenceStatus": "書誌・作品情報のみ",
+      "year": 2006,
+      "authors": [
+        "Samantha Newington"
+      ],
+      "publication": "Durham e-Theses (Durham University)",
+      "recordType": "dissertation",
+      "doi": "",
+      "firstSeen": "2026-11-12T11:20:01+00:00",
       "lastSeen": "2026-11-12T11:20:01+00:00"
     },
     {
@@ -1011,85 +1857,6 @@
       "lastSeen": "2026-11-12T11:20:01+00:00"
     },
     {
-      "id": "anchor:zeus-titans",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Theogony (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodTheogony.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "zeus-titans"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
-    },
-    {
-      "id": "anchor:odyssey-xenia",
-      "kind": "curated-reference-path",
-      "title": "Homer, Odyssey, Book VI (translated text)",
-      "url": "https://www.theoi.com/Text/HomerOdyssey6.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "odyssey-xenia"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:07:48+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
-    },
-    {
-      "id": "anchor:human-ages",
-      "kind": "curated-reference-path",
-      "title": "Hesiod, Works and Days (translated text)",
-      "url": "https://www.theoi.com/Text/HesiodWorksDays.html",
-      "area": "原典・翻訳",
-      "topicIds": [
-        "human-ages"
-      ],
-      "providers": [
-        "事前登録リンク"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "note": "固定の参照先。今回の自動処理では本文も到達性も確認していません。",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-12T11:20:01+00:00"
-    },
-    {
-      "id": "doi:10.5703/1288284317973",
-      "kind": "research-metadata",
-      "title": "Activation of self-healing in pozzolanic natural hydraulic lime-based self-compacting concrete under cyclic compression",
-      "url": "https://doi.org/10.5703/1288284317973",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": null,
-      "authors": [
-        "Ángel De La Rosa",
-        "Gonzalo Ruiz"
-      ],
-      "publication": "Proceedings of the C3 Symposium 2025",
-      "recordType": "proceedings-article",
-      "doi": "10.5703/1288284317973",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
       "id": "doi:10.56578/jche030205",
       "kind": "research-metadata",
       "title": "Evolving Durability Strategies in Concrete Structures from the Roman Era to Today",
@@ -1302,32 +2069,6 @@
       "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
-      "id": "doi:10.1680/macr.2007.59.2.97",
-      "kind": "research-metadata",
-      "title": "Development of high-volume low-lime and high-lime fly-ash-incorporated self-consolidating concrete",
-      "url": "https://doi.org/10.1680/macr.2007.59.2.97",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2007,
-      "authors": [
-        "M. Şahmaran",
-        "Ö. Yaman",
-        "M. Tokyay"
-      ],
-      "publication": "Magazine of Concrete Research",
-      "recordType": "journal-article",
-      "doi": "10.1680/macr.2007.59.2.97",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
       "id": "doi:10.14418/wes01.1.684",
       "kind": "research-metadata",
       "title": "The Cello Suites of Bach and Britten: History, Form and Performance",
@@ -1348,30 +2089,6 @@
       "publication": "",
       "recordType": "dissertation",
       "doi": "10.14418/wes01.1.684",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.11648/j.history.20251301.16",
-      "kind": "research-metadata",
-      "title": "Alphabet: From Linear B to the Greek 27-Letter Alphanumeric System and the Phoenician Abjad",
-      "url": "https://doi.org/10.11648/j.history.20251301.16",
-      "area": "神話・歴史",
-      "topicIds": [
-        "ancient-writing"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2025,
-      "authors": [
-        "Pliakos Ap"
-      ],
-      "publication": "History Research",
-      "recordType": "journal-article",
-      "doi": "10.11648/j.history.20251301.16",
       "firstSeen": "2026-11-09T11:38:41+00:00",
       "lastSeen": "2026-11-09T11:38:41+00:00"
     },
@@ -1399,28 +2116,6 @@
       "recordType": "article",
       "doi": "10.1126/sciadv.add1602",
       "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1093/oso/9780198844914.002.0008",
-      "kind": "research-metadata",
-      "title": "The Greek alphabet",
-      "url": "https://doi.org/10.1093/oso/9780198844914.002.0008",
-      "area": "神話・歴史",
-      "topicIds": [
-        "ancient-writing"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2022,
-      "authors": [],
-      "publication": "The Oxford Linear Algebra for Scientists",
-      "recordType": "other",
-      "doi": "10.1093/oso/9780198844914.002.0008",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
       "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
@@ -1547,76 +2242,6 @@
       "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
-      "id": "doi:10.1038/s41578-023-00539-z",
-      "kind": "research-metadata",
-      "title": "Self-healing Roman concrete",
-      "url": "https://doi.org/10.1038/s41578-023-00539-z",
-      "area": "科学・社会",
-      "topicIds": [
-        "roman-concrete"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2023,
-      "authors": [
-        "Charlotte Allard"
-      ],
-      "publication": "Nature Reviews Materials",
-      "recordType": "journal-article",
-      "doi": "10.1038/s41578-023-00539-z",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1038/s41550-020-01210-1",
-      "kind": "research-metadata",
-      "title": "Earth as a transit exoplanet",
-      "url": "https://doi.org/10.1038/s41550-020-01210-1",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2020,
-      "authors": [
-        "May Chiao"
-      ],
-      "publication": "Nature Astronomy",
-      "recordType": "journal-article",
-      "doi": "10.1038/s41550-020-01210-1",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1017/cbo9780511552700.006",
-      "kind": "research-metadata",
-      "title": "Argument from the history of writing: How writing worked before the Greek alphabet",
-      "url": "https://doi.org/10.1017/cbo9780511552700.006",
-      "area": "神話・歴史",
-      "topicIds": [
-        "ancient-writing"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1991,
-      "authors": [],
-      "publication": "Homer and the Origin of the Greek Alphabet",
-      "recordType": "book-chapter",
-      "doi": "10.1017/cbo9780511552700.006",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
       "id": "doi:10.1017/9781009053839.006",
       "kind": "research-metadata",
       "title": "Transmission, Performance, and Reception: After c. 1900",
@@ -1686,131 +2311,6 @@
       "lastSeen": "2026-11-09T11:38:41+00:00"
     },
     {
-      "id": "doi:10.1016/j.newast.2009.09.001",
-      "kind": "research-metadata",
-      "title": "Exoplanet Transit Database. Reduction and processing of the photometric data of exoplanet transits",
-      "url": "https://doi.org/10.1016/j.newast.2009.09.001",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2010,
-      "authors": [
-        "Stanislav Poddaný",
-        "Luboš Brát",
-        "Ondřej Pejcha"
-      ],
-      "publication": "New Astronomy",
-      "recordType": "journal-article",
-      "doi": "10.1016/j.newast.2009.09.001",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1016/j.ascom.2024.100816",
-      "kind": "research-metadata",
-      "title": "Synthetic light curves of exoplanet transit using nanosatellite data",
-      "url": "https://doi.org/10.1016/j.ascom.2024.100816",
-      "area": "科学・社会",
-      "topicIds": [
-        "exoplanets"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2024,
-      "authors": [
-        "A. Fuentes",
-        "M. Solar"
-      ],
-      "publication": "Astronomy and Computing",
-      "recordType": "journal-article",
-      "doi": "10.1016/j.ascom.2024.100816",
-      "firstSeen": "2026-11-04T10:13:01+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1016/b978-0-12-386892-3.00012-3",
-      "kind": "research-metadata",
-      "title": "Disrupting Consolidation and Reconsolidation of Human Emotional Memory with Propranolol",
-      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00012-3",
-      "area": "心理・臨床",
-      "topicIds": [
-        "memory"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2013,
-      "authors": [
-        "Michelle H. Lonergan",
-        "Alain Brunet",
-        "Lening A. Olivera-Figueroa"
-      ],
-      "publication": "Memory Reconsolidation",
-      "recordType": "book-chapter",
-      "doi": "10.1016/b978-0-12-386892-3.00012-3",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1016/b978-0-12-386892-3.00006-8",
-      "kind": "research-metadata",
-      "title": "Memory Reconsolidation Versus Extinction",
-      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00006-8",
-      "area": "心理・臨床",
-      "topicIds": [
-        "memory"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2013,
-      "authors": [
-        "Satoshi Kida"
-      ],
-      "publication": "Memory Reconsolidation",
-      "recordType": "book-chapter",
-      "doi": "10.1016/b978-0-12-386892-3.00006-8",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
-      "id": "doi:10.1016/b978-0-12-386892-3.00001-9",
-      "kind": "research-metadata",
-      "title": "The Discovery of Memory Reconsolidation",
-      "url": "https://doi.org/10.1016/b978-0-12-386892-3.00001-9",
-      "area": "心理・臨床",
-      "topicIds": [
-        "memory"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2013,
-      "authors": [
-        "Karim Nader"
-      ],
-      "publication": "Memory Reconsolidation",
-      "recordType": "book-chapter",
-      "doi": "10.1016/b978-0-12-386892-3.00001-9",
-      "firstSeen": "2026-11-09T11:38:41+00:00",
-      "lastSeen": "2026-11-09T11:38:41+00:00"
-    },
-    {
       "id": "doi:10.1007/springerreference_302560",
       "kind": "research-metadata",
       "title": "Neuropsychology of Emotion",
@@ -1857,94 +2357,6 @@
       "lastSeen": "2026-11-05T10:59:54+00:00"
     },
     {
-      "id": "doi:10.5040/9781350932289",
-      "kind": "research-metadata",
-      "title": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
-      "url": "https://doi.org/10.5040/9781350932289",
-      "area": "音楽",
-      "topicIds": [
-        "beethoven5"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2021,
-      "authors": [],
-      "publication": "Track 31 Music with motivic sequences: the first movement of Beethoven’s Fifth Symphony.",
-      "recordType": "other",
-      "doi": "10.5040/9781350932289",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.5040/9781350882836",
-      "kind": "research-metadata",
-      "title": "Ravel: Bolero",
-      "url": "https://doi.org/10.5040/9781350882836",
-      "area": "音楽",
-      "topicIds": [
-        "ravelbolero"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2009,
-      "authors": [],
-      "publication": "Ravel: Bolero",
-      "recordType": "other",
-      "doi": "10.5040/9781350882836",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.3138/9781442653382-005",
-      "kind": "research-metadata",
-      "title": "3. Oral Formulaic Composition and Texts",
-      "url": "https://doi.org/10.3138/9781442653382-005",
-      "area": "神話・歴史",
-      "topicIds": [
-        "oral-epic"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1967,
-      "authors": [],
-      "publication": "Oral Formulaic Language in the Biblical Psalms",
-      "recordType": "book-chapter",
-      "doi": "10.3138/9781442653382-005",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.3138/9781442653382-003",
-      "kind": "research-metadata",
-      "title": "1. Oral Formulaic Composition",
-      "url": "https://doi.org/10.3138/9781442653382-003",
-      "area": "神話・歴史",
-      "topicIds": [
-        "oral-epic"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1967,
-      "authors": [],
-      "publication": "Oral Formulaic Language in the Biblical Psalms",
-      "recordType": "book-chapter",
-      "doi": "10.3138/9781442653382-003",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
       "id": "doi:10.2307/1087058",
       "kind": "research-metadata",
       "title": "Homeric Modifications of Formulaic Prototypes: Studies in the Development of Greek Epic Diction",
@@ -1966,123 +2378,6 @@
       "publication": "Phoenix",
       "recordType": "journal-article",
       "doi": "10.2307/1087058",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.2196/98961",
-      "kind": "research-metadata",
-      "title": "From Prediction to Interaction: A Behavioral Informatics Framework for AI in Preventive Health.",
-      "url": "https://doi.org/10.2196/98961",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Europe PMC"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2026,
-      "authors": [
-        "Gavai A, Heringa J."
-      ],
-      "publication": "Journal of medical Internet research",
-      "recordType": "indexed-publication",
-      "doi": "10.2196/98961",
-      "pmid": "42950341",
-      "publicationTypes": [
-        "research-article",
-        "Journal Article"
-      ],
-      "abstractAvailable": true,
-      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.2196/82857",
-      "kind": "research-metadata",
-      "title": "Multicomponent Behavior Change Technique Intervention for Caregivers of People With Alzheimer Disease and Related Dementias: Protocol for a Single-Arm, Personalized Behavioral Trial to Disrupt Sedentary Time.",
-      "url": "https://doi.org/10.2196/82857",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Europe PMC"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2026,
-      "authors": [
-        "Miller D, Lambert S, Jordan L, Butler MJ, Sinvani L, Perrin A, Cheung YK, Cheung YK, Davidson KW, Goodwin AM."
-      ],
-      "publication": "JMIR research protocols",
-      "recordType": "indexed-publication",
-      "doi": "10.2196/82857",
-      "pmid": "42263197",
-      "publicationTypes": [
-        "Clinical Trial Protocol",
-        "research-article",
-        "Journal Article",
-        "Research Support, N.I.H., Extramural"
-      ],
-      "abstractAvailable": true,
-      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.2196/104227",
-      "kind": "research-metadata",
-      "title": "Digital Behavioral Infrastructure for Glucagon-Like Peptide-1 Pharmacotherapy: Viewpoint on Persistence, Tolerability, and Postcessation Durability.",
-      "url": "https://doi.org/10.2196/104227",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Europe PMC"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2026,
-      "authors": [
-        "Cook G."
-      ],
-      "publication": "Journal of medical Internet research",
-      "recordType": "indexed-publication",
-      "doi": "10.2196/104227",
-      "pmid": "42709474",
-      "publicationTypes": [
-        "research-article",
-        "Journal Article"
-      ],
-      "abstractAvailable": true,
-      "note": "公開索引の書誌・文献種別です。抄録・本文の結論と妥当性は未照合です。",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1378/chest.62.6.683",
-      "kind": "research-metadata",
-      "title": "The “Bolero” by Ravel",
-      "url": "https://doi.org/10.1378/chest.62.6.683",
-      "area": "音楽",
-      "topicIds": [
-        "ravelbolero"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1972,
-      "authors": [],
-      "publication": "Chest",
-      "recordType": "journal-article",
-      "doi": "10.1378/chest.62.6.683",
       "firstSeen": "2026-11-05T10:59:54+00:00",
       "lastSeen": "2026-11-05T10:59:54+00:00"
     },
@@ -2109,149 +2404,6 @@
       "publication": "Clinical Psychologist",
       "recordType": "article",
       "doi": "10.1111/cp.12102",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1101/2021.07.29.454400",
-      "kind": "research-metadata",
-      "title": "Habit formation viewed as structural change in the behavioral network",
-      "url": "https://doi.org/10.1101/2021.07.29.454400",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2021,
-      "authors": [
-        "Kota Yamada",
-        "Koji Toda"
-      ],
-      "publication": "",
-      "recordType": "posted-content",
-      "doi": "10.1101/2021.07.29.454400",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1093/oso/9780195063776.003.0003",
-      "kind": "research-metadata",
-      "title": "Beethoven: Fifth Symphony",
-      "url": "https://doi.org/10.1093/oso/9780195063776.003.0003",
-      "area": "音楽",
-      "topicIds": [
-        "beethoven5"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 1997,
-      "authors": [
-        "Gunther Schuller"
-      ],
-      "publication": "The Compleat Conductor",
-      "recordType": "book-chapter",
-      "doi": "10.1093/oso/9780195063776.003.0003",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1093/obo/9780199828340-0232",
-      "kind": "research-metadata",
-      "title": "Habit Formation and Behavior Change",
-      "url": "https://doi.org/10.1093/obo/9780199828340-0232",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2019,
-      "authors": [
-        "Benjamin Gardner",
-        "Amanda L Rebar"
-      ],
-      "publication": "Oxford Bibliographies in Psychology",
-      "recordType": "reference-entry",
-      "doi": "10.1093/obo/9780199828340-0232",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1093/acrefore/9780190236557.013.129",
-      "kind": "research-metadata",
-      "title": "Habit Formation and Behavior Change",
-      "url": "https://doi.org/10.1093/acrefore/9780190236557.013.129",
-      "area": "心理・臨床",
-      "topicIds": [
-        "habit-formation"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2019,
-      "authors": [
-        "Benjamin Gardner",
-        "Amanda L Rebar"
-      ],
-      "publication": "Oxford Research Encyclopedia of Psychology",
-      "recordType": "reference-entry",
-      "doi": "10.1093/acrefore/9780190236557.013.129",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1017/cbo9781139235976.004",
-      "kind": "research-metadata",
-      "title": "Haydn, orchestration, and re-orchestration",
-      "url": "https://doi.org/10.1017/cbo9781139235976.004",
-      "area": "音楽",
-      "topicIds": [
-        "ravelbolero"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2013,
-      "authors": [],
-      "publication": "The Orchestral Revolution",
-      "recordType": "book-chapter",
-      "doi": "10.1017/cbo9781139235976.004",
-      "firstSeen": "2026-11-05T10:59:54+00:00",
-      "lastSeen": "2026-11-05T10:59:54+00:00"
-    },
-    {
-      "id": "doi:10.1017/9781805432036.007",
-      "kind": "research-metadata",
-      "title": "Motivic Intensity: The Fifth Symphony, Op. 67",
-      "url": "https://doi.org/10.1017/9781805432036.007",
-      "area": "音楽",
-      "topicIds": [
-        "beethoven5"
-      ],
-      "providers": [
-        "Crossref"
-      ],
-      "reviewStatus": "未照合",
-      "evidenceStatus": "書誌・作品情報のみ",
-      "year": 2024,
-      "authors": [],
-      "publication": "The Creation of Beethoven's Nine Symphonies",
-      "recordType": "other",
-      "doi": "10.1017/9781805432036.007",
       "firstSeen": "2026-11-05T10:59:54+00:00",
       "lastSeen": "2026-11-05T10:59:54+00:00"
     },
