@@ -132,6 +132,40 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 #release-share-status{min-height:18px;margin:13px 0 0;font-size:12px;color:var(--muted)}
 @media(max-width:600px){.release-words{font-size:13px;gap:17px;line-height:2}.release-share-dialog{padding:18px}}
 
+
+/* v2: discoverable through interaction, not visually advertised. */
+.artwork-pending[hidden]{display:none!important}
+.release-words .secret-char{
+ position:relative;isolation:isolate;border-radius:2px;
+ -webkit-tap-highlight-color:transparent;
+}
+.release-words .secret-char::before{content:"";position:absolute;inset:-7px -4px}
+.release-words.secret-active .secret-char{
+ background:#171717;color:#fff;cursor:pointer;
+ animation:secret-ink 600ms cubic-bezier(.16,1,.3,1) both;
+ animation-delay:calc(var(--reveal-order) * 84ms);
+}
+@keyframes secret-ink{
+ 0%{background:transparent;color:#31312e;transform:translateY(0)}
+ 44%{background:#41413c;color:#fff;transform:translateY(-3px)}
+ 100%{background:#171717;color:#fff;transform:translateY(0)}
+}
+.release-share-toolbar.visible{animation:secret-toolbar-in 360ms ease-out 700ms both}
+@keyframes secret-toolbar-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.release-share-toolbar>span{font-size:12px;color:#555}
+.release-share-toolbar button{min-height:42px}
+.vertical-preview{position:relative;flex-direction:column;gap:23px;min-height:290px;background:#fbfbf9;overflow:hidden}
+.vertical-preview::before{content:"";position:absolute;inset:18px;border:1px solid #deded9;pointer-events:none}
+.vertical-preview span{font-size:31px;line-height:1.52;font-weight:600;position:relative;animation:secret-card-in 470ms cubic-bezier(.16,1,.3,1) both}
+.vertical-preview small{font:600 9px/1.5 Arial,sans-serif;letter-spacing:.12em;color:#686864}
+@keyframes secret-card-in{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:translateY(0)}}
+.release-share-actions button{min-height:42px}
+.release-share-actions a[role=button]{display:inline-flex;align-items:center;min-height:42px}
+.release-share-actions a:not([role=button]){min-height:42px;display:inline-flex;align-items:center}
+@media(prefers-reduced-motion:reduce){
+ .release-words.secret-active .secret-char,.release-share-toolbar.visible,.vertical-preview span{animation:none!important;transition:none!important;transform:none!important}
+}
+
 </style>
 </head>
 <body>
@@ -175,7 +209,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <p class="note-line"><span class="lead">音楽が私たちの</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">ま</button><span class="tail">いにちに彩りを、あたたかさを与えてくれると信じます。</span></p>
 <p class="note-line"><span class="lead">今いる場所が少</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">し</button><span class="tail">ずつ変わっても、音楽を続けていきます。あなたには、</span></p>
 <p class="note-line"><span class="lead">どこにいても、</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">た</button><span class="tail">だ元気でいてほしいと思います。</span></p></div>
-<div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の言葉を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
+<div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の8文字を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
 </section>
 <section id="tracks" class="container section" aria-labelledby="tracks-title">
 <div class="section-head"><div><p class="kicker">01 — 03 / TRACKS</p><h2 id="tracks-title">収録曲</h2></div></div>
@@ -199,10 +233,10 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <footer class="footer"><div class="container"><small>© 2026 Kosuke Tsukamoto</small><a href="https://kosuke-tsukamoto-website.pages.dev/">公式サイト</a></div></footer>
 <div id="release-share-modal" class="release-share-backdrop" hidden><div class="release-share-dialog" role="dialog" aria-modal="true" aria-labelledby="release-share-title">
 <div class="release-share-head"><strong id="release-share-title">KOSUKE TSUKAMOTO / WORDS</strong><button type="button" class="secondary" id="release-share-close" aria-label="閉じる">×</button></div>
-<div class="vertical-preview"><span>けっこんしました</span></div>
-<div class="release-share-actions"><button type="button" id="release-share-copy">言葉をコピー</button><button type="button" class="secondary" id="release-generate">縦書き画像を作る</button></div>
+<div class="vertical-preview"><span class="vertical-word">けっこんしました</span><small>2026.11.22 / KOSUKE TSUKAMOTO</small></div>
+<div class="release-share-actions"><button type="button" id="release-share-copy">言葉をコピー</button><button type="button" class="secondary" data-image-layout="feed">投稿用画像 4:5</button><button type="button" class="secondary" data-image-layout="story">ストーリー用画像 9:16</button></div>
 <div class="release-share-actions"><a id="release-share-x" target="_blank" rel="noopener noreferrer" href="https://twitter.com/">X</a><a id="release-share-line" target="_blank" rel="noopener noreferrer" href="https://line.me/">LINE</a><a href="/lyrics/#korekaramo">歌詞を見る</a></div>
-<div class="release-generated-preview" id="release-generated" hidden><img id="release-generated-image" alt="縦書きメッセージの共有画像"><div class="release-share-actions"><a role="button" id="release-download" download="kosuke-tsukamoto-words.png" href="#">PNGを保存</a><button type="button" class="secondary" id="release-share-image">画像を共有</button></div></div>
+<div class="release-generated-preview" id="release-generated" hidden><img id="release-generated-image" alt="縦書きの共有画像プレビュー"><div class="release-share-actions"><a role="button" id="release-download" download="kosuke-tsukamoto-words.png" href="#">PNGを保存</a><button type="button" class="secondary" id="release-share-image">画像を共有</button></div></div>
 <p role="status" id="release-share-status" aria-live="polite"></p></div></div>
 <script>
 (()=>{"use strict";
@@ -212,8 +246,19 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  const host=document.querySelector(".release-words"),buttons=[...document.querySelectorAll(".secret-char")],toolbar=document.getElementById("secret-toolbar");
  if(!host||buttons.length!==8)return;
  let active=false,lastFocus=null,objectUrl=null,imageBlob=null;
- const setActive=(yes)=>{active=yes;host.classList.toggle("secret-active",yes);toolbar.classList.toggle("visible",yes);buttons.forEach(b=>b.setAttribute("aria-pressed",String(yes)));if(yes){document.getElementById("secret-open").focus();}};
- buttons.forEach((b,i)=>{b.addEventListener("click",()=>setActive(true));if(i===0){b.tabIndex=0;b.setAttribute("aria-label","8行の8文字目を縦に選択する");}});
+ const setActive=(yes)=>{
+  active=yes;
+  if(yes){host.classList.remove("secret-active");void host.offsetWidth;}
+  host.classList.toggle("secret-active",yes);
+  toolbar.classList.toggle("visible",yes);
+  buttons.forEach(b=>b.setAttribute("aria-pressed",String(yes)));
+  if(yes)document.getElementById("secret-open").focus();
+ };
+ buttons.forEach((b,i)=>{
+   b.style.setProperty("--reveal-order",String(i));
+   b.addEventListener("click",()=>setActive(true));
+   if(i===0){b.tabIndex=0;b.setAttribute("aria-label","8行の8文字目を縦に選択する");}
+ });
  document.getElementById("secret-clear").addEventListener("click",()=>{setActive(false);buttons[0].focus();});
  const modal=document.getElementById("release-share-modal"),status=document.getElementById("release-share-status");
  const open=()=>{lastFocus=document.activeElement;status.textContent="";modal.hidden=false;document.body.style.overflow="hidden";document.getElementById("release-share-close").focus();};
@@ -226,14 +271,38 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  document.getElementById("release-share-x").href="https://twitter.com/intent/tweet?text="+encodeURIComponent(secret)+"&url="+encodeURIComponent(page);
  document.getElementById("release-share-line").href="https://line.me/R/msg/text/?"+encodeURIComponent(secret+"\n"+page);
  document.getElementById("release-share-copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(secret);status.textContent="コピーしました。";}catch{const ta=document.createElement("textarea");ta.value=secret;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const success=document.execCommand("copy");ta.remove();status.textContent=success?"コピーしました。":"コピーできませんでした。";}});
- const makeImage=()=>{
- const canvas=document.createElement("canvas");canvas.width=1080;canvas.height=1350;const c=canvas.getContext("2d");c.fillStyle="#f6f6f4";c.fillRect(0,0,1080,1350);c.strokeStyle="#bdbdb9";c.lineWidth=2;c.strokeRect(84,84,912,1182);
- c.textBaseline="top";c.fillStyle="#555";c.font="bold 22px Arial,sans-serif";c.fillText("KOSUKE TSUKAMOTO / WORDS",123,126);
- c.fillStyle="#111";c.font='600 77px "Yu Mincho","Hiragino Mincho ProN",serif';c.textAlign="center";Array.from(secret).forEach((ch,i)=>c.fillText(ch,540,320+i*86));
- c.fillStyle="#777";c.textAlign="left";c.font="bold 23px Arial,sans-serif";c.fillText("KOSUKE TSUKAMOTO",123,1194);
- canvas.toBlob(blob=>{if(!blob){status.textContent="画像を作成できませんでした。";return;}if(objectUrl)URL.revokeObjectURL(objectUrl);imageBlob=blob;objectUrl=URL.createObjectURL(blob);document.getElementById("release-generated-image").src=objectUrl;document.getElementById("release-download").href=objectUrl;document.getElementById("release-generated").hidden=false;status.textContent="画像を作成しました。";},"image/png");
+ const makeImage=(layout)=>{
+  const story=layout==="story",canvas=document.createElement("canvas");
+  canvas.width=1080;canvas.height=story?1920:1350;
+  const c=canvas.getContext("2d");if(!c){status.textContent="画像を作成できませんでした。";return;}
+  const height=canvas.height;
+  c.fillStyle="#f7f7f4";c.fillRect(0,0,1080,height);
+  c.strokeStyle="#c7c7c2";c.lineWidth=2;c.strokeRect(88,88,904,height-176);
+  c.textBaseline="top";c.textAlign="left";c.fillStyle="#555552";
+  c.font="600 21px Arial,sans-serif";c.fillText("KOSUKE TSUKAMOTO / WORDS",130,135);
+  c.strokeStyle="#171717";c.lineWidth=2;c.beginPath();c.moveTo(130,215);c.lineTo(205,215);c.stroke();
+  const startY=story?565:302,spacing=story?94:88;
+  c.textAlign="center";c.fillStyle="#161616";
+  c.font='600 79px "Yu Mincho","Hiragino Mincho ProN",serif';
+  Array.from(secret).forEach((ch,i)=>c.fillText(ch,540,startY+i*spacing));
+  c.textAlign="left";c.fillStyle="#565652";
+  c.font="600 20px Arial,sans-serif";c.fillText("2026.11.22",130,height-215);
+  c.fillStyle="#171717";c.font='600 30px "Yu Mincho","Hiragino Mincho ProN",serif';
+  c.fillText("あなたと、これから、これからも",130,height-169);
+  const fileName=story?"kosuke-tsukamoto-words-story.png":"kosuke-tsukamoto-words-feed.png";
+  canvas.toBlob(blob=>{
+    if(!blob){status.textContent="画像を作成できませんでした。";return;}
+    if(objectUrl)URL.revokeObjectURL(objectUrl);
+    imageBlob=blob;objectUrl=URL.createObjectURL(blob);
+    document.getElementById("release-generated-image").src=objectUrl;
+    const link=document.getElementById("release-download");link.href=objectUrl;link.download=fileName;
+    document.getElementById("release-generated").hidden=false;
+    status.textContent=story?"ストーリー用画像（9:16）を作成しました。":"投稿用画像（4:5）を作成しました。";
+  },"image/png");
  };
- document.getElementById("release-generate").addEventListener("click",makeImage);
+ document.querySelectorAll("[data-image-layout]").forEach(button=>{
+  button.addEventListener("click",()=>makeImage(button.dataset.imageLayout));
+ });
  document.getElementById("release-share-image").addEventListener("click",async()=>{if(!imageBlob){status.textContent="先に画像を作ってください。";return;}const file=new File([imageBlob],"kosuke-tsukamoto-words.png",{type:"image/png"});try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:"束元康介 / WORDS"});return;}}catch(e){if(e.name==="AbortError")return;}status.textContent="画像の共有に対応していません。PNGを保存してください。";});
  const artwork=document.getElementById("release-cover-image");artwork?.addEventListener("load",()=>{artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;});artwork?.addEventListener("error",()=>{artwork.hidden=true;});if(artwork?.complete&&artwork.naturalWidth>0){artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;}
 })();
