@@ -1,0 +1,85 @@
+/* REC NOTE — Studio Monochrome / 2026-11-18. Visual-only layer. */
+:root {
+  --bg:#f1f0ed; --surface:#fff; --surface2:#f7f7f5; --line:#deddd8;
+  --ink:#20201f; --muted:#777671; --accent:#242421; --accent-soft:#efeeeb;
+  --amber:#a28b69; --danger:#a34742;
+  --shadow:0 10px 40px rgba(28,28,27,.035);
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--ink);font-family:"Zen Kaku Gothic New",-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;font-size:13.5px;letter-spacing:.003em}
+button{background:#fff;color:var(--ink);border-color:#dad9d4;border-radius:6px;font-weight:600;min-height:37px;transition:background .15s,border-color .15s,transform .15s}
+button:hover:not(:disabled){background:#f4f3f1;border-color:#aaa9a2}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid #6d6c65;outline-offset:3px}
+button.primary{background:#262624;border-color:#262624;color:#fff}
+button.primary:hover:not(:disabled){background:#46453f;border-color:#46453f}
+button.soft{background:#eeedea;border-color:#d9d8d2;color:#292925}
+button.soft:hover:not(:disabled){background:#e4e3df}
+button.warn{color:#983e39}
+header{background:#252523;border-bottom:1px solid #33332e;color:#f8f8f3}
+.headwrap{max-width:1420px;padding:20px 32px;gap:20px}
+.logo{background:transparent;color:#f5f4ec;border:1px solid #78786f;border-radius:5px;width:43px;height:43px;font-size:13px;font-weight:800;letter-spacing:.12em}
+.brand{gap:15px}
+.brand h1{font-size:18px;color:#fbfaf5;font-weight:750;letter-spacing:.09em}
+.brand h1 span{color:#aba9a0!important;letter-spacing:.02em}
+header .sub{color:#9e9d96;font-size:11px;letter-spacing:.04em}
+header .headops{gap:7px}
+header .headops button{background:#343430;color:#e8e7df;border:1px solid #575750;border-radius:5px;font-weight:500;font-size:12px}
+header .headops button:hover{background:#464640;border-color:#77766e}
+.wrap{max-width:1420px;margin:26px auto;padding:0 32px}
+.top{gap:7px;margin-bottom:21px;border-bottom:1px solid #cecdc7;padding-bottom:13px}
+.songtab{min-width:126px;border-radius:5px;background:#e7e6e2;border:1px solid transparent;color:#605f5a;padding:10px 17px;font-weight:650;letter-spacing:.035em}
+.songtab:hover:not(:disabled){background:#dcdad4}
+.songtab.active{background:#292926;color:#fff;border-color:#292926}
+.songtab.active:hover{background:#3a3a36}
+.count{background:#d9d8d2;color:#77766f;border-radius:3px;font-size:10px;font-weight:700;padding:2px 6px}
+.songtab.active .count{background:#5c5b54;color:#f8f7f1}
+.addSong{background:transparent;border:1px dashed #b2b0a9;color:#66645e}
+.layout{gap:20px;grid-template-columns:minmax(0,1.36fr) minmax(330px,.64fr)}
+.panel{border:1px solid #deddd7;background:#fff;border-radius:9px;box-shadow:var(--shadow)}
+.panelHead{padding:21px 23px;border-color:#e8e7e2}
+.panelBody{padding:24px 23px}
+.panelHead h2,h2{font-size:14px;letter-spacing:.035em;font-weight:750}
+.panelHead .sub{color:#8a8983;margin-top:3px}
+.label{color:#575751;font-size:11px;letter-spacing:.045em;font-weight:650}
+.helper,.sub{color:#85847e}
+.playerBar{gap:8px;margin-bottom:19px}
+.currentTime{font-size:37px;color:#232320;font-weight:750;letter-spacing:-.045em;min-width:138px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.duration{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#96958d;font-size:12px}
+.filePill{background:#f6f5f2;border:1px solid #d3d1cb;color:#393934;border-radius:5px;padding:0 12px;min-height:36px}
+.filePill:hover{background:#ecebe8}
+.wave{background:#242421;border:1px solid #242421;border-radius:5px;height:214px}
+.playhead{background:#eee6d2;width:2px;box-shadow:0 0 0 1px #2525214f}
+.playhead:before{background:#eee6d2;width:11px;height:10px;border-radius:0}
+.mark{background:#b6a07e;opacity:.96}
+.mark:before{background:#b6a07e;border:2px solid #242421;box-shadow:none}
+.mark.selected{background:#eee0c4}
+.mark.selected:before{background:#eee0c4;border-color:#242421}
+.waveHelp{padding-top:9px;color:#84837d;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px}
+.waveZoom label{color:#66655f;font-weight:600}
+.waveZoom select{border-radius:5px;color:#343430;background:#fff}
+.waveZoom .helper{color:#7c7a75}
+.timebox{background:#f6f5f2;border:1px solid #ebeae4;border-radius:5px;padding:12px 14px}
+.timebox strong{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;color:#292925;font-size:19px;font-weight:650}
+.field input,.field select,.field textarea{border-color:#deddd8;background:#fdfdfc;color:#292925;border-radius:5px}
+.field input::placeholder,.field textarea::placeholder{color:#a29f99}
+.field input:focus,.field textarea:focus,.field select:focus{background:#fff;border-color:#77756e}
+.field textarea{min-height:92px}
+.chip{background:#f2f1ed;border:1px solid #e8e7e1;color:#686760;border-radius:3px;font-size:10.5px;padding:3px 7px}
+.item{padding:17px 22px;border-color:#ecebe6}
+.item:hover{background:#f9f8f6}
+.item.selected{background:#f6f5f2;border-left:3px solid #343430;padding-left:19px}
+.itemTime{color:#32312e;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;letter-spacing:-.02em}
+.itemDesc{font-size:13px;line-height:1.7;color:#2b2a27}
+.itemNote{color:#77766f;font-size:11.5px}
+.detail{background:#faf9f7;border-color:#e8e7e1;border-radius:5px}
+.raw{background:#f0efec;color:#5d5c55;border-radius:4px}
+.divider{border-color:#e9e8e3;margin:18px 0}
+.statusDot{background:#6f8b73}
+.toast{background:#292925;border-radius:6px}
+.footnote{color:#85847e;max-width:1030px;line-height:1.9}
+input[type="range"]{accent-color:#3a3936}
+.playLabel{color:#6b6962}
+#filter{border-radius:5px!important;border-color:#deddd7!important;color:#3e3d38;background:#fff!important}
+#rate{border-radius:5px!important;border-color:#deddd7!important;background:#fff!important}
+@media(max-width:880px){.headwrap{padding:17px 18px}.wrap{padding:0 13px;margin:16px auto}.panelBody{padding:17px}.panelHead{padding:16px}.layout{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:420px){.currentTime{font-size:31px;min-width:110px}.songtab{min-width:96px;padding:9px 10px}.headwrap{padding:16px 14px}.logo{width:37px;height:37px}.brand h1{font-size:16px}}
