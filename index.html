@@ -1374,7 +1374,29 @@
 </style>
 <style>
  .hero{min-height:0}.countdown-strip{margin:0}.featured-recording,.short-about{padding:40px 6vw;border-top:1px solid var(--line)}.featured-recording h2,.short-about h2{font-size:clamp(28px,4vw,40px);line-height:1.5;margin:12px 0}.featured-recording audio{width:100%;max-width:660px;display:block;margin:18px 0}.featured-recording p{font-size:14px;line-height:1.8}.recording-note{color:#666;font-size:12px!important}.recording-links,.footer-routes{display:flex;gap:8px 24px;flex-wrap:wrap}.recording-links a,.short-about a,.footer-routes a{display:inline-flex;align-items:center;min-height:44px;font-size:13px;text-decoration:underline;text-underline-offset:4px}.short-about p{max-width:660px;font-size:15px;line-height:1.9}.short-about a{margin-right:24px}.footer-routes{max-width:var(--max);margin:24px auto 0}.lyric-box-section #lyric-stage .fragment-card{min-height:0}.lyric-box-section #lyric-stage .fragment-text{min-height:0;padding:14px 0;font-size:clamp(20px,2.6vw,34px)}.lyric-box-section #lyric-stage .fragment-source{min-height:44px}.lyric-box-section #lyric-stage{align-items:stretch}.lyric-box-section .lyric-machine{min-width:0}.lyric-box-section .lyric-box-grid>div{min-width:0}.lyric-box-section .lyric-box-intro .section-title br{display:none}.lyric-box-section .lyric-stat{margin-top:12px}.news{padding-top:40px;padding-bottom:40px}.news .section-title{font-size:clamp(28px,4vw,42px)}@media(max-width:640px){.lyric-box-section #lyric-stage .fragment-card{min-height:0}.lyric-box-section #lyric-stage .fragment-text{min-height:0;font-size:clamp(18px,5.2vw,24px)}.lyric-box-section #lyric-stage .fragment-source{font-size:11px;min-height:44px}.featured-recording,.short-about{padding:30px 6vw}.news{padding-top:30px;padding-bottom:30px}}
-</style><link rel="stylesheet" href="/assets/site-navigation.css"><script src="/assets/site-navigation.js" defer></script><style>.hero{padding-top:34px}@media(max-width:640px){.hero{padding-top:24px}}</style><style>.countdown-strip{max-width:none;padding:0 6vw}.countdown-inner{max-width:var(--max);margin:auto}.lyric-box-section .lyric-box-intro .section-title{font-size:clamp(29px,3.1vw,42px)}.lyric-box-section .lyric-controls-single #lyric-draw{width:100%}</style><style>.lyric-box-section #lyric-share{background:transparent!important;color:#ddd!important;border:1px solid #777!important;min-height:44px;font-size:11px!important}.lyric-box-section #lyric-share:hover,.lyric-box-section #lyric-share:focus-visible{background:#292929!important;color:#fff!important}</style><link rel="stylesheet" href="/assets/typography-refinement.css"><link rel="stylesheet" href="/assets/voice-feedback.css" data-voice-feedback="v1"></head>
+</style><link rel="stylesheet" href="/assets/site-navigation.css"><script src="/assets/site-navigation.js" defer></script><style>.hero{padding-top:34px}@media(max-width:640px){.hero{padding-top:24px}}</style><style>.countdown-strip{max-width:none;padding:0 6vw}.countdown-inner{max-width:var(--max);margin:auto}.lyric-box-section .lyric-box-intro .section-title{font-size:clamp(29px,3.1vw,42px)}.lyric-box-section .lyric-controls-single #lyric-draw{width:100%}</style><style>.lyric-box-section #lyric-share{background:transparent!important;color:#ddd!important;border:1px solid #777!important;min-height:44px;font-size:11px!important}.lyric-box-section #lyric-share:hover,.lyric-box-section #lyric-share:focus-visible{background:#292929!important;color:#fff!important}</style><link rel="stylesheet" href="/assets/typography-refinement.css"><link rel="stylesheet" href="/assets/voice-feedback.css" data-voice-feedback="v1"><style id="first-single-announcement-style">
+.countdown-announced{font-size:clamp(17px,2.5vw,28px);font-weight:700}
+.countdown-announced-link{font-size:13px;text-underline-offset:3px}
+.release-announcement[hidden]{display:none!important}
+.release-announcement{position:fixed;inset:0;z-index:100000;background:rgba(0,0,0,.78);display:flex;align-items:center;justify-content:center;padding:18px;overflow:auto}
+.release-announcement-panel{background:#f7f7f4;color:#171717;width:min(1060px,100%);max-height:95dvh;overflow:auto;position:relative;display:grid;grid-template-columns:1.08fr .92fr}
+.release-announcement-media{aspect-ratio:1;background:#e8e8e5;display:flex;align-items:center;justify-content:center;color:#555;letter-spacing:.12em;font-size:11px;text-align:center}
+.release-announcement-media img{width:100%;height:100%;object-fit:contain;display:block}
+.release-announcement-media img[hidden],.release-announcement-media div[hidden]{display:none}
+.release-announcement-content{display:flex;flex-direction:column;justify-content:center;gap:19px;padding:56px 45px 42px}
+.release-announcement-content p{margin:0}
+.release-announcement-kicker{font:700 11px/1.4 Arial,sans-serif;letter-spacing:.13em}
+.release-announcement-content h2{font-family:var(--sans, sans-serif);font-weight:700;font-size:clamp(29px,3.4vw,51px);line-height:1.25;margin:0}
+.release-announcement-title{font-size:clamp(19px,2.3vw,29px);line-height:1.6;font-weight:600}
+.release-announcement-artist{font-size:14px}
+.release-announcement-actions{display:flex;flex-direction:column;align-items:flex-start;gap:12px;margin-top:8px}
+.release-announcement-actions a{font-size:13px;text-decoration:underline;text-underline-offset:5px}
+.release-announcement-actions a.primary{padding:14px 19px;background:#171717;color:#fff;text-decoration:none}
+.release-announcement-close{position:absolute;top:13px;right:13px;z-index:2;border:1px solid #777;background:#f7f7f4;color:#111;display:flex;align-items:center;justify-content:center;width:42px;height:42px;cursor:pointer;font-size:24px;line-height:1}
+.release-announcement-close:focus-visible,.release-announcement a:focus-visible{outline:3px solid #111;outline-offset:3px}
+.release-announcement-note{font-size:12px;color:#666}
+@media(max-width:700px){.release-announcement{padding:10px;align-items:flex-start}.release-announcement-panel{grid-template-columns:1fr;max-width:500px;margin:auto}.release-announcement-media{aspect-ratio:1;max-height:46vh}.release-announcement-content{padding:24px 24px 30px;gap:12px}.release-announcement-content h2{font-size:32px}.release-announcement-title{font-size:21px}.release-announcement-close{top:8px;right:8px}}
+</style></head>
 <body>
 <header class="site-header"><a class="site-brand" href="/">束元康介<span>KOSUKE TSUKAMOTO</span></a><details class="site-menu"><summary>MENU <span aria-hidden="true">＋</span></summary><nav aria-label="メインメニュー"><a href="/works/">WORKS</a><a href="/lyrics/">LYRICS</a><a href="/#lyric-box">LYRIC BOX</a><a href="/music-education/">EDUCATION</a><a href="/voice-box/">VOICE BOX</a><a href="/special-thanks/">SPECIAL THANKS</a><a href="/profile/">PROFILE</a><a href="/contact/">CONTACT</a></nav></details></header>
 <main id="top"><section class="hero">
@@ -1422,15 +1444,19 @@
         .map(part => [part.type, Number(part.value)]));
       const today = Date.UTC(parts.year, parts.month - 1, parts.day);
       const days = Math.round((targetDay - today) / 86400000);
-      section.hidden = days < 0;
-      if (days === 0) {
-        section.dataset.state = "day";
-        label.textContent = "本日";
-      } else if (days > 0) {
-        section.dataset.state = "before";
-        label.textContent = "発表まで";
-        number.textContent = String(days);
+      section.hidden = false;
+      if (days <= 0) {
+        if (section.dataset.state !== "announced") {
+          section.dataset.state = "announced";
+          section.setAttribute("aria-label", "1st Single 配信決定のお知らせ");
+          section.querySelector(".countdown-inner").innerHTML =
+            '<span class="countdown-announced">1st Single　配信決定。</span><a class="countdown-announced-link" href="/releases/2026-11-22/">特設ページを見る →</a>';
+        }
+        return;
       }
+      section.dataset.state = "before";
+      label.textContent = "発表まで";
+      number.textContent = String(days);
     }
 
     updateCountdown();
@@ -2156,6 +2182,30 @@ document.addEventListener("DOMContentLoaded", () => {
 <!-- v36: compact VOICE strip + tighter transition to works -->
 
 
-<script>(()=>{const routes={"voice": "/voice-box/", "voices": "/voice-box/#voices", "voice-korekara": "/voice-box/#korekara", "contact": "/contact/", "timeline": "/works/#timeline", "works": "/works/", "project": "/music-education/", "profile": "/profile/#profile", "activity": "/profile/#activity", "school-song": "/school-song/", "lyrics": "/lyrics/"};function route(){const next=routes[location.hash.slice(1)];if(next)location.replace(next);}window.addEventListener("hashchange",route);route();})();</script></body>
+<script>(()=>{const routes={"voice": "/voice-box/", "voices": "/voice-box/#voices", "voice-korekara": "/voice-box/#korekara", "contact": "/contact/", "timeline": "/works/#timeline", "works": "/works/", "project": "/music-education/", "profile": "/profile/#profile", "activity": "/profile/#activity", "school-song": "/school-song/", "lyrics": "/lyrics/"};function route(){const next=routes[location.hash.slice(1)];if(next)location.replace(next);}window.addEventListener("hashchange",route);route();})();</script><div id="first-single-announcement" class="release-announcement" hidden aria-labelledby="first-single-announcement-title">
+<div class="release-announcement-panel" role="dialog" aria-modal="true" aria-labelledby="first-single-announcement-title">
+<button class="release-announcement-close" id="first-single-announcement-close" aria-label="お知らせを閉じる" type="button">×</button>
+<div class="release-announcement-media"><img id="first-single-announcement-cover" src="/assets/releases/first-single-2026-cover.webp" alt="あなたと、これから、これからも ジャケット" hidden><div id="first-single-announcement-placeholder" role="img" aria-label="ジャケット画像は準備中です">JACKET ARTWORK<br>COMING SOON</div></div>
+<div class="release-announcement-content"><p class="release-announcement-kicker">KOSUKE TSUKAMOTO / 1ST SINGLE</p><h2 id="first-single-announcement-title">配信決定。</h2>
+<p class="release-announcement-title">あなたと、<br>これから、<br>これからも</p><p class="release-announcement-artist">束元康介</p>
+<div class="release-announcement-actions"><a href="/releases/2026-11-22/" class="primary">特設ページを見る</a><a href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る</a></div>
+</div></div></div>
+<script id="first-single-announcement-script">
+(()=>{"use strict";
+ const modal=document.getElementById("first-single-announcement");const closeBtn=document.getElementById("first-single-announcement-close");const cover=document.getElementById("first-single-announcement-cover"),placeholder=document.getElementById("first-single-announcement-placeholder");
+ function readyCover(){if(cover.naturalWidth>0){cover.hidden=false;placeholder.hidden=true;}}
+ cover.addEventListener("load",readyCover);cover.addEventListener("error",()=>{cover.hidden=true;placeholder.hidden=false;});if(cover.complete)readyCover();
+ const nowParts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));
+ const jst=nowParts.year+"-"+nowParts.month+"-"+nowParts.day;
+ const key="first-single-2026-announcement-dismissed-v1";
+ const canShow=jst>="2026-11-22"&&jst<="2026-11-29"&&!localStorage.getItem(key);
+ let lastFocus=null;
+ function close(){modal.hidden=true;document.body.style.overflow="";try{localStorage.setItem(key,"1")}catch(e){};lastFocus?.focus();}
+ function show(){lastFocus=document.activeElement;modal.hidden=false;document.body.style.overflow="hidden";closeBtn.focus();}
+ closeBtn.addEventListener("click",close);modal.addEventListener("click",e=>{if(e.target===modal)close();});
+ document.addEventListener("keydown",e=>{if(modal.hidden)return;if(e.key==="Escape"){close();return;}if(e.key==="Tab"){const controls=[...modal.querySelectorAll('button,a[href]')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
+ if(canShow)show();
+})();
+</script></body>
 </html>
 
