@@ -135,6 +135,8 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 
 /* v2: discoverable through interaction, not visually advertised. */
 .artwork-pending[hidden]{display:none!important}
+.cover-holder.has-artwork{padding:0;gap:0;background:transparent}
+.cover-holder.has-artwork img{width:100%;height:100%;object-fit:contain}
 .release-words .secret-char{
  position:relative;isolation:isolate;border-radius:2px;
  -webkit-tap-highlight-color:transparent;
@@ -187,7 +189,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 </div>
 <div class="cover-wrap">
 <div class="cover-holder" id="release-cover"><img id="release-cover-image" src="/assets/releases/first-single-2026-cover.webp" alt="あなたと、これから、これからも ジャケット" hidden><div id="release-cover-pending" class="artwork-pending" role="img" aria-label="ジャケット画像は準備中です"><div class="frame" aria-hidden="true">＋</div><small>JACKET ARTWORK<br>COMING SOON</small></div></div>
-<p class="cover-label">Artwork / 準備中</p>
+<p class="cover-label" id="release-cover-label">Artwork / 準備中</p>
 </div>
 </div>
 <section id="preview" class="container music-first" aria-labelledby="preview-title">
@@ -304,7 +306,12 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
   button.addEventListener("click",()=>makeImage(button.dataset.imageLayout));
  });
  document.getElementById("release-share-image").addEventListener("click",async()=>{if(!imageBlob){status.textContent="先に画像を作ってください。";return;}const file=new File([imageBlob],"kosuke-tsukamoto-words.png",{type:"image/png"});try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:"束元康介 / WORDS"});return;}}catch(e){if(e.name==="AbortError")return;}status.textContent="画像の共有に対応していません。PNGを保存してください。";});
- const artwork=document.getElementById("release-cover-image");artwork?.addEventListener("load",()=>{artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;});artwork?.addEventListener("error",()=>{artwork.hidden=true;});if(artwork?.complete&&artwork.naturalWidth>0){artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;}
+ const artwork=document.getElementById("release-cover-image");
+ const coverLabel=document.getElementById("release-cover-label");
+ const showArtwork=()=>{if(!artwork?.naturalWidth)return;artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;artwork.closest(".cover-holder")?.classList.add("has-artwork");if(coverLabel)coverLabel.textContent="JACKET ARTWORK";};
+ const hideArtwork=()=>{if(!artwork)return;artwork.hidden=true;document.getElementById("release-cover-pending").hidden=false;artwork.closest(".cover-holder")?.classList.remove("has-artwork");if(coverLabel)coverLabel.textContent="Artwork / 準備中";};
+ artwork?.addEventListener("load",showArtwork);artwork?.addEventListener("error",hideArtwork);
+ if(artwork?.complete)showArtwork();
 })();
 </script>
 </body>
