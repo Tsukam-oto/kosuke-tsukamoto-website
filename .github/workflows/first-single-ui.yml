@@ -33,11 +33,11 @@ jobs:
           sleep 3
       - name: Test width, hidden message, share images, poetry, and release announcement
         run: node tests/first-single-ui.mjs
-      - name: Upload failure screenshots only
-        if: failure()
+      - name: Upload temporary private review screenshots
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: first-single-ui-failure-screenshots
+          name: first-single-ui-review
           path: test-results/first-single
           if-no-files-found: ignore
           retention-days: 1
