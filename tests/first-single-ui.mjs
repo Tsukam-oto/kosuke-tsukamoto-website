@@ -28,10 +28,11 @@ async function exerciseShare(page,engine) {
   await page.locator("#secret-open").click();
   assert.equal(await page.locator("#release-share-modal").isVisible(),true);
   const assertImage = async (layout,dimensions)=>{
-    await page.locator('[data-image-layout="'+layout+'"]').click();
     const img = page.locator("#release-generated-image");
+    const oldSrc = await img.getAttribute("src");
+    await page.locator('[data-image-layout="'+layout+'"]').click();
     await img.waitFor({state:"visible"});
-    await page.waitForFunction(()=>{const i=document.getElementById("release-generated-image");return i.complete&&i.naturalWidth>0});
+    await page.waitForFunction(prev=>{const i=document.getElementById("release-generated-image");return i.getAttribute("src")!==prev&&i.complete&&i.naturalWidth>0;},oldSrc);
     const actual = await img.evaluate(i=>[i.naturalWidth,i.naturalHeight]);
     assert.deepEqual(actual,dimensions,engine+" "+layout+" image size");
     const href = await page.locator("#release-download").getAttribute("href");
