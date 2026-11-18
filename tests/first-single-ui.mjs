@@ -110,6 +110,15 @@ async function testEngine(engineType,engine){
    const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
    await page.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
    await page.locator(".release-words .secret-char").first().waitFor();
+   assert.equal(await page.locator("h2.release-statement-heading").innerText(),"FOR THIS RELEASE");
+   assert.equal(await page.locator("#preview").count(),0,"premature preview removed");
+   assert.equal(await page.locator("h2:has-text('まず、音楽から。')").count(),0,"unwanted heading removed");
+   assert.equal(await page.locator(".hero + .editorial-note").count(),1,"statement follows jacket directly");
+   const fontSize=await page.locator(".release-words").evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+   assert.ok(fontSize>=15,"release statement is visually legible at width "+width);
+   if(width===375||width===768||width===1440){
+     await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-statement-"+width+".png",animations:"disabled"});
+   }
    await checkColumn(page,engine,width);
    if(width===375){
     await exerciseShare(page,engine);
