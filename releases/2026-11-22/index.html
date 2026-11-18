@@ -175,6 +175,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <p class="note-line"><span class="lead">音楽が私たちの</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">ま</button><span class="tail">いにちに彩りを、あたたかさを与えてくれると信じます。</span></p>
 <p class="note-line"><span class="lead">今いる場所が少</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">し</button><span class="tail">ずつ変わっても、音楽を続けていきます。あなたには、</span></p>
 <p class="note-line"><span class="lead">どこにいても、</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">た</button><span class="tail">だ元気でいてほしいと思います。</span></p></div>
+<div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の言葉を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
 </section>
 <section id="tracks" class="container section" aria-labelledby="tracks-title">
 <div class="section-head"><div><p class="kicker">01 — 03 / TRACKS</p><h2 id="tracks-title">収録曲</h2></div></div>
@@ -196,7 +197,6 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 </div></section>
 </main>
 <footer class="footer"><div class="container"><small>© 2026 Kosuke Tsukamoto</small><a href="https://kosuke-tsukamoto-website.pages.dev/">公式サイト</a></div></footer>
-<div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の言葉を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
 <div id="release-share-modal" class="release-share-backdrop" hidden><div class="release-share-dialog" role="dialog" aria-modal="true" aria-labelledby="release-share-title">
 <div class="release-share-head"><strong id="release-share-title">KOSUKE TSUKAMOTO / WORDS</strong><button type="button" class="secondary" id="release-share-close" aria-label="閉じる">×</button></div>
 <div class="vertical-preview"><span>けっこんしました</span></div>
@@ -235,7 +235,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  };
  document.getElementById("release-generate").addEventListener("click",makeImage);
  document.getElementById("release-share-image").addEventListener("click",async()=>{if(!imageBlob){status.textContent="先に画像を作ってください。";return;}const file=new File([imageBlob],"kosuke-tsukamoto-words.png",{type:"image/png"});try{if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:"束元康介 / WORDS"});return;}}catch(e){if(e.name==="AbortError")return;}status.textContent="画像の共有に対応していません。PNGを保存してください。";});
- const artwork=document.getElementById("release-cover-image");artwork?.addEventListener("load",()=>{artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;});artwork?.addEventListener("error",()=>{artwork.hidden=true;});
+ const artwork=document.getElementById("release-cover-image");artwork?.addEventListener("load",()=>{artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;});artwork?.addEventListener("error",()=>{artwork.hidden=true;});if(artwork?.complete&&artwork.naturalWidth>0){artwork.hidden=false;document.getElementById("release-cover-pending").hidden=true;}
 })();
 </script>
 </body>
