@@ -306,7 +306,7 @@
         method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({expiresIn:600})});
       const signed=d?.signedURL||d?.signedUrl;
       if(!signed)throw Error('一時URLが取得できませんでした');
-      const url=signed.startsWith('http')?signed:API+(signed.startsWith('/')?'':'/')+signed;
+      const url=signed.startsWith('http')?signed:API+(signed.startsWith('/storage/v1')?'':'/storage/v1')+(signed.startsWith('/')?'':'/')+signed;
       const res=await fetch(url,{cache:'no-store'});
       if(!res.ok)throw Error('取得できません：HTTP '+res.status);
       const blob=await res.blob();
