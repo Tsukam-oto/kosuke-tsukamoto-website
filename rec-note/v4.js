@@ -305,4 +305,9 @@
   displayVideo();setVersionButtons();updateVariants();srtBtn.classList.toggle('visible',activeMode!=='REC');restoreCompare(song);
   document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement?.tagName))return;if(e.code==='KeyL'){e.preventDefault();if(loopRange)stopLoop();else startLoop()}});
   window.addEventListener('beforeunload',()=>{video.pause()});
+  // Used exclusively to load user-selected files retrieved from private cloud storage.
+  window.RECNOTE_MEDIA=Object.freeze({
+    loadCompare:(targetSong,file)=>loadCompare(file,targetSong,true),
+    loadVideo:(file,key)=>loadVideo(file,key)
+  });
 })();
