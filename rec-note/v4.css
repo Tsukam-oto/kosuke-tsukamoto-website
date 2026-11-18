@@ -1,0 +1,44 @@
+/* REC NOTE v4 — studio tools, matching the existing monochrome theme */
+.studioTools{margin:0 0 18px;padding:17px 18px 15px;background:#f6f5f2;border:1px solid #e4e2dc;border-radius:7px;display:grid;gap:13px}
+.studioHeading{display:flex;align-items:baseline;gap:12px;justify-content:space-between;flex-wrap:wrap;font-size:12px;font-weight:750;letter-spacing:.045em}
+.studioKicker{font:600 10px ui-monospace,Menlo,monospace;color:#88857e;letter-spacing:.12em}
+.studioRow{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.studioRow button,.studioRow select,.studioRow label.filePill{border-radius:5px;min-height:36px}
+.studioRow .activeTool{background:#292925!important;border-color:#292925!important;color:#fff!important}
+.studioRow .toolHint{font-size:11px;color:#74716b;flex:1 1 135px}
+.versionGroup{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding-top:12px;border-top:1px solid #e4e2dc}
+.versionGroup button{min-width:62px}
+.versionGroup .filePill{font-size:11px;max-width:280px;border-style:solid;background:#fff}
+.versionLabel{font-size:11px;font-weight:650;color:#625f58;margin-right:6px}
+.studioWaveRange{position:absolute;top:0;bottom:26px;background:rgba(212,194,155,.14);border-inline:1px solid rgba(227,208,165,.66);pointer-events:none;z-index:2;display:none}
+.studioVideo{margin:18px 0 6px;padding:17px;border:1px solid #e3e2dc;border-radius:7px;background:#f7f6f3;display:grid;gap:11px}
+.studioVideo[hidden]{display:none!important}
+.studioVideo video{display:block;width:100%;max-height:440px;background:#232320;border-radius:5px;object-fit:contain;aspect-ratio:16/9}
+.studioVideo .noVideo{display:grid;place-items:center;min-height:130px;background:#e9e8e4;color:#77736d;border-radius:5px;font-size:12px}
+.studioVideo .noVideo[hidden]{display:none}
+.studioVideo .studioRow input[type=text],.studioVideo .studioRow input:not([type]){width:115px;min-height:37px;border:1px solid #d3d1ca;background:#fff;border-radius:5px;padding:7px}
+.studioVideo .studioRow .videoClock{font:600 16px ui-monospace,Menlo,monospace;color:#30302c;margin-right:auto}
+.v4FieldNote{color:#78766e;font-size:10.5px}
+#subtitleInput{min-height:74px!important}
+#frameTimeInput{width:100%;padding:9px 10px;border:1px solid #d3d1ca;border-radius:5px;background:#fff;min-height:39px;color:#30302c}
+#shortAudition{display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px 0 15px}
+#shortAudition select{border:1px solid #d5d3cd;border-radius:5px;min-height:38px;background:#fff;padding:6px 9px;max-width:180px}
+#shortAudition .auditionStatus{flex:1 1 100%;font-size:11px;color:#7c7973}
+#srtBtn{display:none}
+#srtBtn.visible{display:inline-flex}
+.studioTools .filePill input{display:none}
+.studioMobileHint{font-size:10px;color:#77736c}
+@media(max-width:610px){.studioTools,.studioVideo{padding:13px}.studioRow{gap:6px}.studioRow button{flex:1 1 auto}.studioVideo video{max-height:300px}.studioHeading{gap:3px}}
+.studioVideo video[hidden]{display:none!important}
+.studioLibrary{margin:14px 0 20px;padding:0 16px 14px;border:1px solid #e2e0da;border-radius:7px;background:#fff}
+.studioLibrary summary{cursor:pointer;padding:12px 0;font-size:12px;font-weight:700;color:#363530}
+.studioLibrary .libraryBody{display:grid;gap:10px}
+.studioLibrary .libraryItem{display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;border-top:1px solid #efeee9;padding-top:8px;font-size:12px}
+.studioLibrary a{color:#555047;text-decoration:underline;text-underline-offset:3px;overflow-wrap:anywhere}
+.studioStage{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+.studioStage span{font-size:11px;background:#edece8;border-radius:4px;padding:5px 9px;color:#55534d}
+.studioStage strong{color:#242321}
+.studioDetail{display:grid;gap:9px;padding-top:11px;margin-top:11px;border-top:1px solid #e5e4de}
+.studioDetail label{font-size:11px;color:#66645d;font-weight:650;display:grid;gap:4px}
+.studioDetail textarea,.studioDetail input{border:1px solid #d5d3cc;background:#fff;border-radius:5px;padding:7px 9px;font:inherit;font-size:12px;width:100%}
+.studioDetail textarea{min-height:65px;resize:vertical}
