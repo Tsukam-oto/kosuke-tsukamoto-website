@@ -166,6 +166,9 @@ async function checkHomepage(browser,engine){
     await page.locator("#first-single-announcement-close").click();
     assert.equal(await modal.isVisible(),false);
     assert.equal(await page.locator(".countdown-announced-link").isVisible(),true);
+    assert.equal(await page.locator(".countdown-youtube-link").isVisible(),true,"home channel link remains after dismissing popup");
+    const docWidth=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+    assert.ok(docWidth[0]<=docWidth[1]+1.5,"no homepage horizontal overflow after release");
     await page.reload({waitUntil:"domcontentloaded"});
     assert.equal(await modal.isVisible(),false,"popup shown once per visitor");
     await context.close();
