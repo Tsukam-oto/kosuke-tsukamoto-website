@@ -55,6 +55,76 @@ async function exerciseShare(page,engine) {
   log(engine+" reveal/share/escape/clear");
 }
 
+async function checkTeaser(browser,engine){
+ const url=BASE+"/releases/2026-11-22/";
+ const fixture={
+   youtubeChannelUrl:"https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA",
+   teasers:[{id:"intro",title:"《これからも》 INTRO",youtubeUrl:"https://www.youtube.com/watch?v=AbC_123xYz0",audioUrl:null},
+     {id:"chorus",title:"《これからも》 CHORUS",youtubeUrl:null,audioUrl:null}]
+ };
+ {
+  const page=await browser.newPage({viewport:{width:375,height:840}});
+  await page.goto(url,{waitUntil:"networkidle"});
+  assert.equal(await page.locator("#teaser").isVisible(),false,"unpublished teaser must not render");
+  assert.equal(await page.locator("#hero-teaser-link").isVisible(),false,"do not claim an unpublished teaser exists");
+  assert.equal(await page.locator(".release-youtube-channel").isVisible(),true,"YouTube channel link always visible");
+  assert.equal(await page.locator(".hero + #for-this-release").count(),1,"release essay keeps priority");
+  await page.close();
+  log(engine+" teaser pending","no false promise; channel remains linked");
+ }
+ {
+  const page=await browser.newPage({viewport:{width:375,height:840}});
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
+  await page.route("**/www.youtube-nocookie.com/**",route=>route.abort());
+  await page.goto(url,{waitUntil:"domcontentloaded"});
+  await page.locator("#teaser").waitFor({state:"visible"});
+  assert.equal(await page.locator("#hero-teaser-link").isVisible(),true);
+  assert.equal(await page.locator(".release-teaser-item").count(),1,"only released teaser should appear");
+  assert.equal(await page.locator(".release-teaser-item a").first().getAttribute("href"),fixture.teasers[0].youtubeUrl);
+  await page.locator(".release-teaser-player button").first().click();
+  assert.ok((await page.locator(".release-teaser-player iframe").getAttribute("src")).includes("AbC_123xYz0"));
+  await page.close();
+  log(engine+" teaser published","direct watch URL + lazy playback + no pending chorus");
+ }
+ {
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify({teasers:[{id:"intro",title:"《これからも》 INTRO",youtubeUrl:null,audioUrl:"/assets/releases/teaser.mp3"}]})}));
+  await page.goto(url,{waitUntil:"domcontentloaded"});
+  await page.locator("#teaser").waitFor({state:"visible"});
+  assert.equal(await page.locator(".release-teaser-player audio").count(),1);
+  assert.equal(await page.locator(".release-teaser-player iframe").count(),0);
+  await page.close();
+  log(engine+" audio teaser","HTML audio control is offered for a valid configured audio file");
+ }
+ {
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
+  await page.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
+  await page.locator("#releases-teaser-link").waitFor({state:"visible"});
+  assert.equal(await page.locator(".release-secondary-link").count(),2);
+  await page.close();
+  log(engine+" releases listing","teaser and channel paths visible");
+ }
+ {
+  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:"reduce"});
+  const page=await context.newPage();
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
+  await page.addInitScript(()=>{
+   const NativeDate=Date;
+   class FixedDate extends NativeDate{
+     constructor(...args){super(...(args.length?args:["2026-11-22T12:00:00+09:00"]));}
+     static now(){return new NativeDate("2026-11-22T12:00:00+09:00").valueOf();}
+   }
+   globalThis.Date=FixedDate;
+  });
+  await page.goto(BASE+"/",{waitUntil:"domcontentloaded"});
+  await page.locator("#first-single-popup-teaser").waitFor({state:"visible"});
+  assert.equal(await page.locator("#first-single-popup-teaser").getAttribute("href"),fixture.teasers[0].youtubeUrl);
+  await context.close();
+  log(engine+" popup teaser","release-day direct teaser CTA");
+ }
+}
+
 async function checkLyrics(page,engine){
   await page.goto(BASE+"/lyrics/#korekaramo",{waitUntil:"domcontentloaded"});
   await page.locator("#korekaramo").waitFor();
@@ -132,6 +202,7 @@ async function testEngine(engineType,engine){
   await checkLyrics(page,engine);
   await page.close();
   await checkHomepage(browser,engine);
+  await checkTeaser(browser,engine);
  }finally{await browser.close();}
 }
 await testEngine(chromium,"chromium");
