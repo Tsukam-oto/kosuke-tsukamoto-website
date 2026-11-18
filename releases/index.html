@@ -26,6 +26,7 @@ h2{font-size:clamp(24px,3.8vw,39px);font-weight:600;line-height:1.45;margin:14px
 .link{display:inline-block;border:1px solid #111;background:#111;color:white;padding:10px 18px;text-decoration:none;font-size:13px}
 footer{padding:32px clamp(20px,6vw,75px);border-top:1px solid var(--line);font-size:12px;color:#666}
 @media(max-width:680px){main{padding:52px 0 70px}.release{grid-template-columns:1fr;gap:24px}.cover{max-width:400px}header nav{gap:12px;font-size:11px}}
+.release-links{display:flex;flex-wrap:wrap;align-items:center;gap:16px 22px}.release-secondary-link{font-size:13px;text-underline-offset:3px}.release-secondary-link[hidden]{display:none!important}
 </style></head><body>
 <header><a class="brand" href="/">束元康介</a><nav aria-label="ナビゲーション"><a href="/works/">作品</a><a href="/lyrics/">詩集</a><a href="/">ホーム</a></nav></header>
 <main><p class="kicker">RELEASES / 配信作品</p><h1>配信作品</h1><p class="intro">配信する音楽を、作品ごとに紹介します。歌詞や制作背景は、各作品のページからご覧いただけます。</p>
@@ -33,9 +34,26 @@ footer{padding:32px clamp(20px,6vw,75px);border-top:1px solid var(--line);font-s
 <div><p class="kicker">1ST SINGLE / 2026</p><h2>あなたと、<br>これから、<br>これからも</h2>
 <p class="track-note">2026年11月22日 配信決定発表。配信開始日は決まり次第お知らせします。</p>
 <ol class="tracks"><li>あなたと　— 新録</li><li>これから　— 新録</li><li>これからも　— 新曲</li></ol>
-<a href="/releases/2026-11-22/" class="link">特設ページを見る →</a></div>
+<div class="release-links"><a href="/releases/2026-11-22/" class="link">特設ページを見る →</a><a id="releases-teaser-link" class="release-secondary-link" href="/releases/2026-11-22/#teaser" hidden>ティザーを聴く →</a><a class="release-secondary-link" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a></div></div>
 </article>
 </main><footer>© 2026 Kosuke Tsukamoto</footer>
 <script>
-(()=>{const img=document.getElementById("releases-artwork");img.addEventListener("load",()=>{img.hidden=false;document.getElementById("releases-cover-pending").hidden=true});img.addEventListener("error",()=>{img.hidden=true});if(img.complete&&img.naturalWidth>0){img.hidden=false;document.getElementById("releases-cover-pending").hidden=true;}})();
+(()=>{
+ const img=document.getElementById("releases-artwork");
+ img.addEventListener("load",()=>{img.hidden=false;document.getElementById("releases-cover-pending").hidden=true});
+ img.addEventListener("error",()=>{img.hidden=true});
+ if(img.complete&&img.naturalWidth>0){img.hidden=false;document.getElementById("releases-cover-pending").hidden=true;}
+ fetch("/assets/releases/first-single-media.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(data=>{
+    if(!Array.isArray(data?.teasers))return;
+    const available=data.teasers.some(t=>{
+      for(const raw of [t.youtubeUrl,t.audioUrl]){
+        if(typeof raw!=="string"||!raw.trim()||(!raw.startsWith("https://")&&!raw.startsWith("/")))continue;
+        try{const url=new URL(raw,location.href);if(url.protocol!=="https:")continue;if(raw===t.youtubeUrl&&!["www.youtube.com","youtube.com","m.youtube.com","youtu.be"].includes(url.hostname))continue;return true;}catch{}
+      }
+      return false;
+    });
+    const link=document.getElementById("releases-teaser-link");
+    if(available&&link)link.hidden=false;
+ }).catch(()=>{});
+})();
 </script></body></html>
