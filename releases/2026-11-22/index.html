@@ -139,7 +139,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  position:relative;isolation:isolate;border-radius:2px;
  -webkit-tap-highlight-color:transparent;
 }
-.release-words .secret-char::before{content:"";position:absolute;inset:-7px -4px}
+.release-words .secret-char::before{content:"";position:absolute;inset:-11px -15px}
 .release-words.secret-active .secret-char{
  background:#171717;color:#fff;cursor:pointer;
  animation:secret-ink 600ms cubic-bezier(.16,1,.3,1) both;
@@ -246,18 +246,18 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  const host=document.querySelector(".release-words"),buttons=[...document.querySelectorAll(".secret-char")],toolbar=document.getElementById("secret-toolbar");
  if(!host||buttons.length!==8)return;
  let active=false,lastFocus=null,objectUrl=null,imageBlob=null;
- const setActive=(yes)=>{
+ const setActive=(yes,focusShare=false)=>{
   active=yes;
   if(yes){host.classList.remove("secret-active");void host.offsetWidth;}
   host.classList.toggle("secret-active",yes);
   toolbar.classList.toggle("visible",yes);
   buttons.forEach(b=>b.setAttribute("aria-pressed",String(yes)));
-  if(yes)document.getElementById("secret-open").focus();
+  if(yes&&focusShare)document.getElementById("secret-open").focus({preventScroll:true});
  };
  buttons.forEach((b,i)=>{
    b.style.setProperty("--reveal-order",String(i));
-   b.addEventListener("click",()=>setActive(true));
-   if(i===0){b.tabIndex=0;b.setAttribute("aria-label","8行の8文字目を縦に選択する");}
+   b.addEventListener("click",event=>setActive(true,event.detail===0));
+   if(i===0){b.tabIndex=0;b.setAttribute("aria-label","この文章の縦の8文字を選択する");}
  });
  document.getElementById("secret-clear").addEventListener("click",()=>{setActive(false);buttons[0].focus();});
  const modal=document.getElementById("release-share-modal"),status=document.getElementById("release-share-status");
