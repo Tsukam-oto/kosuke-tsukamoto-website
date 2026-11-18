@@ -1404,7 +1404,7 @@
  @keyframes first-single-backdrop{from{opacity:0}to{opacity:1}}
  @keyframes first-single-entrance{from{opacity:0;transform:translateY(14px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 }
-.release-announcement[hidden],.release-announcement-media img[hidden],.release-announcement-media div[hidden],.news-item[hidden]{display:none!important}
+.release-announcement[hidden],.release-announcement-media img[hidden],.release-announcement-media div[hidden],.release-announcement-actions [hidden],.news-item[hidden]{display:none!important}
 @media(max-width:700px){
  .release-announcement-panel{max-height:none}
  .release-announcement-media{min-height:150px;max-height:43dvh}
@@ -2201,7 +2201,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <div class="release-announcement-media"><img id="first-single-announcement-cover" src="/assets/releases/first-single-2026-cover.webp" alt="あなたと、これから、これからも ジャケット" hidden><div id="first-single-announcement-placeholder" role="img" aria-label="ジャケット画像は準備中です">JACKET ARTWORK<br>COMING SOON</div></div>
 <div class="release-announcement-content"><p class="release-announcement-kicker">KOSUKE TSUKAMOTO / 1ST SINGLE</p><h2 id="first-single-announcement-title">配信決定。</h2>
 <p class="release-announcement-title">あなたと、<br>これから、<br>これからも</p><p class="release-announcement-artist">束元康介</p>
-<div class="release-announcement-actions"><a href="/releases/2026-11-22/" class="primary">特設ページを見る</a><a href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る</a></div>
+<div class="release-announcement-actions"><a href="/releases/2026-11-22/" class="primary">特設ページを見る</a><a id="first-single-popup-teaser" hidden target="_blank" rel="noopener noreferrer">ティザーを聴く ↗</a><a href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a></div>
 </div></div></div>
 <script id="first-single-announcement-script">
 (()=>{"use strict";
@@ -2220,6 +2220,29 @@ document.addEventListener("DOMContentLoaded", () => {
  closeBtn.addEventListener("click",close);modal.querySelectorAll("a[href]").forEach(a=>a.addEventListener("click",close));modal.addEventListener("click",e=>{if(e.target===modal)close();});
  document.addEventListener("keydown",e=>{if(modal.hidden)return;if(e.key==="Escape"){close();return;}if(e.key==="Tab"){const controls=[...modal.querySelectorAll('button,a[href]')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  if(canShow)show();
+ fetch("/assets/releases/first-single-media.json",{cache:"no-store"})
+ .then(res=>res.ok?res.json():null)
+ .then(data=>{
+    if(!data||!Array.isArray(data.teasers))return;
+    const find=(entry)=>{
+      const raw=entry?.youtubeUrl||entry?.audioUrl;
+      if(typeof raw!=="string"||!raw.trim())return null;
+      try{
+        const url=new URL(raw,location.href);
+        if(url.protocol!=="https:")return null;
+        if(entry.youtubeUrl){
+          const host=url.hostname.toLowerCase();
+          if(!["youtube.com","www.youtube.com","m.youtube.com","youtu.be"].includes(host))return null;
+        }
+        return url.href;
+      }catch{return null;}
+    };
+    const teaser=data.teasers.map(find).find(Boolean);
+    if(teaser){
+      const link=document.getElementById("first-single-popup-teaser");
+      if(link){link.href=teaser;link.hidden=false;}
+    }
+ }).catch(()=>{});
 })();
 </script></body>
 </html>
