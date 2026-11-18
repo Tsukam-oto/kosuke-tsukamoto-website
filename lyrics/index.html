@@ -1676,5 +1676,8 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 });
 </script>
+<script id="lyric-open-deeplink">
+(()=>{function openFromHash(){const hash=decodeURIComponent(location.hash.slice(1));if(!hash)return;const node=document.getElementById(hash);if(node?.matches("details.lyrics-item"))node.open=true;}window.addEventListener("hashchange",openFromHash);openFromHash();})();
+</script>
 </body>
 </html>
