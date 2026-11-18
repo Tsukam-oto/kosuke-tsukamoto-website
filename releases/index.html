@@ -5,7 +5,7 @@
 <meta name="robots" content="index,follow"><link rel="canonical" href="https://kosuke-tsukamoto-website.pages.dev/releases/">
 <meta property="og:type" content="website"><meta property="og:title" content="配信作品｜束元康介">
 <meta property="og:description" content="配信作品『あなたと、これから、これからも』を紹介します。"><meta property="og:url" content="https://kosuke-tsukamoto-website.pages.dev/releases/">
-<meta property="og:image" content="https://kosuke-tsukamoto-website.pages.dev/assets/conducting-scene.webp">
+<meta property="og:image" content="https://kosuke-tsukamoto-website.pages.dev/assets/releases/first-single-2026-cover.webp">
 <link rel="stylesheet" href="/assets/site-navigation.css">
 <style>
 :root{--paper:#f6f6f4;--ink:#161616;--line:#d6d6d2;--mute:#686864}
@@ -37,5 +37,5 @@ footer{padding:32px clamp(20px,6vw,75px);border-top:1px solid var(--line);font-s
 </article>
 </main><footer>© 2026 Kosuke Tsukamoto</footer>
 <script>
-(()=>{const img=document.getElementById("releases-artwork");img.addEventListener("load",()=>{img.hidden=false;document.getElementById("releases-cover-pending").hidden=true});img.addEventListener("error",()=>{img.hidden=true})})();
+(()=>{const img=document.getElementById("releases-artwork");img.addEventListener("load",()=>{img.hidden=false;document.getElementById("releases-cover-pending").hidden=true});img.addEventListener("error",()=>{img.hidden=true});if(img.complete&&img.naturalWidth>0){img.hidden=false;document.getElementById("releases-cover-pending").hidden=true;}})();
 </script></body></html>
