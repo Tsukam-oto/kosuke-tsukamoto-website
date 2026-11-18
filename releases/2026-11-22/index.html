@@ -281,6 +281,8 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  document.getElementById("release-share-line").href="https://line.me/R/msg/text/?"+encodeURIComponent(secret+"\n"+page);
  document.getElementById("release-share-copy").addEventListener("click",async()=>{try{await navigator.clipboard.writeText(secret);status.textContent="コピーしました。";}catch{const ta=document.createElement("textarea");ta.value=secret;ta.style.position="fixed";ta.style.opacity="0";document.body.appendChild(ta);ta.select();const success=document.execCommand("copy");ta.remove();status.textContent=success?"コピーしました。":"コピーできませんでした。";}});
  const makeImage=(layout)=>{
+  document.getElementById("release-generated").hidden=true;
+  status.textContent="画像を作成しています。";
   const story=layout==="story",canvas=document.createElement("canvas");
   canvas.width=1080;canvas.height=story?1920:1350;
   const c=canvas.getContext("2d");if(!c){status.textContent="画像を作成できませんでした。";return;}
