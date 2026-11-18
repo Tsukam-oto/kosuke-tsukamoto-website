@@ -2199,11 +2199,12 @@ document.addEventListener("DOMContentLoaded", () => {
  const jst=nowParts.year+"-"+nowParts.month+"-"+nowParts.day;
  const topic=document.getElementById("first-single-topic");if(topic&&jst>="2026-11-22")topic.hidden=false;
  const key="first-single-2026-announcement-dismissed-v1";
- const canShow=jst>="2026-11-22"&&jst<="2026-11-29"&&!localStorage.getItem(key);
+ let dismissed=false;try{dismissed=localStorage.getItem(key)==="1";}catch(e){}
+ const canShow=jst>="2026-11-22"&&jst<="2026-11-29"&&!dismissed;
  let lastFocus=null;
  function close(){modal.hidden=true;document.body.style.overflow="";try{localStorage.setItem(key,"1")}catch(e){};lastFocus?.focus();}
  function show(){lastFocus=document.activeElement;modal.hidden=false;document.body.style.overflow="hidden";closeBtn.focus();}
- closeBtn.addEventListener("click",close);modal.addEventListener("click",e=>{if(e.target===modal)close();});
+ closeBtn.addEventListener("click",close);modal.querySelectorAll("a[href]").forEach(a=>a.addEventListener("click",close));modal.addEventListener("click",e=>{if(e.target===modal)close();});
  document.addEventListener("keydown",e=>{if(modal.hidden)return;if(e.key==="Escape"){close();return;}if(e.key==="Tab"){const controls=[...modal.querySelectorAll('button,a[href]')].filter(el=>el.getClientRects().length);const first=controls[0],last=controls[controls.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}}});
  if(canShow)show();
 })();
