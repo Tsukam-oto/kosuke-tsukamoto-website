@@ -1397,6 +1397,9 @@
 .release-announcement-note{font-size:12px;color:#666}
 @media(max-width:700px){.release-announcement{padding:10px;align-items:flex-start}.release-announcement-panel{grid-template-columns:1fr;max-width:500px;margin:auto}.release-announcement-media{aspect-ratio:1;max-height:46vh}.release-announcement-content{padding:24px 24px 30px;gap:12px}.release-announcement-content h2{font-size:32px}.release-announcement-title{font-size:21px}.release-announcement-close{top:8px;right:8px}}
 </style><style>
+.countdown-strip[data-state="announced"] .countdown-inner{flex-wrap:wrap;padding-top:11px;padding-bottom:11px}
+.countdown-released-links{display:flex;align-items:center;flex-wrap:wrap;gap:9px 22px}
+.countdown-released-links a{font-size:12px;text-underline-offset:4px}
 /* v2 announcement: emphasis on artwork, no celebratory effects. */
 @media(prefers-reduced-motion:no-preference){
  .release-announcement:not([hidden]){animation:first-single-backdrop 260ms ease-out both}
@@ -1463,7 +1466,7 @@
           section.dataset.state = "announced";
           section.setAttribute("aria-label", "1st Single 配信決定のお知らせ");
           section.querySelector(".countdown-inner").innerHTML =
-            '<span class="countdown-announced">1st Single　配信決定。</span><a class="countdown-announced-link" href="/releases/2026-11-22/">特設ページを見る →</a>';
+            '<span class="countdown-announced">1st Single　配信決定。</span><div class="countdown-released-links"><a class="countdown-announced-link" href="/releases/2026-11-22/">特設ページを見る →</a><a class="countdown-youtube-link" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネル ↗</a></div>';
         }
         return;
       }
