@@ -204,6 +204,34 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
   .editorial-note{padding-top:39px;padding-bottom:58px}
 }
 
+
+/* Teaser links are factual: only show an individual recording when its real URL exists. */
+.release-hero-actions{display:flex;flex-wrap:wrap;align-items:center;column-gap:22px;row-gap:13px;margin-top:30px}
+.release-hero-actions .main-action{margin-top:0}
+.release-youtube-channel,.release-hero-teaser-link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
+.release-hero-actions [hidden],.release-teaser-section[hidden]{display:none!important}
+.release-teaser-section{padding-top:clamp(60px,7vw,100px);padding-bottom:clamp(70px,8vw,110px);border-top:1px solid var(--line)}
+.release-teaser-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:32px}
+.release-teaser-heading h2{font-size:clamp(28px,4vw,44px)}
+.release-teaser-channel{font-size:13px;text-decoration:underline;text-underline-offset:4px;white-space:nowrap}
+.release-teaser-items{display:grid;gap:30px}
+.release-teaser-item{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(20px,4vw,50px);align-items:center;border-top:1px solid var(--line);padding-top:27px}
+.release-teaser-item h3{font-size:clamp(22px,2.8vw,32px);font-weight:600;line-height:1.5;margin:0 0 18px}
+.release-teaser-item .release-teaser-index{font-size:11px;color:var(--muted);letter-spacing:.12em;margin:0 0 10px}
+.release-teaser-item a{font-size:13px;text-decoration:underline;text-underline-offset:4px}
+.release-teaser-player{aspect-ratio:16/9;background:#181818;color:#fff;display:flex;justify-content:center;align-items:center;width:100%;overflow:hidden}
+.release-teaser-player.shorts{aspect-ratio:9/16;max-height:420px;width:auto;max-width:100%;margin:auto}
+.release-teaser-player button{display:flex;justify-content:center;align-items:center;gap:14px;background:none;color:#fff;border:1px solid #eee;padding:18px 22px;font-size:14px;cursor:pointer}
+.release-teaser-player button:hover,.release-teaser-player button:focus-visible{background:#383838}
+.release-teaser-player iframe{display:block;width:100%;height:100%;border:0}
+.release-teaser-player audio{width:min(100% - 36px,650px)}
+@media(max-width:800px){
+ .release-hero-actions{margin-top:24px;gap:17px}
+ .release-teaser-heading{align-items:flex-start;flex-direction:column;gap:12px}
+ .release-teaser-item{grid-template-columns:1fr;gap:15px}
+ .release-teaser-player.shorts{max-height:350px}
+}
+
 </style>
 </head>
 <body>
@@ -220,7 +248,11 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <h1><span>あなたと、</span><span>これから、</span><span>これからも</span></h1>
 <p class="artist">束元康介</p>
 <p class="summary">卒業生とともにつくった《あなたと》《これから》の新録と、新曲《これからも》。3曲を収録した初の配信作品です。</p>
-<a href="#for-this-release" class="main-action">この作品について <span aria-hidden="true">↓</span></a>
+<div class="release-hero-actions">
+<a href="#for-this-release" class="main-action">FOR THIS RELEASE <span aria-hidden="true">↓</span></a>
+<a id="hero-teaser-link" class="release-hero-teaser-link" href="#teaser" hidden>ティザーを聴く ↓</a>
+<a class="release-youtube-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a>
+</div>
 <p class="release-state">配信開始日は確定次第お知らせします。</p>
 </div>
 <div class="cover-wrap">
@@ -239,6 +271,10 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <p class="note-line"><span class="lead">今いる場所が少</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">し</button><span class="tail">ずつ変わっても、音楽を続けていきます。あなたには、</span></p>
 <p class="note-line"><span class="lead">どこにいても、</span><button type="button" class="secret-char" tabindex="-1" aria-label="縦の言葉を選択">た</button><span class="tail">だ元気でいてほしいと思います。</span></p></div>
 <div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の8文字を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
+</section>
+<section id="teaser" class="container release-teaser-section" aria-labelledby="teaser-title" hidden>
+<div class="release-teaser-heading"><div><p class="kicker">TEASER / 先行公開</p><h2 id="teaser-title">《これからも》</h2></div><a class="release-teaser-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a></div>
+<div id="release-teaser-items" class="release-teaser-items"></div>
 </section>
 <section id="tracks" class="container section" aria-labelledby="tracks-title">
 <div class="section-head"><div><p class="kicker">01 — 03 / TRACKS</p><h2 id="tracks-title">収録曲</h2></div></div>
@@ -341,6 +377,71 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  const hideArtwork=()=>{if(!artwork)return;artwork.hidden=true;document.getElementById("release-cover-pending").hidden=false;artwork.closest(".cover-holder")?.classList.remove("has-artwork");if(coverLabel)coverLabel.textContent="Artwork / 準備中";};
  artwork?.addEventListener("load",showArtwork);artwork?.addEventListener("error",hideArtwork);
  if(artwork?.complete)showArtwork();
+})();
+</script>
+<script id="first-single-teaser-loader">
+(()=>{
+ "use strict";
+ const channel="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA";
+ const section=document.getElementById("teaser"),items=document.getElementById("release-teaser-items");
+ const jump=document.getElementById("hero-teaser-link");
+ const channelLinks=[...document.querySelectorAll(".release-youtube-channel,.release-teaser-channel")];
+ if(!section||!items)return;
+ const youtube=(raw)=>{
+   try{
+     const u=new URL(raw);
+     if(u.protocol!=="https:")return null;
+     const host=u.hostname.toLowerCase();
+     let id=null,shorts=false;
+     if(host==="youtu.be"){id=u.pathname.split("/")[1];}
+     else if(["youtube.com","www.youtube.com","m.youtube.com"].includes(host)){
+       const parts=u.pathname.split("/").filter(Boolean);
+       id=u.pathname==="/watch"?u.searchParams.get("v"):["shorts","embed","live"].includes(parts[0])?parts[1]:null;
+       shorts=parts[0]==="shorts";
+     }
+     if(!id||!/^[-\w]{11}$/.test(id))return null;
+     return {id,shorts,url:u.href};
+   }catch{return null;}
+ };
+ const audio=(raw)=>{
+   try{const u=new URL(raw,location.href);return u.protocol==="https:"||u.origin===location.origin?u.href:null;}catch{return null;}
+ };
+ const addItem=(entry,index)=>{
+   const vid=youtube(entry.youtubeUrl),src=audio(entry.audioUrl);
+   if(!vid&&!src)return false;
+   const article=document.createElement("article");article.className="release-teaser-item";
+   const content=document.createElement("div");
+   const no=document.createElement("p");no.className="release-teaser-index";no.textContent="TEASER / "+String(index+1).padStart(2,"0");
+   const title=document.createElement("h3");title.textContent=entry.title||"《これからも》";
+   content.append(no,title);
+   const media=document.createElement("div");media.className="release-teaser-player";
+   if(vid){
+      if(vid.shorts)media.classList.add("shorts");
+      const link=document.createElement("a");link.href=vid.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="YouTubeで見る ↗";content.append(link);
+      const play=document.createElement("button");play.type="button";play.textContent="▶ ティザーを再生";
+      play.setAttribute("aria-label",title.textContent+"のティザーを再生");
+      play.addEventListener("click",()=>{
+        const frame=document.createElement("iframe");
+        frame.src="https://www.youtube-nocookie.com/embed/"+vid.id+"?autoplay=1&rel=0";
+        frame.title=title.textContent+" / YouTube";frame.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share";frame.allowFullscreen=true;
+        media.replaceChildren(frame);
+      });
+      media.append(play);
+   }else{
+      const player=document.createElement("audio");player.controls=true;player.preload="none";player.src=src;
+      media.append(player);
+      const open=document.createElement("a");open.href=src;open.textContent="音源を開く ↗";open.target="_blank";open.rel="noopener noreferrer";content.append(open);
+   }
+   article.append(content,media);items.append(article);return true;
+ };
+ fetch("/assets/releases/first-single-media.json",{cache:"no-store"})
+  .then(res=>{if(!res.ok)throw Error("No media config");return res.json();})
+  .then(config=>{
+   try{if(new URL(config.youtubeChannelUrl).href===channel)channelLinks.forEach(link=>{link.href=channel;});}catch{}
+   const list=Array.isArray(config.teasers)?config.teasers:[];
+   const visible=list.map(addItem).some(Boolean);
+   if(visible){section.hidden=false;if(jump)jump.hidden=false;}
+  }).catch(()=>{ /* No teaser is advertised until a confirmed URL is configured. */ });
 })();
 </script>
 </body>
