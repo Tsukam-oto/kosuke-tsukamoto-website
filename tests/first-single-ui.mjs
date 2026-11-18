@@ -24,6 +24,8 @@ async function checkColumn(page, engine, width) {
 async function exerciseShare(page,engine) {
   await page.locator(".secret-char").nth(2).click();
   assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),true);
+  await page.waitForTimeout(1300);
+  await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-revealed-words.png",animations:"disabled"});
   await page.locator("#secret-open").waitFor({state:"visible"});
   await page.locator("#secret-open").click();
   assert.equal(await page.locator("#release-share-modal").isVisible(),true);
@@ -37,7 +39,12 @@ async function exerciseShare(page,engine) {
     assert.deepEqual(actual,dimensions,engine+" "+layout+" image size");
     const href = await page.locator("#release-download").getAttribute("href");
     assert.ok(href.startsWith("blob:"),"download should contain PNG");
-    log(engine+" "+layout+" PNG",actual.join("×"));
+    const [download]=await Promise.all([
+      page.waitForEvent("download"),
+      page.locator("#release-download").click()
+    ]);
+    await download.saveAs(output+"/"+engine+"-"+layout+"-export.png");
+    log(engine+" "+layout+" PNG",actual.join("×")+"; download verified");
   };
   await assertImage("feed",[1080,1350]);
   await assertImage("story",[1080,1920]);
