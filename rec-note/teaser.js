@@ -283,10 +283,18 @@
     session.audio.pause();
     session.video?.pause();
     cancelAnimationFrame(session.raf);
-    if(session.recorder&&session.recorder.state!=='inactive')session.recorder.stop();
     if(abort)session.cancelled=true;
-    if(session.context)session.context.close().catch(()=>{});
-    if(session.stream)session.stream.getTracks().forEach(t=>t.stop());
+    const cleanup=()=>{
+      if(session.context)session.context.close().catch(()=>{});
+      if(session.stream)session.stream.getTracks().forEach(t=>t.stop());
+    };
+    if(session.recorder&&session.recorder.state!=='inactive'){
+      const oldStop=session.recorder.onstop;
+      session.recorder.onstop=(e)=>{
+        try{if(typeof oldStop==='function')oldStop(e);}finally{cleanup();}
+      };
+      session.recorder.stop();
+    }else cleanup();
     $t('teaserPreview').disabled=false;$t('teaserExport').disabled=false;
     activeExport=false;
   }
