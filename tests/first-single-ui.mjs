@@ -125,6 +125,50 @@ async function checkTeaser(browser,engine){
  }
 }
 
+async function checkArtworkContest(browser,engine){
+ const widths=[240,320,375,768,1440];
+ for(const width of widths){
+   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+   await page.goto(BASE+"/releases/artwork-project/",{waitUntil:"domcontentloaded"});
+   assert.equal(await page.locator("h1").innerText(),"ジャケットを\n募集します。");
+   assert.equal(await page.locator(".track-card").count(),2);
+   assert.equal(await page.locator(".track-card .track-links a").count(),4);
+   assert.equal(await page.locator("form#artwork-entry-form").getAttribute("method"),"POST");
+   assert.equal(await page.locator("form#artwork-entry-form").getAttribute("action"),"https://formspree.io/f/xbgjraga");
+   const x=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+   assert.ok(x[0]<=x[1]+1.5,engine+" contest horizontal overflow "+width+"px");
+   assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"empty entry must fail");
+   if(width===375)await page.screenshot({path:output+"/"+engine+"-artwork-contest-375.png",fullPage:true,animations:"disabled"});
+   await page.close();
+ }
+ const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
+ await page.goto(BASE+"/releases/artwork-project/",{waitUntil:"domcontentloaded"});
+ await page.locator("#artist-name").fill("Test Artist");
+ await page.locator("#artist-email").fill("sample@example.com");
+ await page.locator("#artwork-song").selectOption("あなたと");
+ await page.locator("#artwork-url").fill("https://example.org/artwork-preview");
+ await page.locator("#artwork-original").check();
+ await page.locator("#artwork-consent").check();
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid contest entry");
+ let post=null;
+ await page.route("https://formspree.io/f/xbgjraga",async route=>{
+   post={method:route.request().method(),body:route.request().postData()};
+   await route.fulfill({status:200,contentType:"text/html",body:"<p>Test success</p>"});
+ });
+ await page.locator("#artwork-entry-form button[type=submit]").click();
+ await page.waitForURL("https://formspree.io/f/xbgjraga");
+ assert.equal(post?.method,"POST");
+ assert.ok(post?.body?.includes("artwork_url"));
+ assert.ok(post?.body?.includes("first-single-solo-jacket-call-2026"));
+ assert.ok(post?.body?.includes("Test Artist"));
+ await page.close();
+ const listing=await browser.newPage({viewport:{width:390,height:844}});
+ await listing.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
+ assert.equal(await listing.locator('a[href="/releases/artwork-project/"]').count(),1,"catalog contest link");
+ await listing.close();
+ log(engine+" artwork contest","5 screen widths; 2 song demos; form validation; intercepted POST; catalog link");
+}
+
 async function checkLyrics(page,engine){
   await page.goto(BASE+"/lyrics/#korekaramo",{waitUntil:"domcontentloaded"});
   await page.locator("#korekaramo").waitFor();
@@ -155,6 +199,7 @@ async function checkHomepage(browser,engine){
   {
     const {context,page}=await freshWithDate("2026-11-21T12:00:00+09:00");
     assert.equal(await page.locator("#first-single-announcement").isVisible(),false);
+    assert.equal(await page.locator("#artwork-contest-topic").isVisible(),false,"no public contest announcement before November 22");
     await context.close();
     log(engine+" homepage pre-release", "no spoiler popup");
   }
@@ -163,6 +208,7 @@ async function checkHomepage(browser,engine){
     const modal=page.locator("#first-single-announcement");
     await modal.waitFor({state:"visible"});
     assert.equal(await page.locator("#first-single-topic").isVisible(),true);
+    assert.equal(await page.locator("#artwork-contest-topic").isVisible(),true,"artwork contest public on November 22");
     await page.locator("#first-single-announcement-close").click();
     assert.equal(await modal.isVisible(),false);
     assert.equal(await page.locator(".countdown-announced-link").isVisible(),true);
@@ -206,6 +252,7 @@ async function testEngine(engineType,engine){
   await page.close();
   await checkHomepage(browser,engine);
   await checkTeaser(browser,engine);
+  await checkArtworkContest(browser,engine);
  }finally{await browser.close();}
 }
 await testEngine(chromium,"chromium");
