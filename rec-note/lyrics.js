@@ -15,6 +15,7 @@
   let selectedLine = -1;
   let requestSeq = 0;
   let activePlaybackLine = -1;
+  let tapMode = false;
   const DRAFT_KEY='rec_note_lyric_time_drafts_v6';
   let timeDrafts={};
   try{const old=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');if(old&&typeof old==='object'&&!Array.isArray(old))timeDrafts=old;}catch(e){}
@@ -35,6 +36,7 @@
     '  <span class="lyricsProgress" id="lyricsProgress"></span>',
     '</div>',
     '<p class="lyricsCaution" id="lyricsCaution" hidden></p>',
+    '<div class="lyricsTapRow"><button id="lyricsTapMode" type="button" class="small">歌詞をタップして時間を合わせる</button><span id="lyricsTapInfo">再生中、歌詞の行を押すと位置を選べます。</span></div>',
     '<div class="lyricsScroll" id="lyricsScroll" role="list" aria-label="歌詞の行一覧"></div>',
     '<div class="lyricsEditor" id="lyricsEditor" hidden>',
     '  <div class="lyricsSelected" id="lyricsSelected"></div>',
@@ -53,7 +55,7 @@
     '  </div>',
     '  <p class="lyricsHint" id="lyricsHint"></p>',
     '</div>',
-    '<div class="lyricsExport"><button type="button" id="lyricsSrt" class="small" disabled>時間登録済みの歌詞をSRT出力</button>',
+    '<div class="lyricsExport"><button type="button" id="lyricsLrc" class="small" disabled>歌詞タイミングをLRC出力</button><button type="button" id="lyricsSrt" class="small" disabled>時間登録済みの歌詞をSRT出力</button>',
     '<span class="lyricsHint">未登録の行は出力しません。歌詞の原文には書き込みません。</span></div>'
   ].join('');
   const anchor = document.querySelector('.layout > .panel .panelBody .waveHelp');
@@ -108,11 +110,12 @@
         time.textContent += ' / 同時編集の競合あり';
       }
       item.append(title,time);
-      item.addEventListener('click', () => selectLine(i));
+      item.addEventListener('click', () => tapMode ? captureByTap(i) : selectLine(i));
       container.append(item);
     }
     container.scrollTop = oldScroll;
     $l('lyricsProgress').textContent = '開始時刻 ' + registered + ' / ' + count + '行';
+    $l('lyricsLrc').disabled = registered===0;
     $l('lyricsSrt').disabled = !rawLines.some((l,i)=>{
       const t=primaryTiming(i);
       return l.trim() && Number.isFinite(t?.start) && Number.isFinite(t?.end) && t.end>t.start;
@@ -146,6 +149,32 @@
     renderLines();
   }
 
+
+  function captureByTap(index) {
+    if(!version || !rawLines[index]?.trim())return;
+    selectedLine=index;
+    const existing=primaryTiming(index);
+    const start=timestamp();
+    const end=Number.isFinite(existing?.end)&&existing.end>start?existing.end:null;
+    if(!setTiming(start,end))return;
+    const next=rawLines.findIndex((line,i)=>i>index&&line.trim());
+    if(next>=0){
+      selectedLine=next;
+      showEditor();
+      renderLines();
+      const node=$l('lyricsScroll').querySelector('[data-line-index="'+next+'"]');
+      node?.scrollIntoView({block:'nearest',behavior:'auto'});
+    }
+  }
+  function toggleTapMode(){
+    tapMode=!tapMode;
+    $l('lyricsTapMode').classList.toggle('active',tapMode);
+    $l('lyricsTapMode').setAttribute('aria-pressed',String(tapMode));
+    $l('lyricsTapMode').textContent=tapMode?'時間合わせを終了':'歌詞をタップして時間を合わせる';
+    $l('lyricsTapInfo').textContent=tapMode?
+      '音源を流しながら、歌われ始めた行を押すと開始時刻を記録し、次の行へ進みます。':
+      '行を選ぶと、その時間へ移動して修正指示を作れます。';
+  }
   function setTiming(start,end) {
     if(selectedLine<0 || !version || !work) return false;
     if(start!==null && (!Number.isFinite(start)||start<0)) {
@@ -232,6 +261,7 @@
     $l('lyricsScroll').replaceChildren();
     $l('lyricsProgress').textContent='';
     $l('lyricsSrt').disabled=true;
+    $l('lyricsLrc').disabled=true;
     if(!bridge.isSignedIn()) {
       status('歌詞を表示するには上のクラウドにログインしてください。');
       return;
@@ -302,6 +332,24 @@
     downloadText('REC_NOTE_'+song.replace(/[\/:*?"<>|]/g,'_')+'_歌詞タイミング.srt',txt,'text/plain;charset=utf-8');
     notify(rows.length+'行の字幕SRTを保存しました。未設定の行は含みません。');
   }
+
+  function exportLrc(){
+    if(!version)return;
+    const rows=[];
+    rawLines.forEach((line,i)=>{
+      const t=primaryTiming(i);
+      if(line.trim() && Number.isFinite(t?.start))rows.push({start:t.start,line,i});
+    });
+    rows.sort((a,b)=>a.start-b.start||a.i-b.i);
+    if(!rows.length){notify('開始時間が登録されていません。');return;}
+    const fmtLrc=t=>{
+      const ticks=Math.round(Math.max(0,t)*100);
+      return '['+String(Math.floor(ticks/6000)).padStart(2,'0')+':'+String(Math.floor(ticks%6000/100)).padStart(2,'0')+'.'+String(ticks%100).padStart(2,'0')+']';
+    };
+    downloadText('REC_NOTE_'+song.replace(/[\\/:*?"<>|]/g,'_')+'_歌詞同期.lrc',
+      rows.map(r=>fmtLrc(r.start)+r.line).join('\n')+'\n','text/plain;charset=utf-8');
+    notify(rows.length+'行の歌詞タイミングをLRCで保存しました。');
+  }
   function renderPlaybackLine(){
     if(!version)return;
     const t=Number(current)||0;
@@ -325,6 +373,7 @@
     saveDrafts();
   });
   $l('lyricsReload').addEventListener('click',loadLyrics);
+  $l('lyricsTapMode').addEventListener('click',toggleTapMode);
   $l('lyricsVersion').addEventListener('change',e=>showVersion(e.target.value));
   $l('lyricsCaptureStart').addEventListener('click',()=>capture('start'));
   $l('lyricsCaptureEnd').addEventListener('click',()=>capture('end'));
@@ -332,6 +381,7 @@
   $l('lyricsUse').addEventListener('click',useLyricForInstruction);
   $l('lyricsPlay').addEventListener('click',playSelected);
   $l('lyricsSrt').addEventListener('click',exportSrt);
+  $l('lyricsLrc').addEventListener('click',exportLrc);
   audio.addEventListener('timeupdate',renderPlaybackLine);
 
   window.addEventListener('recnote:cloud-auth-change',()=>loadLyrics());
