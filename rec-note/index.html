@@ -83,7 +83,7 @@
 <div class="field span2"><label class="label" for="assetInput">素材・参考リンク（任意）</label><input id="assetInput" type="url" placeholder="https://drive.google.com/..." /></div>
 <div class="field span2"><label class="label" for="sceneInput">映像・構成メモ（任意）</label><textarea id="sceneInput" placeholder="例：風景カットへ切替／歌詞を中央に表示" rows="2"></textarea></div>
 </div></div>
-<div class="formFoot"><button class="primary" id="saveBtn">＋ この時間に修正箇所を登録</button><button id="resetBtn">入力をクリア</button><span class="backup" id="saveState"><span class="statusDot"></span>入力内容はこのブラウザに保存</span></div></div></section><aside class="panel"><div class="panelHead"><div><h2 id="listTitle">修正箇所一覧 <span class="count" id="listCount">0</span></h2><div class="sub">項目を選ぶとその位置へ移動します</div></div><select id="filter" aria-label="ステータスで絞り込み" style="padding:7px;border:1px solid #d9e0e8;border-radius:8px;background:white;font-size:12px"><option value="all">すべて表示</option><option value="下書き">下書き</option><option value="送信済み">送信済み</option><option value="修正音源受領">修正音源受領</option><option value="再修正">再修正</option><option value="確認済み">確認済み</option></select></div><div class="items" id="itemList"></div></aside></div><p class="footnote"><strong>データの保存について</strong>：サイトのページ自体は公開ですが、制作記録と歌詞原文はログインした本人だけが参照できます。記録はこのブラウザに保存され、クラウドにログインすると修正記録・歌詞の時間情報を本人専用の非公開領域に同期します。「余白」の歌詞原文は読み取りのみで変更しません。音源・動画は選択した場合だけ非公開ストレージへアップロードします。通信切断時も端末側に記録しますが、データ消失に備えて「JSON保存」でバックアップしてください。メールは自動送信しません。REC・MV・SHORTは同じ曲に紐づきますが、指示はモードごとに分離されます。</p></main>
+<div class="formFoot"><button class="primary" id="saveBtn">＋ この時間に修正箇所を登録</button><button id="resetBtn">入力をクリア</button><span class="backup" id="saveState"><span class="statusDot"></span>入力内容はこのブラウザに保存</span></div></div></section><aside class="panel"><div class="panelHead"><div><h2 id="listTitle">修正箇所一覧 <span class="count" id="listCount">0</span></h2><div class="sub">項目を選ぶとその位置へ移動します</div></div><select id="filter" aria-label="ステータスで絞り込み" style="padding:7px;border:1px solid #d9e0e8;border-radius:8px;background:white;font-size:12px"><option value="all">すべて表示</option><option value="下書き">下書き</option><option value="送信済み">送信済み</option><option value="修正音源受領">修正音源受領</option><option value="再修正">再修正</option><option value="確認済み">確認済み</option></select></div><div class="items" id="itemList"></div></aside></div><p class="footnote"><strong>データの保存について</strong>：サイトのページ自体は公開ですが、制作記録と歌詞原文はログインした本人だけが参照できます。記録はこのブラウザに保存され、クラウドにログインすると修正記録・歌詞の時間情報を本人専用の非公開領域に同期します。「余白」の歌詞原文は読み取りのみで変更しません。音源はログイン中に選ぶと、画面のチェックが有効な場合のみ非公開ストレージに保存します。端末内にすでにある音源は「端末の音源をクラウドにも保存」から再選択せずに登録できます。動画は手動アップロードです。通信切断時も端末側に記録しますが、データ消失に備えて「JSON保存」でバックアップしてください。メールは自動送信しません。REC・MV・SHORTは同じ曲に紐づきますが、指示はモードごとに分離されます。</p></main>
 <audio id="audio" preload="metadata"></audio><div id="toast" class="toast" role="status"></div>
 <script>
 'use strict';
@@ -205,8 +205,9 @@ applyMode();restoreDraft();
 restoreSongAudio(song);if(!saved)$('saveState').textContent='ブラウザ保存が利用できません。バックアップ保存をお使いください';
 updateAll();
 </script>
-<script src="./v4.js?v=4.1"></script>
+<script src="./v4.js?v=6.3"></script>
 <script src="./operations.js?v=4.1"></script>
 <script src="./cloud.js?v=6.3"></script>
 <script src="./lyrics.js?v=6.2"></script>
+<script src="./media-persistence.js?v=6.3"></script>
 </body></html>
