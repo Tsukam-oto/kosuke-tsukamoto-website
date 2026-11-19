@@ -177,7 +177,7 @@
   }
   function setTiming(start,end) {
     if(selectedLine<0 || !version || !work) return false;
-    if(start!==null && (!Number.isFinite(start)||start<0)) {
+    if(!Number.isFinite(start)||start<0) {
       notify('開始時間は 1:19.0 の形式で入力してください。');
       return false;
     }
@@ -226,7 +226,9 @@
   function saveTimes(){
     const a=$l('lyricsStart').value.trim(), b=$l('lyricsEnd').value.trim();
     if(!a){notify('開始時間を指定してください。');return;}
-    setTiming(parseTime(a), b?parseTime(b):null);
+    const start=parseTime(a),end=b?parseTime(b):null;
+    if(start===null || (b && end===null)){notify('時間は 1:19.0 の形式で入力してください。');return;}
+    setTiming(start,end);
   }
   function useLyricForInstruction() {
     if(selectedLine<0 || !version || !work)return;
