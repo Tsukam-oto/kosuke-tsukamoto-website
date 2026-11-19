@@ -269,6 +269,34 @@ async function checkHomepage(browser,engine){
   }
 }
 
+async function checkReleaseInternalLinks(browser,engine){
+ const page=await browser.newPage({viewport:{width:390,height:844}});
+ const origin=new URL(BASE).origin;
+ const sources=["/releases/artwork-project/","/releases/2026-11-22/","/releases/","/special-thanks/ucnuc/"];
+ const checked=new Set();
+ try{
+  for(const source of sources){
+   await page.goto(BASE+source,{waitUntil:"domcontentloaded"});
+   const hrefs=await page.locator("a[href]").evaluateAll(els=>els.map(el=>el.getAttribute("href")).filter(Boolean));
+   for(const href of hrefs){
+    const target=new URL(href,BASE+source);
+    if(target.origin!==origin)continue;
+    const path=target.pathname+target.search;
+    if(!checked.has(path)){
+     const response=await page.request.get(origin+path);
+     assert.ok(response.ok(),engine+" broken local link from "+source+" -> "+href+" (HTTP "+response.status()+")");
+     checked.add(path);
+    }
+    if(target.pathname===new URL(source,origin).pathname&&target.hash&&target.hash!=="#"){
+     const id=decodeURIComponent(target.hash.slice(1));
+     assert.equal(await page.evaluate(id=>!!document.getElementById(id),id),true,engine+" missing on-page anchor "+source+" -> "+href);
+    }
+   }
+  }
+  log(engine+" internal release links",checked.size+" unique local routes returned HTTP 200; on-page anchors verified");
+ }finally{await page.close();}
+}
+
 async function testEngine(engineType,engine){
  const browser=await engineType.launch({headless:true});
  try{
@@ -301,6 +329,7 @@ async function testEngine(engineType,engine){
   await checkTeaser(browser,engine);
   await checkArtworkContest(browser,engine);
   await checkUcnucThanks(browser,engine);
+  await checkReleaseInternalLinks(browser,engine);
  }finally{await browser.close();}
 }
 await testEngine(chromium,"chromium");
