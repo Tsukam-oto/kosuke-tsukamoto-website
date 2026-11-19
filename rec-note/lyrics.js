@@ -152,6 +152,7 @@
 
   function captureByTap(index) {
     if(!version || !rawLines[index]?.trim())return;
+    if(!audio.currentSrc || audio.readyState<1){notify('先に音源を読み込み、再生位置を確認してください。');return;}
     selectedLine=index;
     const existing=primaryTiming(index);
     const start=timestamp();
@@ -167,6 +168,7 @@
     }
   }
   function toggleTapMode(){
+    if(!tapMode && (!audio.currentSrc || audio.readyState<1)){notify('先に音源を読み込んでください。');return;}
     tapMode=!tapMode;
     $l('lyricsTapMode').classList.toggle('active',tapMode);
     $l('lyricsTapMode').setAttribute('aria-pressed',String(tapMode));
