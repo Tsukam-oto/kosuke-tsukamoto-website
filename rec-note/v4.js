@@ -76,7 +76,11 @@
   byId('versionB').addEventListener('click',()=>{stopShort();switchVersion('B')});
   byId('compareFile').addEventListener('change',async e=>{
     const file=e.target.files?.[0];if(!file)return;
-    await loadCompare(file,song,true);e.target.value='';
+    const targetSong=song;
+    const saved=loadCompare(file,targetSong,true);
+    window.dispatchEvent(new CustomEvent('recnote:media-user-selected',{detail:{kind:'B',song:targetSong,file}}));
+    if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
+    await saved;e.target.value='';
   });
   async function loadCompare(file,targetSong,save=true){
     if(compareFiles[targetSong]?.url)URL.revokeObjectURL(compareFiles[targetSong].url);
@@ -308,6 +312,7 @@
   // Used exclusively to load user-selected files retrieved from private cloud storage.
   window.RECNOTE_MEDIA=Object.freeze({
     loadCompare:(targetSong,file)=>loadCompare(file,targetSong,true),
+    hasCompare:(targetSong)=>Boolean(compareFiles[targetSong]?.url),
     loadVideo:(file,key)=>loadVideo(file,key)
   });
 })();
