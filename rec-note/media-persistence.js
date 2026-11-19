@@ -91,7 +91,7 @@
     if(n!==uiVersion || targetSong!==song)return;
     const exists=Boolean(cached?.file || files[targetSong]?.url);
     const cloudCopy=cloud.isSignedIn()?currentCloud(targetSong,'A'):null;
-    const stored=exists?'端末に保存済み':'端末には未保存';
+    const stored=cached?.file?'端末に保存済み':exists?'読み込み済み（端末保存未確認）':'端末には未保存';
     const online=cloud.isSignedIn()?(cloudCopy?'クラウドにも保存済み':'クラウド未登録'):'クラウド未接続';
     $('recMediaStatusText').textContent=stored+' / '+online;
     $('recMediaSaveCached').disabled=working.size>0 || !cloud.isSignedIn();
@@ -167,7 +167,7 @@
         for(const kind of ['A','B']){
           if(!cloud.isSignedIn())break;
           const remote=currentCloud(targetSong,kind);
-          if(!remote)continue;
+          if(!remote || working.has(targetSong+'\u001f'+kind))continue;
           if(kind==='A' && !files[targetSong]?.url)await restoreSongAudio(targetSong);
           const local=await fromCache(targetSong,kind);
           const memory=kind==='A'?Boolean(files[targetSong]?.url):Boolean(window.RECNOTE_MEDIA?.hasCompare?.(targetSong));
