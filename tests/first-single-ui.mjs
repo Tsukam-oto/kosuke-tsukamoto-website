@@ -128,52 +128,55 @@ async function checkTeaser(browser,engine){
 async function checkArtworkContest(browser,engine){
  const widths=[240,320,375,768,1440];
  for(const width of widths){
-   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
-   await page.goto(BASE+"/releases/artwork-project/",{waitUntil:"domcontentloaded"});
-   assert.equal(await page.locator("h1").innerText(),"ジャケットを\n募集します。");
-   assert.equal(await page.locator(".track-card").count(),2);
-   assert.equal(await page.locator(".track-card .track-links a").count(),4);
-   assert.equal(await page.locator("form#artwork-entry-form").getAttribute("method"),"POST");
-   assert.equal(await page.locator("form#artwork-entry-form").getAttribute("action"),"https://formspree.io/f/xbgjraga");
-   const x=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
-   assert.ok(x[0]<=x[1]+1.5,engine+" contest horizontal overflow "+width+"px");
-   assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"empty entry must fail");
-   assert.equal(await page.locator("#data-consent").count(),1,"data-handling disclosure must have separate consent");
-   assert.equal(await page.locator("#data-policy").isVisible(),true);
-   assert.ok((await page.locator("#data-policy").innerText()).includes("Formspree"),"third-party handler must be disclosed");
-   assert.ok((await page.locator("#data-policy").innerText()).includes("削除"),"deletion process must be disclosed");
-   if(width===375)await page.screenshot({path:output+"/"+engine+"-artwork-contest-375.png",fullPage:true,animations:"disabled"});
-   await page.close();
+  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+  await page.goto(BASE+"/releases/artwork-project/",{waitUntil:"domcontentloaded"});
+  assert.equal(await page.locator("h1").innerText(),"ジャケットを\n募集します。");
+  assert.equal(await page.locator(".track-card").count(),2);
+  assert.equal(await page.locator(".track-card .track-links a").count(),4);
+  assert.equal(await page.locator("form#artwork-entry-form").getAttribute("method"),"POST");
+  assert.equal(await page.locator("form#artwork-entry-form").getAttribute("action"),"https://formspree.io/f/xbgjraga");
+  assert.equal(await page.locator('input[name="artwork_url"]').count(),0,"no image URL request at initial contact");
+  assert.equal(await page.locator('input[type="file"]').count(),0,"no artwork file request");
+  assert.equal(await page.locator("#graduation-consent").count(),1);
+  assert.ok((await page.locator("main").innerText()).includes("中学校を卒業された方"));
+  const bounds=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+  assert.ok(bounds[0]<=bounds[1]+1.5,engine+" contest horizontal overflow "+width);
+  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"empty message must fail");
+  assert.equal(await page.locator("#data-consent").count(),1,"data-handling disclosure must be accepted");
+  assert.ok((await page.locator("#data-policy").innerText()).includes("Formspree"));
+  assert.ok((await page.locator("#data-policy").innerText()).includes("削除"));
+  if(width===375)await page.screenshot({path:output+"/"+engine+"-artwork-contest-375.png",fullPage:true,animations:"disabled"});
+  await page.close();
  }
  const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
  await page.goto(BASE+"/releases/artwork-project/",{waitUntil:"domcontentloaded"});
  await page.locator("#artist-name").fill("Test Artist");
  await page.locator("#artist-email").fill("sample@example.com");
- await page.locator("#artwork-song").selectOption("あなたと");
- await page.locator("#artwork-url").fill("https://example.org/artwork-preview");
- await page.locator("#artwork-original").check();
- await page.locator("#artwork-consent").check();
- assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"privacy consent should be required");
+ await page.locator("#artwork-song").selectOption("両方");
+ await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
+ await page.locator("#graduation-consent").check();
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"privacy consent required");
  await page.locator("#data-consent").check();
- assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid contest entry");
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid interest message");
  let post=null;
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
-   post={method:route.request().method(),body:route.request().postData()};
-   await route.fulfill({status:200,contentType:"text/html",body:"<p>Test success</p>"});
+  post={method:route.request().method(),body:route.request().postData()};
+  await route.fulfill({status:200,contentType:"text/html",body:"<p>Test success</p>"});
  });
  await page.locator("#artwork-entry-form button[type=submit]").click();
  await page.waitForURL("https://formspree.io/f/xbgjraga");
- assert.equal(await page.locator("#artwork-form-status").count(),0,"intercepted submit navigates to server response");
  assert.equal(post?.method,"POST");
- assert.ok(post?.body?.includes("artwork_url"));
- assert.ok(post?.body?.includes("first-single-solo-jacket-call-2026"));
+ assert.ok(post?.body?.includes("first-single-artwork-interest-2026"));
+ assert.ok(post?.body?.includes("junior_high_graduated"));
  assert.ok(post?.body?.includes("Test Artist"));
+ assert.ok(post?.body?.includes("message"));
+ assert.ok(!post?.body?.includes("artwork_url"),"no artwork link is collected");
  await page.close();
  const listing=await browser.newPage({viewport:{width:390,height:844}});
  await listing.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
- assert.equal(await listing.locator('a[href="/releases/artwork-project/"]').count(),1,"catalog contest link");
+ assert.equal(await listing.locator('a[href="/releases/artwork-project/"]').count(),1,"catalog interest link");
  await listing.close();
- log(engine+" artwork contest","5 screen widths; 2 song demos; form validation; intercepted POST; catalog link");
+ log(engine+" artwork interests","5 widths; graduate-only interest message; intercepted POST; catalog link");
 }
 
 async function checkUcnucThanks(browser,engine){
