@@ -45,3 +45,9 @@
  .lyricsActions button{min-height:43px}
 }
 @media(max-width:375px){.lyricsLine{display:block}.lyricsTime{display:block;max-width:100%;text-align:left;margin-top:3px}}
+
+.lyricsTapRow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:0 17px 11px;font-size:11px;color:#86837d}
+.lyricsTapRow button{border-radius:5px;background:#f5f4f0}
+.lyricsTapRow button.active{background:#2a2a27;color:#fff;border-color:#2a2a27}
+.lyricsTapRow span{line-height:1.5}
+@media(max-width:700px){.lyricsTapRow{padding:0 12px 10px}.lyricsTapRow button{min-height:40px;flex:1 1 auto}.lyricsExport{gap:6px}}
