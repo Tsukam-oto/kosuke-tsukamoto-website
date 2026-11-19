@@ -35,6 +35,7 @@
     sourceMessages: clone(state.sourceMessages || {}),
     songs: clone(SONGS),
     drafts: clone(state.drafts || {}),
+    teaserPresets: clone(state.teaserPresets || {}),
     lyricTimings: clone(Array.isArray(state.lyricTimings) ? state.lyricTimings : []),
     cloudMedia: clone(state.cloudMedia || [])
   });
@@ -44,6 +45,7 @@
     sourceMessages: d?.sourceMessages && typeof d.sourceMessages==='object' ? d.sourceMessages : {},
     songs: Array.isArray(d?.songs) ? d.songs.filter(x=>typeof x==='string' && x.trim()) : [],
     drafts: d?.drafts && typeof d.drafts==='object' ? d.drafts : {},
+    teaserPresets: d?.teaserPresets && typeof d.teaserPresets==='object' && !Array.isArray(d.teaserPresets) ? d.teaserPresets : {},
     lyricTimings: Array.isArray(d?.lyricTimings) ? d.lyricTimings.filter(x=>x && typeof x.id==='string' && typeof x.workId==='string' && typeof x.textVersionId==='string' && Number.isInteger(x.lineIndex)) : [],
     cloudMedia: Array.isArray(d?.cloudMedia) ? d.cloudMedia.filter(x=>x && typeof x.id==='string' && typeof x.path==='string') : []
   });
@@ -90,13 +92,14 @@
     const m=mergeItems(b.records,l.records,r.records,{copyConflicts:true});
     const msgs=mergeObject(b.sourceMessages,l.sourceMessages,r.sourceMessages);
     const drafts=mergeObject(b.drafts,l.drafts,r.drafts);
+    const teasers=mergeObject(b.teaserPresets,l.teaserPresets,r.teaserPresets);
     const media=mergeItems(b.cloudMedia,l.cloudMedia,r.cloudMedia,{copyConflicts:true});
     const timings=mergeItems(b.lyricTimings,l.lyricTimings,r.lyricTimings,{copyConflicts:true});
     return {
       doc:{version:5,records:m.output,sourceMessages:msgs.out,drafts:drafts.out,
-        cloudMedia:media.output,lyricTimings:timings.output,
+        cloudMedia:media.output,lyricTimings:timings.output,teaserPresets:teasers.out,
         songs:[...new Set([...b.songs,...l.songs,...r.songs,...m.output.map(x=>x.song)])]},
-      conflicts:[...m.conflicts,...msgs.conflicts,...drafts.conflicts,...media.conflicts,...timings.conflicts]
+      conflicts:[...m.conflicts,...msgs.conflicts,...drafts.conflicts,...media.conflicts,...timings.conflicts,...teasers.conflicts]
     };
   }
 
@@ -180,7 +183,7 @@
     const x=normalized(doc);suppress=true;
     const oldMode=activeMode,oldSong=song;
     state.records=clone(x.records); state.sourceMessages=clone(x.sourceMessages);
-    state.drafts=clone(x.drafts);state.cloudMedia=clone(x.cloudMedia);
+    state.drafts=clone(x.drafts);state.cloudMedia=clone(x.cloudMedia);state.teaserPresets=clone(x.teaserPresets);
     state.lyricTimings=clone(x.lyricTimings);
     SONGS=[...new Set([...x.songs,...x.records.map(r=>r.song)])];
     if(!SONGS.length)SONGS=['これからも','これから','あなたと'];
