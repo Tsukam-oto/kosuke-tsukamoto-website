@@ -35,6 +35,7 @@
     sourceMessages: clone(state.sourceMessages || {}),
     songs: clone(SONGS),
     drafts: clone(state.drafts || {}),
+    lyricTimings: clone(Array.isArray(state.lyricTimings) ? state.lyricTimings : []),
     cloudMedia: clone(state.cloudMedia || [])
   });
   const normalized = d => ({
@@ -43,6 +44,7 @@
     sourceMessages: d?.sourceMessages && typeof d.sourceMessages==='object' ? d.sourceMessages : {},
     songs: Array.isArray(d?.songs) ? d.songs.filter(x=>typeof x==='string' && x.trim()) : [],
     drafts: d?.drafts && typeof d.drafts==='object' ? d.drafts : {},
+    lyricTimings: Array.isArray(d?.lyricTimings) ? d.lyricTimings.filter(x=>x && typeof x.id==='string' && typeof x.workId==='string' && typeof x.textVersionId==='string' && Number.isInteger(x.lineIndex)) : [],
     cloudMedia: Array.isArray(d?.cloudMedia) ? d.cloudMedia.filter(x=>x && typeof x.id==='string' && typeof x.path==='string') : []
   });
 
@@ -89,11 +91,12 @@
     const msgs=mergeObject(b.sourceMessages,l.sourceMessages,r.sourceMessages);
     const drafts=mergeObject(b.drafts,l.drafts,r.drafts);
     const media=mergeItems(b.cloudMedia,l.cloudMedia,r.cloudMedia,{copyConflicts:true});
+    const timings=mergeItems(b.lyricTimings,l.lyricTimings,r.lyricTimings,{copyConflicts:true});
     return {
       doc:{version:5,records:m.output,sourceMessages:msgs.out,drafts:drafts.out,
-        cloudMedia:media.output,
+        cloudMedia:media.output,lyricTimings:timings.output,
         songs:[...new Set([...b.songs,...l.songs,...r.songs,...m.output.map(x=>x.song)])]},
-      conflicts:[...m.conflicts,...msgs.conflicts,...drafts.conflicts,...media.conflicts]
+      conflicts:[...m.conflicts,...msgs.conflicts,...drafts.conflicts,...media.conflicts,...timings.conflicts]
     };
   }
 
@@ -110,6 +113,7 @@
     $c('recCloudUser').textContent=logged?(owner.email||'ログイン中'):'';
     $c('recCloudPanel').classList.toggle('connected',logged);
     renderMedia();
+    window.dispatchEvent(new CustomEvent('recnote:cloud-auth-change',{detail:{signedIn:logged}}));
   }
   function loadBase() {
     if(!uid())return null;
@@ -149,6 +153,24 @@
     return parseResponse(res);
   }
   async function whoAmI(){const data=await api('/auth/v1/user');if(!data?.id)throw Error('本人確認に失敗しました');return {id:data.id,email:data.email||''};}
+
+  // Read-only bridge to the existing private lyric archive (the source remains unchanged).
+  async function readLyricWork(requestedSong) {
+    if (!session || !owner) throw Error('歌詞の閲覧にはクラウドへのログインが必要です');
+    const title=String(requestedSong||'').trim();
+    if(!title)throw Error('曲名が未設定です');
+    const works=await api('/rest/v1/lyric_master_works?select=id,title,verification_status&sky=eq.choir&form=eq.song&title=eq.'+encodeURIComponent(title)+'&limit=3');
+    if(!Array.isArray(works)||!works.length)return null;
+    if(works.length!==1)throw Error('同名作品が複数あります。歌詞原本を確認してください');
+    const work=works[0];
+    const versions=await api('/rest/v1/lyric_master_text_versions?select=id,version_no,literal_text,text_status,created_at&work_id=eq.'+encodeURIComponent(work.id)+'&order=version_no.desc&limit=20');
+    return {work,versions:Array.isArray(versions)?versions:[]};
+  }
+  window.RECNOTE_LYRIC_BRIDGE=Object.freeze({
+    read:readLyricWork,
+    isSignedIn:()=>Boolean(session&&owner)
+  });
+
   async function getRemote(){
     const query=`?select=owner_id,payload,revision,updated_at&owner_id=eq.${encodeURIComponent(uid())}&limit=1`;
     const rows=await api('/rest/v1/rec_note_cloud_documents'+query);
@@ -159,6 +181,7 @@
     const oldMode=activeMode,oldSong=song;
     state.records=clone(x.records); state.sourceMessages=clone(x.sourceMessages);
     state.drafts=clone(x.drafts);state.cloudMedia=clone(x.cloudMedia);
+    state.lyricTimings=clone(x.lyricTimings);
     SONGS=[...new Set([...x.songs,...x.records.map(r=>r.song)])];
     if(!SONGS.length)SONGS=['これからも','これから','あなたと'];
     if(!SONGS.includes(song))song=SONGS[0];
@@ -171,6 +194,7 @@
     if(typeof renderProject==='function')renderProject();
     if(typeof renderMedia==='function')renderMedia();
     suppress=false;
+    window.dispatchEvent(new CustomEvent('recnote:cloud-synced'));
   }
   // Called by legacy code after every edit; never clears offline data.
   const oldPersist=persist;
