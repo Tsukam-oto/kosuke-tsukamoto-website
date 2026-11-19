@@ -301,16 +301,16 @@
   $c('recCloudSync').addEventListener('click',()=>syncNow().catch(()=>{}));
   $c('recCloudSignOut').addEventListener('click',signOut);
   // An explicit file selection is required; no silent upload of personal files.
-  async function upload(kind,file) {
+  async function upload(kind,file,requestedSong=song) {
     if(!owner||!session){showStatus('先にログインしてください','bad');return;}
     if(!file||!file.size)return false;
     const actualKind=kind==='VIDEO'?('VIDEO_'+activeMode):kind;
     const existing=(Array.isArray(state.cloudMedia)?state.cloudMedia:[]).find(m=>
-      m.song===song && m.kind===actualKind && m.name===file.name &&
+      m.song===requestedSong && m.kind===actualKind && m.name===file.name &&
       m.size===file.size && Number(m.lastModified||0)===Number(file.lastModified||0) && m.lastModified!=null);
     if(existing){showStatus(file.name+' は既にクラウドに保存されています','good');return existing;}
     if(file.size>MAX_UPLOAD){showStatus('ファイルが45MBを超えています。この端末では引き続き使用できます。クラウド共有にはMP3/M4Aなどを登録してください。','bad');return false;}
-    const targetSong=song,targetMode=activeMode;
+    const targetSong=requestedSong,targetMode=activeMode;
     const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,7)||'bin';
     const path=uid()+'/'+randomId()+'.'+ext;
     showStatus(file.name+' を非公開ストレージにアップロード中…','busy');
@@ -391,10 +391,7 @@
     isSignedIn:()=>Boolean(session&&owner),
     ownerId:()=>uid()||null,
     list:(targetSong)=>Array.isArray(state.cloudMedia)?state.cloudMedia.filter(m=>m.song===targetSong):[],
-    upload:(kind,file,targetSong)=>{
-      if(targetSong!==song){showStatus('アップロードする楽曲を選択し直してください','bad');return Promise.resolve(false);}
-      return upload(kind,file);
-    },
+    upload:(kind,file,targetSong)=>upload(kind,file,targetSong),
     retrieve:(entry)=>retrieve(entry)
   });
   // Pure helpers are exposed only for local, non-mutating smoke tests.
