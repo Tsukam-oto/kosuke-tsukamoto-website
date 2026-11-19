@@ -5,3 +5,15 @@
 .recCloudConnected{display:grid;gap:10px}.recCloudLine{display:flex;align-items:center;gap:8px;flex-wrap:wrap}#recCloudUser{margin-right:auto;font-size:11px;color:#706e67;word-break:break-word}.recCloudUpload{display:inline-flex;align-items:center;justify-content:center;border:1px solid #d9d8d2;padding:8px 12px;background:#f6f5f2;border-radius:5px;min-height:37px;cursor:pointer;font-size:12px;font-weight:600}.recCloudUpload:hover{background:#ecebe6}.recCloudMedia{display:grid;gap:5px;max-height:175px;overflow-y:auto}.recCloudMediaRow{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eeeae5;padding:5px 0;gap:12px}.recCloudMediaRow span{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}.recCloudMediaRow button{font-size:11px;padding:4px 9px;min-height:30px;flex-shrink:0}.recCloudStatus{font-size:12px;font-weight:600;color:#77736b;padding:7px 10px;background:#f7f6f3;border-radius:4px}.recCloudStatus[data-level="good"]{color:#3a604b;background:#eef5f0}.recCloudStatus[data-level="bad"]{color:#983e39;background:#fbefed}.recCloudStatus[data-level="busy"]{color:#695e44;background:#f5f2e9}
 [hidden]{display:none!important}
 @media(max-width:740px){.recCloudPanel{padding:15px 13px}.recCloudLogin{display:grid}.recCloudLogin label{min-width:0}.recCloudLogin button{width:100%}.recCloudHead{align-items:start}}
+/* REC NOTE v6.3 — audio persistence controls */
+.recMediaPersistence{padding:11px 18px;margin:0;background:#f7f7f4;border-bottom:1px solid #e5e3dd;color:#34332f;display:grid;gap:8px}
+.recMediaStatus{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;font-size:11px}
+.recMediaStatus strong{font-size:12px;letter-spacing:.03em}
+.recMediaStatus span{color:#66645f;font-variant-numeric:tabular-nums}
+.recMediaOptions{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.recMediaOptin{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:650;cursor:pointer;line-height:1.5}
+.recMediaOptin input{width:17px;height:17px;accent-color:#33322e;cursor:pointer}
+.recMediaOptin small{font-size:10px;font-weight:400;color:#77746c}
+.recMediaOptions button{font-size:11px;min-height:34px;border-color:#c9c7bf;border-radius:5px;white-space:normal}
+.recMediaHelp{font-size:10.5px;color:#86837c;line-height:1.6;margin:0}
+@media(max-width:680px){.recMediaPersistence{padding:11px 12px}.recMediaOptions{display:grid;grid-template-columns:1fr;gap:7px}.recMediaOptin{font-size:11px}.recMediaOptions button{width:100%;min-height:40px}.recMediaStatus{align-items:baseline}}
