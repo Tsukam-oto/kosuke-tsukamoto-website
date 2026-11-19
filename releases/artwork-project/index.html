@@ -51,6 +51,15 @@ h1{font-size:clamp(42px,7vw,86px);letter-spacing:.015em;line-height:1.14;font-we
 .note{border-left:2px solid var(--ink);padding:3px 0 3px 20px;margin-top:28px;color:var(--muted);font-size:13px}
 .form-shell{max-width:760px}
 .form-shell>p{font-size:13px;color:var(--muted)}
+.data-policy{background:#f3f3f0;border:1px solid #dadad4;padding:24px 26px;margin:24px 0 29px;font-size:13px;line-height:1.9}
+.data-policy h3{font-size:16px;margin:0 0 13px;font-weight:700}
+.data-policy dl{margin:0}
+.data-policy dt{font-weight:700;margin:14px 0 3px}
+.data-policy dd{margin:0;color:#40403d}
+.data-policy p{margin:13px 0 0}
+.data-warning{border-left:3px solid #6b6b66;padding:1px 0 1px 15px;margin:15px 0;color:#343430;font-size:13px}
+.form-status{margin:14px 0 0;font-size:13px;min-height:1.7em}
+.form-submit[disabled]{opacity:.7;cursor:progress}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .form-field{margin:0 0 23px}
 .form-field label{display:block;font-size:14px;font-weight:600;margin-bottom:8px}
@@ -94,7 +103,7 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 <dl>
 <dt>募集するもの</dt><dd>《あなたと》《これから》それぞれの単独配信用ジャケット。片方への応募、両方への応募が可能です。両方に応募する場合は、それぞれ別のフォームからお送りください。</dd>
 <dt>作品の形式</dt><dd>正方形のJPGまたはPNG画像。正式採用時には3000×3000〜6000×6000ピクセル、RGB、20MB以内の入稿データが必要です。応募段階では確認用画像の共有URLでも構いません。</dd>
-<dt>応募方法</dt><dd>このページのフォームで応募曲、連絡先、画像の共有URLを送信してください。Google Driveなどの共有リンクは、主催者が開ける閲覧権限に設定してください。リンク先を確認できない場合は、再送をお願いすることがあります。</dd>
+<dt>応募方法</dt><dd>このページのフォームで応募曲、連絡先、画像の共有URLを送信してください。Google Driveなどの共有リンクは、選考担当者が閲覧できる権限に設定してください。「リンクを知っている全員」は、URLを知った第三者も閲覧できる設定です。共有範囲をご確認ください。リンクを開けない場合は再送をお願いすることがあります。</dd>
 <dt>応募資格</dt><dd>ご自身で制作した作品であれば応募いただけます。18歳未満の方は保護者の同意を得てご応募ください。学校の授業・学校行事とは別の個人企画です。</dd>
 <dt>著作権と採用について</dt><dd>応募作品の著作権は作者に帰属します。第三者の著作物や人物を使う場合は必要な許諾を得てください。応募作品を無断で配信・宣伝に使用することはありません。採用候補者には、クレジット・使用範囲・加工・謝礼の有無を含めた条件を別途ご相談し、合意後に使用します。</dd>
 <dt>選考・結果</dt><dd>楽曲との関係、作品の表現、配信ジャケットとしての適性などを考慮して選考します。応募状況や配信規定により、採用作品を決定しない場合もあります。採用候補者には応募時の連絡先へ個別にご連絡します。</dd>
@@ -104,7 +113,22 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 <section id="entry" class="panel"><div class="container section">
 <p class="kicker">ENTRY</p><h2>応募フォーム</h2>
 <div class="form-shell">
-<p>画像ファイルを直接添付する方式ではなく、作品画像を閲覧できるURLで応募を受け付けます。メールアドレスは作品確認・選考結果の連絡に使用します。フォーム内容はFormspreeを通じて主催者に届きます。</p>
+<p>画像の共有URLからご応募いただきます。個人情報の取り扱いと共有範囲を確認した上で、送信してください。</p>
+<div class="data-policy" id="data-policy" aria-labelledby="data-policy-title">
+<h3 id="data-policy-title">応募データの取り扱い</h3>
+<dl>
+<dt>取得する情報</dt>
+<dd>お名前・活動名、メールアドレス、応募曲、作品画像の共有URL、任意の作品説明、確認事項への回答。</dd>
+<dt>利用目的</dt>
+<dd>応募作品の確認、選考、応募内容についての連絡、採用候補者との使用条件の調整に限って利用します。応募者の連絡先や作品を、本人の同意なく宣伝・公開しません。</dd>
+<dt>送信先と管理</dt>
+<dd>入力情報は外部サービスのFormspreeを通じて主催者の受付先へ送信され、Formspreeにも保存されます。画像ファイル自体はフォームに添付・保管せず、応募者が選んだ共有サービス側に置かれます。一般のお問い合わせと同じ受付先を使用しますが、応募データは専用の件名・分類で区別します。<a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspreeのプライバシーポリシー ↗</a></dd>
+<dt>保管・削除・取り下げ</dt>
+<dd>選考・連絡に必要な間のみ取り扱い、不要となった応募情報は削除します。応募の取り下げや、登録した連絡先・URLの訂正、データの削除については<a href="/contact/">お問い合わせ</a>からご連絡ください。</dd>
+</dl>
+<p class="data-warning">画像の共有URLには、公開範囲が「リンクを知っている全員」の設定もあります。作品の閲覧範囲を確認してください。氏名・住所・学校名などの不要な個人情報を画像や説明に含めないでください。</p>
+<p>このフォームへの入力内容は、ブラウザ内の保存領域に自動保存しません。</p>
+</div>
 <form id="artwork-entry-form" action="https://formspree.io/f/xbgjraga" method="POST">
 <input type="hidden" name="_subject" value="ARTWORK PROJECT｜ジャケット公募応募">
 <input type="hidden" name="category" value="ARTWORK PROJECT / ジャケット公募">
@@ -118,15 +142,39 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 <select id="artwork-song" name="song" required><option value="" selected disabled>選択してください</option><option value="あなたと">あなたと</option><option value="これから">これから</option></select></div>
 <div class="form-field"><label for="artwork-url">作品画像の共有URL <span aria-hidden="true">＊</span></label>
 <input id="artwork-url" type="url" name="artwork_url" placeholder="https://..." maxlength="1800" pattern="https://.*" required inputmode="url">
-<span class="help">閲覧権限のあるURLを入力してください。作品画像は非公開の審査に使用し、無断公開しません。送信前にリンクが開くかご確認ください。</span></div>
+<span class="help">作品画像を閲覧できるHTTPSのURLを入力してください。Google Driveなどでは共有範囲にご注意ください。送信前に、別のブラウザでリンクを開けるかご確認ください。</span></div>
 <div class="form-field"><label for="artwork-message">作品について <span class="optional">（任意）</span></label>
 <textarea id="artwork-message" name="message" maxlength="1500" placeholder="制作について伝えたいことがあれば、ご記入ください。"></textarea></div>
 <div class="checkbox-line"><input id="artwork-original" type="checkbox" name="originality_confirmed" value="yes" required><label for="artwork-original">応募作品は自分が制作したものであり、第三者の権利を侵害しないことを確認しました。</label></div>
-<div class="checkbox-line"><input id="artwork-consent" type="checkbox" name="rules_accepted" value="yes" required><label for="artwork-consent">上記の募集要項と、採用前に利用条件の確認が必要であることに同意します。18歳未満の場合は保護者の同意を得ています。</label></div>
-<p class="help">送信するとFormspreeの受付画面に移動します。こちらのページ上では応募完了とは判定しません。</p>
+<div class="checkbox-line"><input id="artwork-consent" type="checkbox" name="rules_accepted" value="yes" required><label for="artwork-consent">上記の募集要項と、採用前に利用条件の確認が必要であることを理解しています。18歳未満の場合は保護者の同意を得ています。</label></div>
+<div class="checkbox-line"><input id="data-consent" type="checkbox" name="data_policy_accepted" value="yes" required><label for="data-consent"><a href="#data-policy">応募データの取り扱い</a>を読み、Formspreeを通じて応募情報が送信・保存されることを確認しました。</label></div>
+<p class="help">送信後はFormspreeの受付画面に移動します。受付完了画面を確認するまで、応募が届いたとは判断できません。自動返信メールは保証されません。受付状況が不明な場合は、再送前に<a href="/contact/">お問い合わせ</a>ください。</p>
+<p id="artwork-form-status" class="form-status" role="status" aria-live="polite"></p>
 <button class="form-submit" type="submit">応募内容を送信する →</button>
 </form>
 </div></div></section>
 </main>
 <footer class="footer"><span>© 2026 Kosuke Tsukamoto</span><div><a href="/contact/">お問い合わせ</a>　<a href="/releases/2026-11-22/">1st Single</a>　<a href="/">HOME</a></div></footer>
+<script>
+(()=>{
+"use strict";
+const form=document.getElementById("artwork-entry-form");
+const submit=form?.querySelector('button[type="submit"]');
+const status=document.getElementById("artwork-form-status");
+if(!form||!submit||!status)return;
+const original=submit.textContent;
+let submitting=false;
+form.addEventListener("submit",event=>{
+  if(submitting){event.preventDefault();return;}
+  if(!form.reportValidity()){event.preventDefault();return;}
+  submitting=true;
+  submit.disabled=true;
+  submit.textContent="送信しています…";
+  status.textContent="受付画面に移動します。送信完了の表示をご確認ください。";
+});
+window.addEventListener("pageshow",()=>{
+  submitting=false;submit.disabled=false;submit.textContent=original;status.textContent="";
+});
+})();
+</script>
 </body></html>
