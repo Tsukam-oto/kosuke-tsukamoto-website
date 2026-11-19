@@ -1,0 +1,36 @@
+/* REC NOTE teaser / video studio v6.4 */
+.teaserBuilder{background:#fff;border:1px solid #e1dfd9;border-radius:10px;margin:14px 0 18px;overflow:hidden;color:#292926}
+.teaserBuilder[hidden]{display:none!important}
+.teaserHeader{padding:21px 23px 17px;display:flex;align-items:center;justify-content:space-between;gap:18px;border-bottom:1px solid #e7e5df}
+.teaserEyebrow{font-size:10px;font-weight:800;letter-spacing:.18em;color:#86827a;margin:0 0 4px}
+.teaserHeader h2{margin:0;font-size:21px;line-height:1.35;font-weight:720}
+.teaserHeader p{margin:6px 0 0;color:#75736e;font-size:12px;line-height:1.6}
+.teaserStep{flex:none;color:#686660;font-size:11px;letter-spacing:.01em}
+.teaserLayout{display:grid;grid-template-columns:minmax(0,1.08fr) minmax(260px,.92fr);gap:0}
+.teaserSettings{padding:21px 23px;display:grid;gap:13px;border-right:1px solid #e7e5df;align-content:start}
+.teaserField{display:grid;gap:6px;min-width:0}
+.teaserField>label:not(.teaserCheck){font-size:12px;font-weight:750;color:#46443e}
+.teaserField input:not([type=checkbox]),.teaserField select{min-height:41px;width:100%;max-width:100%;background:#faf9f7;border:1px solid #d9d7d1;border-radius:7px;font-size:13px;padding:8px 11px;color:#24231f}
+.teaserTwo{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.teaserInline{display:flex;gap:6px;align-items:stretch}
+.teaserInline input{min-width:0}
+.teaserInline button{min-width:70px;flex:none;font-size:11px;border-radius:7px;padding:6px}
+.teaserTakeRange{min-height:36px;font-size:11px;color:#514f48;border-style:dashed;background:#f8f7f4;border-radius:6px}
+.teaserAssets{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.teaserPick{display:flex;align-items:center;justify-content:center;cursor:pointer;text-align:center;border:1px solid #b7b4ac;border-radius:7px;padding:10px 8px;font-size:11px;font-weight:700;min-height:43px;color:#393731;background:#fafaf8}
+.teaserPick:hover{background:#f1f0ed}
+.teaserCheck{display:flex;align-items:flex-start;gap:9px;font-size:12px;font-weight:650;cursor:pointer}
+.teaserCheck input{width:17px;height:17px;accent-color:#333331;flex:none;margin-top:2px}
+.teaserHelp,.teaserNote{font-size:11px;color:#858178;line-height:1.65;margin:0}
+.teaserOutput{background:#f8f7f5;min-width:0;padding:20px;display:flex;flex-direction:column;align-items:center;gap:13px}
+.teaserPreviewShell{display:flex;justify-content:center;align-items:center;background:#222;max-width:100%;max-height:530px;width:100%;min-height:140px;border-radius:7px;overflow:hidden}
+.teaserPreviewShell canvas{display:block;width:auto;height:auto;max-width:100%;max-height:525px;object-fit:contain;background:#191919}
+.teaserControls{display:grid;grid-template-columns:1.7fr 1fr;gap:8px;width:100%}
+.teaserControls button{min-height:43px;background:#fff;border:1px solid #c5c2ba;border-radius:7px;font-size:12px}
+.teaserExport{width:100%;min-height:49px;background:#252523;color:#fff;border:1px solid #252523;border-radius:7px;font-size:13px;font-weight:760}
+.teaserExport:hover:not(:disabled){background:#41413e;color:white}
+.teaserStatus{font-size:11px;color:#5d5b54;line-height:1.6;min-height:18px;width:100%;text-align:center}
+.teaserStatus[data-level=error]{color:#ad513e}
+.teaserOutput .teaserNote{text-align:center}
+@media(max-width:850px){.teaserLayout{grid-template-columns:1fr}.teaserSettings{border-right:0;border-bottom:1px solid #e7e5df}.teaserPreviewShell{max-height:450px}.teaserPreviewShell canvas{max-height:445px}}
+@media(max-width:640px){.teaserBuilder{margin:10px 0 14px}.teaserHeader{padding:16px 14px;display:block}.teaserHeader h2{font-size:18px}.teaserStep{display:block;margin-top:8px}.teaserSettings{padding:15px 14px;gap:12px}.teaserTwo{gap:8px}.teaserAssets{grid-template-columns:1fr 1fr}.teaserOutput{padding:14px;gap:11px}.teaserPreviewShell{max-height:430px}.teaserPreviewShell canvas{max-height:425px}.teaserField input:not([type=checkbox]),.teaserField select{min-height:44px}.teaserTakeRange{min-height:42px}}
