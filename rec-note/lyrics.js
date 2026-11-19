@@ -15,6 +15,10 @@
   let selectedLine = -1;
   let requestSeq = 0;
   let activePlaybackLine = -1;
+  const DRAFT_KEY='rec_note_lyric_time_drafts_v6';
+  let timeDrafts={};
+  try{const old=JSON.parse(localStorage.getItem(DRAFT_KEY)||'{}');if(old&&typeof old==='object'&&!Array.isArray(old))timeDrafts=old;}catch(e){}
+  function saveDrafts(){try{localStorage.setItem(DRAFT_KEY,JSON.stringify(timeDrafts));}catch(e){}}
 
   const panel = document.createElement('section');
   panel.id = 'lyricsPanel';
@@ -72,6 +76,7 @@
     const oldScroll = container.scrollTop;
     container.replaceChildren();
     if (!version) return;
+    activePlaybackLine = -1;
     let registered = 0, count = 0;
     for (let i=0; i<rawLines.length; i++) {
       const line = rawLines[i];
@@ -121,17 +126,20 @@
     if(!chosen) return;
     $l('lyricsSelected').textContent = rawLines[selectedLine];
     const record = primaryTiming(selectedLine);
-    $l('lyricsStart').value = Number.isFinite(record?.start) ? fmt(record.start) : '';
-    $l('lyricsEnd').value = Number.isFinite(record?.end) ? fmt(record.end) : '';
+    const draft=timeDrafts[timingId(selectedLine)];
+    $l('lyricsStart').value = draft ? draft.start : (Number.isFinite(record?.start) ? fmt(record.start) : '');
+    $l('lyricsEnd').value = draft ? draft.end : (Number.isFinite(record?.end) ? fmt(record.end) : '');
     const conflict = conflictTimings(selectedLine).length;
     $l('lyricsHint').textContent = conflict ?
       '同じ行が別端末で同時に編集されています。競合記録は保護されています。内容を確認してください。' :
+      draft ? '時刻の未保存入力をこの端末から復元しました。時間を保存してください。' :
       '曲を再生して現在位置を取得するか、上の時刻欄に直接入力してください。';
   }
 
   function selectLine(index) {
     if(!version || !rawLines[index]?.trim()) return;
     selectedLine = index;
+    $l('lyricsUse').textContent='この歌詞で指示を作る';
     const timing = primaryTiming(index);
     if(Number.isFinite(timing?.start)) seek(timing.start);
     showEditor();
@@ -164,6 +172,7 @@
     const old=timings().findIndex(x=>x.id===id);
     if(old>=0) state.lyricTimings[old]=data;
     else state.lyricTimings.push(data);
+    delete timeDrafts[id];saveDrafts();
     persist();
     showEditor();
     renderLines();
@@ -310,6 +319,11 @@
     }
   }
 
+  for(const field of ['lyricsStart','lyricsEnd'])$l(field).addEventListener('input',()=>{
+    if(selectedLine<0||!version)return;
+    timeDrafts[timingId(selectedLine)]={start:$l('lyricsStart').value,end:$l('lyricsEnd').value};
+    saveDrafts();
+  });
   $l('lyricsReload').addEventListener('click',loadLyrics);
   $l('lyricsVersion').addEventListener('change',e=>showVersion(e.target.value));
   $l('lyricsCaptureStart').addEventListener('click',()=>capture('start'));
