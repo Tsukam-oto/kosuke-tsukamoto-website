@@ -313,6 +313,7 @@
   window.RECNOTE_MEDIA=Object.freeze({
     loadCompare:(targetSong,file)=>loadCompare(file,targetSong,true),
     hasCompare:(targetSong)=>Boolean(compareFiles[targetSong]?.url),
+    getCompareSource:(targetSong)=>compareFiles[targetSong]||null,
     loadVideo:(file,key)=>loadVideo(file,key)
   });
 })();
