@@ -138,6 +138,10 @@ async function checkArtworkContest(browser,engine){
    const x=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
    assert.ok(x[0]<=x[1]+1.5,engine+" contest horizontal overflow "+width+"px");
    assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"empty entry must fail");
+   assert.equal(await page.locator("#data-consent").count(),1,"data-handling disclosure must have separate consent");
+   assert.equal(await page.locator("#data-policy").isVisible(),true);
+   assert.ok((await page.locator("#data-policy").innerText()).includes("Formspree"),"third-party handler must be disclosed");
+   assert.ok((await page.locator("#data-policy").innerText()).includes("削除"),"deletion process must be disclosed");
    if(width===375)await page.screenshot({path:output+"/"+engine+"-artwork-contest-375.png",fullPage:true,animations:"disabled"});
    await page.close();
  }
@@ -149,6 +153,8 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-url").fill("https://example.org/artwork-preview");
  await page.locator("#artwork-original").check();
  await page.locator("#artwork-consent").check();
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"privacy consent should be required");
+ await page.locator("#data-consent").check();
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid contest entry");
  let post=null;
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
@@ -157,6 +163,7 @@ async function checkArtworkContest(browser,engine){
  });
  await page.locator("#artwork-entry-form button[type=submit]").click();
  await page.waitForURL("https://formspree.io/f/xbgjraga");
+ assert.equal(await page.locator("#artwork-form-status").count(),0,"intercepted submit navigates to server response");
  assert.equal(post?.method,"POST");
  assert.ok(post?.body?.includes("artwork_url"));
  assert.ok(post?.body?.includes("first-single-solo-jacket-call-2026"));
