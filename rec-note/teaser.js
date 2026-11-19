@@ -190,7 +190,7 @@
       multiline(c,message.value.trim(),w/2,h-pad*1.15,w-pad*2,unit*.44,2);
     }
     // Gentle 0.35s fade on the first and last frames.
-    const alpha=Math.max(Math.max(0,(.3-elapsed)/.3),Math.max(0,(elapsed-(clipLen-.4))/.4));
+    const alpha=canvas===preview && !live ? 0 : Math.max(Math.max(0,(.3-elapsed)/.3),Math.max(0,(elapsed-(clipLen-.4))/.4));
     if(alpha>0){c.fillStyle='rgba(0,0,0,'+Math.min(1,alpha).toFixed(3)+')';c.fillRect(0,0,w,h);}
     c.restore();
   }
