@@ -93,6 +93,7 @@
   function viewSize(r,quality=false){
     const short=r==='9:16',wide=r==='16:9';
     const max=quality?(window.matchMedia('(max-width:700px)').matches?720:1080):540;
+    if(quality)return short?{w:max,h:Math.round(max*16/9)}:wide?{w:Math.round(max*16/9),h:max}:{w:max,h:max};
     return short?{w:Math.round(max*9/16),h:max}:wide?{w:max,h:Math.round(max*9/16)}:{w:max,h:max};
   }
   function setCanvasAspect(){
