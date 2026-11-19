@@ -176,6 +176,32 @@ async function checkArtworkContest(browser,engine){
  log(engine+" artwork contest","5 screen widths; 2 song demos; form validation; intercepted POST; catalog link");
 }
 
+async function checkUcnucThanks(browser,engine){
+ for(const width of [320,375,768,1440]){
+  const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+  await page.goto(BASE+"/special-thanks/ucnuc/",{waitUntil:"domcontentloaded"});
+  assert.equal(await page.locator("h1").innerText(),"UCNUC");
+  assert.ok((await page.locator("main").innerText()).includes("marty"));
+  assert.ok((await page.locator("main").innerText()).includes("録音からミックス"));
+  assert.equal(await page.locator('a[href="https://ucnuc.jp/"]').count(),1);
+  assert.equal(await page.locator('a[href="/releases/2026-11-22/"]').count()>=1,true);
+  assert.ok(!(await page.locator("main").innerText()).includes("マスタリング"),"unconfirmed mastering is not attributed");
+  const doc=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+  assert.ok(doc[0]<=doc[1]+1.5,engine+" UCNUC horizontal overflow "+width);
+  if(width===375)await page.screenshot({path:output+"/"+engine+"-ucnuc-375.png",fullPage:true,animations:"disabled"});
+  await page.close();
+ }
+ const index=await browser.newPage();
+ await index.goto(BASE+"/special-thanks/",{waitUntil:"domcontentloaded"});
+ assert.equal(await index.locator('a[href="/special-thanks/ucnuc/"]').count(),1,"SPECIAL THANKS contains UCNUC");
+ await index.close();
+ const release=await browser.newPage();
+ await release.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
+ assert.equal(await release.locator('.ucnuc-credit a[href="/special-thanks/ucnuc/"]').count(),1,"release links to recording acknowledgement");
+ await release.close();
+ log(engine+" UCNUC special thanks","4 widths; studio credits; release and index backlinks");
+}
+
 async function checkLyrics(page,engine){
   await page.goto(BASE+"/lyrics/#korekaramo",{waitUntil:"domcontentloaded"});
   await page.locator("#korekaramo").waitFor();
@@ -260,6 +286,7 @@ async function testEngine(engineType,engine){
   await checkHomepage(browser,engine);
   await checkTeaser(browser,engine);
   await checkArtworkContest(browser,engine);
+  await checkUcnucThanks(browser,engine);
  }finally{await browser.close();}
 }
 await testEngine(chromium,"chromium");
