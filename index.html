@@ -1483,7 +1483,7 @@
   })();
 </script><section class="news" id="news" aria-labelledby="topics-title"><div class="wrap">
 <p class="section-kicker">TOPICS</p><h2 class="section-title" id="topics-title">公開・更新情報</h2>
-<div class="news-list"><div class="news-item" id="first-single-topic" hidden><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-11-22">2026.11.22</time></div><span class="smallcaps">RELEASE</span><p><a href="/releases/2026-11-22/">1st Single『あなたと、これから、これからも』配信決定。特設ページを見る →</a></p></div><div class="news-item"><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-10-29">2026.10.29</time></div><span class="smallcaps">CHORAL</span><p><a href="/works/all-around-you/">合唱作品《All around you》の制作デモ音源と楽譜の抜粋を公開しました。</a></p></div><div class="news-item"><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-10-14">2026.10.14</time></div><span class="smallcaps">SPECIAL THANKS</span><p><a href="#deai-live">SPECIAL THANKSと《出会い》正式ライブ音源を公開しました。録音を聴く →</a></p></div>
+<div class="news-list"><div class="news-item" id="artwork-contest-topic" hidden><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-11-22">2026.11.22</time></div><span class="smallcaps">ARTWORK PROJECT</span><p><a href="/releases/artwork-project/">《あなたと》《これから》のジャケット募集を開始しました。募集要項・応募はこちら →</a></p></div><div class="news-item" id="first-single-topic" hidden><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-11-22">2026.11.22</time></div><span class="smallcaps">RELEASE</span><p><a href="/releases/2026-11-22/">1st Single『あなたと、これから、これからも』配信決定。特設ページを見る →</a></p></div><div class="news-item"><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-10-29">2026.10.29</time></div><span class="smallcaps">CHORAL</span><p><a href="/works/all-around-you/">合唱作品《All around you》の制作デモ音源と楽譜の抜粋を公開しました。</a></p></div><div class="news-item"><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-10-14">2026.10.14</time></div><span class="smallcaps">SPECIAL THANKS</span><p><a href="#deai-live">SPECIAL THANKSと《出会い》正式ライブ音源を公開しました。録音を聴く →</a></p></div>
 <div class="news-item"><div class="topic-meta"><span class="topic-badge">新着・公開</span><time datetime="2026-10-14">2026.10.14</time></div><span class="smallcaps">POETRY</span><p><a href="/lyrics/">詩集《音楽の風景》を公開しました。詩集を読む →</a></p></div>
 
 </div>
@@ -2214,6 +2214,7 @@ document.addEventListener("DOMContentLoaded", () => {
  const nowParts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));
  const jst=nowParts.year+"-"+nowParts.month+"-"+nowParts.day;
  const topic=document.getElementById("first-single-topic");if(topic&&jst>="2026-11-22")topic.hidden=false;
+ const contest=document.getElementById("artwork-contest-topic");if(contest&&jst>="2026-11-22")contest.hidden=false;
  const key="first-single-2026-announcement-dismissed-v1";
  let dismissed=false;try{dismissed=localStorage.getItem(key)==="1";}catch(e){}
  const canShow=jst>="2026-11-22"&&jst<="2026-11-29"&&!dismissed;
