@@ -169,12 +169,19 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-entry-form button[type=submit]").click();
  await page.waitForURL("https://formspree.io/f/xbgjraga");
  assert.equal(post?.method,"POST");
- assert.ok(post?.body?.includes("first-single-artwork-interest-2026"));
- assert.ok(post?.body?.includes("junior_high_graduated"));
- assert.ok(!post?.body?.includes("unpaid_project_confirmed"));
- assert.ok(post?.body?.includes("Test Artist"));
- assert.ok(post?.body?.includes("message"));
- assert.ok(!post?.body?.includes("artwork_url"),"no artwork link is collected");
+ // Native HTML forms percent-encode values (spaces become '+').
+ // Parse as application/x-www-form-urlencoded instead of comparing raw text.
+ const fields=new URLSearchParams(post?.body||"");
+ assert.equal(fields.get("project"),"first-single-artwork-interest-2026");
+ assert.equal(fields.get("_subject"),"ARTWORK PROJECT｜制作希望メッセージ");
+ assert.equal(fields.get("name"),"Test Artist");
+ assert.equal(fields.get("email"),"sample@example.com");
+ assert.equal(fields.get("song"),"両方");
+ assert.equal(fields.get("message"),"二曲のジャケットを描いてみたいです。ご連絡ください。");
+ assert.equal(fields.get("junior_high_graduated"),"yes");
+ assert.equal(fields.get("data_policy_accepted"),"yes");
+ assert.equal(fields.has("unpaid_project_confirmed"),false,"no unpaid consent data");
+ assert.equal(fields.has("artwork_url"),false,"no artwork link is collected");
  await page.close();
  const listing=await browser.newPage({viewport:{width:390,height:844}});
  await listing.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
