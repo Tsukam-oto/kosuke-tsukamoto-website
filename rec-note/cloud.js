@@ -303,8 +303,13 @@
   // An explicit file selection is required; no silent upload of personal files.
   async function upload(kind,file) {
     if(!owner||!session){showStatus('先にログインしてください','bad');return;}
-    if(!file||!file.size)return;
-    if(file.size>MAX_UPLOAD){showStatus('ファイルが45MBを超えています。MP3/M4Aなどで小さくして再度選択してください。','bad');return;}
+    if(!file||!file.size)return false;
+    const actualKind=kind==='VIDEO'?('VIDEO_'+activeMode):kind;
+    const existing=(Array.isArray(state.cloudMedia)?state.cloudMedia:[]).find(m=>
+      m.song===song && m.kind===actualKind && m.name===file.name &&
+      m.size===file.size && Number(m.lastModified||0)===Number(file.lastModified||0) && m.lastModified!=null);
+    if(existing){showStatus(file.name+' は既にクラウドに保存されています','good');return existing;}
+    if(file.size>MAX_UPLOAD){showStatus('ファイルが45MBを超えています。この端末では引き続き使用できます。クラウド共有にはMP3/M4Aなどを登録してください。','bad');return false;}
     const targetSong=song,targetMode=activeMode;
     const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,7)||'bin';
     const path=uid()+'/'+randomId()+'.'+ext;
@@ -314,11 +319,12 @@
         method:'POST',headers:{'content-type':file.type||'application/octet-stream','x-upsert':'false'},body:file
       });
       state.cloudMedia=Array.isArray(state.cloudMedia)?state.cloudMedia:[];
-      const media={id:randomId(),song:targetSong,kind:kind==='VIDEO'?('VIDEO_'+targetMode):kind,path,name:file.name,size:file.size,mime:file.type||'',createdAt:new Date().toISOString()};
+      const media={id:randomId(),song:targetSong,kind:kind==='VIDEO'?('VIDEO_'+targetMode):kind,path,name:file.name,size:file.size,mime:file.type||'',lastModified:file.lastModified||0,createdAt:new Date().toISOString()};
       state.cloudMedia.push(media);
       persist(); await syncNow();renderMedia();
       showStatus(file.name+' を非公開で保存しました','good');
-    }catch(e){showStatus('アップロード／同期に失敗：'+e.message,'bad');}
+      return media;
+    }catch(e){showStatus('アップロード／同期に失敗：'+e.message,'bad');return false;}
   }
   for(const [id,kind] of [['recCloudUploadA','A'],['recCloudUploadB','B'],['recCloudUploadVideo','VIDEO']]){
     $c(id).addEventListener('change',e=>{const f=e.target.files?.[0];e.target.value='';if(f)upload(kind,f);});
@@ -344,7 +350,8 @@
         await window.RECNOTE_MEDIA.loadVideo(file,m.song+'\u001f'+m.kind.slice(6));
       }
       showStatus(m.name+' を読み込みました。必要に応じて再生してください。','good');
-    }catch(e){showStatus('ファイルの読込失敗：'+e.message,'bad');}
+      return true;
+    }catch(e){showStatus('ファイルの読込失敗：'+e.message,'bad');return false;}
   }
   function renderMedia(){
     const root=$c('recCloudMedia');if(!root)return;
@@ -379,6 +386,17 @@
   setInterval(()=>{if(!document.hidden&&session&&owner&&!syncing)syncNow().catch(()=>{})},45000);
   showAuth();showStatus('未接続：この端末には保存されます。クラウドを使うにはログインしてください。');
   restore();
+  // The local media coordinator calls only these authenticated user-scoped actions.
+  window.RECNOTE_CLOUD_MEDIA=Object.freeze({
+    isSignedIn:()=>Boolean(session&&owner),
+    ownerId:()=>uid()||null,
+    list:(targetSong)=>Array.isArray(state.cloudMedia)?state.cloudMedia.filter(m=>m.song===targetSong):[],
+    upload:(kind,file,targetSong)=>{
+      if(targetSong!==song){showStatus('アップロードする楽曲を選択し直してください','bad');return Promise.resolve(false);}
+      return upload(kind,file);
+    },
+    retrieve:(entry)=>retrieve(entry)
+  });
   // Pure helpers are exposed only for local, non-mutating smoke tests.
   window.RECNOTE_CLOUD_TEST={mergeDocuments,normalized};
 })();
