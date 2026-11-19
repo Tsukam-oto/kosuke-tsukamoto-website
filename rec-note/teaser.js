@@ -261,7 +261,7 @@
     makeBackground(f,'video');storeAsset('video',f,song);
   });
   for(const input of [style,ratio,source,start,length,title,message,withLyrics]){
-    input.addEventListener('change',()=>{if(input===style){withLyrics.checked=style.value==='lyrics';if(style.value==='mv'&&ratio.value==='9:16')ratio.value='16:9';}if(input===ratio)setCanvasAspect();save();});
+    input.addEventListener('change',()=>{if(input===style){withLyrics.checked=style.value==='lyrics';ratio.value=style.value==='mv'?'16:9':'9:16';length.value=style.value==='mv'?'30':style.value==='lyrics'?'20':'15';setCanvasAspect();}if(input===ratio)setCanvasAspect();save();});
     if(input===title||input===message)input.addEventListener('input',save);
   }
   $t('teaserCapture').addEventListener('click',()=>{start.value=fmt(current);save();});
