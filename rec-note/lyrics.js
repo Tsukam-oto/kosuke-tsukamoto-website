@@ -405,7 +405,8 @@
   window.RECNOTE_LYRICS=Object.freeze({
     getFormLink,
     refresh:loadLyrics,
-    getSelected:()=>selectedLine>=0&&version?{text:rawLines[selectedLine],versionId:version.id,lineIndex:selectedLine}:null
+    getSelected:()=>selectedLine>=0&&version?{text:rawLines[selectedLine],versionId:version.id,lineIndex:selectedLine}:null,
+    getTimedLines:()=>version&&work?rawLines.map((text,lineIndex)=>{const t=primaryTiming(lineIndex);return {text,lineIndex,start:t?.start??null,end:t?.end??null};}).filter(x=>x.text.trim()&&Number.isFinite(x.start)):[]
   });
   loadLyrics();
 })();
