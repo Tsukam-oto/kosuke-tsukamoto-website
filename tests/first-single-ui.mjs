@@ -138,8 +138,9 @@ async function checkArtworkContest(browser,engine){
   assert.equal(await page.locator('input[name="artwork_url"]').count(),0,"no image URL request at initial contact");
   assert.equal(await page.locator('input[type="file"]').count(),0,"no artwork file request");
   assert.equal(await page.locator("#graduation-consent").count(),1);
-  assert.equal(await page.locator("#unpaid-confirm").count(),1);
-  assert.ok((await page.locator("main").innerText()).includes("謝礼・報酬はありません"));
+  assert.equal(await page.locator("#unpaid-confirm").count(),0,"no compulsory unpaid agreement");
+  assert.ok((await page.locator("main").innerText()).includes("制作を始める前に金額と条件を決めます"));
+  assert.ok(!(await page.locator("main").innerText()).includes("無償でのご協力"));
   assert.ok((await page.locator("main").innerText()).includes("中学校を卒業された方"));
   const bounds=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
   assert.ok(bounds[0]<=bounds[1]+1.5,engine+" contest horizontal overflow "+width);
@@ -158,9 +159,7 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
  await page.locator("#graduation-consent").check();
  await page.locator("#data-consent").check();
- assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"unpaid terms acknowledgement required");
- await page.locator("#unpaid-confirm").check();
- assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"completed unpaid interest form");
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"interest message valid after privacy and graduation checks");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid interest message");
  let post=null;
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
@@ -172,7 +171,7 @@ async function checkArtworkContest(browser,engine){
  assert.equal(post?.method,"POST");
  assert.ok(post?.body?.includes("first-single-artwork-interest-2026"));
  assert.ok(post?.body?.includes("junior_high_graduated"));
- assert.ok(post?.body?.includes("unpaid_project_confirmed"));
+ assert.ok(!post?.body?.includes("unpaid_project_confirmed"));
  assert.ok(post?.body?.includes("Test Artist"));
  assert.ok(post?.body?.includes("message"));
  assert.ok(!post?.body?.includes("artwork_url"),"no artwork link is collected");
