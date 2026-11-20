@@ -53,13 +53,23 @@ footer{padding:32px clamp(20px,6vw,75px);border-top:1px solid var(--line);font-s
  if(img.complete&&img.naturalWidth>0){img.hidden=false;document.getElementById("releases-cover-pending").hidden=true;}
  fetch("/assets/releases/first-single-media.json",{cache:"no-store"}).then(r=>r.ok?r.json():null).then(data=>{
     if(!Array.isArray(data?.teasers))return;
-    const available=data.teasers.some(t=>{
-      for(const raw of [t.youtubeUrl,t.audioUrl]){
-        if(typeof raw!=="string"||!raw.trim()||(!raw.startsWith("https://")&&!raw.startsWith("/")))continue;
-        try{const url=new URL(raw,location.href);if(url.protocol!=="https:")continue;if(raw===t.youtubeUrl&&!["www.youtube.com","youtube.com","m.youtube.com","youtu.be"].includes(url.hostname))continue;return true;}catch{}
-      }
-      return false;
-    });
+    const youtube=(raw)=>{
+      if(typeof raw!=="string"||!raw.trim())return false;
+      try{
+        const u=new URL(raw);
+        if(u.protocol!=="https:")return false;
+        const host=u.hostname.toLowerCase(),parts=u.pathname.split("/").filter(Boolean);
+        if(host==="youtu.be")return /^[-\\w]{11}$/.test(parts[0]||"");
+        if(!["youtube.com","www.youtube.com","m.youtube.com"].includes(host))return false;
+        const id=u.pathname==="/watch"?u.searchParams.get("v"):(["shorts","embed","live"].includes(parts[0])?parts[1]:null);
+        return /^[-\\w]{11}$/.test(id||"");
+      }catch{return false;}
+    };
+    const audio=(raw)=>{
+      if(typeof raw!=="string"||!raw.trim()||(!raw.startsWith("/")&&!raw.startsWith("https://")))return false;
+      try{const u=new URL(raw,location.href);return u.protocol==="https:"||u.origin===location.origin;}catch{return false;}
+    };
+    const available=data.teasers.some(t=>youtube(t?.youtubeUrl)||audio(t?.audioUrl));
     const link=document.getElementById("releases-teaser-link");
     if(available&&link)link.hidden=false;
  }).catch(()=>{});
