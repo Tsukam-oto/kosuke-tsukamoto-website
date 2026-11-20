@@ -300,8 +300,8 @@ async function checkLyrics(page,engine){
 }
 
 async function checkHomepage(browser,engine){
-  async function freshWithDate(iso,width=390) {
-    const context = await browser.newContext({viewport:{width,height:840}, reducedMotion:"reduce"});
+  async function freshWithDate(iso,width=390,height=840) {
+    const context = await browser.newContext({viewport:{width,height}, reducedMotion:"reduce"});
     const page=await context.newPage();
     await page.addInitScript(({fixed})=>{
       const NativeDate=Date;
@@ -348,7 +348,17 @@ async function checkHomepage(browser,engine){
     await desktop.page.locator("#first-single-announcement").waitFor({state:"visible"});
     await desktop.page.screenshot({path:output+"/"+engine+"-homepage-popup-1440.png",animations:"disabled"});
     await desktop.context.close();
-    log(engine+" homepage announcement", "first visit only; permanent CTA; mobile + desktop screenshots");
+    const compact=await freshWithDate("2026-11-22T12:00:00+09:00",320,568);
+    await compact.page.locator("#first-single-announcement").waitFor({state:"visible"});
+    assert.equal(await compact.page.locator("#first-single-announcement-close").isVisible(),true);
+    const surface=await compact.page.locator(".release-announcement-panel").evaluate(el=>({scroll:el.scrollWidth,client:el.clientWidth}));
+    assert.ok(surface.scroll<=surface.client+2,"compact popup must not overflow horizontally");
+    await compact.page.locator(".release-announcement-actions a.primary").scrollIntoViewIfNeeded();
+    assert.equal(await compact.page.locator(".release-announcement-actions a.primary").isVisible(),true,"compact-screen CTA remains reachable");
+    await compact.page.keyboard.press("Escape");
+    assert.equal(await compact.page.locator("#first-single-announcement").isVisible(),false,"keyboard escape closes the popup");
+    await compact.context.close();
+    log(engine+" homepage announcement", "first visit only; permanent CTA; 320px keyboard and compact viewport; mobile + desktop screenshots");
   }
 }
 
