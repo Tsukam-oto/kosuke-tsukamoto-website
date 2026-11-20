@@ -2223,7 +2223,7 @@ document.addEventListener("DOMContentLoaded", () => {
  const contest=document.getElementById("artwork-contest-topic");if(contest&&(jst>="2026-11-22"||localPreview))contest.hidden=false;
  const key="first-single-2026-announcement-dismissed-v1";
  let dismissed=false;try{dismissed=localStorage.getItem(key)==="1";}catch(e){}
- const canShow=(localPreview||(jst>="2026-11-22"&&jst<="2026-11-29"))&&!dismissed;
+ const canShow=localPreview||((jst>="2026-11-22"&&jst<="2026-11-29")&&!dismissed);
  let lastFocus=null;
  function close(){modal.hidden=true;document.body.style.overflow="";try{localStorage.setItem(key,"1")}catch(e){};lastFocus?.focus();}
  function show(){lastFocus=document.activeElement;modal.hidden=false;document.body.style.overflow="hidden";closeBtn.focus();}
