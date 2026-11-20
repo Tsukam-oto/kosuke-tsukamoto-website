@@ -123,6 +123,43 @@ async function checkTeaser(browser,engine){
   await context.close();
   log(engine+" popup teaser","release-day direct teaser CTA");
  }
+ {
+  // A YouTube channel URL is not a playable video; it must not activate a teaser CTA.
+  const bad={teasers:[{id:"intro",title:"《これからも》 INTRO",youtubeUrl:"https://www.youtube.com/",audioUrl:null}]};
+  for(const [path,selector] of [
+    ["/releases/2026-11-22/","#hero-teaser-link"],
+    ["/releases/","#releases-teaser-link"]
+  ]){
+    const page=await browser.newPage({viewport:{width:375,height:844}});
+    await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(bad)}));
+    await page.goto(BASE+path,{waitUntil:"networkidle"});
+    assert.equal(await page.locator(selector).isVisible(),false,engine+" invalid video URL must not show "+selector);
+    await page.close();
+  }
+  const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:"reduce"});
+  const page=await context.newPage();
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(bad)}));
+  await page.addInitScript(()=>{
+    const NativeDate=Date;class FixedDate extends NativeDate{
+      constructor(...args){super(...(args.length?args:["2026-11-22T12:00:00+09:00"]));}
+      static now(){return new NativeDate("2026-11-22T12:00:00+09:00").valueOf();}
+    }globalThis.Date=FixedDate;
+  });
+  await page.goto(BASE+"/",{waitUntil:"networkidle"});
+  assert.equal(await page.locator("#first-single-popup-teaser").isVisible(),false,"invalid popup teaser URL must remain hidden");
+  await context.close();
+  log(engine+" invalid teaser URLs","no false playable links on release, catalog, or homepage");
+ }
+ {
+  // The local audio file must remain usable when a video URL is invalid.
+  const fixture={teasers:[{id:"intro",title:"《これからも》 INTRO",youtubeUrl:"https://www.youtube.com/",audioUrl:"/assets/releases/teaser.mp3"}]};
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
+  await page.goto(BASE+"/releases/",{waitUntil:"networkidle"});
+  assert.equal(await page.locator("#releases-teaser-link").isVisible(),true,"valid audio must activate catalog teaser CTA");
+  await page.close();
+  log(engine+" teaser audio fallback","valid audio survives invalid video URL");
+ }
 }
 
 async function checkArtworkContest(browser,engine){
