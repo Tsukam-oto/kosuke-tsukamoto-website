@@ -59,10 +59,10 @@ footer{padding:32px clamp(20px,6vw,75px);border-top:1px solid var(--line);font-s
         const u=new URL(raw);
         if(u.protocol!=="https:")return false;
         const host=u.hostname.toLowerCase(),parts=u.pathname.split("/").filter(Boolean);
-        if(host==="youtu.be")return /^[-\\w]{11}$/.test(parts[0]||"");
+        if(host==="youtu.be")return /^[A-Za-z0-9_-]{11}$/.test(parts[0]||"");
         if(!["youtube.com","www.youtube.com","m.youtube.com"].includes(host))return false;
         const id=u.pathname==="/watch"?u.searchParams.get("v"):(["shorts","embed","live"].includes(parts[0])?parts[1]:null);
-        return /^[-\\w]{11}$/.test(id||"");
+        return /^[A-Za-z0-9_-]{11}$/.test(id||"");
       }catch{return false;}
     };
     const audio=(raw)=>{
