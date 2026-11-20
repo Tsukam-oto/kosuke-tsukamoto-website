@@ -2207,7 +2207,7 @@ document.addEventListener("DOMContentLoaded", () => {
 <p class="release-announcement-kicker">1ST SINGLE / NEW RELEASE</p>
 <h2 id="first-single-announcement-title">配信決定<span class="release-period">。</span></h2>
 <p class="release-announcement-title">あなたと、<br>これから、<br>これからも</p>
-<p class="release-announcement-description">卒業生とともにつくった2曲の新録と、新曲《これからも》。<small>配信開始日は後日発表します。</small></p>
+<p class="release-announcement-description">《あなたと》《これから》の新録と、新曲《これからも》。全3曲。<small>配信開始日は後日発表します。</small></p>
 <div class="release-announcement-actions"><a href="/releases/2026-11-22/" class="primary">特設ページを見る <span aria-hidden="true">↗</span></a><a id="first-single-popup-teaser" hidden target="_blank" rel="noopener noreferrer">ティザーを聴く ↗</a><a href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネル ↗</a></div>
 </div></div></div>
 <script id="first-single-announcement-script">
@@ -2216,13 +2216,14 @@ document.addEventListener("DOMContentLoaded", () => {
  const artNote=document.querySelector("#first-single-announcement .release-announcement-art-note");
  function readyCover(){if(cover.naturalWidth>0){cover.hidden=false;placeholder.hidden=true;if(artNote)artNote.hidden=false;}}
  cover.addEventListener("load",readyCover);cover.addEventListener("error",()=>{cover.hidden=true;placeholder.hidden=false;if(artNote)artNote.hidden=true;});if(cover.complete)readyCover();
+ const localPreview=["localhost","127.0.0.1"].includes(location.hostname)&&new URLSearchParams(location.search).get("preview-first-single")==="1";
  const nowParts=Object.fromEntries(new Intl.DateTimeFormat("en-US",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(new Date()).filter(x=>x.type!=="literal").map(x=>[x.type,x.value]));
  const jst=nowParts.year+"-"+nowParts.month+"-"+nowParts.day;
- const topic=document.getElementById("first-single-topic");if(topic&&jst>="2026-11-22")topic.hidden=false;
- const contest=document.getElementById("artwork-contest-topic");if(contest&&jst>="2026-11-22")contest.hidden=false;
+ const topic=document.getElementById("first-single-topic");if(topic&&(jst>="2026-11-22"||localPreview))topic.hidden=false;
+ const contest=document.getElementById("artwork-contest-topic");if(contest&&(jst>="2026-11-22"||localPreview))contest.hidden=false;
  const key="first-single-2026-announcement-dismissed-v1";
  let dismissed=false;try{dismissed=localStorage.getItem(key)==="1";}catch(e){}
- const canShow=jst>="2026-11-22"&&jst<="2026-11-29"&&!dismissed;
+ const canShow=(localPreview||(jst>="2026-11-22"&&jst<="2026-11-29"))&&!dismissed;
  let lastFocus=null;
  function close(){modal.hidden=true;document.body.style.overflow="";try{localStorage.setItem(key,"1")}catch(e){};lastFocus?.focus();}
  function show(){lastFocus=document.activeElement;modal.hidden=false;document.body.style.overflow="hidden";closeBtn.focus();}
