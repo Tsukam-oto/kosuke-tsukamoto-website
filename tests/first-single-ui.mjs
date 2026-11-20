@@ -256,6 +256,7 @@ async function checkCoverWhenAvailable(browser,engine){
  await page.locator("#first-single-announcement-cover").waitFor({state:"visible"});
  assert.equal(await page.locator("#first-single-announcement-placeholder").isVisible(),false);
  assert.ok(await page.locator("#first-single-announcement-cover").evaluate(el=>el.naturalWidth>0));
+ assert.equal(await page.locator(".release-announcement-art-note").isVisible(),true,"artwork note should accompany a loaded cover");
  await context.close();
  log(engine+" album artwork replacement","all three release surfaces display the image and hide placeholders");
 }
@@ -326,6 +327,13 @@ async function checkHomepage(browser,engine){
     await modal.waitFor({state:"visible"});
     assert.equal(await page.locator("#first-single-topic").isVisible(),true);
     assert.equal(await page.locator("#artwork-contest-topic").isVisible(),true,"artwork contest public on November 22");
+    assert.equal(await page.locator(".release-announcement-topline .date").innerText(),"ANNOUNCED / 2026.11.22");
+    assert.ok((await modal.innerText()).includes("配信開始日は後日発表します"));
+    assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
+    assert.equal(await page.locator(".release-announcement-art-note").isVisible(),false,"do not claim artwork before its image loads");
+    const layout=await page.locator(".release-announcement-panel").evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,bg:getComputedStyle(el).backgroundColor}));
+    assert.ok(layout.scroll<=layout.client+2,"mobile announcement should not overflow horizontally");
+    assert.equal(layout.bg,"rgb(20, 20, 23)","new editorial announcement styles must load");
     await page.screenshot({path:output+"/"+engine+"-homepage-popup-390.png",animations:"disabled"});
     await page.locator("#first-single-announcement-close").click();
     assert.equal(await modal.isVisible(),false);
