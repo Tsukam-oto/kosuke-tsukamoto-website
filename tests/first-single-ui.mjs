@@ -362,6 +362,34 @@ async function checkHomepage(browser,engine){
   }
 }
 
+async function checkReleaseMetadata(browser,engine){
+ const expected="https://kosuke-tsukamoto-website.pages.dev/assets/releases/first-single-2026-og.jpg";
+ for(const path of ["/releases/","/releases/2026-11-22/","/releases/artwork-project/"]){
+  const page=await browser.newPage();
+  await page.goto(BASE+path,{waitUntil:"domcontentloaded"});
+  assert.equal(await page.locator('meta[property="og:image"]').getAttribute("content"),expected,"release OGP uses dedicated image");
+  assert.equal(await page.locator('meta[property="og:image:width"]').getAttribute("content"),"1200");
+  assert.equal(await page.locator('meta[property="og:image:height"]').getAttribute("content"),"630");
+  assert.equal(await page.locator('meta[name="twitter:card"]').getAttribute("content"),"summary_large_image");
+  await page.close();
+ }
+ log(engine+" release metadata","1200x630 social artwork configured on three pages");
+}
+
+async function checkLocalPreview(browser,engine){
+ const page=await browser.newPage({viewport:{width:375,height:812}});
+ const baseOrigin=new URL(BASE);
+ if(!["localhost","127.0.0.1"].includes(baseOrigin.hostname))return;
+ await page.goto(BASE+"/?preview-first-single=1",{waitUntil:"domcontentloaded"});
+ await page.locator("#first-single-announcement").waitFor({state:"visible"});
+ await page.locator("#first-single-announcement-close").click();
+ assert.equal(await page.locator("#first-single-announcement").isVisible(),false);
+ await page.reload({waitUntil:"domcontentloaded"});
+ await page.locator("#first-single-announcement").waitFor({state:"visible"});
+ await page.close();
+ log(engine+" localhost-only preview","release announcement may be reviewed locally without date changes");
+}
+
 async function checkReleaseInternalLinks(browser,engine){
  const page=await browser.newPage({viewport:{width:390,height:844}});
  const origin=new URL(BASE).origin;
@@ -419,6 +447,8 @@ async function testEngine(engineType,engine){
   await checkLyrics(page,engine);
   await page.close();
   await checkHomepage(browser,engine);
+  await checkLocalPreview(browser,engine);
+  await checkReleaseMetadata(browser,engine);
   await checkTeaser(browser,engine);
   await checkCoverWhenAvailable(browser,engine);
   await checkArtworkContest(browser,engine);
