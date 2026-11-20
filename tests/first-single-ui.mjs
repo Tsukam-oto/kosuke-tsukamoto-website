@@ -229,8 +229,8 @@ async function checkLyrics(page,engine){
 }
 
 async function checkHomepage(browser,engine){
-  async function freshWithDate(iso) {
-    const context = await browser.newContext({viewport:{width:390,height:840}, reducedMotion:"reduce"});
+  async function freshWithDate(iso,width=390) {
+    const context = await browser.newContext({viewport:{width,height:840}, reducedMotion:"reduce"});
     const page=await context.newPage();
     await page.addInitScript(({fixed})=>{
       const NativeDate=Date;
@@ -256,6 +256,7 @@ async function checkHomepage(browser,engine){
     await modal.waitFor({state:"visible"});
     assert.equal(await page.locator("#first-single-topic").isVisible(),true);
     assert.equal(await page.locator("#artwork-contest-topic").isVisible(),true,"artwork contest public on November 22");
+    await page.screenshot({path:output+"/"+engine+"-homepage-popup-390.png",animations:"disabled"});
     await page.locator("#first-single-announcement-close").click();
     assert.equal(await modal.isVisible(),false);
     assert.equal(await page.locator(".countdown-announced-link").isVisible(),true);
@@ -265,7 +266,11 @@ async function checkHomepage(browser,engine){
     await page.reload({waitUntil:"domcontentloaded"});
     assert.equal(await modal.isVisible(),false,"popup shown once per visitor");
     await context.close();
-    log(engine+" homepage announcement", "first visit only; permanent CTA");
+    const desktop=await freshWithDate("2026-11-22T12:00:00+09:00",1440);
+    await desktop.page.locator("#first-single-announcement").waitFor({state:"visible"});
+    await desktop.page.screenshot({path:output+"/"+engine+"-homepage-popup-1440.png",animations:"disabled"});
+    await desktop.context.close();
+    log(engine+" homepage announcement", "first visit only; permanent CTA; mobile + desktop screenshots");
   }
 }
 
