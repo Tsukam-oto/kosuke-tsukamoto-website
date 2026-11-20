@@ -2228,19 +2228,25 @@ document.addEventListener("DOMContentLoaded", () => {
  .then(res=>res.ok?res.json():null)
  .then(data=>{
     if(!data||!Array.isArray(data.teasers))return;
-    const find=(entry)=>{
-      const raw=entry?.youtubeUrl||entry?.audioUrl;
+    const videoLink=(raw)=>{
       if(typeof raw!=="string"||!raw.trim())return null;
       try{
-        const url=new URL(raw,location.href);
-        if(url.protocol!=="https:")return null;
-        if(entry.youtubeUrl){
-          const host=url.hostname.toLowerCase();
-          if(!["youtube.com","www.youtube.com","m.youtube.com","youtu.be"].includes(host))return null;
+        const u=new URL(raw);
+        if(u.protocol!=="https:")return null;
+        const host=u.hostname.toLowerCase(),parts=u.pathname.split("/").filter(Boolean);
+        let id=null;
+        if(host==="youtu.be")id=parts[0];
+        else if(["youtube.com","www.youtube.com","m.youtube.com"].includes(host)){
+          id=u.pathname==="/watch"?u.searchParams.get("v"):(["shorts","embed","live"].includes(parts[0])?parts[1]:null);
         }
-        return url.href;
+        return /^[A-Za-z0-9_-]{11}$/.test(id||"")?u.href:null;
       }catch{return null;}
     };
+    const audioLink=(raw)=>{
+      if(typeof raw!=="string"||!raw.trim()||(!raw.startsWith("/")&&!raw.startsWith("https://")))return null;
+      try{const u=new URL(raw,location.href);return u.protocol==="https:"||u.origin===location.origin?u.href:null;}catch{return null;}
+    };
+    const find=(entry)=>videoLink(entry?.youtubeUrl)||audioLink(entry?.audioUrl);
     const teaser=data.teasers.map(find).find(Boolean);
     if(teaser){
       const link=document.getElementById("first-single-popup-teaser");
