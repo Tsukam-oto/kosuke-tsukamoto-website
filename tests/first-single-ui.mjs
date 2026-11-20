@@ -2,7 +2,7 @@
 // node tests/first-single-ui.mjs
 import { chromium, webkit } from "playwright";
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 
 const BASE = process.env.UI_BASE_URL || "http://127.0.0.1:8765";
 const output = "test-results/first-single";
@@ -227,6 +227,39 @@ async function checkArtworkContest(browser,engine){
  log(engine+" artwork interests","5 widths; graduate-only interest message; intercepted POST; catalog link");
 }
 
+async function checkCoverWhenAvailable(browser,engine){
+ // The real album cover is supplied later. Mock a valid image at the exact planned path.
+ const artwork=await readFile("assets/share-works.png");
+ for(const item of [
+  {path:"/releases/",img:"#releases-artwork",pending:"#releases-cover-pending"},
+  {path:"/releases/2026-11-22/",img:"#release-cover-image",pending:"#release-cover-pending"}
+ ]){
+  const page=await browser.newPage({viewport:{width:390,height:844}});
+  await page.route("**/assets/releases/first-single-2026-cover.webp",route=>route.fulfill({status:200,contentType:"image/png",body:artwork}));
+  await page.goto(BASE+item.path,{waitUntil:"networkidle"});
+  await page.locator(item.img).waitFor({state:"visible"});
+  assert.equal(await page.locator(item.pending).isVisible(),false,"placeholder must disappear when artwork loads");
+  assert.ok(await page.locator(item.img).evaluate(el=>el.naturalWidth>0),"real image dimensions loaded");
+  if(item.path.includes("2026-11-22"))assert.equal(await page.locator("#release-cover-label").innerText(),"JACKET ARTWORK");
+  await page.close();
+ }
+ const context=await browser.newContext({viewport:{width:390,height:844},reducedMotion:"reduce"});
+ const page=await context.newPage();
+ await page.route("**/assets/releases/first-single-2026-cover.webp",route=>route.fulfill({status:200,contentType:"image/png",body:artwork}));
+ await page.addInitScript(()=>{
+  const NativeDate=Date;class FixedDate extends NativeDate{
+   constructor(...args){super(...(args.length?args:["2026-11-22T12:00:00+09:00"]));}
+   static now(){return new NativeDate("2026-11-22T12:00:00+09:00").valueOf();}
+  }globalThis.Date=FixedDate;
+ });
+ await page.goto(BASE+"/",{waitUntil:"networkidle"});
+ await page.locator("#first-single-announcement-cover").waitFor({state:"visible"});
+ assert.equal(await page.locator("#first-single-announcement-placeholder").isVisible(),false);
+ assert.ok(await page.locator("#first-single-announcement-cover").evaluate(el=>el.naturalWidth>0));
+ await context.close();
+ log(engine+" album artwork replacement","all three release surfaces display the image and hide placeholders");
+}
+
 async function checkUcnucThanks(browser,engine){
  for(const width of [320,375,768,1440]){
   const page=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
@@ -369,6 +402,7 @@ async function testEngine(engineType,engine){
   await page.close();
   await checkHomepage(browser,engine);
   await checkTeaser(browser,engine);
+  await checkCoverWhenAvailable(browser,engine);
   await checkArtworkContest(browser,engine);
   await checkUcnucThanks(browser,engine);
   await checkReleaseInternalLinks(browser,engine);
