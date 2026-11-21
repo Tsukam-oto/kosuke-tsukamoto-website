@@ -1,8 +1,7 @@
 /* REC NOTE 7.0: mobile cloud lyric timing; existing record schema and authentication. */
 (function(){
 'use strict';
-const link=document.createElement('a');link.href='./lyric-sync.html';link.className='syncShortcut';link.textContent='歌詞同期';
-document.querySelector('.headops')?.prepend(link);
+// Dedicated full-song timing page only. The audio-corrections page has its own navigation.
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync\.html$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
@@ -38,10 +37,6 @@ root.innerHTML=[
 ].join('');
 document.body.append(root);
 document.getElementById('syncInit')?.remove();
-const taskNav=document.createElement('nav');
-taskNav.className='syncTaskNav';taskNav.setAttribute('aria-label','作業を選択');
-taskNav.innerHTML='<a href="./">録音の修正依頼</a><a href="./lyric-sync.html" aria-current="page">歌詞のタイミング合わせ</a>';
-root.insertBefore(taskNav,root.querySelector('.syncHeading'));
 /* Simplified focus-mode shell: onboarding only until ready, one large record action.
    Existing event handlers, storage keys and timing records are preserved. */
 const intro=document.createElement('section');intro.className='syncIntro';intro.id='syncIntro';
