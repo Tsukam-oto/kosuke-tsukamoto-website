@@ -347,15 +347,33 @@ async function checkUcnucThanks(browser,engine){
   if(width===375)await page.screenshot({path:output+"/"+engine+"-ucnuc-375.png",fullPage:true,animations:"disabled"});
   await page.close();
  }
- const index=await browser.newPage();
- await index.goto(BASE+"/special-thanks/",{waitUntil:"domcontentloaded"});
- assert.equal(await index.locator('a[href="/special-thanks/ucnuc/"]').count(),1,"SPECIAL THANKS contains UCNUC");
- await index.close();
+ for(const width of [320,375,768,1440]){
+  const index=await browser.newPage({viewport:{width,height:900},reducedMotion:"reduce"});
+  await index.goto(BASE+"/special-thanks/#jacket-artwork-thanks",{waitUntil:"domcontentloaded"});
+  assert.equal(await index.locator('a[href="/special-thanks/ucnuc/"]').count(),1,"SPECIAL THANKS retains UCNUC");
+  assert.equal(await index.locator('a[href="/special-thanks/eastgate/"]').count(),1,"SPECIAL THANKS retains the choir");
+  const jacket=index.locator("#jacket-artwork-thanks");
+  assert.equal(await jacket.count(),1,"2026 EP artwork credit must be available");
+  assert.ok((await jacket.innerText()).includes("ジャケットイラスト"),"anonymous artwork credit is visible");
+  assert.ok((await jacket.innerText()).includes("あなたと、これから、これからも"),"artwork credit links to the correct EP");
+  assert.equal(await jacket.locator('a[href^="https://"]').count(),0,"anonymous artwork section must not link to any artist profile");
+  assert.equal(await jacket.locator('a[href="/releases/2026-11-22/"]').count(),1,"artwork acknowledgement links to EP");
+  const bounds=await index.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+  assert.ok(bounds[0]<=bounds[1]+1.5,engine+" thanks index mobile overflow at width "+width);
+  if(width===375)await index.screenshot({path:output+"/"+engine+"-special-thanks-artwork-375.png",fullPage:true,animations:"disabled"});
+  await index.close();
+ }
+ const home=await browser.newPage({viewport:{width:375,height:840}});
+ await home.goto(BASE+"/",{waitUntil:"domcontentloaded"});
+ const orderedTopics=await home.locator("#news > .wrap > .news-list > .news-item").evaluateAll(els=>els.slice(0,3).map(el=>el.id));
+ assert.deepEqual(orderedTopics,["first-single-topic","special-thanks-ep-topic","artwork-contest-topic"],"TOPICS prioritizes EP release, thanks, then artwork recruitment");
+ assert.equal(await home.locator('#special-thanks-ep-topic a[href="/special-thanks/#jacket-artwork-thanks"]').count(),1,"updated TOPICS links directly to anonymous artwork credit");
+ await home.close();
  const release=await browser.newPage();
  await release.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
  assert.equal(await release.locator('.ucnuc-credit a[href="/special-thanks/ucnuc/"]').count(),1,"release links to recording acknowledgement");
  await release.close();
- log(engine+" UCNUC special thanks","4 widths; studio credits; release and index backlinks");
+ log(engine+" credits and TOPICS","4 widths; UCNUC, unnamed artwork, choir preserved; 11/22 TOPICS ordering");
 }
 
 async function checkLyrics(page,engine){
