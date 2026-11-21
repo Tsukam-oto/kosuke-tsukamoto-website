@@ -210,7 +210,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 /* Teaser links are factual: only show an individual recording when its real URL exists. */
 .release-hero-actions{display:flex;flex-wrap:wrap;align-items:center;column-gap:22px;row-gap:13px;margin-top:30px}
 .release-hero-actions .main-action{margin-top:0}
-.release-youtube-channel,.release-tiktok-channel,.release-hero-teaser-link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
+.release-youtube-channel,.release-tiktok-channel,.release-hero-teaser-link,.release-feedback-link{font-size:13px;font-weight:600;text-decoration:underline;text-underline-offset:4px}
 .release-hero-actions [hidden],.release-teaser-section[hidden]{display:none!important}
 .release-teaser-section{padding-top:clamp(60px,7vw,100px);padding-bottom:clamp(70px,8vw,110px);border-top:1px solid var(--line)}
 .release-teaser-heading{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:32px}
@@ -263,6 +263,26 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 .ep-participation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
 .ep-participation-card{border-top:2px solid var(--ink);padding-top:24px;display:flex;flex-direction:column;align-items:flex-start}
 .ep-participation-card h3{font-size:24px;line-height:1.5;margin:0 0 14px}.ep-participation-card p{font-size:14px;line-height:1.95;margin:0 0 18px}.ep-participation-card .kicker{font-size:11px}.ep-participation-card .artwork-project-meta{font-size:12px}.ep-participation-card a{margin-top:auto;text-decoration:underline;overflow-wrap:anywhere}
+
+.ep-message-card{scroll-margin-top:80px}
+.ep-feedback-form{width:100%;margin:2px 0 0;display:grid;gap:10px;align-self:stretch}
+.ep-feedback-label{display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;line-height:1.5}
+.ep-feedback-required,.ep-feedback-optional{font-size:10px;font-weight:500;color:var(--muted)}
+.ep-feedback-form textarea,.ep-feedback-form input[type="text"]{width:100%;box-sizing:border-box;background:#fff;color:var(--ink);border:1px solid #bdbdb8;border-radius:0;padding:13px 14px;font-size:16px;line-height:1.65}
+.ep-feedback-form textarea{resize:vertical;min-height:108px}
+.ep-feedback-form textarea:focus-visible,.ep-feedback-form input[type="text"]:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ep-feedback-consent{border:0;padding:0;margin:6px 0 2px;display:grid;gap:7px;min-width:0}
+.ep-feedback-consent legend{font-size:13px;font-weight:700;margin-bottom:9px}
+.ep-feedback-consent label{display:flex;align-items:flex-start;gap:9px;font-size:12px;line-height:1.6;cursor:pointer}
+.ep-feedback-consent input{flex:none;margin:4px 0 0;width:17px;height:17px;accent-color:var(--ink)}
+.ep-message-card .ep-feedback-form .ep-feedback-notice{font-size:11px;color:var(--muted);line-height:1.75;margin:4px 0}
+.ep-message-card .ep-feedback-form .ep-feedback-notice a{color:inherit;text-decoration:underline}
+.ep-feedback-send{display:inline-flex;align-items:center;justify-content:center;min-height:48px;background:var(--ink);color:#fff;border:1px solid var(--ink);padding:11px 16px;font-size:13px;font-weight:700;cursor:pointer;width:100%;margin-top:2px}
+.ep-feedback-send:hover{background:#333}
+.ep-feedback-send:focus-visible{outline:3px solid #444;outline-offset:4px}
+.ep-feedback-hp{position:absolute!important;left:-9999px!important;top:auto!important;width:1px!important;height:1px!important;overflow:hidden!important}
+.ep-message-card .ep-message-other{margin:18px 0 0;font-size:12px;font-weight:500;text-decoration:underline}
+
 @media(max-width:800px){.hero h1{font-size:clamp(40px,10vw,60px);margin:18px 0}.release-work-title{font-size:clamp(22px,5.8vw,32px)}.release-hero-actions{grid-template-columns:minmax(0,1fr);gap:16px}.release-hero-actions .main-action{min-width:0;width:min(100%,260px)}.ep-participation-grid{grid-template-columns:1fr;gap:36px}.ep-participation-card h3{font-size:22px}}
 </style>
 </head>
@@ -284,6 +304,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <div class="release-hero-actions">
 <a href="#for-this-release" class="main-action">EPについて読む <span aria-hidden="true">↓</span></a>
 <a id="hero-teaser-link" class="release-hero-teaser-link" href="#teaser" hidden>ティザーを見る ↓</a>
+<a class="release-feedback-link" href="#ep-message">ひとことを送る ↓</a>
 <a class="release-youtube-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a><a class="release-tiktok-channel" href="https://www.tiktok.com/@tsukam.oto.kos" target="_blank" rel="noopener noreferrer">TikTokを見る ↗</a>
 </div>
 
@@ -329,7 +350,29 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <div class="section-head"><div><p class="kicker">JOIN / MESSAGE</p><h2 id="artwork-project-title">このEPについて</h2></div></div>
 <div class="ep-participation-grid">
 <article class="ep-participation-card"><p class="kicker">ARTWORK PROJECT</p><h3>ジャケット募集</h3><p>《あなたと》《これから》の単独配信用ジャケットを描いてくださる方を募集します。まずは「描いてみたい」というメッセージから。</p><p class="artwork-project-meta">2026年11月22日 募集開始</p><a href="/releases/artwork-project/" class="artwork-project-action">ジャケット募集の詳細・応募 →</a></article>
-<article class="ep-participation-card"><p class="kicker">COMMENT / MESSAGE</p><h3>感想・メッセージ</h3><p>ティザーや歌詞を見て感じたこと、このEPへのひとことをお寄せください。VOICE BOXから、匿名でも送れます。</p><a href="/voice-box/" class="artwork-project-action">EPの感想・メッセージを送る →</a></article>
+<article class="ep-participation-card ep-message-card" id="ep-message" aria-labelledby="ep-message-title">
+<p class="kicker">COMMENT / MESSAGE</p>
+<h3 id="ep-message-title">EPへのひとこと</h3>
+<p>ティザーや歌詞を見た感想、応援のひとことなど。匿名で、ここから直接送れます。</p>
+<form id="ep-feedback-form" class="ep-feedback-form" action="https://formspree.io/f/xbgjraga" method="POST">
+<input type="hidden" name="_subject" value="1st EP｜あなたと、これから、これからも｜感想">
+<input type="hidden" name="category" value="1st EP / 感想・メッセージ">
+<input type="hidden" name="project" value="first-ep-2026-11-22">
+<input type="hidden" name="work" value="あなたと、これから、これからも">
+<div class="ep-feedback-hp" aria-hidden="true"><label>入力しないでください<input name="_gotcha" type="text" tabindex="-1" autocomplete="off"></label></div>
+<label class="ep-feedback-label" for="ep-feedback-message">あなたの言葉 <span class="ep-feedback-required">必須</span></label>
+<textarea id="ep-feedback-message" name="voice" rows="4" maxlength="1200" required placeholder="ひとことからでも大丈夫です。"></textarea>
+<label class="ep-feedback-label" for="ep-feedback-name">お名前・ニックネーム <span class="ep-feedback-optional">任意</span></label>
+<input id="ep-feedback-name" name="name" type="text" maxlength="100" autocomplete="nickname" placeholder="空欄なら匿名として受け付けます">
+<fieldset class="ep-feedback-consent"><legend>サイトでの紹介について</legend>
+<label><input type="radio" name="publication" value="掲載しない" checked> 紹介しない</label>
+<label><input type="radio" name="publication" value="匿名で掲載してよい"> 内容を確認したうえで匿名で紹介してよい</label>
+</fieldset>
+<p class="ep-feedback-notice">送信内容は自動公開されません。<a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree ↗</a>を通じて受け付けます。個人情報や第三者を特定できる内容は書かないでください。送信後は受付画面で完了をご確認ください。</p>
+<button type="submit" class="ep-feedback-send">ひとことを送る →</button>
+</form>
+<a class="ep-message-other" href="/voice-box/">ほかの作品へのメッセージはVOICE BOXへ →</a>
+</article>
 </div>
 </section>
 <section id="listen" class="container links-section" aria-labelledby="listen-title">
