@@ -66,3 +66,31 @@
  #syncStudio .fsNudge button{font-size:10px}
 }
 @media(prefers-reduced-motion:reduce){#syncStudio .fsEditor .fsActions{-webkit-backdrop-filter:none;backdrop-filter:none}}
+
+/* v12: instrumental boundaries live inside the lyric page, not a separate mode */
+#syncStudio .fsInlineBar{
+ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+ gap:7px;margin:8px 0 12px;
+}
+#syncStudio .fsInlineBar button{
+ min-height:47px;border:1px solid #d9d2c9;border-radius:11px;background:#fff;
+ color:#484149;font-size:13px;font-weight:700;letter-spacing:.01em;
+}
+#syncStudio .fsInlineBar button:focus-visible{outline:3px solid #9e8580;outline-offset:2px}
+#syncStudio #fullSongSections[hidden]{display:none!important}
+#syncStudio #fullSongSections{scroll-margin-top:174px;margin:0 0 13px;padding-bottom:95px}
+#syncStudio #fullSongSections .fsIntro{
+ display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+#syncStudio #fullSongSections .fsIntro strong{font-size:15px}
+#syncStudio #fsClose{font-size:12px;min-height:42px;padding:8px 12px;border-color:#dad4ce;background:#f7f5f1}
+#syncStudio.syncInlineSectionActive .syncDock{display:none!important}
+#syncStudio.syncInlineSectionActive .syncModeBar{display:none!important}
+#syncStudio .fsTools{display:none!important}
+#syncStudio.syncNeedsAudio .fsInlineBar,#syncStudio.syncNeedsLogin .fsInlineBar{display:none!important}
+#syncStudio .fsItem{font-size:12px}
+@media(max-width:550px){
+ #syncStudio .fsInlineBar{gap:6px;margin:7px 0 11px}
+ #syncStudio .fsInlineBar button{font-size:12px;min-height:45px}
+ #syncStudio #fullSongSections{scroll-margin-top:170px}
+}
