@@ -10,7 +10,7 @@ document.body.classList.add('syncPage');document.title='歌詞同期 | REC NOTE'
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
-'<header class="syncHeading"><div><small>LYRIC SYNC</small><h1>歌詞合わせ</h1></div><a href="./">REC NOTE</a></header>',
+'<header class="syncHeading"><div><small>LYRIC SYNC</small><h1>曲のタイミング合わせ</h1></div><a href="./">REC NOTE</a></header>',
 '<details id="syncAccount"><summary><span id="syncAccountSummary">クラウドにログイン</span><b id="syncAuthState">確認中</b></summary><div id="syncCloudSlot"></div></details>',
 '<nav class="syncSongs" aria-label="楽曲選択"><button data-song="あなたと">あなたと</button><button data-song="これから">これから</button><button data-song="これからも">これからも</button></nav>',
 '<p id="syncNotice" class="syncNotice" role="status">準備しています…</p>',
@@ -37,6 +37,7 @@ root.innerHTML=[
 '<footer class="syncDock"><div><strong id="syncDockLyric">歌詞を選択</strong><small id="syncDockClock">0:00.00</small></div><button id="syncDockPlay" aria-label="再生・一時停止">▶</button><button class="syncEmphasis" id="syncTapNow">歌い始めを記録</button></footer>'
 ].join('');
 document.body.append(root);
+document.getElementById('syncInit')?.remove();
 const taskNav=document.createElement('nav');
 taskNav.className='syncTaskNav';taskNav.setAttribute('aria-label','作業を選択');
 taskNav.innerHTML='<a href="./">録音の修正依頼</a><a href="./lyric-sync.html" aria-current="page">歌詞のタイミング合わせ</a>';
@@ -63,7 +64,7 @@ root.insertBefore(adjust,$('syncEditor'));adjust.append($('syncEditor'));
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
-extra.append(root.querySelector('.syncSectionLabel label'),root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVersion'),$('syncTools'),root.querySelector('.syncFoot'));
+extra.append(root.querySelector('.syncSectionLabel label'),root.querySelector('.syncTransport label'),root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVersion'),$('syncTools'),root.querySelector('.syncFoot'));
 const dockEdit=document.createElement('button');dockEdit.type='button';dockEdit.id='syncDockEdit';dockEdit.textContent='修正';dockEdit.setAttribute('aria-label','選択した歌詞の時刻を修正');root.querySelector('.syncDock').insertBefore(dockEdit,$('syncTapNow'));
 dockEdit.addEventListener('click',()=>{if($('syncEditor').hidden)return;adjust.open=!adjust.open;});
 const closeEdit=document.createElement('button');closeEdit.type='button';closeEdit.id='syncCloseEdit';closeEdit.textContent='閉じる';closeEdit.setAttribute('aria-label','時刻修正を閉じる');
