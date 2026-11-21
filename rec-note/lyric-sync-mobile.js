@@ -37,6 +37,23 @@ root.innerHTML=[
 '<footer class="syncDock"><div><strong id="syncDockLyric">歌詞を選択</strong><small id="syncDockClock">0:00.00</small></div><button id="syncDockPlay" aria-label="再生・一時停止">▶</button><button class="syncEmphasis" id="syncTapNow">歌い始めを記録</button></footer>'
 ].join('');
 document.body.append(root);
+/* Simplified focus-mode shell: onboarding only until ready, one large record action.
+   Existing event handlers, storage keys and timing records are preserved. */
+const intro=document.createElement('section');intro.className='syncIntro';intro.id='syncIntro';
+intro.innerHTML='<strong id="syncIntroTitle">ログインして始めます</strong><p id="syncIntroText">同じアカウントでMac・iPhoneから続けられます。</p>';
+root.insertBefore(intro,root.querySelector('.syncPlayer'));
+const hint=document.createElement('p');hint.className='syncOneLineHelp';hint.textContent='①再生 → ②歌い始めたら画面下の「記録」を押す';
+root.insertBefore(hint,$('syncLines'));
+const review=document.createElement('div');review.className='syncQuickReview';review.id='syncQuickReview';
+review.innerHTML='<span class="syncQuickNote">選択中の行</span><button id="syncQuickListen" type="button">前後を聴く</button><button id="syncQuickEnd" type="button">いま終了</button><button id="syncQuickConfirm" type="button">確認済み</button><button id="syncQuickAdjust" type="button">時刻を直す</button>';
+root.insertBefore(review,$('syncEditor'));
+const adjust=document.createElement('details');adjust.id='syncFineTune';adjust.className='syncFineTune';
+adjust.innerHTML='<summary>時刻を細かく調整する</summary>';
+root.insertBefore(adjust,$('syncEditor'));adjust.append($('syncEditor'));
+const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
+extra.innerHTML='<summary>その他の設定・書き出し</summary>';
+root.insertBefore(extra,$('syncTools'));
+extra.append(root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVersion'),$('syncTools'),root.querySelector('.syncFoot'));
 const cloudPanel=$('recCloudPanel');if(cloudPanel)$('syncCloudSlot').append(cloudPanel);
 const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:',OFFSET_PREFIX='rec_note_sync_offset_v7:';
 function audioOffset(){const saved=localStorage.getItem(OFFSET_PREFIX+song);if(saved!==null&&Number.isFinite(Number(saved)))return Number(saved);return /_1119\.mp3$/i.test(files[song]?.name||'')?-0.022:0;}
@@ -183,6 +200,24 @@ function clock(){
  const cloud=media.isSignedIn()&&media.list(song).some(m=>m.kind==='A');
  $('syncMediaHelp').textContent=cloud?'クラウドのMP3が登録されています。別端末でも自動復元できます。':hasAudio()?'端末では再生できます。外出先用にはMP3をクラウドへ登録してください。':'Dropboxの tsukamoto_mix にある、この曲のMP3を一度だけ登録してください。以降は外出先でも使えます。';
  $('syncMedia').classList.toggle('registered',cloud);
+ focusState();
+}
+function focusState(){
+ const signed=bridge.isSignedIn(),has=hasAudio(),stored=signed&&media.list(song).some(m=>m.kind==='A');
+ root.classList.toggle('syncNeedsLogin',!signed);
+ root.classList.toggle('syncNeedsAudio',signed&&!has);
+ root.classList.toggle('syncReady',signed&&has);
+ $('syncAccountSummary').textContent=signed?'保存先：クラウド':'ログインして始める';
+ const label=$('syncIntroTitle'),info=$('syncIntroText');
+ if(!signed){label.textContent='まずログイン';info.textContent='REC NOTEに使っているアカウントでログインしてください。';}
+ else if(!has){label.textContent=stored?'音源を読み込んでいます':'最初にMP3を登録';info.textContent=stored?'クラウドに保存済みの音源を復元します。読み込まれないときは下から選択できます。':'曲を選び、MP3を一度登録してください。次からは自動で開きます。';}
+ $('syncMedia').hidden=stored&&has;
+ const t=get(selected),some=rows().some(x=>started(x.time));
+ $('syncQuickReview').hidden=!signed||!has||!some||selected<0;
+ $('syncQuickConfirm').disabled=!complete(t)||confirmed(t)||conflict(selected);
+ $('syncQuickEnd').disabled=!started(t)||confirmed(t);
+ $('syncQuickEnd').hidden=complete(t);
+ $('syncDockLyric').title=selected>=0?lines[selected]:'';
 }
 function toggleAudio(){if(!hasAudio()){notice('先にMP3を選んでください。',true);return;}if(audio.paused)audio.play().catch(e=>notice('再生できません：'+e.message,true));else audio.pause();}
 async function loadLyrics(){
@@ -221,6 +256,10 @@ function json(){
  if(!version)return;
  download('LYRIC_SYNC_'+song+'_同期.json',JSON.stringify({schema_version:3,source:'REC_NOTE_CLOUD_LYRIC_SYNC',song,workId:work.id,textVersionId:version.id,textStatus:version.text_status,exportedAt:new Date().toISOString(),cues:rows().map(x=>({lineIndex:x.i,text:x.text,start:x.time?.start??null,end:x.time?.end??null,status:x.time?.status||'unassigned'}))},null,2),'application/json');
 }
+$('syncQuickListen').addEventListener('click',()=>$('syncReplay').click());
+$('syncQuickEnd').addEventListener('click',()=>$('syncCaptureEnd').click());
+$('syncQuickConfirm').addEventListener('click',()=>$('syncConfirm').click());
+$('syncQuickAdjust').addEventListener('click',()=>{const item=$('syncFineTune');item.open=true;item.scrollIntoView({behavior:'smooth',block:'start'});});
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{if(song!==b.dataset.song){setSong(b.dataset.song);loadLyrics();}});
 $('syncVersion').addEventListener('change',e=>changeVersion(e.target.value));
 $('syncPlay').addEventListener('click',toggleAudio);$('syncDockPlay').addEventListener('click',toggleAudio);
