@@ -319,6 +319,10 @@ async function checkHomepage(browser,engine){
   {
     const {context,page}=await freshWithDate("2026-11-21T12:00:00+09:00");
     assert.equal(await page.locator("#first-single-announcement").isVisible(),false);
+    assert.deepEqual(await page.locator("#lyric-box .lyric-stat strong").allInnerTexts(),["534","12"],"LYRIC BOX includes Korekaramo in 12 works");
+    assert.ok((await page.content()).includes('"source":"これからも"'),"Korekaramo excerpt source exists in LYRIC BOX");
+    assert.ok((await page.content()).includes('"これからも": "korekaramo"'),"Korekaramo LYRIC BOX link maps to published poem");
+    assert.equal(await page.locator('#korekaramo').count(),0,"the song lyrics are linked from the separate lyrics page");
     assert.equal(await page.locator("#artwork-contest-topic").isVisible(),false,"no public contest announcement before November 22");
     await context.close();
     log(engine+" homepage pre-release", "no spoiler popup");
