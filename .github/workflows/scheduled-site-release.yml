@@ -1,0 +1,142 @@
+name: Scheduled site release gate
+
+on:
+  schedule:
+    # 2026-11-22 JST: 00:00, then safety retries if GitHub scheduling is delayed or dropped.
+    # UTC date is 2026-11-21 for these cron entries.
+    - cron: '0,7,17,27,37,47,57 15 21 11 *'
+    - cron: '13,43 16-17 21 11 *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+
+concurrency:
+  group: scheduled-site-release-20261122
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.repository == 'Tsukam-oto/kosuke-tsukamoto-website'
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check exact release date in Japan
+        id: date
+        shell: bash
+        run: |
+          set -euo pipefail
+          current="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S')"
+          echo "Current JST: $current"
+          if [[ "${current:0:10}" != "2026-11-22" ]]; then
+            echo "Not release day, no publication."
+            exit 0
+          fi
+          echo "eligible=true" >> "$GITHUB_OUTPUT"
+
+      - name: Get default-branch repo safely
+        if: steps.date.outputs.eligible == 'true'
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 1
+
+      - name: Validate PR, assets, build and announcement before merge
+        if: steps.date.outputs.eligible == 'true'
+        id: validate
+        shell: bash
+        env:
+          REPO: Tsukam-oto/kosuke-tsukamoto-website
+        run: |
+          set -euo pipefail
+          pr_json="$(gh api "repos/$REPO/pulls/68")"
+          state="$(jq -r .state <<< "$pr_json")"
+          merged="$(jq -r .merged <<< "$pr_json")"
+          if [[ "$merged" == "true" ]]; then
+            echo "Already merged; release is idempotent."
+            echo "already=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          [[ "$state" == "open" ]] || { echo "::error::PR #68 is not open"; exit 1; }
+          head="$(jq -r .head.ref <<< "$pr_json")"
+          base="$(jq -r .base.ref <<< "$pr_json")"
+          head_repo="$(jq -r .head.repo.full_name <<< "$pr_json")"
+          mergeable="$(jq -r .mergeable <<< "$pr_json")"
+          [[ "$head" == "feature/first-single-20261122" && "$base" == "main" && "$head_repo" == "$REPO" ]] || {
+            echo "::error::Unexpected PR branch/repository; stopping"; exit 1;
+          }
+          [[ "$mergeable" == "true" ]] || { echo "::error::PR is not currently mergeable"; exit 1; }
+          sha="$(jq -r .head.sha <<< "$pr_json")"
+          echo "Validating candidate SHA: $sha"
+          git fetch --no-tags --depth=1 origin "$sha"
+          git show "$sha:releases/2026-11-22/index.html" > /tmp/first-ep-page.html
+          grep -Fq '1st ep' /tmp/first-ep-page.html
+          grep -Fq '全6曲' /tmp/first-ep-page.html
+          grep -Fq 'Piano Instrumental' /tmp/first-ep-page.html
+          grep -Fq '配信開始日：後日発表' /tmp/first-ep-page.html
+          git show "$sha:assets/releases/first-single-2026-cover.webp" > /tmp/first-ep-cover.webp || {
+            echo "::error::Cover missing in PR; no broken release"; exit 1;
+          }
+          git show "$sha:assets/releases/first-single-2026-og.jpg" > /tmp/first-ep-og.jpg || {
+            echo "::error::Social image missing in PR; no broken release"; exit 1;
+          }
+          [[ "$(wc -c < /tmp/first-ep-cover.webp)" -gt 10000 && "$(file -b --mime-type /tmp/first-ep-cover.webp)" == "image/webp" ]] || {
+            echo "::error::Cover invalid or too small"; exit 1;
+          }
+          [[ "$(wc -c < /tmp/first-ep-og.jpg)" -gt 10000 && "$(file -b --mime-type /tmp/first-ep-og.jpg)" == "image/jpeg" ]] || {
+            echo "::error::Social image invalid or too small"; exit 1;
+          }
+          runs="$(gh api "repos/$REPO/actions/runs?event=pull_request&head_sha=$sha&per_page=100")"
+          qa="$(jq --arg sha "$sha" -r '[.workflow_runs[] | select(.head_sha==$sha and .path==".github/workflows/first-single-ui.yml")] | sort_by(.run_number) | last | .conclusion // "missing"' <<< "$runs")"
+          [[ "$qa" == "success" ]] || { echo "::error::PR QA for $sha is $qa, not successful"; exit 1; }
+          status_json="$(gh api "repos/$REPO/commits/$sha/status")"
+          netlify="$(jq -r '[.statuses[] | select(.context=="netlify/kosuketsukamoto/deploy-preview")] | first | .state // "missing"' <<< "$status_json")"
+          [[ "$netlify" == "success" ]] || { echo "::error::Preview deploy for $sha is $netlify"; exit 1; }
+          echo "head_sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "Validated image mime-types, release details, QA, and deploy preview."
+
+      - name: Publish only after Japanese midnight
+        if: steps.date.outputs.eligible == 'true' && steps.validate.outputs.already != 'true'
+        shell: bash
+        env:
+          REPO: Tsukam-oto/kosuke-tsukamoto-website
+        run: |
+          set -euo pipefail
+          pr="$(gh api "repos/$REPO/pulls/68")"
+          if [[ "$(jq -r .head.sha <<< "$pr")" != "${{ steps.validate.outputs.head_sha }}" ]]; then
+            echo "::error::PR changed during validation; abort"; exit 1
+          fi
+          if [[ "$(jq -r .draft <<< "$pr")" == "true" ]]; then
+            gh pr ready 68 --repo "$REPO"
+          fi
+          gh pr merge 68 --merge --repo "$REPO"
+          merged="$(gh api "repos/$REPO/pulls/68" --jq .merged)"
+          [[ "$merged" == "true" ]] || { echo "::error::Merge was not confirmed"; exit 1; }
+          echo "Merged PR #68 into main after Japanese midnight."
+
+      - name: Check public deployment and artwork
+        if: steps.date.outputs.eligible == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          domain="https://kosuke-tsukamoto-website.pages.dev"
+          ready=0
+          for attempt in 1 2 3 4 5 6; do
+            if curl -fsSL --connect-timeout 5 --max-time 15 "$domain/releases/2026-11-22/" -o /tmp/published-release.html \
+              && grep -Fq '1st ep' /tmp/published-release.html \
+              && curl -fsSL --connect-timeout 5 --max-time 15 "$domain/assets/releases/first-single-2026-cover.webp" -o /tmp/published-cover.webp \
+              && curl -fsSL --connect-timeout 5 --max-time 15 "$domain/assets/releases/first-single-2026-og.jpg" -o /tmp/published-og.jpg \
+              && [[ "$(file -b --mime-type /tmp/published-cover.webp)" == "image/webp" ]] \
+              && [[ "$(file -b --mime-type /tmp/published-og.jpg)" == "image/jpeg" ]]; then
+              ready=1
+              break
+            fi
+            echo "Waiting for Cloudflare Pages production to update ($attempt/6)"
+            sleep 20
+          done
+          [[ "$ready" == "1" ]] || { echo "::error::PR merged but production deployment was not verified"; exit 1; }
+          echo "Confirmed public 1st ep release page and both images."
