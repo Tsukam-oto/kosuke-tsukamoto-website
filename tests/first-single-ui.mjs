@@ -68,6 +68,7 @@ async function checkTeaser(browser,engine){
   await page.locator("#teaser").waitFor({state:"visible"});
   assert.equal(await page.locator("#hero-teaser-link").isVisible(),true,"actual published Shorts teaser is linked");
   assert.equal(await page.locator(".release-teaser-item").count(),1,"exactly one verified teaser is published");
+  assert.equal(await page.locator(".release-teaser-item h3").innerText(),"1st EP TEASER");
   assert.equal(await page.locator(".release-teaser-item a").first().getAttribute("href"),"https://youtube.com/shorts/9sHQVSQfBnc");
   assert.equal(await page.locator(".release-youtube-channel").isVisible(),true,"YouTube channel link always visible");
   assert.equal(await page.locator(".hero + #for-this-release").count(),1,"release essay keeps priority");
@@ -446,6 +447,16 @@ async function testEngine(engineType,engine){
    await page.locator(".release-words .secret-char").first().waitFor();
    assert.equal(await page.locator("h2.release-statement-heading").innerText(),"FOR THIS RELEASE");
    assert.equal(await page.locator(".track").count(),6,"the first EP contains six planned tracks");
+   assert.equal(await page.locator(".hero h1").innerText(),"配信決定。","announcement is the primary heading");
+   assert.ok((await page.locator(".release-work-title").innerText()).replace(/\s/g,"").includes("あなたと、これから、これからも"));
+   assert.ok((await page.locator(".hero .summary").innerText()).includes("全6曲の1st EP"));
+   assert.ok((await page.locator(".hero .summary").innerText()).includes("配信開始日は後日発表"));
+   const heroLinks=page.locator(".release-hero-actions a");
+   assert.deepEqual((await heroLinks.allTextContents()).map(s=>s.replace(/\s+/g," ").trim()),["EPについて読む ↓","ティザーを見る ↓","YouTubeチャンネルを見る ↗","TikTokを見る ↗"]);
+   assert.equal(await page.locator("#artwork-project a[href=\"/voice-box/\"]").count(),1,"anonymous feedback is reachable");
+   assert.equal(await page.locator("#artwork-project a[href=\"/releases/artwork-project/\"]").count(),1,"artwork participation is distinct");
+   const wrongArrows=await page.locator("a[href]").evaluateAll(links=>links.filter(a=>/[↗↓→]/.test(a.textContent)).filter(a=>{const href=a.getAttribute("href");const expected=href.startsWith("#")?"↓":new URL(href,location.href).origin===location.origin||new URL(href,location.href).origin==="https://kosuke-tsukamoto-website.pages.dev"?"→":"↗";return !a.textContent.trim().endsWith(expected);}).map(a=>a.textContent));
+   assert.deepEqual(wrongArrows,[],"arrows describe actual navigation");
    assert.equal(await page.locator('.release-hero-actions a[href="https://www.tiktok.com/@tsukam.oto.kos"]').count(),1,"TikTok is accessible from first ep hero");
    assert.ok((await page.locator(".eyebrow").innerText()).includes("1st EP"),"release is identified as first EP");
    assert.equal(await page.locator(".track-title").count(),6);
@@ -464,6 +475,8 @@ async function testEngine(engineType,engine){
    const fontSize=await page.locator(".release-words").evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
    assert.ok(fontSize>=15,"release statement is visually legible at width "+width);
    if(width===375||width===768||width===1440){
+     await page.locator(".hero").screenshot({path:output+"/"+engine+"-hero-"+width+".png",animations:"disabled"});
+     await page.locator("#artwork-project").screenshot({path:output+"/"+engine+"-participation-"+width+".png",animations:"disabled"});
      await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-statement-"+width+".png",animations:"disabled"});
    }
    await checkColumn(page,engine,width);

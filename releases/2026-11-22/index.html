@@ -251,6 +251,19 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 @media(max-width:800px){.track-instrumental .track-row{grid-template-columns:26px minmax(0,1fr);gap:9px;min-height:74px;padding:12px 0}.track-instrumental .track-title{font-size:clamp(19px,4.5vw,24px)}}
 
 .ucnuc-credit{margin:26px 0 0;font-size:12px;line-height:1.95;color:var(--muted)}.ucnuc-credit a{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
+/* EP announcement hierarchy and participation */
+.hero h1{font-size:clamp(48px,6vw,80px);line-height:1.15;letter-spacing:-.055em;margin:24px 0 20px}
+.release-work-title{font-size:clamp(25px,3vw,38px);line-height:1.55;font-weight:600;letter-spacing:-.035em;margin:0 0 18px;overflow-wrap:anywhere}
+.release-hero-actions{display:grid;grid-template-columns:max-content minmax(0,1fr);gap:16px 22px}
+.release-hero-actions a{min-width:0}.release-hero-actions .main-action{min-width:190px}
+.release-hero-actions .release-youtube-channel,.release-hero-actions .release-tiktok-channel{font-size:12px}
+.release-teaser-player.shorts{width:min(100%,250px);max-height:none;aspect-ratio:9/16}
+.release-teaser-player button{width:100%;height:100%;border:0;background:linear-gradient(0deg,rgba(0,0,0,.7),rgba(0,0,0,.12)),url("/assets/releases/first-single-2026-cover.webp") center/cover;line-height:1.7;text-shadow:0 1px 8px #000}
+.release-teaser-player button:hover,.release-teaser-player button:focus-visible{background:linear-gradient(0deg,rgba(0,0,0,.8),rgba(0,0,0,.25)),url("/assets/releases/first-single-2026-cover.webp") center/cover}
+.ep-participation-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.ep-participation-card{border-top:2px solid var(--ink);padding-top:24px;display:flex;flex-direction:column;align-items:flex-start}
+.ep-participation-card h3{font-size:24px;line-height:1.5;margin:0 0 14px}.ep-participation-card p{font-size:14px;line-height:1.95;margin:0 0 18px}.ep-participation-card .kicker{font-size:11px}.ep-participation-card .artwork-project-meta{font-size:12px}.ep-participation-card a{margin-top:auto;text-decoration:underline;overflow-wrap:anywhere}
+@media(max-width:800px){.hero h1{font-size:clamp(40px,10vw,60px);margin:18px 0}.release-work-title{font-size:clamp(22px,5.8vw,32px)}.release-hero-actions{grid-template-columns:minmax(0,1fr);gap:16px}.release-hero-actions .main-action{min-width:0;width:min(100%,260px)}.ep-participation-grid{grid-template-columns:1fr;gap:36px}.ep-participation-card h3{font-size:22px}}
 </style>
 </head>
 <body>
@@ -258,18 +271,19 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 
 <header class="site-header"><div class="container">
 <a href="https://kosuke-tsukamoto-website.pages.dev/" class="brand">束元康介</a>
-<a class="back" href="https://kosuke-tsukamoto-website.pages.dev/">公式サイトに戻る</a>
+<a class="back" href="https://kosuke-tsukamoto-website.pages.dev/">公式サイトに戻る →</a>
 </div></header>
 <main id="main">
 <div class="container hero">
 <div class="hero-copy">
 <div class="eyebrow"><b>1st EP</b><span>2026.11.22 発表</span></div>
-<h1><span>あなたと、</span><span>これから、</span><span>これからも</span></h1>
+<h1>配信決定。</h1>
+<p class="release-work-title">あなたと、<br>これから、これからも</p>
 <p class="artist">束元康介</p>
-<p class="summary">《あなたと》《これから》の新録と、新曲《これからも》。歌入り3曲とピアノのみの3曲、全6曲を収録予定。</p>
+<p class="summary">《あなたと》《これから》の新録と、新曲《これからも》。さらに各曲のピアノ版を加えた、全6曲の1st EPです。配信開始日は後日発表します。</p>
 <div class="release-hero-actions">
-<a href="#for-this-release" class="main-action">FOR THIS RELEASE <span aria-hidden="true">↓</span></a>
-<a id="hero-teaser-link" class="release-hero-teaser-link" href="#teaser" hidden>ティザーを聴く ↓</a>
+<a href="#for-this-release" class="main-action">EPについて読む <span aria-hidden="true">↓</span></a>
+<a id="hero-teaser-link" class="release-hero-teaser-link" href="#teaser" hidden>ティザーを見る ↓</a>
 <a class="release-youtube-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a><a class="release-tiktok-channel" href="https://www.tiktok.com/@tsukam.oto.kos" target="_blank" rel="noopener noreferrer">TikTokを見る ↗</a>
 </div>
 
@@ -292,18 +306,18 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <div id="secret-toolbar" class="container release-share-toolbar" role="status" aria-live="polite"><span>縦の8文字を選択しました</span><div><button id="secret-open" type="button">この言葉をシェアする</button> <button class="secondary" id="secret-clear" type="button">選択を解除</button></div></div>
 </section>
 <section id="teaser" class="container release-teaser-section" aria-labelledby="teaser-title" hidden>
-<div class="release-teaser-heading"><div><p class="kicker">TEASER / 先行公開</p><h2 id="teaser-title">《これからも》</h2></div><a class="release-teaser-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a></div>
+<div class="release-teaser-heading"><div><p class="kicker">TEASER / 先行公開</p><h2 id="teaser-title">1st EP TEASER</h2></div><a class="release-teaser-channel" href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" target="_blank" rel="noopener noreferrer">YouTubeチャンネルを見る ↗</a></div>
 <div id="release-teaser-items" class="release-teaser-items"></div>
 </section>
 <section id="tracks" class="container section" aria-labelledby="tracks-title">
 <div class="section-head"><div><p class="kicker">01 — 06 / TRACKS</p><h2 id="tracks-title">収録曲</h2></div></div>
 <div class="tracks">
 <details class="track" open><summary><span class="number">01</span><span class="track-title">あなたと</span><span class="tag">令和6年度・新録</span><span class="plus" aria-hidden="true">＋</span></summary>
-<div class="track-details"><div><p class="track-description">令和6年度の卒業生とともにつくった合唱曲を、歌とピアノで新たに録音しました。</p><p class="track-source">原曲：令和6年度 卒業記念創作合唱<br>作詞：令和6年度3学年一同・束元康介 ／ 作曲：束元康介</p><p><a class="more-link" href="/lyrics/#anata-to">歌詞を読む ↗</a></p></div></div></details>
+<div class="track-details"><div><p class="track-description">令和6年度の卒業生とともにつくった合唱曲を、歌とピアノで新たに録音しました。</p><p class="track-source">原曲：令和6年度 卒業記念創作合唱<br>作詞：令和6年度3学年一同・束元康介 ／ 作曲：束元康介</p><p><a class="more-link" href="/lyrics/#anata-to">歌詞を読む →</a></p></div></div></details>
 <details class="track"><summary><span class="number">02</span><span class="track-title">これから</span><span class="tag">令和7年度・新録</span><span class="plus" aria-hidden="true">＋</span></summary>
-<div class="track-details"><div><p class="track-description">令和7年度の卒業生とともにつくった合唱曲を、歌とピアノで新たに録音しました。</p><p class="track-source">原曲：令和7年度 卒業記念創作合唱<br>作詞：令和7年度3学年一同・束元康介 ／ 作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekara">歌詞を読む ↗</a></p></div></div></details>
+<div class="track-details"><div><p class="track-description">令和7年度の卒業生とともにつくった合唱曲を、歌とピアノで新たに録音しました。</p><p class="track-source">原曲：令和7年度 卒業記念創作合唱<br>作詞：令和7年度3学年一同・束元康介 ／ 作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekara">歌詞を読む →</a></p></div></div></details>
 <details class="track"><summary><span class="number">03</span><span class="track-title">これからも</span><span class="tag">2026年・新曲</span><span class="plus" aria-hidden="true">＋</span></summary>
-<div class="track-details"><div><p class="track-source">作詞・作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekaramo">歌詞を読む ↗</a></p></div></div></details>
+<div class="track-details"><div><p class="track-source">作詞・作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekaramo">歌詞を読む →</a></p></div></div></details>
 <div class="track track-instrumental"><div class="track-row"><span class="number">04</span><span class="track-title">あなたと<span class="track-version">（Piano Instrumental）</span></span></div></div>
 <div class="track track-instrumental"><div class="track-row"><span class="number">05</span><span class="track-title">これから<span class="track-version">（Piano Instrumental）</span></span></div></div>
 <div class="track track-instrumental"><div class="track-row"><span class="number">06</span><span class="track-title">これからも<span class="track-version">（Piano Instrumental）</span></span></div></div>
@@ -312,24 +326,25 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 
 
 <section id="artwork-project" class="container artwork-project-section" aria-labelledby="artwork-project-title">
-<div class="artwork-project-grid">
-<div><p class="kicker">ARTWORK PROJECT</p><h2 id="artwork-project-title"><span>ジャケットを</span><span>募集します。</span></h2></div>
-<div><p>《あなたと》《これから》の単独配信用ジャケットを描いてくださる方を募集します。まずはメッセージでご連絡ください。</p><p class="artwork-project-meta">2026年11月22日 募集開始</p><a href="/releases/artwork-project/" class="artwork-project-action">募集内容・メッセージはこちら ↗</a></div>
+<div class="section-head"><div><p class="kicker">JOIN / MESSAGE</p><h2 id="artwork-project-title">このEPについて</h2></div></div>
+<div class="ep-participation-grid">
+<article class="ep-participation-card"><p class="kicker">ARTWORK PROJECT</p><h3>ジャケット募集</h3><p>《あなたと》《これから》の単独配信用ジャケットを描いてくださる方を募集します。まずは「描いてみたい」というメッセージから。</p><p class="artwork-project-meta">2026年11月22日 募集開始</p><a href="/releases/artwork-project/" class="artwork-project-action">ジャケット募集の詳細・応募 →</a></article>
+<article class="ep-participation-card"><p class="kicker">COMMENT / MESSAGE</p><h3>感想・メッセージ</h3><p>ティザーや歌詞を見て感じたこと、このEPへのひとことをお寄せください。VOICE BOXから、匿名でも送れます。</p><a href="/voice-box/" class="artwork-project-action">EPの感想・メッセージを送る →</a></article>
 </div>
 </section>
 <section id="listen" class="container links-section" aria-labelledby="listen-title">
 <div class="links-layout">
 <div><p class="kicker">RELEASE</p><h2 id="listen-title">配信情報</h2><p class="credit-line">2026年11月22日 配信決定を発表<br>束元康介 1st EP ／ 全6曲予定<br>配信開始日：後日発表</p>
-<p class="ucnuc-credit">Recording &amp; Mixing — <a href="/special-thanks/ucnuc/">UCNUC / marty ↗</a></p></div>
+<p class="ucnuc-credit">Recording &amp; Mixing — <a href="/special-thanks/ucnuc/">UCNUC / marty →</a></p></div>
 <div><div class="service-info"><p class="release-youtube"><a href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA" rel="noopener noreferrer" target="_blank">束元康介のYouTubeチャンネルを見る ↗</a></p><p class="release-youtube"><a href="https://www.tiktok.com/@tsukam.oto.kos" target="_blank" rel="noopener noreferrer">束元康介のTikTokを見る ↗</a></p></div></div>
 </div></section>
 </main>
-<footer class="footer"><div class="container"><small>© 2026 Kosuke Tsukamoto</small><a href="https://kosuke-tsukamoto-website.pages.dev/">公式サイト</a></div></footer>
+<footer class="footer"><div class="container"><small>© 2026 Kosuke Tsukamoto</small><a href="https://kosuke-tsukamoto-website.pages.dev/">公式サイト →</a></div></footer>
 <div id="release-share-modal" class="release-share-backdrop" hidden><div class="release-share-dialog" role="dialog" aria-modal="true" aria-labelledby="release-share-title">
 <div class="release-share-head"><strong id="release-share-title">KOSUKE TSUKAMOTO / WORDS</strong><button type="button" class="secondary" id="release-share-close" aria-label="閉じる">×</button></div>
 <div class="vertical-preview"><span class="vertical-word">けっこんしました</span><small>2026.11.22 / KOSUKE TSUKAMOTO</small></div>
 <div class="release-share-actions"><button type="button" id="release-share-copy">言葉をコピー</button><button type="button" class="secondary" data-image-layout="feed">投稿用画像 4:5</button><button type="button" class="secondary" data-image-layout="story">ストーリー用画像 9:16</button></div>
-<div class="release-share-actions"><a id="release-share-x" target="_blank" rel="noopener noreferrer" href="https://twitter.com/">X</a><a id="release-share-line" target="_blank" rel="noopener noreferrer" href="https://line.me/">LINE</a><a href="/lyrics/#korekaramo">歌詞を見る</a></div>
+<div class="release-share-actions"><a id="release-share-x" target="_blank" rel="noopener noreferrer" href="https://twitter.com/">X</a><a id="release-share-line" target="_blank" rel="noopener noreferrer" href="https://line.me/">LINE</a><a href="/lyrics/#korekaramo">歌詞を見る →</a></div>
 <div class="release-generated-preview" id="release-generated" hidden><img id="release-generated-image" alt="縦書きの共有画像プレビュー"><div class="release-share-actions"><a role="button" id="release-download" download="kosuke-tsukamoto-words.png" href="#">PNGを保存</a><button type="button" class="secondary" id="release-share-image">画像を共有</button></div></div>
 <p role="status" id="release-share-status" aria-live="polite"></p></div></div>
 <script>
@@ -442,7 +457,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
    const article=document.createElement("article");article.className="release-teaser-item";
    const content=document.createElement("div");
    const no=document.createElement("p");no.className="release-teaser-index";no.textContent="TEASER / "+String(index+1).padStart(2,"0");
-   const title=document.createElement("h3");title.textContent=entry.title||"《これからも》";
+   const title=document.createElement("h3");title.textContent=entry.title||"1st EP TEASER";
    content.append(no,title);
    const media=document.createElement("div");media.className="release-teaser-player";
    if(vid){
