@@ -30,6 +30,46 @@ async function checkColumn(page, engine, width) {
   log(engine+" "+width+"px", "column drift "+spread.toFixed(2)+"px; no overflow");
 }
 
+async function checkLandscapeStatement(browser,engine){
+  for(const [width,height] of [[667,375],[844,390],[956,440]]){
+    const page=await browser.newPage({viewport:{width,height},reducedMotion:"reduce"});
+    await page.goto(BASE+"/releases/2026-11-22/#for-this-release",{waitUntil:"domcontentloaded"});
+    const lines=page.locator(".release-words .note-line");
+    await lines.first().waitFor();
+    const textBefore=await lines.allTextContents();
+    assert.equal(textBefore.length,8,"all eight original lines remain visible in landscape");
+    const measurements=await page.evaluate(()=>{
+      const block=document.querySelector("#for-this-release");
+      const words=document.querySelector(".release-words");
+      const chars=[...words.querySelectorAll(".secret-char")].map(el=>({x:el.getBoundingClientRect().x,y:el.getBoundingClientRect().y}));
+      return {font:parseFloat(getComputedStyle(words).fontSize),layout:getComputedStyle(words).gridAutoRows,
+        blockHeight:block.getBoundingClientRect().height,
+        scrollWidth:document.documentElement.scrollWidth,viewportWidth:document.documentElement.clientWidth,
+        xDrift:Math.max(...chars.map(x=>x.x))-Math.min(...chars.map(x=>x.x)),
+        steps:chars.slice(1).map((p,i)=>p.y-chars[i].y)};
+    });
+    assert.ok(measurements.font>=14&&measurements.font<=16.1,engine+" horizontal phone text must remain readable without desktop scaling "+width+"x"+height);
+    assert.equal(measurements.layout,"1fr",engine+" horizontally rotated phone still aligns its eight natural text lines");
+    assert.ok(measurements.xDrift<=1.25,engine+" landscape secret text column remains straight");
+    assert.ok(Math.max(...measurements.steps)-Math.min(...measurements.steps)<=2,engine+" landscape line rhythm must remain even");
+    assert.ok(measurements.scrollWidth<=measurements.viewportWidth+1.5,engine+" landscape document must not scroll sideways");
+    if(width>=844)assert.ok(measurements.blockHeight<=height,engine+" landscape statement should fit a short viewport: "+measurements.blockHeight);
+    if(width===844)await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-landscape-before-844.png",animations:"disabled"});
+    await page.locator(".release-words .secret-char").nth(2).click();
+    assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),true);
+    const activated=await page.locator(".release-words .secret-char").evaluateAll(els=>els.map(el=>({x:el.getBoundingClientRect().x,y:el.getBoundingClientRect().y})));
+    assert.ok(Math.max(...activated.map(a=>a.x))-Math.min(...activated.map(a=>a.x))<=1.25,engine+" touched landscape characters form a straight column");
+    assert.ok(activated[7].y-activated[0].y<=250,engine+" touched eight-letter reveal remains compact in landscape");
+    assert.deepEqual(await lines.allTextContents(),textBefore,"landscape touch does not mutate original prose");
+    if(width===844)await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-landscape-revealed-844.png",animations:"disabled"});
+    await page.locator("#secret-clear").click();
+    assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),false);
+    assert.deepEqual(await lines.allTextContents(),textBefore,"landscape clear restores the original full text");
+    await page.close();
+    log(engine+" landscape "+width+"x"+height,"legible original text, aligned eight letters, touch/share behavior preserved");
+  }
+}
+
 async function exerciseShare(page,engine) {
   const sourceLines=await page.locator(".release-words .note-line").allTextContents();
   assert.equal(sourceLines.length,8,"the original editorial note remains eight complete lines");
@@ -583,6 +623,7 @@ async function testEngine(engineType,engine){
    if(width===1440)await page.screenshot({path:output+"/"+engine+"-desktop.png",fullPage:true,animations:"disabled"});
    await page.close();
   }
+  await checkLandscapeStatement(browser,engine);
   const page=await browser.newPage({viewport:{width:375,height:860}});
   await checkLyrics(page,engine);
   await page.close();
