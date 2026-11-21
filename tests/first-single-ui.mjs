@@ -294,6 +294,13 @@ async function checkLyrics(page,engine){
   await page.locator("#korekaramo").waitFor();
   assert.equal(await page.locator(".lyrics-item").count(),12);
   assert.equal(await page.locator("#korekaramo").evaluate(el=>el.open),true,"direct link should expand lyrics");
+  assert.equal(await page.locator("#korekaramo .poem-line").count(),38,"Korekaramo must retain all 38 original lyric lines");
+  assert.equal(await page.locator("#korekaramo .poem-line").first().innerText(),"僕のこれからを話したら","Korekaramo first lyric line unchanged");
+  assert.equal(await page.locator("#korekaramo .poem-line").last().innerText(),"ありがとう、これからも","Korekaramo final lyric line unchanged");
+  assert.equal(await page.locator('#korekaramo a[href="/releases/2026-11-22/"]').count(),1,"Korekaramo links to its EP feature");
+  const releaseMeta=await page.locator("#korekaramo .poem-meta").innerText();
+  assert.ok(releaseMeta.includes("1st EP"),"Korekaramo metadata uses 1st EP branding");
+  assert.ok(!releaseMeta.includes("1st Single"),"obsolete release branding is not shown");
   await page.locator("#korekaramo .poem-share-begin").click();
   await page.locator("#korekaramo .poem-line").first().click();
   await page.locator("#phrase-share").click();
@@ -440,6 +447,7 @@ async function testEngine(engineType,engine){
    assert.equal(await page.locator('.release-hero-actions a[href="https://www.tiktok.com/@tsukam.oto.kos"]').count(),1,"TikTok is accessible from first ep hero");
    assert.ok((await page.locator(".eyebrow").innerText()).includes("1st EP"),"release is identified as first EP");
    assert.equal(await page.locator(".track-title").count(),6);
+   assert.equal(await page.locator('a[href="/lyrics/#korekaramo"]').count()>0,true,"EP feature links to the full Korekaramo lyrics");
    assert.equal(await page.locator(".track-title").filter({hasText:"Piano Instrumental"}).count(),3,"three piano-only versions are listed");
    assert.ok((await page.locator("#listen .credit-line").innerText()).includes("全6曲予定"),"EP planned duration and count are accurate");
    assert.equal(await page.locator("#preview").count(),0,"premature preview removed");
