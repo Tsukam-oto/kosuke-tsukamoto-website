@@ -330,7 +330,7 @@ async function checkHomepage(browser,engine){
     assert.equal(await page.locator(".release-announcement-topline .date").innerText(),"ANNOUNCED / 2026.11.22");
     assert.ok((await modal.innerText()).includes("配信開始日は後日発表します"));
     assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
-    assert.ok((await page.locator(".release-announcement-kicker").innerText()).includes("1ST EP"));
+    assert.ok((await page.locator(".release-announcement-kicker").innerText()).includes("1st EP"));
     assert.ok((await page.locator(".release-announcement-description").innerText()).includes("全6曲収録予定"));
     assert.equal(await page.locator(".release-announcement-art-note").isVisible(),false,"do not claim artwork before its image loads");
     const layout=await page.locator(".release-announcement-panel").evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,bg:getComputedStyle(el).backgroundColor}));
