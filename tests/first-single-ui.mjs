@@ -332,7 +332,8 @@ async function checkHomepage(browser,engine){
     assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
     assert.ok((await page.locator(".release-announcement-kicker").innerText()).includes("1st ep"));
     assert.ok((await page.locator(".release-announcement-description").innerText()).includes("全6曲収録予定"));
-    assert.equal(await page.locator(".release-announcement-art-note").isVisible(),false,"do not claim artwork before its image loads");
+    const coverLoaded=await page.locator("#first-single-announcement-cover").evaluate(el=>el.complete&&el.naturalWidth>0);
+    assert.equal(await page.locator(".release-announcement-art-note").isVisible(),coverLoaded,"artwork caption must match actual cover-load state");
     const layout=await page.locator(".release-announcement-panel").evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,bg:getComputedStyle(el).backgroundColor}));
     assert.ok(layout.scroll<=layout.client+2,"mobile announcement should not overflow horizontally");
     assert.equal(layout.bg,"rgb(20, 20, 23)","new editorial announcement styles must load");
