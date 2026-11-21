@@ -4,7 +4,7 @@
    No changes to original lyric texts, WAVs or REC correction records. */
 (function(){
 'use strict';
-if(!/\/lyric-sync\.html$/i.test(location.pathname)&&new URLSearchParams(location.search).get('sync')!=='1')return;
+if(!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname)&&new URLSearchParams(location.search).get('sync')!=='1')return;
 if(typeof state==='undefined'||typeof persist!=='function'||!window.RECNOTE_CLOUD_MEDIA)return;
 const $=id=>document.getElementById(id);
 const root=$('syncStudio'),audio=$('audio'),cloud=window.RECNOTE_CLOUD_MEDIA,login=window.RECNOTE_LYRIC_BRIDGE;
