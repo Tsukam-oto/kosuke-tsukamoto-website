@@ -18,6 +18,7 @@ root.innerHTML=[
 '<div class="syncTime"><strong id="syncClock">0:00.00</strong><span id="syncLength">/ 0:00.00</span></div>',
 '<input id="syncSlider" type="range" min="0" max="100" value="0" step="1" aria-label="再生位置"/>',
 '<div class="syncTransport"><button id="syncBack">−3秒</button><button class="syncEmphasis" id="syncPlay">▶ 再生</button><button id="syncNext">＋3秒</button><label>速度 <select id="syncSpeed"><option value="0.65">0.65×</option><option value="0.8">0.8×</option><option value="1" selected>1×</option></select></label></div>',
+'<label class="syncOffsetLabel">WAV基準の時刻補正 <select id="syncOffset"><option value="-0.022">11/19版MP3：−0.022秒</option><option value="0">補正なし：0秒</option></select><small>原本WAVとの実測差。Safariでずれがなければ「補正なし」に変更できます。</small></label>',
 '<div class="syncMedia" id="syncMedia"><p id="syncMediaHelp">MP3はクラウドから復元します。</p><label>MP3を一度だけ登録<input id="syncUpload" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4"/></label><span id="syncUploadState"></span></div></section>',
 '<div class="syncOverview"><strong id="syncCount">0 / 0 行</strong><span id="syncBreakdown">確認待ち</span><div class="syncMeter"><i id="syncMeterFill"></i></div></div>',
 '<div class="syncSectionLabel"><div><strong>歌詞をタップして記録</strong><small>再生中、歌われ始めた行をタップ</small></div><label><input id="syncTapMode" type="checkbox" checked/>連続タップ</label></div>',
@@ -36,7 +37,10 @@ root.innerHTML=[
 ].join('');
 document.body.append(root);
 const cloudPanel=$('recCloudPanel');if(cloudPanel)$('syncCloudSlot').append(cloudPanel);
-const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:';
+const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:',OFFSET_PREFIX='rec_note_sync_offset_v7:';
+function audioOffset(){const saved=localStorage.getItem(OFFSET_PREFIX+song);if(saved!==null&&Number.isFinite(Number(saved)))return Number(saved);return /_1119\.mp3$/i.test(files[song]?.name||'')?-0.022:0;}
+function wavPosition(){return Math.max(0,(Number(audio.currentTime)||0)+audioOffset());}
+function refreshOffsetSelector(){$('syncOffset').value=String(audioOffset());}
 let work=null,versions=[],version=null,lines=[],selected=-1,lastTap=-1,seq=0,replayEnd=null;
 function timestamp(v){const t=Math.max(0,Math.round((Number(v)||0)*100)),s=Math.floor(t/100);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')+'.'+String(t%100).padStart(2,'0');}
 function parse(v){v=String(v||'').trim().replace('：',':');if(!v)return null;const m=v.match(/^(\d+):([0-5]?\d)(?:\.(\d{1,3}))?$/);if(m)return Number(m[1])*60+Number(m[2])+Number('0.'+(m[3]||'0'));return /^\d+(?:\.\d{1,3})?$/.test(v)?Number(v):null;}
@@ -107,7 +111,7 @@ function hasAudio(){return !!(files[song]?.url)&&audio.readyState>=1;}
 function tap(i){
  if(!hasAudio()){choose(i,true,false);notice('先にMP3を読み込んでください。',true);return;}
  if(confirmed(get(i))){choose(i,true,false);notice('確認済みです。編集するには確認を解除してください。',true);return;}
- const now=Math.round(audio.currentTime*100)/100,t=get(i);
+ const now=Math.round(wavPosition()*100)/100,t=get(i);
  if(lastTap>=0&&lastTap!==i){
   const prev=get(lastTap);
   if(prev&&started(prev)&&!Number.isFinite(prev.end)&&prev.start<now&&!confirmed(prev))saveRecord(lastTap,{end:now,status:'draft'});
@@ -125,7 +129,7 @@ function editorSave(){
 }
 function capture(kind){
  if(selected<0)return;if(!hasAudio()){notice('音源を先に再生してください。',true);return;}
- const t=get(selected),now=Math.round(audio.currentTime*100)/100;
+ const t=get(selected),now=Math.round(wavPosition()*100)/100;
  let a=kind==='start'?now:parse($('syncStart').value)??t?.start??null;
  let b=kind==='end'?now:parse($('syncEnd').value)??t?.end??null;
  if(kind==='start'&&Number.isFinite(b)&&b<=a)b=null;
@@ -142,9 +146,10 @@ function confirm(){
  if(conflict(selected)){notice('この行にはクラウド編集競合があります。',true);return;}
  if(saveRecord(selected,{status:'confirmed',confirmedAt:new Date().toISOString()})){renderRows();fillEditor();notice('この歌詞を確認済みにしました。');}
 }
-function seek(t){if(!hasAudio())return;audio.currentTime=Math.max(0,Math.min(t,audio.duration||t));clock();}
+function seek(t){if(!hasAudio())return;audio.currentTime=Math.max(0,Math.min(t-audioOffset(),audio.duration||t));clock();}
 function clock(){
- const t=Number(audio.currentTime)||0,d=Number.isFinite(audio.duration)?audio.duration:0;
+ const t=wavPosition(),d=Number.isFinite(audio.duration)?audio.duration:0;
+ refreshOffsetSelector();
  $('syncClock').textContent=timestamp(t);$('syncDockClock').textContent=timestamp(t);$('syncLength').textContent='/ '+timestamp(d);
  const slider=$('syncSlider');slider.max=String(Math.max(1,Math.round(d*100)));if(document.activeElement!==slider)slider.value=String(Math.round(t*100));
  $('syncPlay').textContent=audio.paused?'▶ 再生':'Ⅱ 一時停止';$('syncDockPlay').textContent=audio.paused?'▶':'Ⅱ';
@@ -193,9 +198,10 @@ function json(){
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{if(song!==b.dataset.song){setSong(b.dataset.song);loadLyrics();}});
 $('syncVersion').addEventListener('change',e=>changeVersion(e.target.value));
 $('syncPlay').addEventListener('click',toggleAudio);$('syncDockPlay').addEventListener('click',toggleAudio);
-$('syncBack').addEventListener('click',()=>seek((audio.currentTime||0)-3));
-$('syncNext').addEventListener('click',()=>seek((audio.currentTime||0)+3));
+$('syncBack').addEventListener('click',()=>seek(wavPosition()-3));
+$('syncNext').addEventListener('click',()=>seek(wavPosition()+3));
 $('syncSpeed').addEventListener('change',e=>audio.playbackRate=Number(e.target.value));
+$('syncOffset').addEventListener('change',e=>{localStorage.setItem(OFFSET_PREFIX+song,e.target.value);clock();notice('この端末のWAV基準補正を更新しました。登録済み時刻は書き換えません。');});
 $('syncSlider').addEventListener('input',e=>{$('syncClock').textContent=timestamp(e.target.value/100);});
 $('syncSlider').addEventListener('change',e=>seek(e.target.value/100));
 $('syncCaptureStart').addEventListener('click',()=>capture('start'));
@@ -213,7 +219,7 @@ $('syncReplay').addEventListener('click',()=>{const t=get(selected);if(!started(
 $('syncPush').addEventListener('click',()=>{if(!media.isSignedIn()){$('syncAccount').open=true;notice('ログインしてください。',true);return;}$('recCloudSync')?.click();notice('同期を要求しました。完了表示をご確認ください。');});
 $('syncSrt').addEventListener('click',srt);$('syncJson').addEventListener('click',json);
 $('syncTapMode').addEventListener('change',()=>lastTap=-1);
-audio.addEventListener('timeupdate',()=>{clock();if(replayEnd!==null&&audio.currentTime>=replayEnd){audio.pause();replayEnd=null;}});
+audio.addEventListener('timeupdate',()=>{clock();if(replayEnd!==null&&wavPosition()>=replayEnd){audio.pause();replayEnd=null;}});
 audio.addEventListener('loadedmetadata',clock);audio.addEventListener('play',clock);audio.addEventListener('pause',clock);
 $('syncUpload').addEventListener('change',async e=>{
  const file=e.target.files?.[0];e.target.value='';if(!file)return;
