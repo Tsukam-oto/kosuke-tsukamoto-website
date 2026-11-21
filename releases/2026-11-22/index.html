@@ -553,7 +553,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
      const width=box.width, firstCapacity=box.right-secretRect.right-4;
      if(width<170||firstCapacity<10)continue;
      const cs=getComputedStyle(line);
-     measureContext.font=cs.font;
+     measureContext.font=cs.fontStyle+" "+cs.fontWeight+" "+cs.fontSize+" "+cs.fontFamily;
      const letterSpacing=Number.parseFloat(cs.letterSpacing)||0;
      const characters=Array.from(raw);
      const measure=text=>measureContext.measureText(text).width+Math.max(0,Array.from(text).length-1)*letterSpacing;
