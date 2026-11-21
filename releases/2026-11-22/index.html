@@ -194,6 +194,44 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 }
 .release-words .note-line{line-height:inherit;overflow-wrap:anywhere}
 .release-words .secret-char{font-weight:inherit}
+/* On phones, touching any hidden character condenses the same eight real lines
+   into one readable vertical column. All original words remain in the DOM and
+   return unchanged when selection is cleared. */
+@media(max-width:700px){
+  .release-words.secret-active{
+    gap:5px;
+  }
+  .release-words.secret-active .note-line{
+    display:grid;
+    grid-template-columns:7em 1em minmax(0,1fr);
+    align-items:baseline;
+    min-height:36px;
+    margin:0;
+    line-height:1.8;
+    overflow:visible;
+  }
+  .release-words.secret-active .note-line .lead{
+    width:auto;
+    display:block;
+    white-space:nowrap;
+  }
+  .release-words.secret-active .note-line .secret-char{
+    width:1em;
+    display:block;
+    font-size:inherit;
+    line-height:1.8;
+    align-self:baseline;
+    margin:0;
+  }
+  .release-words.secret-active .note-line .tail{
+    display:block;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    min-width:0;
+  }
+  .release-words{scroll-margin-top:80px}
+}
 .release-share-toolbar{margin-top:38px}
 #tracks{padding-top:clamp(57px,7vw,92px)}
 @media(max-width:800px){
@@ -438,6 +476,13 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
   host.classList.toggle("secret-active",yes);
   toolbar.classList.toggle("visible",yes);
   buttons.forEach(b=>b.setAttribute("aria-pressed",String(yes)));
+  if(yes&&window.matchMedia("(max-width:700px)").matches){
+    // In compact reveal mode the entire eight-character vertical line fits
+    // on a phone screen. Move the view to its top only after relayout.
+    requestAnimationFrame(()=>{
+      host.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+    });
+  }
   if(yes&&focusShare)document.getElementById("secret-open").focus({preventScroll:true});
  };
  buttons.forEach((b,i)=>{
