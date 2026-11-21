@@ -72,7 +72,11 @@ function store(key,patch){
  if(rec.end!==null&&(!Number.isFinite(rec.end)||rec.end<0)){alertStatus('終了時刻が不正です。',true);return false}
  if(Number.isFinite(rec.end)&&(!Number.isFinite(rec.start)||rec.end<=rec.start)){alertStatus('終了は開始より後にしてください。',true);return false}
  if(j>=0)a[j]=rec;else a.push(rec);
- persist();clearDraft(key);const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
+ persist();clearDraft(key);
+ if((key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
+  window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start}}));
+ }
+ const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
  render();return true;
 }
