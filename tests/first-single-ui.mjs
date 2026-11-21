@@ -498,7 +498,7 @@ async function testEngine(engineType,engine){
    assert.ok((await page.locator(".hero .summary").innerText()).includes("全6曲の1st EP"));
    assert.ok((await page.locator(".hero .summary").innerText()).includes("配信開始日は後日発表"));
    const heroLinks=page.locator(".release-hero-actions a");
-   assert.deepEqual((await heroLinks.allTextContents()).map(s=>s.replace(/\s+/g," ").trim()),["EPについて読む ↓","ティザーを見る ↓","YouTubeチャンネルを見る ↗","TikTokを見る ↗"]);
+   assert.deepEqual((await heroLinks.allTextContents()).map(s=>s.replace(/\s+/g," ").trim()),["EPについて読む ↓","ティザーを見る ↓","ひとことを送る ↓","YouTubeチャンネルを見る ↗","TikTokを見る ↗"]);
    assert.equal(await page.locator("#artwork-project a[href=\"/voice-box/\"]").count(),1,"anonymous feedback is reachable");
    assert.equal(await page.locator("#artwork-project a[href=\"/releases/artwork-project/\"]").count(),1,"artwork participation is distinct");
    const wrongArrows=await page.locator("a[href]").evaluateAll(links=>links.filter(a=>/[↗↓→]/.test(a.textContent)).filter(a=>{const href=a.getAttribute("href");const expected=href.startsWith("#")?"↓":new URL(href,location.href).origin===location.origin||new URL(href,location.href).origin==="https://kosuke-tsukamoto-website.pages.dev"?"→":"↗";return !a.textContent.trim().endsWith(expected);}).map(a=>a.textContent));
