@@ -105,3 +105,7 @@ body.syncPage #syncStudio{display:block;max-width:750px;margin:0 auto;padding:0 
  #syncStudio .syncDock #syncTapNow{font-size:11px}
 }
 @media(prefers-reduced-motion:reduce){#syncStudio *{scroll-behavior:auto!important;transition:none!important}}
+
+#syncStudio .syncOffsetLabel{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-top:1px solid #efebe7;margin-top:13px;padding-top:11px;font-size:11px;font-weight:700;color:#756c65}
+#syncStudio .syncOffsetLabel select{background:#fff;border:1px solid #ded8d1;padding:6px 9px;border-radius:8px;font-size:12px;min-height:38px}
+#syncStudio .syncOffsetLabel small{flex-basis:100%;line-height:1.5;font-weight:400;color:#8f867d}
