@@ -62,7 +62,7 @@ function saveRecord(i,patch){
  if(Number.isFinite(next.end)&&(!Number.isFinite(next.start)||next.end<=next.start)){notice('終了時刻は開始より後にしてください。',true);return false;}
  STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
  if(at>=0)list[at]=next;else list.push(next);
- persist();notice('端末に保存しました。クラウド同期を実行しています。');return true;
+ persist();$('syncAuthState').textContent=media.isSignedIn()?'クラウド同期待ち':'端末内のみ';notice('端末に保存しました。クラウド同期を実行しています。');return true;
 }
 function renderRows(){
  const view=$('syncLines'),position=view.scrollTop;view.replaceChildren();
@@ -150,7 +150,7 @@ function clock(){
  $('syncPlay').textContent=audio.paused?'▶ 再生':'Ⅱ 一時停止';$('syncDockPlay').textContent=audio.paused?'▶':'Ⅱ';
  $('syncFile').textContent=hasAudio()?(files[song].name||'再生可能'):'音源未登録';
  const cloud=media.isSignedIn()&&media.list(song).some(m=>m.kind==='A');
- $('syncMediaHelp').textContent=cloud?'クラウドのMP3が登録されています。別端末でも自動復元できます。':hasAudio()?'端末では再生できます。外出先用にはMP3をクラウドへ登録してください。':'MP3を一度登録すると外出先でも再生できます。';
+ $('syncMediaHelp').textContent=cloud?'クラウドのMP3が登録されています。別端末でも自動復元できます。':hasAudio()?'端末では再生できます。外出先用にはMP3をクラウドへ登録してください。':'Dropboxの tsukamoto_mix にある、この曲のMP3を一度だけ登録してください。以降は外出先でも使えます。';
  $('syncMedia').classList.toggle('registered',cloud);
 }
 function toggleAudio(){if(!hasAudio()){notice('先にMP3を選んでください。',true);return;}if(audio.paused)audio.play().catch(e=>notice('再生できません：'+e.message,true));else audio.pause();}
@@ -219,16 +219,16 @@ $('syncUpload').addEventListener('change',async e=>{
  const file=e.target.files?.[0];e.target.value='';if(!file)return;
  if(!media.isSignedIn()){$('syncAccount').open=true;notice('先にログインしてください。',true);return;}
  if(file.size>45000000){notice('クラウド上限は45MBです。MP3またはM4Aを選んでください。',true);return;}
- const target=song;$('syncUploadState').textContent='登録中…';
+ if(!/\.(mp3|m4a)$/i.test(file.name)){notice('MP3またはM4Aの音源を選択してください。',true);return;}const target=song;$('syncUploadState').textContent='登録中…';
  try{await loadAudio(target,file,true);const m=await media.upload('A',file,target);if(!m?.id)throw Error('クラウド保存に失敗しました');
  $('syncUploadState').textContent='クラウド保存済み';notice('MP3を非公開で保存しました。外出先でも使用できます。');clock();}
  catch(err){$('syncUploadState').textContent='保存失敗';notice(err.message,true);}
 });
 window.addEventListener('recnote:cloud-auth-change',()=>{
  const signed=bridge.isSignedIn();$('syncAuthState').textContent=signed?'接続中':'ログインが必要';
- if(signed){$('syncAccount').open=false;loadLyrics();}else {$('syncAccount').open=true;notice('ログインしてください。',true);}
+ if(signed){$('syncAccount').open=false;loadLyrics();}else {work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;notice('ログインしてください。',true);}
 });
-window.addEventListener('recnote:cloud-synced',()=>{renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();});
+window.addEventListener('recnote:cloud-synced',()=>{$('syncAuthState').textContent='クラウド同期済み';renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();});
 window.addEventListener('focus',clock);
 clock();loadLyrics();
 })();
