@@ -299,7 +299,7 @@ $('syncUpload').addEventListener('change',async e=>{
 });
 window.addEventListener('recnote:cloud-auth-change',()=>{
  const signed=bridge.isSignedIn();$('syncAuthState').textContent=signed?'接続中':'ログインが必要';
- if(signed){$('syncAccount').open=false;loadLyrics();}else {work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;notice('ログインしてください。',true);}
+ if(signed){$('syncAccount').open=false;loadLyrics();}else {audio.pause();work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncFineTune').open=false;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;notice('ログインしてください。',true);}focusState();
 });
 window.addEventListener('recnote:cloud-synced',()=>{$('syncAuthState').textContent='クラウド同期済み';renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();});
 window.addEventListener('focus',clock);
