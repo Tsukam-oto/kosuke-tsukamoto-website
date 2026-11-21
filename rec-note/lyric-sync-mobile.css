@@ -1,0 +1,107 @@
+/* REC NOTE — mobile cloud lyric synchronization workspace v7 */
+.syncShortcut{display:inline-flex;align-items:center;text-decoration:none;padding:8px 12px;border:1px solid #d2d9df;border-radius:10px;background:#253d50;color:#fff;font-size:12px;font-weight:700;white-space:nowrap}
+body.syncPage{margin:0;background:#f4f2ee;color:#292a2b;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif}
+body.syncPage>header,body.syncPage>main,body.syncPage>.footnote{display:none!important}
+body.syncPage #syncStudio{display:block;max-width:750px;margin:0 auto;padding:0 16px calc(125px + env(safe-area-inset-bottom));background:#f4f2ee;min-height:100dvh}
+#syncStudio *{box-sizing:border-box}
+#syncStudio button,#syncStudio select,#syncStudio input{font:inherit}
+#syncStudio button{cursor:pointer;min-height:44px;border:1px solid #d7d4ce;background:#fff;color:#2d3234;border-radius:11px;padding:10px 12px;font-size:13px;font-weight:700}
+#syncStudio button:disabled{opacity:.42;cursor:default}
+#syncStudio button:focus-visible,#syncStudio a:focus-visible,#syncStudio input:focus-visible,#syncStudio select:focus-visible{outline:3px solid #aa816c;outline-offset:2px}
+#syncStudio .syncEmphasis{background:#30333c;color:#fff;border-color:#30333c}
+#syncStudio .syncHeading{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:25px 0 17px;border-bottom:1px solid #dad5ce}
+#syncStudio .syncHeading small{font-size:10px;letter-spacing:.14em;font-weight:750;color:#8c7f78}
+#syncStudio .syncHeading h1{font-size:20px;line-height:1.4;font-weight:800;letter-spacing:.015em;margin:5px 0 0}
+#syncStudio .syncHeading a{font-size:11px;font-weight:700;color:#65534d;text-decoration:none;white-space:nowrap}
+#syncStudio #syncAccount{border:1px solid #e0dcd6;border-radius:11px;margin-top:13px;background:#fff;overflow:hidden}
+#syncStudio #syncAccount summary{display:flex;justify-content:space-between;gap:8px;align-items:center;cursor:pointer;padding:12px 15px;font-size:12px;font-weight:750}
+#syncStudio #syncAccount summary b{font-size:11px;font-weight:700;color:#62746a}
+#syncStudio #syncCloudSlot{padding:8px 12px 14px;border-top:1px solid #eee}
+#syncStudio #syncCloudSlot .recCloudPanel{border:0;margin:0;box-shadow:none}
+#syncStudio .syncSongs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin:15px 0 10px}
+#syncStudio .syncSongs button{padding:12px 6px;min-height:48px;border-radius:9px;font-size:13px}
+#syncStudio .syncSongs button.active{background:#302c33;color:#fff;border-color:#302c33}
+#syncStudio .syncNotice{min-height:34px;margin:0 0 12px;padding:8px 11px;background:#efeee9;border-radius:8px;color:#595850;font-size:12px;line-height:1.55}
+#syncStudio .syncNotice.error{color:#9a4938;background:#fff0eb}
+#syncStudio .syncPlayer{background:white;border:1px solid #dedad2;border-radius:14px;padding:17px;box-shadow:0 4px 16px #29262b08}
+#syncStudio .syncSongHead{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-bottom:12px}
+#syncStudio .syncSongHead strong{font-size:17px}
+#syncStudio .syncSongHead span{font-size:10px;color:#7b7772;max-width:52%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#syncStudio .syncTime{display:flex;align-items:baseline;gap:8px;font-variant-numeric:tabular-nums}
+#syncStudio .syncTime strong{font-size:29px;letter-spacing:.015em;color:#29272d;line-height:1.3}
+#syncStudio .syncTime span{font-size:12px;color:#88817b}
+#syncStudio #syncSlider{display:block;width:100%;margin:15px 0 18px;accent-color:#746079;height:18px;touch-action:pan-x;cursor:pointer}
+#syncStudio .syncTransport{display:grid;grid-template-columns:1fr 1.35fr 1fr auto;gap:6px;align-items:stretch}
+#syncStudio .syncTransport button{min-height:49px}
+#syncStudio .syncTransport label{display:flex;align-items:center;justify-content:center;gap:4px;font-size:11px;color:#7b746f}
+#syncStudio .syncTransport select{border:1px solid #ddd8d1;border-radius:8px;padding:7px 2px;font-size:12px;min-height:43px;background:#fff;max-width:75px}
+#syncStudio .syncMedia{border-top:1px solid #ece9e5;margin-top:16px;padding-top:11px;display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+#syncStudio .syncMedia p{font-size:11px;color:#77716b;flex-basis:100%;margin:0}
+#syncStudio .syncMedia label{display:inline-flex;align-items:center;justify-content:center;border:1px solid #cac3ba;padding:8px 13px;min-height:40px;border-radius:9px;font-weight:700;font-size:12px;background:#faf9f7;cursor:pointer}
+#syncStudio .syncMedia label input{display:none}
+#syncStudio .syncMedia span{font-size:11px;color:#5c746c}
+#syncStudio .syncMedia.registered label{font-size:11px}
+#syncStudio .syncOverview{padding:16px 2px 14px}
+#syncStudio .syncOverview strong{font-size:14px}
+#syncStudio .syncOverview span{display:block;font-size:11px;color:#817c76;margin-top:2px}
+#syncStudio .syncMeter{margin-top:10px;height:6px;border-radius:9px;background:#e2ddd7;overflow:hidden}
+#syncStudio .syncMeter i{display:block;background:#548576;width:0%;height:100%;transition:width .2s}
+#syncStudio .syncSectionLabel{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:4px 0 11px}
+#syncStudio .syncSectionLabel strong{display:block;font-size:15px}
+#syncStudio .syncSectionLabel small{display:block;font-size:11px;color:#8b8178;margin-top:2px}
+#syncStudio .syncSectionLabel label{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:700;white-space:nowrap}
+#syncStudio .syncSectionLabel input{width:20px;height:20px;accent-color:#34333d}
+#syncStudio .syncWarning{margin:0 0 10px;border:1px solid #ebd2aa;border-radius:9px;padding:10px 12px;background:#fff6e8;font-size:12px;color:#805728}
+#syncStudio .syncVersion{display:flex;justify-content:flex-start;align-items:center;gap:8px;color:#7c756c;font-size:11px;margin-bottom:7px}
+#syncStudio .syncVersion select{font-size:11px;border:1px solid #ddd8d0;background:#fff;border-radius:7px;min-height:32px;padding:5px 8px}
+#syncStudio .syncLines{background:#fff;border:1px solid #e0dcd6;border-radius:12px;overflow-y:auto;overscroll-behavior:contain;max-height:min(48dvh,510px)}
+#syncStudio .syncLine{width:100%;background:#fff;display:grid;grid-template-columns:30px minmax(0,1fr) auto;align-items:center;text-align:left;gap:6px;padding:11px 12px;border:0;border-radius:0;min-height:57px;border-bottom:1px solid #efede9;line-height:1.5;font-weight:500;font-size:13px}
+#syncStudio .syncLine:last-child{border-bottom:0}
+#syncStudio .syncLine.selected{background:#eee9e4;box-shadow:inset 3px 0 #8d6c6b}
+#syncStudio .syncLine.confirmed{background:#f3faf6}
+#syncStudio .syncLine.confirmed.selected{background:#dcece3}
+#syncStudio .syncLine.started .syncLineStamp{color:#a26a51}
+#syncStudio .syncLine.conflict{box-shadow:inset 3px 0 #ba523d}
+#syncStudio .syncLineNumber{font-size:10px;color:#b1a79c;font-variant-numeric:tabular-nums}
+#syncStudio .syncLineText{overflow-wrap:anywhere;white-space:pre-wrap}
+#syncStudio .syncLineStamp{color:#8f877e;font-variant-numeric:tabular-nums;font-size:10px;text-align:right;white-space:nowrap}
+#syncStudio .syncLine.confirmed .syncLineStamp{color:#3d7a5e}
+#syncStudio .syncEditor{background:#fff;border:1px solid #dfdad3;border-radius:12px;margin-top:13px;padding:16px}
+#syncStudio .syncEditor>small{color:#817d76;font-size:11px}
+#syncStudio .syncEditor h2{margin:5px 0 15px;font-size:16px;line-height:1.65}
+#syncStudio .syncFields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#syncStudio .syncFields label{font-size:11px;font-weight:750;color:#7c746d}
+#syncStudio .syncFields input{display:block;min-height:47px;padding:10px;width:100%;border-radius:9px;background:#faf9f7;border:1px solid #d8d1c9;color:#35333a;font-size:17px;font-variant-numeric:tabular-nums;margin-top:5px}
+#syncStudio .syncEditorActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:12px}
+#syncStudio .syncEditorActions button{font-size:12px;min-height:46px;padding:8px 6px;line-height:1.4}
+#syncStudio .syncNudge{display:grid;grid-template-columns:1fr repeat(4,minmax(45px,.7fr));gap:5px;align-items:center;margin-top:10px}
+#syncStudio .syncNudge span{font-size:11px;font-weight:700;color:#82776d}
+#syncStudio .syncNudge button{font-size:11px;padding:6px 2px;min-height:39px;border-radius:7px}
+#syncStudio #syncEditorHelp{font-size:11px;color:#807a74;line-height:1.6;margin:12px 0 0}
+#syncStudio .syncTools{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin-top:14px}
+#syncStudio .syncTools button{min-height:48px;font-size:12px}
+#syncStudio .syncFoot{color:#857d77;font-size:11px;line-height:1.8;padding:12px 0 30px;margin:10px 0 0}
+#syncStudio .syncDock{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:50;width:min(750px,100%);display:grid;grid-template-columns:minmax(0,1fr) 48px minmax(148px,auto);align-items:center;gap:8px;background:#fefdfbe8;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid #e5e0d8;padding:9px 14px calc(10px + env(safe-area-inset-bottom));box-shadow:0 -5px 20px #00000010}
+#syncStudio .syncDock div{min-width:0}
+#syncStudio .syncDock strong{font-size:12px;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#syncStudio .syncDock small{font-size:11px;color:#817c77;font-variant-numeric:tabular-nums;display:block}
+#syncStudio .syncDock button{min-height:49px;border-radius:11px}
+#syncStudio .syncDock #syncTapNow{font-size:12px;padding:8px 10px}
+@media(max-width:520px){
+ body.syncPage #syncStudio{padding-left:12px;padding-right:12px}
+ #syncStudio .syncHeading{padding-top:18px}
+ #syncStudio .syncHeading h1{font-size:17px}
+ #syncStudio .syncSongHead{align-items:flex-start}
+ #syncStudio .syncTime strong{font-size:27px}
+ #syncStudio .syncTransport{grid-template-columns:1fr 1.35fr 1fr}
+ #syncStudio .syncTransport label{grid-column:1/-1;justify-content:flex-end;margin-top:2px}
+ #syncStudio .syncLine{grid-template-columns:24px minmax(0,1fr);padding:10px 12px}
+ #syncStudio .syncLineStamp{grid-column:2;justify-self:start;text-align:left;margin-top:-5px}
+ #syncStudio .syncLines{max-height:42dvh}
+ #syncStudio .syncNudge{grid-template-columns:repeat(4,minmax(0,1fr))}
+ #syncStudio .syncNudge span{grid-column:1/-1}
+ #syncStudio .syncEditorActions button{font-size:11px}
+ #syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 43px minmax(133px,auto);gap:5px;padding-left:9px;padding-right:9px}
+ #syncStudio .syncDock #syncTapNow{font-size:11px}
+}
+@media(prefers-reduced-motion:reduce){#syncStudio *{scroll-behavior:auto!important;transition:none!important}}
