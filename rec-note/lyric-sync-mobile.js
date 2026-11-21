@@ -37,6 +37,10 @@ root.innerHTML=[
 '<footer class="syncDock"><div><strong id="syncDockLyric">歌詞を選択</strong><small id="syncDockClock">0:00.00</small></div><button id="syncDockPlay" aria-label="再生・一時停止">▶</button><button class="syncEmphasis" id="syncTapNow">歌い始めを記録</button></footer>'
 ].join('');
 document.body.append(root);
+const taskNav=document.createElement('nav');
+taskNav.className='syncTaskNav';taskNav.setAttribute('aria-label','作業を選択');
+taskNav.innerHTML='<a href="./">録音の修正依頼</a><a href="./lyric-sync.html" aria-current="page">歌詞のタイミング合わせ</a>';
+root.insertBefore(taskNav,root.querySelector('.syncHeading'));
 /* Simplified focus-mode shell: onboarding only until ready, one large record action.
    Existing event handlers, storage keys and timing records are preserved. */
 const intro=document.createElement('section');intro.className='syncIntro';intro.id='syncIntro';
