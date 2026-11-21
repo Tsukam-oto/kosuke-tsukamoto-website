@@ -47,6 +47,11 @@ root.insertBefore(hint,$('syncLines'));
 const modeBar=document.createElement('nav');modeBar.id='syncModeBar';modeBar.className='syncModeBar';modeBar.setAttribute('aria-label','作業の切り替え');
 modeBar.innerHTML='<button type="button" id="syncRecordMode" class="active" aria-pressed="true">① 時刻を記録</button><button type="button" id="syncReviewMode" aria-pressed="false">② 聴いて確認</button>';
 root.insertBefore(modeBar,$('syncLines'));
+const fillMissing=document.createElement('button');
+fillMissing.type='button';fillMissing.id='syncFillMissing';
+fillMissing.className='syncFillMissing';fillMissing.hidden=true;
+fillMissing.textContent='終了時刻が未設定の行だけ補完する';
+root.insertBefore(fillMissing,$('syncLines'));
 const saveBadge=document.createElement('span');saveBadge.id='syncSaveState';saveBadge.className='syncSaveState';saveBadge.textContent='接続を確認中';saveBadge.setAttribute('aria-live','polite');
 root.insertBefore(saveBadge,root.querySelector('.syncOverview'));
 
@@ -92,6 +97,48 @@ function rows(){return lines.map((text,i)=>({text,i,time:get(i)})).filter(x=>x.t
 function started(t){return Number.isFinite(t?.start);}
 function complete(t){return started(t)&&Number.isFinite(t?.end)&&t.end>t.start;}
 function confirmed(t){return complete(t)&&t.status==='confirmed';}
+// Read-only candidate. Existing ends and confirmed cues always win.
+// Interlude/outro starts prevent a lyric from spilling through an instrumental passage.
+function candidateEnd(i){
+ const t=get(i);if(!started(t)||!version||!work)return null;
+ const options=rows().filter(x=>x.i>i&&started(x.time)&&x.time.start>t.start).map(x=>x.time.start);
+ for(const x of all()){
+  if(x.song!==song||x.kind!=='song-section'||x.deleted||!['interlude','outro'].includes(x.sectionType))continue;
+  if(Number.isFinite(x.start)&&x.start>t.start)options.push(x.start);
+ }
+ return options.length?Math.round(Math.min(...options)*100)/100:null;
+}
+function fillableRows(){
+ return rows().filter(x=>started(x.time)&&!Number.isFinite(x.time.end)&&!confirmed(x.time)&&!conflict(x.i)&&Number.isFinite(candidateEnd(x.i)));
+}
+function completeMissingEnds(onlyBeforeIndex=null){
+ if(!version||!work||!bridge.isSignedIn())return 0;
+ const possible=fillableRows();
+ let targets=possible;
+ if(Number.isInteger(onlyBeforeIndex)){
+  // Only the immediately preceding started line may be automatically closed.
+  const previous=rows().filter(x=>x.i<onlyBeforeIndex&&started(x.time)).at(-1);
+  targets=previous?possible.filter(x=>x.i===previous.i):[];
+ }
+ if(!targets.length)return 0;
+ const list=all();
+ STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
+ let updated=0;
+ for(const x of targets){
+  const index=list.findIndex(t=>t.id===id(x.i));
+  if(index<0)continue;
+  const current=list[index],end=candidateEnd(x.i);
+  if(!started(current)||Number.isFinite(current.end)||confirmed(current)||conflict(x.i)||!Number.isFinite(end)||end<=current.start)continue;
+  list[index]={...current,end,autoEndSource:'next-start-or-section',updatedAt:new Date().toISOString()};
+  updated++;
+ }
+ if(updated){
+  persist();
+  saveBadgeStatus('端末保存済 · クラウド同期待ち','pending');
+  renderRows();if(selected>=0)fillEditor();
+ }
+ return updated;
+}
 function draftKey(){return DRAFT_PREFIX+song+':'+(version?.id||'')+':'+selected;}
 function clearDraft(){try{localStorage.removeItem(draftKey());}catch(e){}}
 function saveDraft(){if(selected<0)return;try{localStorage.setItem(draftKey(),JSON.stringify({a:$('syncStart').value,b:$('syncEnd').value}));}catch(e){}}
@@ -128,7 +175,7 @@ function renderRows(){
   b.className='syncLine'+(x.i===selected?' selected':'')+(confirmed(t)?' confirmed':complete(t)?' complete':started(t)?' started':'')+(conflict(x.i)?' conflict':'');
   const number=document.createElement('span');number.className='syncLineNumber';number.textContent=String(n+1).padStart(2,'0');
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
-  const time=document.createElement('span');time.className='syncLineStamp';time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+' / 終了未設定':'未記録';
+  const time=document.createElement('span');time.className='syncLineStamp';const suggested=started(t)&&!Number.isFinite(t?.end)?candidateEnd(x.i):null;time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+(Number.isFinite(suggested)?' → '+timestamp(suggested)+'（自動候補）':' / 終了未設定'):'未記録';
   b.append(number,content,time);
   b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));});
   view.append(b);
@@ -136,6 +183,7 @@ function renderRows(){
  view.scrollTop=position;$('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
  $('syncBreakdown').textContent='開始 '+begin+'・終了 '+end+'・確認済み '+done;
  $('syncMeterFill').style.width=(data.length?100*done/data.length:0)+'%';
+ const missing=fillableRows().length;fillMissing.hidden=missing===0;fillMissing.textContent=missing+'行の終了未設定を自動補完';
 }
 function choose(i,scroll,seekAudio){
  if(!lines[i]?.trim())return;
@@ -208,11 +256,9 @@ function tap(i){
  if(!hasAudio()){choose(i,true,false);notice('先にMP3を読み込んでください。',true);return;}
  if(confirmed(get(i))){choose(i,true,false);notice('確認済みです。編集するには確認を解除してください。',true);return;}
  const now=Math.round(wavPosition()*100)/100,t=get(i);
- if(lastTap>=0&&lastTap!==i){
-  const prev=get(lastTap);
-  if(prev&&started(prev)&&!Number.isFinite(prev.end)&&prev.start<now&&!confirmed(prev))saveRecord(lastTap,{end:now,status:'draft'});
- }
- if(!saveRecord(i,{start:now,end:Number.isFinite(t?.end)&&t.end>now?t.end:null,status:'draft'}))return;
+ if(started(t)){notice('この歌詞の開始は登録済みです。既存の時刻は変更しません。');return;}
+ if(!saveRecord(i,{start:now,end:null,status:'draft'}))return;
+ completeMissingEnds(i);
  lastTap=i;selected=i;clearDraft();renderRows();
  const next=$('syncTapMode').checked?rows().find(x=>x.i>i):null;choose(next?.i??i,true,false);
  notice(timestamp(now)+' に記録。'+(next?'次の歌詞へ進みました。':'開始を保存しました。'));
@@ -340,6 +386,11 @@ for(const b of root.querySelectorAll('[data-adjust-end]'))b.addEventListener('cl
 $('syncConfirm').addEventListener('click',confirm);
 $('syncUnconfirm').addEventListener('click',()=>{if(selected>=0&&saveRecord(selected,{status:'draft',confirmedAt:null})){renderRows();fillEditor();}});
 $('syncTapNow').addEventListener('click',primaryAction);
+fillMissing.addEventListener('click',()=>{
+ const count=completeMissingEnds();
+ if(count)notice(count+'行の終了時刻を、次の歌詞または間奏の開始から補完しました。既存の時刻は変更していません。');
+ else notice('補完できる終了未設定の行はありません。');
+});
 $('syncRecordMode').addEventListener('click',()=>switchSyncMode('record'));
 $('syncReviewMode').addEventListener('click',()=>switchSyncMode('review'));
 $('syncUndo').addEventListener('click',()=>{if(!STACK.length){notice('戻せる操作がありません。');return;}state.lyricTimings=JSON.parse(STACK.pop());persist();renderRows();fillEditor();notice('前の状態に戻しました。');});
