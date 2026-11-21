@@ -30,6 +30,45 @@ async function checkColumn(page, engine, width) {
   log(engine+" "+width+"px", "column drift "+spread.toFixed(2)+"px; no overflow");
 }
 
+async function checkWrappedTailSlots(browser,engine){
+ for(const width of [240,320,375,430]){
+  const page=await browser.newPage({viewport:{width,height:820},reducedMotion:"reduce"});
+  await page.goto(BASE+"/releases/2026-11-22/#for-this-release",{waitUntil:"domcontentloaded"});
+  await page.evaluate(async()=>{await document.fonts.ready;});
+  await page.waitForFunction(()=>document.querySelectorAll(".release-words .note-line.has-tail-skip").length>0);
+  const measurements=await page.evaluate(()=>{
+   const noteLines=[...document.querySelectorAll(".release-words .note-line")];
+   const original=["私には音楽を届けたい人がいます。どれだけ大切に思っていても、","会える時間はあっという間に過ぎていきます。","離れていても、この曲を聴いてもらえたら嬉しいです。","これまでたくさんの人との出会いと別れがありました。","思い出を大切にしていても、少しずつ忘れてしまうかもしれません。それでも、","音楽が私たちのまいにちに彩りを、あたたかさを与えてくれると信じます。","今いる場所が少しずつ変わっても、音楽を続けていきます。あなたには、","どこにいても、ただ元気でいてほしいと思います。"];
+   const rows=[];
+   noteLines.forEach((line,i)=>{
+    if(line.textContent!==original[i])throw Error("A sentence changed at "+i+": "+line.textContent);
+    const mark=line.querySelector(".secret-char").getBoundingClientRect();
+    for(const slot of line.querySelectorAll(".tail-continuation")){
+     const left=slot.querySelector(".tail-before").getBoundingClientRect();
+     const gap=slot.querySelector(".tail-hole").getBoundingClientRect();
+     const right=slot.querySelector(".tail-after").getBoundingClientRect();
+     rows.push({markX:mark.left,gapX:gap.left,gapWidth:gap.width,leftX:left.left,lineX:line.getBoundingClientRect().left,rightX:right.left,gapRight:gap.right});
+    }
+   });
+   return {rows,scrollWidth:document.documentElement.scrollWidth,clientWidth:document.documentElement.clientWidth};
+  });
+  assert.ok(measurements.rows.length>0,engine+" at "+width+" at least one sentence should wrap");
+  for(const row of measurements.rows){
+    assert.ok(Math.abs(row.markX-row.gapX)<=1.5,engine+" wrapped line must reserve the hidden character's exact column");
+    assert.ok(Math.abs(row.leftX-row.lineX)<=1.5,engine+" continuation must still use the seven readable cells before the hidden slot");
+    assert.ok(row.rightX>=row.gapRight-1.5,engine+" continuation text resumes after the blank eighth cell");
+  }
+  assert.ok(measurements.scrollWidth<=measurements.clientWidth+1.5,engine+" at "+width+" no sideways overflow from reserved slots");
+  if(width===375)await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-reserved-eighth-slot-375.png",animations:"disabled"});
+  await page.locator(".secret-char").nth(2).click();
+  assert.equal(await page.locator(".release-words .tail-continuation").count(),0,"tapped secret restores original markup before showing animation");
+  await page.locator("#secret-clear").click();
+  await page.waitForFunction(()=>document.querySelectorAll(".release-words .tail-continuation").length>0);
+  await page.close();
+  log(engine+" "+width+"px wrap","continued prose skips exactly the eighth column and remains readable");
+ }
+}
+
 async function checkLandscapeStatement(browser,engine){
   for(const [width,height] of [[667,375],[844,390],[956,440]]){
     const page=await browser.newPage({viewport:{width,height},reducedMotion:"reduce"});
@@ -623,6 +662,7 @@ async function testEngine(engineType,engine){
    if(width===1440)await page.screenshot({path:output+"/"+engine+"-desktop.png",fullPage:true,animations:"disabled"});
    await page.close();
   }
+  await checkWrappedTailSlots(browser,engine);
   await checkLandscapeStatement(browser,engine);
   const page=await browser.newPage({viewport:{width:375,height:860}});
   await checkLyrics(page,engine);
