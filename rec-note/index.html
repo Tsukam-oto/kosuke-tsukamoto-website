@@ -68,9 +68,24 @@
 <link rel="stylesheet" href="./lyrics.css?v=6.1" />
 <link rel="stylesheet" href="./teaser.css?v=6.4" />
   <link rel="stylesheet" href="./lyric-sync-mobile.css?v=8.1" />
+<style>
+/* REC NOTE two-task entry, other production modes retained in code */
+.recTaskNav{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:1240px;margin:12px auto 4px;padding:0 18px}
+.recTaskNav a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62px;gap:3px;padding:11px 8px;text-align:center;background:#fff;color:#425066;text-decoration:none;border:1px solid #dce1e7;border-radius:13px;font-size:15px;font-weight:750;line-height:1.4}
+.recTaskNav a small{font-size:11px;font-weight:450;opacity:.78}
+.recTaskNav a[aria-current="page"]{background:#24384d;color:#fff;border-color:#24384d}
+.recTaskNav a:focus-visible{outline:3px solid #7aa6d4;outline-offset:3px}
+body.recSimplified .modeDock{display:none!important}
+body.recSimplified .headwrap .brand .sub{display:none}
+@media(max-width:600px){.recTaskNav{padding:0 12px;gap:7px;margin:9px auto 5px}.recTaskNav a{font-size:13px;min-height:58px}.recTaskNav a small{font-size:10px}}
+</style>
 </head>
-<body>
+<body class="recSimplified">
 <header><div class="headwrap"><div class="brand"><div class="logo">RN</div><div><h1>REC NOTE <span style="font-size:12px;font-weight:500;color:#a6a49c">/ CREATIVE TIMELINE</span></h1><div class="sub">音と映像の制作指示を、時間に結びつけて記録する</div></div></div><div class="headops"><button id="mailBtn">UCNUCメール案</button><button id="csvBtn">CSV出力</button><button id="jsonBtn">JSON保存</button><button id="importBtn">JSON取込</button><input id="importFile" type="file" accept="application/json,.json" hidden /></div></div></header>
+<nav class="recTaskNav" aria-label="作業を選択">
+  <a href="./" aria-current="page">録音の修正依頼<small>何分何秒の、どこを直すか</small></a>
+  <a href="./lyric-sync.html">歌詞のタイミング合わせ<small>歌声に合わせて時刻を記録</small></a>
+</nav>
 <main class="wrap"><div class="top" id="songTabs"></div>
 <div class="modeDock" role="region" aria-label="制作モード">
   <div class="modeChooser" role="group" aria-label="制作モードを選ぶ"><button id="modeRec" class="modeBtn active" type="button" aria-pressed="true"><span class="modeCode">01</span> REC <small>録音・ミックス</small></button><button id="modeMv" class="modeBtn" type="button" aria-pressed="false"><span class="modeCode">02</span> MV <small>映像・字幕</small></button><button id="modeShort" class="modeBtn" type="button" aria-pressed="false"><span class="modeCode">03</span> SHORT <small>縦動画・構成</small></button></div>
@@ -98,7 +113,7 @@ const $=id=>document.getElementById(id);
 let state={records:initialRecords.map(r=>({...r})),sourceMessages:{...sourceMessages},songs:SONGS.slice()};
 let saved=false;
 try{const s=localStorage.getItem(STORAGE_KEY);if(s){const p=JSON.parse(s);if(Array.isArray(p.records))state.records=p.records;if(p.sourceMessages&&typeof p.sourceMessages==='object')state.sourceMessages=p.sourceMessages;if(Array.isArray(p.songs)&&p.songs.length)state.songs=p.songs.filter(x=>typeof x==='string'&&x.trim()).slice(0,100);if(['REC','MV','SHORT'].includes(p.activeMode))state.activeMode=p.activeMode;if(p.drafts&&typeof p.drafts==='object')state.drafts=p.drafts;if(Array.isArray(p.lyricTimings))state.lyricTimings=p.lyricTimings;if(Array.isArray(p.cloudMedia))state.cloudMedia=p.cloudMedia;if(p.teaserPresets&&typeof p.teaserPresets==='object'&&!Array.isArray(p.teaserPresets))state.teaserPresets=p.teaserPresets;}saved=true;}catch(err){saved=false;}
-SONGS=[...new Set([...state.songs,...state.records.map(r=>r.song)])];let activeMode=['REC','MV','SHORT'].includes(state.activeMode)?state.activeMode:'REC';state.drafts=state.drafts&&typeof state.drafts==='object'?state.drafts:{};let song=(()=>{try{const s=localStorage.getItem(LAST_SONG_KEY);return SONGS.includes(s)?s:SONGS[0]||'これからも'}catch(e){return SONGS[0]||'これからも'}})(),files={},current=0,selectedId=null,editId=null,rangeStart=0,rangeEnd=null,peaks=null,waveDuration=null,dragging=false,renderQueued=false,toastTimer=null,audioObjectUrl=null,viewSpan=0,viewStart=0,audioLoadToken=0;
+SONGS=[...new Set([...state.songs,...state.records.map(r=>r.song)])];let activeMode='REC'; // Start with audio corrections; keep all prior mode data unchanged.state.drafts=state.drafts&&typeof state.drafts==='object'?state.drafts:{};let song=(()=>{try{const s=localStorage.getItem(LAST_SONG_KEY);return SONGS.includes(s)?s:SONGS[0]||'これからも'}catch(e){return SONGS[0]||'これからも'}})(),files={},current=0,selectedId=null,editId=null,rangeStart=0,rangeEnd=null,peaks=null,waveDuration=null,dragging=false,renderQueued=false,toastTimer=null,audioObjectUrl=null,viewSpan=0,viewStart=0,audioLoadToken=0;
 const audio=$('audio'); const canvas=$('waveCanvas'); const ctx=canvas.getContext('2d');
 function fmt(t,decimal=true){if(t==null||!Number.isFinite(t))return '—';const total=Math.max(0,t);let whole=Math.floor(total);let dec=Math.round((total-whole)*10);if(dec===10){whole++;dec=0;}return Math.floor(whole/60)+':'+String(whole%60).padStart(2,'0')+(decimal?'.'+dec:'');}
 function parseTime(v){v=String(v||'').trim().replace('：',':');if(!v)return null;if(/^\d+(\.\d+)?$/.test(v))return +v;const m=v.match(/^(\d+):([0-5]?\d)(?:\.(\d))?$/);return m?Number(m[1])*60+Number(m[2])+Number(m[3]||0)/10:null;}
