@@ -74,7 +74,7 @@ jobs:
           echo "Validating candidate SHA: $sha"
           git fetch --no-tags --depth=1 origin "$sha"
           git show "$sha:releases/2026-11-22/index.html" > /tmp/first-ep-page.html
-          grep -Fq '1st ep' /tmp/first-ep-page.html
+          grep -Fq '1st EP' /tmp/first-ep-page.html
           grep -Fq '全6曲' /tmp/first-ep-page.html
           grep -Fq 'Piano Instrumental' /tmp/first-ep-page.html
           grep -Fq '配信開始日：後日発表' /tmp/first-ep-page.html
@@ -127,7 +127,7 @@ jobs:
           ready=0
           for attempt in 1 2 3 4 5 6; do
             if curl -fsSL --connect-timeout 5 --max-time 15 "$domain/releases/2026-11-22/" -o /tmp/published-release.html \
-              && grep -Fq '1st ep' /tmp/published-release.html \
+              && grep -Fq '1st EP' /tmp/published-release.html \
               && curl -fsSL --connect-timeout 5 --max-time 15 "$domain/assets/releases/first-single-2026-cover.webp" -o /tmp/published-cover.webp \
               && curl -fsSL --connect-timeout 5 --max-time 15 "$domain/assets/releases/first-single-2026-og.jpg" -o /tmp/published-og.jpg \
               && [[ "$(file -b --mime-type /tmp/published-cover.webp)" == "image/webp" ]] \
@@ -139,4 +139,4 @@ jobs:
             sleep 20
           done
           [[ "$ready" == "1" ]] || { echo "::error::PR merged but production deployment was not verified"; exit 1; }
-          echo "Confirmed public 1st ep release page and both images."
+          echo "Confirmed public 1st EP release page and both images."
