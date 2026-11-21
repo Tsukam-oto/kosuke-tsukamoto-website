@@ -109,7 +109,7 @@ function renderRows(){
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
   const time=document.createElement('span');time.className='syncLineStamp';time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+' / 終了未設定':'未記録';
   b.append(number,content,time);
-  b.addEventListener('click',()=>{choose(x.i,true,true);});
+  b.addEventListener('click',()=>{choose(x.i,true,false);});
   view.append(b);
  }
  view.scrollTop=position;$('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
