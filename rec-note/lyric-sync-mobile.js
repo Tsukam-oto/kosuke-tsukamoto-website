@@ -178,8 +178,8 @@ function updatePrimary(){
   button.textContent=confirmed(t)?'確認済み ✓':'確認済みにする';
   button.disabled=!usable||!complete(t)||confirmed(t)||conflict(selected);
  }else{
-  button.textContent=usable&&started(t)&&!complete(t)?'歌い終わりを記録':'歌い始めを記録';
-  button.disabled=!usable||confirmed(t)||!hasAudio();
+  button.textContent=confirmed(t)?'確認済み ✓':complete(t)?'時刻は記録済み':started(t)?'歌い終わりを記録':'歌い始めを記録';
+  button.disabled=!usable||complete(t)||!hasAudio();
  }
 }
 function switchSyncMode(mode){
@@ -197,6 +197,7 @@ function switchSyncMode(mode){
 function primaryAction(){
  if(syncMode==='review'){confirm();return;}
  const t=get(selected);
+ if(complete(t)){notice('時刻は記録済みです。修正するか「聴いて確認」に切り替えてください。');return;}
  if(started(t)&&!complete(t)){
   capture('end');updatePrimary();return;
  }
