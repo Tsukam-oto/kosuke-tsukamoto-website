@@ -7,6 +7,12 @@ on:
     - cron: '0,7,17,27,37,47,57 15 21 11 *'
     - cron: '13,43 16-17 21 11 *'
   workflow_dispatch:
+    inputs:
+      prearm_midnight:
+        description: 'Prevalidate after 23:50 JST and wait until 00:00 JST to start merging'
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   contents: write
@@ -25,18 +31,30 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Check exact release date in Japan
+      - name: Check Japanese release date or authorized prearm window
         id: date
         shell: bash
+        env:
+          PREARM_MIDNIGHT: ${{ inputs.prearm_midnight || 'false' }}
         run: |
           set -euo pipefail
           current="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S')"
+          now_epoch="$(date -u +%s)"
+          release_epoch="$(date -u -d '2026-11-21 15:00:00 UTC' +%s)"
           echo "Current JST: $current"
-          if [[ "${current:0:10}" != "2026-11-22" ]]; then
-            echo "Not release day, no publication."
+          if [[ "${current:0:10}" == "2026-11-22" ]]; then
+            echo "eligible=true" >> "$GITHUB_OUTPUT"
             exit 0
           fi
-          echo "eligible=true" >> "$GITHUB_OUTPUT"
+          if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$PREARM_MIDNIGHT" == "true" ]]; then
+            remaining=$((release_epoch - now_epoch))
+            if (( remaining > 0 && remaining <= 600 )); then
+              echo "Prearm accepted: $remaining seconds to JST midnight. No early publication."
+              echo "eligible=true" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+          echo "Not eligible for publication or prearming; no changes."
 
       - name: Get default-branch repo safely
         if: steps.date.outputs.eligible == 'true'
@@ -106,6 +124,16 @@ jobs:
           REPO: Tsukam-oto/kosuke-tsukamoto-website
         run: |
           set -euo pipefail
+          release_epoch="$(date -u -d '2026-11-21 15:00:00 UTC' +%s)"
+          # An interactive prearmed run validates the candidate first and waits here.
+          # The existing cron-based run reaches this step after midnight.
+          if (( $(date -u +%s) < release_epoch )); then
+            echo "Prevalidated. Waiting until 2026-11-22 00:00:00 JST before merge."
+            while (( $(date -u +%s) < release_epoch )); do sleep 0.2; done
+          fi
+          current_jst="$(TZ=Asia/Tokyo date '+%Y-%m-%d %H:%M:%S')"
+          [[ "${current_jst:0:10}" == "2026-11-22" ]] || { echo "::error::Early merge forbidden"; exit 1; }
+          echo "Publish gate opened at JST $current_jst"
           pr="$(gh api "repos/$REPO/pulls/68")"
           if [[ "$(jq -r .head.sha <<< "$pr")" != "${{ steps.validate.outputs.head_sha }}" ]]; then
             echo "::error::PR changed during validation; abort"; exit 1
