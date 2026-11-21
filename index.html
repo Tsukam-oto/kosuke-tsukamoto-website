@@ -1428,15 +1428,38 @@
 .home-ep-launch-primary{background:#fff;color:#161615!important;padding:11px 17px}
 .home-ep-launch-secondary{color:#fff!important;border-bottom:1px solid #9b9b96;padding:8px 0}
 @media(max-width:640px){
-  .home-ep-launch{padding:94px 5vw 23px}
-  .home-ep-launch-inner{grid-template-columns:minmax(0,1fr) 100px;grid-template-areas:"intro cover" "desc desc" "links links";column-gap:13px;row-gap:11px;align-items:start}
-  .home-ep-launch-kicker{font-size:10px;margin-bottom:8px}
-  .home-ep-launch h2{font-size:clamp(29px,8.8vw,39px)}
-  .home-ep-launch-work{font-size:clamp(15px,4.1vw,18px);line-height:1.5;margin-top:8px}
-  .home-ep-launch-desc{font-size:12px;line-height:1.7}
-  .home-ep-launch-actions{gap:8px 19px;margin-top:4px}
-  .home-ep-launch-actions a{font-size:11px}
-  .home-ep-launch-primary{padding:10px 12px}
+  /* Phone: concise two-column opening with balanced artwork, no squeezed title. */
+  .home-ep-launch{padding:93px 19px 24px}
+  .home-ep-launch-inner{grid-template-columns:76px minmax(0,1fr);grid-template-areas:"cover intro" "desc desc" "links links";column-gap:15px;row-gap:10px;align-items:center}
+  .home-ep-launch-cover{width:76px;height:76px;object-fit:cover;align-self:center}
+  .home-ep-launch-kicker{font-size:9px;letter-spacing:.055em;line-height:1.4;margin-bottom:5px}
+  .home-ep-launch h2{font-size:clamp(28px,8vw,34px);line-height:1.15}
+  .home-ep-launch-work{font-size:clamp(13px,3.65vw,16px);line-height:1.35;margin-top:5px;overflow-wrap:normal;word-break:normal}
+  .home-ep-launch-desc{font-size:12px;line-height:1.55;margin-top:1px}
+  .home-ep-launch-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:3px}
+  .home-ep-launch-actions a{font-size:11px;line-height:1.4;min-height:41px;justify-content:center;text-align:center;padding:10px 5px}
+  .home-ep-launch-primary{padding:10px 5px}
+  .home-ep-launch-secondary{border:1px solid #a7a7a4;padding:9px 5px}
+}
+@media(max-width:350px){
+  .home-ep-launch{padding-left:13px;padding-right:13px}
+  .home-ep-launch-inner{grid-template-columns:65px minmax(0,1fr);column-gap:11px}
+  .home-ep-launch-cover{width:65px;height:65px}
+  .home-ep-launch-work{font-size:13px}
+}
+/* Phone announcement: information and action must precede the artwork. */
+@media(max-width:700px){
+  .release-announcement{padding:9px;align-items:flex-start;overflow-y:auto}
+  .release-announcement-panel{display:flex;flex-direction:column;max-width:500px;width:100%;max-height:calc(100dvh - 18px);margin:auto;overflow-y:auto}
+  .release-announcement-content{order:0;padding:38px 19px 16px;gap:9px}
+  .release-announcement-content h2{font-size:clamp(31px,8vw,39px);line-height:1.16}
+  .release-announcement-title{font-size:clamp(18px,5vw,22px);line-height:1.43}
+  .release-announcement-description{font-size:12px;line-height:1.55}
+  .release-announcement-media{order:1;aspect-ratio:1;width:min(165px,45%);max-height:none;min-height:0;margin:4px auto 17px;flex:none}
+  .release-announcement-actions{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 13px;margin-top:7px}
+  .release-announcement-actions a{font-size:12px;line-height:1.4}
+  .release-announcement-actions a.primary{padding:11px 13px}
+  .release-announcement-close{top:6px;right:6px;width:36px;height:36px}
 }
 </style><link rel="stylesheet" href="/assets/first-single-home-spotlight.css"></head>
 <body>
