@@ -101,7 +101,9 @@ async function checkTeaser(browser,engine){
   await page.route("**/assets/releases/first-single-media.json",route=>route.fulfill({status:200,contentType:"application/json",body:JSON.stringify(fixture)}));
   await page.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
   await page.locator("#releases-teaser-link").waitFor({state:"visible"});
-  assert.equal(await page.locator(".release-secondary-link").count(),2);
+  assert.equal(await page.locator(".release-secondary-link").count(),3,"teaser, YouTube, and TikTok links are available");
+  assert.equal(await page.locator('.release-secondary-link[href="https://www.tiktok.com/@tsukam.oto.kos"]').count(),1,"official TikTok destination remains available");
+  assert.equal(await page.locator('.release-secondary-link[href="https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA"]').count(),1,"official YouTube destination remains available");
   await page.close();
   log(engine+" releases listing","teaser and channel paths visible");
  }
