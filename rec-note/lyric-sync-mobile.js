@@ -1,9 +1,9 @@
 /* REC NOTE 7.0: mobile cloud lyric timing; existing record schema and authentication. */
 (function(){
 'use strict';
-const link=document.createElement('a');link.href='./?sync=1';link.className='syncShortcut';link.textContent='歌詞同期';
+const link=document.createElement('a');link.href='./lyric-sync.html';link.className='syncShortcut';link.textContent='歌詞同期';
 document.querySelector('.headops')?.prepend(link);
-if(new URLSearchParams(location.search).get('sync')!=='1')return;
+if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync\.html$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
 document.body.classList.add('syncPage');document.title='歌詞同期 | REC NOTE';
