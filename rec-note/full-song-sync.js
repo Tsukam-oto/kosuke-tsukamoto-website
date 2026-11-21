@@ -9,12 +9,12 @@ if(typeof state==='undefined'||typeof persist!=='function'||!window.RECNOTE_CLOU
 const $=id=>document.getElementById(id);
 const root=$('syncStudio'),audio=$('audio'),cloud=window.RECNOTE_CLOUD_MEDIA,login=window.RECNOTE_LYRIC_BRIDGE;
 if(!root||!audio)return;
-const tab=document.createElement('nav');tab.id='fullSongTabs';tab.className='fullSongTabs';
-tab.setAttribute('aria-label','曲全体の時間を合わせる');
-tab.innerHTML='<button id="fullSongSectionsTab" type="button" aria-pressed="true">前奏・間奏・アウトロ</button><button id="fullSongLyricsTab" type="button" aria-pressed="false">歌詞のタイミング</button>';
+const tab=document.createElement('nav');tab.id='fullSongTabs';tab.className='fsInlineBar';
+tab.setAttribute('aria-label','歌詞の間の時間も記録する');
+tab.innerHTML='<button id="fsOpenIntro" type="button">前奏</button><button id="fsOpenInterlude" type="button">間奏</button><button id="fsOpenOutro" type="button">後奏</button>';
 const panel=document.createElement('section');panel.id='fullSongSections';panel.className='fullSongSections';
 panel.innerHTML=[
- '<div class="fsIntro"><strong>曲全体の時間を合わせる</strong><p>MP3を聴きながら、前奏・間奏・アウトロの開始と終了を記録します。</p></div>',
+ '<div class="fsIntro"><strong>前奏・間奏・後奏</strong><button id="fsClose" type="button">歌詞に戻る ×</button></div>',
  '<div class="fsOverview"><strong id="fsProgress">0 / 2 区間を確認済み</strong><span id="fsSaveNote">記録した時間はクラウドに同期されます</span></div>',
  '<div id="fsList" class="fsList"></div>',
  '<button type="button" id="fsAddInterlude" class="fsAdd">＋ 間奏を追加する</button>',
@@ -37,8 +37,8 @@ panel.innerHTML=[
 const lyricsAnchor=$('syncModeBar')||$('syncLines');
 root.insertBefore(tab,lyricsAnchor);
 root.insertBefore(panel,lyricsAnchor);
-const covered=[$('syncModeBar'),$('syncLines'),$('syncSourceWarning'),$('syncOverview'),$('syncOneLineHelp'),$('.syncSectionLabel'),$('.syncFineTune'),$('.syncExtra'),$('.syncDock')].filter(Boolean);
-let view='sections',selection='intro',previewEnd=null;
+panel.hidden=true;
+let view='lyrics',selection='intro',previewEnd=null;
 const DRAFT_PREFIX='rec_note_section_timing_draft_v9:';
 const SELECT_PREFIX='rec_note_section_selected_v9:';
 function draftKey(key=selection){return DRAFT_PREFIX+song+':'+key;}
@@ -51,7 +51,7 @@ function restoreSelection(){try{const last=localStorage.getItem(SELECT_PREFIX+so
 const workId=()=> 'rec-note-section:'+song;
 const id=key=>'song-section:'+encodeURIComponent(song)+':'+key;
 const index=key=>key==='intro'?-100:key==='outro'?-101:-200-Number(key.split('-')[1]||1);
-const name=key=>key==='intro'?'前奏':key==='outro'?'アウトロ':'間奏 '+String(Number(key.split('-')[1]||1));
+const name=key=>key==='intro'?'前奏':key==='outro'?'後奏':'間奏 '+String(Number(key.split('-')[1]||1));
 const sections=()=>Array.isArray(state.lyricTimings)?state.lyricTimings:(state.lyricTimings=[]);
 const find=key=>sections().find(x=>x.id===id(key)&&x.deleted!==true);
 const disputes=key=>sections().filter(x=>x.syncConflictOf===id(key));
@@ -143,17 +143,28 @@ function saveEdit(){
  if(a===null||($('fsEndInput').value.trim()&&b===null)){alertStatus('時刻は 1:20.35 の形式で入力してください。',true);return;}
  if(store(selection,{start:a,end:b,status:'draft',confirmedAt:null}))$('fsFine').open=false;
 }
-function switchView(to){
- view=to==='lyrics'?'lyrics':'sections';previewEnd=null;
- root.classList.toggle('syncStructureView',view==='sections');
- root.classList.toggle('syncLyricsView',view==='lyrics');
- $('fullSongSectionsTab').setAttribute('aria-pressed',String(view==='sections'));
- $('fullSongLyricsTab').setAttribute('aria-pressed',String(view==='lyrics'));
- panel.hidden=view!=='sections';
- if(view==='sections')render();
+function openSection(key){
+ view='sections';selection=key;previewEnd=null;
+ root.classList.remove('syncStructureView','syncLyricsView');
+ root.classList.add('syncInlineSectionActive');
+ panel.hidden=false;render();
+ panel.scrollIntoView({behavior:'smooth',block:'start'});
 }
-$('fullSongSectionsTab').addEventListener('click',()=>switchView('sections'));
-$('fullSongLyricsTab').addEventListener('click',()=>switchView('lyrics'));
+function closeSection(){
+ view='lyrics';previewEnd=null;root.classList.remove('syncInlineSectionActive');
+ panel.hidden=true;$('fsFine').open=false;
+}
+$('fsOpenIntro').addEventListener('click',()=>openSection('intro'));
+$('fsOpenOutro').addEventListener('click',()=>openSection('outro'));
+$('fsOpenInterlude').addEventListener('click',()=>{
+ const choices=keys().filter(x=>x.startsWith('interlude-'));
+ if(choices.length){openSection(choices[choices.length-1]);return;}
+ if(!cloud.isSignedIn()){alertStatus('ログインしてください。',true);return;}
+ const key='interlude-1';
+ if(store(key,{start:null,end:null,status:'draft',deleted:false}))openSection(key);
+});
+$('fsClose').addEventListener('click',closeSection);
+$('syncLines').addEventListener('click',()=>{if(view==='sections')closeSection();});
 $('fsBegin').addEventListener('click',()=>capture('start'));
 $('fsFinish').addEventListener('click',()=>capture('end'));
 $('fsConfirm').addEventListener('click',()=>{const r=find(selection);if(!complete(r)){alertStatus('開始と終了を記録してから確認してください。',true);return;}if(disputes(selection).length){alertStatus('先に編集競合を解消してください。',true);return;}store(selection,{status:'confirmed',confirmedAt:new Date().toISOString()});});
@@ -188,10 +199,10 @@ $('fsExport').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='FULL_SONG_TIMING_'+song+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{restoreSelection();previewEnd=null;render();});
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();});
 window.addEventListener('recnote:cloud-synced',render);
 window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();});
 audio.addEventListener('loadedmetadata',render);
 window.addEventListener('focus',render);
-restoreSelection();switchView('sections');
+restoreSelection();closeSection();render();
 })();
