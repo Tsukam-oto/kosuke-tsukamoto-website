@@ -130,6 +130,9 @@
     if(!targetSong||!['A','B'].includes(kind)||!file)return;
     unbind(targetSong,kind);
     showAudioStatus();
+    // The dedicated song-sync page uploads the selected MP3 explicitly.
+    // Avoid a second background copy for the same user-selected file.
+    if(document.body.classList.contains('syncPage'))return;
     if(!optIn || !cloud.isSignedIn())return;
     uploadFile(targetSong,kind,file).catch(err=>console.warn('Audio cloud upload:',err));
   });
