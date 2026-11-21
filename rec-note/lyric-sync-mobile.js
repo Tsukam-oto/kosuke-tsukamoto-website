@@ -47,7 +47,7 @@ root.insertBefore(hint,$('syncLines'));
 const modeBar=document.createElement('nav');modeBar.id='syncModeBar';modeBar.className='syncModeBar';modeBar.setAttribute('aria-label','作業の切り替え');
 modeBar.innerHTML='<button type="button" id="syncRecordMode" class="active" aria-pressed="true">① 時刻を記録</button><button type="button" id="syncReviewMode" aria-pressed="false">② 聴いて確認</button>';
 root.insertBefore(modeBar,$('syncLines'));
-const saveBadge=document.createElement('span');saveBadge.id='syncSaveState';saveBadge.className='syncSaveState';saveBadge.textContent='接続を確認中';
+const saveBadge=document.createElement('span');saveBadge.id='syncSaveState';saveBadge.className='syncSaveState';saveBadge.textContent='接続を確認中';saveBadge.setAttribute('aria-live','polite');
 root.insertBefore(saveBadge,root.querySelector('.syncOverview'));
 
 const review=document.createElement('div');review.className='syncQuickReview';review.id='syncQuickReview';
@@ -59,9 +59,14 @@ root.insertBefore(adjust,$('syncEditor'));adjust.append($('syncEditor'));
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
-extra.append(root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVersion'),$('syncTools'),root.querySelector('.syncFoot'));
+extra.append(root.querySelector('.syncSectionLabel label'),root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVersion'),$('syncTools'),root.querySelector('.syncFoot'));
 const dockEdit=document.createElement('button');dockEdit.type='button';dockEdit.id='syncDockEdit';dockEdit.textContent='修正';dockEdit.setAttribute('aria-label','選択した歌詞の時刻を修正');root.querySelector('.syncDock').insertBefore(dockEdit,$('syncTapNow'));
 dockEdit.addEventListener('click',()=>{if($('syncEditor').hidden)return;adjust.open=!adjust.open;});
+const closeEdit=document.createElement('button');closeEdit.type='button';closeEdit.id='syncCloseEdit';closeEdit.textContent='閉じる';closeEdit.setAttribute('aria-label','時刻修正を閉じる');
+adjust.insertBefore(closeEdit,$('syncEditor'));
+closeEdit.addEventListener('click',()=>{adjust.open=false;dockEdit.focus();});
+adjust.addEventListener('keydown',e=>{if(e.key==='Escape'){adjust.open=false;dockEdit.focus();}});
+
 const cloudPanel=$('recCloudPanel');if(cloudPanel)$('syncCloudSlot').append(cloudPanel);
 const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:',OFFSET_PREFIX='rec_note_sync_offset_v7:',RESUME_PREFIX='rec_note_sync_resume_v81:';
 let syncMode='record';
@@ -296,7 +301,7 @@ function changeVersion(v){
  $('syncSourceWarning').textContent='この歌詞はPDF抽出による未校正版です。時間合わせと原文校正は別工程です。';
  const saved=readCheckpoint(),unconfirmed=rows().find(x=>!confirmed(x.time));
  selected=Number.isInteger(saved)&&lines[saved]?.trim()&&!confirmed(get(saved))?saved:(unconfirmed?.i??rows()[0]?.i??-1);
- renderRows();if(selected>=0)choose(selected,false,false);
+ renderRows();if(selected>=0)choose(selected,true,false);
 }
 function download(name,content,type){
  const url=URL.createObjectURL(new Blob([content],{type:type||'text/plain;charset=utf-8'}));
