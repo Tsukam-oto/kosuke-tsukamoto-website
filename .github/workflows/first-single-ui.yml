@@ -7,6 +7,9 @@ on:
       - 'lyrics/index.html'
       - 'works/index.html'
       - 'releases/**'
+      - 'assets/releases/first-single-2026-cover.webp'
+      - 'assets/releases/first-single-2026-og.jpg'
+      - 'assets/first-single-home-spotlight.css'
       - 'tests/first-single-ui.mjs'
       - '.github/workflows/first-single-ui.yml'
   workflow_dispatch:
