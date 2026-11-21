@@ -270,3 +270,15 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
 #syncStudio .syncTaskNav a:focus-visible{outline:3px solid #bd9f92;outline-offset:2px}
 #syncStudio .syncHeading a{display:none}
 #syncStudio .syncHeading{padding-top:15px}
+
+/* v12: just one non-destructive repair action for historical lyric starts */
+#syncStudio .syncFillMissing{display:block;width:100%;min-height:44px;
+ margin:5px 0 10px;border:1px solid #cfded6;background:#edf5ef;
+ border-radius:10px;color:#315f49;text-align:center;font-size:12px;font-weight:700}
+#syncStudio .syncFillMissing[hidden]{display:none!important}
+#syncStudio.syncNeedsLogin .syncFillMissing,#syncStudio.syncNeedsAudio .syncFillMissing{display:none!important}
+#syncStudio .syncLineStamp{white-space:normal}
+@media(max-width:550px){
+ #syncStudio .syncFillMissing{font-size:12px;min-height:44px}
+ #syncStudio .syncLineStamp{font-size:10px}
+}
