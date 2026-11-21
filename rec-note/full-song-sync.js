@@ -38,7 +38,16 @@ const lyricsAnchor=$('syncModeBar')||$('syncLines');
 root.insertBefore(tab,lyricsAnchor);
 root.insertBefore(panel,lyricsAnchor);
 const covered=[$('syncModeBar'),$('syncLines'),$('syncSourceWarning'),$('syncOverview'),$('syncOneLineHelp'),$('.syncSectionLabel'),$('.syncFineTune'),$('.syncExtra'),$('.syncDock')].filter(Boolean);
-let view='sections',selection='intro',previewEnd=null,request=0;
+let view='sections',selection='intro',previewEnd=null;
+const DRAFT_PREFIX='rec_note_section_timing_draft_v9:';
+const SELECT_PREFIX='rec_note_section_selected_v9:';
+function draftKey(key=selection){return DRAFT_PREFIX+song+':'+key;}
+function readDraft(key=selection){try{return JSON.parse(localStorage.getItem(draftKey(key))||'null')}catch(e){return null}}
+function saveDraft(){try{localStorage.setItem(draftKey(),JSON.stringify({start:$('fsStartInput').value,end:$('fsEndInput').value}));}catch(e){}}
+function clearDraft(key=selection){try{localStorage.removeItem(draftKey(key))}catch(e){}}
+function rememberSelection(){try{localStorage.setItem(SELECT_PREFIX+song,selection)}catch(e){}}
+function restoreSelection(){try{const last=localStorage.getItem(SELECT_PREFIX+song);selection=last||'intro'}catch(e){selection='intro'}}
+
 const workId=()=> 'rec-note-section:'+song;
 const id=key=>'song-section:'+encodeURIComponent(song)+':'+key;
 const index=key=>key==='intro'?-100:key==='outro'?-101:-200-Number(key.split('-')[1]||1);
@@ -63,7 +72,7 @@ function store(key,patch){
  if(rec.end!==null&&(!Number.isFinite(rec.end)||rec.end<0)){alertStatus('終了時刻が不正です。',true);return false}
  if(Number.isFinite(rec.end)&&(!Number.isFinite(rec.start)||rec.end<=rec.start)){alertStatus('終了は開始より後にしてください。',true);return false}
  if(j>=0)a[j]=rec;else a.push(rec);
- persist();const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
+ persist();clearDraft(key);const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
  render();return true;
 }
@@ -73,7 +82,7 @@ function keys(){
 }
 function render(){
  if(!root.classList.contains('syncReady')){$('fsList').replaceChildren();panel.hidden=view!=='sections';return;}
- const k=keys();if(!k.includes(selection))selection='intro';
+ const k=keys();if(!k.includes(selection))selection='intro';rememberSelection();
  const list=$('fsList');list.replaceChildren();
  let done=0;
  for(const key of k){
@@ -90,8 +99,12 @@ function render(){
  const r=find(selection),issue=disputes(selection).length>0;
  $('fsEditor').hidden=false;$('fsTitle').textContent=name(selection);
  $('fsRecorded').textContent=complete(r)?display(r.start)+' 〜 '+display(r.end):Number.isFinite(r?.start)?'開始 '+display(r.start)+' ・ 終了未設定':'時間未設定';
- $('fsStartInput').value=Number.isFinite(r?.start)?display(r.start):'';
- $('fsEndInput').value=Number.isFinite(r?.end)?display(r.end):'';
+  const draft=readDraft();
+ const inputActive=document.activeElement&&['fsStartInput','fsEndInput'].includes(document.activeElement.id);
+ if(!inputActive){
+  $('fsStartInput').value=draft?.start??(Number.isFinite(r?.start)?display(r.start):'');
+  $('fsEndInput').value=draft?.end??(Number.isFinite(r?.end)?display(r.end):'');
+ }
  $('fsBegin').disabled=!ready()||verified(r);
  $('fsFinish').disabled=!ready()||!Number.isFinite(r?.start)||verified(r);
  $('fsListen').disabled=!ready()||!Number.isFinite(r?.start);
@@ -131,7 +144,7 @@ function saveEdit(){
  if(store(selection,{start:a,end:b,status:'draft',confirmedAt:null}))$('fsFine').open=false;
 }
 function switchView(to){
- view=to==='lyrics'?'lyrics':'sections';
+ view=to==='lyrics'?'lyrics':'sections';previewEnd=null;
  root.classList.toggle('syncStructureView',view==='sections');
  root.classList.toggle('syncLyricsView',view==='lyrics');
  $('fullSongSectionsTab').setAttribute('aria-pressed',String(view==='sections'));
@@ -151,6 +164,7 @@ $('fsListen').addEventListener('click',()=>{
 });
 audio.addEventListener('timeupdate',()=>{if(previewEnd!==null&&pos()>=previewEnd){audio.pause();previewEnd=null;}});
 $('fsSave').addEventListener('click',saveEdit);
+for(const key of ['fsStartInput','fsEndInput'])$(key).addEventListener('input',saveDraft);
 for(const b of panel.querySelectorAll('[data-fs-adjust]'))b.addEventListener('click',()=>{
  const [field,shift]=b.dataset.fsAdjust.split(':'),input=$(field==='start'?'fsStartInput':'fsEndInput'),t=validTime(input.value);
  if(t===null){alertStatus('先に時刻を登録してください。',true);return;}
@@ -174,10 +188,10 @@ $('fsExport').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='FULL_SONG_TIMING_'+song+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{selection='intro';previewEnd=null;render();});
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{restoreSelection();previewEnd=null;render();});
 window.addEventListener('recnote:cloud-synced',render);
 window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;}else render();});
 audio.addEventListener('loadedmetadata',render);
 window.addEventListener('focus',render);
-switchView('sections');
+restoreSelection();switchView('sections');
 })();
