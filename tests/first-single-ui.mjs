@@ -22,7 +22,7 @@ async function checkColumn(page, engine, width) {
     const variance=Math.max(...steps)-Math.min(...steps);
     assert.ok(variance<=2.0,engine+" "+width+"px: uneven original-state vertical rhythm "+variance.toFixed(2)+"px");
     const layout=await page.locator(".release-words").evaluate(el=>getComputedStyle(el).gridAutoRows);
-    assert.equal(layout.split(" ").length,8,engine+" untouched prose must have eight equal grid rows");
+    assert.equal(layout,"1fr",engine+" untouched prose must use equal-height grid tracks");
     assert.ok(await page.locator(".release-words .note-line").first().evaluate(el=>el.textContent.includes("大切に思っていても")),"long prose is fully present in untouched state");
   }
   const viewport = await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
