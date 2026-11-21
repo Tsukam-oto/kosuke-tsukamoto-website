@@ -232,3 +232,33 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncDock #syncTapNow{font-size:12px}
  #syncStudio .syncDock strong{font-size:12px}
 }
+
+/* v8.1: record/review focus, visible sync state and resume context */
+#syncStudio .syncSaveState{
+ display:inline-flex;align-items:center;gap:6px;font-size:11px;min-height:25px;
+ padding:2px 9px;border:1px solid #e1ded8;background:#eeece8;border-radius:20px;
+ color:#77736c;margin:7px 0 1px;
+}
+#syncStudio .syncSaveState::before{content:'';display:block;width:6px;height:6px;border-radius:50%;background:#a7a099}
+#syncStudio .syncSaveState[data-status="saved"]{color:#42785c;background:#e9f3ec;border-color:#cddfce}
+#syncStudio .syncSaveState[data-status="saved"]::before{background:#4b9770}
+#syncStudio .syncSaveState[data-status="error"]{color:#aa523c;background:#fff0e9;border-color:#f0d4c7}
+#syncStudio .syncSaveState[data-status="error"]::before{background:#d46e4e}
+#syncStudio .syncSaveState[data-status="offline"]{color:#857a73;background:#f1efec}
+#syncStudio .syncModeBar{display:grid;grid-template-columns:1fr 1fr;gap:4px;background:#eae7e2;border-radius:12px;padding:4px;margin:15px 0 10px}
+#syncStudio .syncModeBar button{min-height:45px;border:0;border-radius:9px;background:transparent;color:#77716b;font-size:13px;font-weight:700;box-shadow:none}
+#syncStudio .syncModeBar button.active{background:#fff;color:#353037;box-shadow:0 2px 7px #241d2112}
+#syncStudio .syncModeBar button:focus-visible{outline:2px solid #a9857e}
+#syncStudio .syncExtra .syncSectionLabel label{display:flex;align-items:center;gap:9px;padding:9px 14px;font-size:12px;color:#666;cursor:pointer}
+#syncStudio .syncLine{scroll-margin-top:200px;scroll-margin-bottom:100px}
+#syncStudio .syncFineTune[open] #syncCloseEdit{position:sticky;top:52px;float:right;margin:8px 15px 0 0;padding:8px 13px;background:#f1ede8;color:#65574d;min-height:38px;font-size:12px;z-index:3}
+#syncStudio .syncFineTune[open]>summary{font-size:14px;min-height:52px}
+#syncStudio .syncDock #syncTapNow:disabled{background:#aaa4a0;border-color:#aaa4a0;color:#fff;opacity:.8}
+#syncStudio.syncNeedsLogin .syncModeBar,#syncStudio.syncNeedsAudio .syncModeBar{display:none!important}
+#syncStudio.syncNeedsLogin .syncSaveState{display:none!important}
+#syncStudio .syncOverview{padding-top:10px}
+@media(max-width:550px){
+ #syncStudio .syncModeBar{margin-top:13px;margin-bottom:9px}
+ #syncStudio .syncModeBar button{min-height:43px;font-size:12px}
+ #syncStudio .syncLine{scroll-margin-top:225px}
+}
