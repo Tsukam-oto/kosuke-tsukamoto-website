@@ -67,8 +67,8 @@
 <link rel="stylesheet" href="./cloud.css?v=6.3" />
 <link rel="stylesheet" href="./lyrics.css?v=6.1" />
 
-  <link rel="stylesheet" href="./lyric-sync-mobile.css?v=8.2" />
-<link rel="stylesheet" href="./full-song-sync.css?v=9.1" />
+  <link rel="stylesheet" href="./lyric-sync-mobile.css?v=10" />
+<link rel="stylesheet" href="./full-song-sync.css?v=10" />
 <style id="syncOnlyPreload">
 /* Dedicated sync page: never expose the legacy recording / production forms. */
 body.syncPage>header,body.syncPage>main.wrap,body.syncPage>main,
@@ -85,7 +85,8 @@ body.syncPage #syncStudio~#syncInit{display:none!important}
 #syncStudio .syncHeading h1{font-size:20px!important;margin:1px 0!important}
 #syncStudio .syncHeading small{display:none!important}
 #syncStudio .syncTransport label{display:none}
-#syncStudio .syncExtra .syncTransport label{display:flex}
+#syncStudio .syncExtra>label{display:flex;align-items:center;gap:9px;margin:5px 0;padding:9px 14px;color:#6c6560;font-size:12px}
+#syncStudio .syncExtra>label select{border:1px solid #d9d5ce;border-radius:8px;padding:5px 8px;background:#fff;min-height:37px}
 #syncStudio.syncReady #syncAccount{display:none}
 #syncStudio .fsCaution,#syncStudio .syncFoot{display:none!important}
 #syncStudio .fsIntro p{display:none}
@@ -245,6 +246,6 @@ updateAll();
 <script src="./lyrics.js?v=6.4"></script>
 <script src="./media-persistence.js?v=6.3"></script>
 
-<script src="./lyric-sync-mobile.js?v=8.2"></script>
-<script src="./full-song-sync.js?v=9.1"></script>
+<script src="./lyric-sync-mobile.js?v=10"></script>
+<script src="./full-song-sync.js?v=10"></script>
 </body></html>
