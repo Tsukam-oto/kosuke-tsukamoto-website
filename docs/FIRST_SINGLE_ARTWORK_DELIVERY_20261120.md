@@ -1,4 +1,4 @@
-# 1st Single｜高解像度ジャケットの受領・Web公開用アセット
+# 1st EP｜高解像度ジャケットの受領・Web公開用アセット
 
 対象：PR #68 (`feature/first-single-20261122`)。**main未マージ、本番未公開。**
 
@@ -18,7 +18,7 @@
 
 ## GitHubに配置するファイル
 - `assets/releases/first-single-2026-cover.webp` — 2048×2048 px、可逆WebP、公開用派生版。SHA-256 `a3e33bfb8e0dac7c`で始まる。
-- `assets/releases/first-single-2026-og.jpg` — 1200×630 px、1st Single発表用SNSカード。SHA-256 `4d4fdfaf62e02f1d`で始まる。
+- `assets/releases/first-single-2026-og.jpg` — 1200×630 px、1st EP発表用SNSカード。SHA-256 `4d4fdfaf62e02f1d`で始まる。
 - Web表示箇所：トップの初回告知、`/releases/`、`/releases/2026-11-22/`。
 - OGP表示箇所：`/releases/`、`/releases/2026-11-22/`、`/releases/artwork-project/` の`og:image`と`twitter:image`。
 
@@ -26,7 +26,7 @@
 
 ## デザイン
 - 大きすぎたオレンジのマット枠と内側の二重罫線を撤去。作品のイラスト自体を主役にする。
-- トップの説明は「《あなたと》《これから》の新録と、新曲《これからも》。全3曲。」と記載。「配信決定」と「配信開始」は区別する。
+- トップの説明は「歌入り3曲とピアノ・インストゥルメンタル3曲。全6曲収録予定。」と記載。「配信決定」と「配信開始」は区別する。
 - 11/22以降のホーム告知挙動を維持。ローカルのテスト入口は `http://127.0.0.1:8765/?preview-first-single=1`。本番の公開前ガードとは独立。
 
 ## 未完了の公開ブロッカー
