@@ -16,6 +16,15 @@ async function checkColumn(page, engine, width) {
   assert.equal(coords.map(o=>o.text).join(""),"けっこんしました");
   const spread = Math.max(...coords.map(o=>o.x)) - Math.min(...coords.map(o=>o.x));
   assert.ok(spread <= 1.25, engine+" at "+width+": column drift "+spread.toFixed(2)+"px");
+  if(width<=700){
+    assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),false,"the eight character column is formed in untouched normal text");
+    const steps=coords.slice(1).map((o,i)=>o.y-coords[i].y);
+    const variance=Math.max(...steps)-Math.min(...steps);
+    assert.ok(variance<=2.0,engine+" "+width+"px: uneven original-state vertical rhythm "+variance.toFixed(2)+"px");
+    const layout=await page.locator(".release-words").evaluate(el=>getComputedStyle(el).gridAutoRows);
+    assert.equal(layout.split(" ").length,8,engine+" untouched prose must have eight equal grid rows");
+    assert.ok(await page.locator(".release-words .note-line").first().evaluate(el=>el.textContent.includes("大切に思っていても")),"long prose is fully present in untouched state");
+  }
   const viewport = await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
   assert.ok(viewport.scroll<=viewport.client+1.5,engine+" at "+width+": horizontal overflow");
   log(engine+" "+width+"px", "column drift "+spread.toFixed(2)+"px; no overflow");
