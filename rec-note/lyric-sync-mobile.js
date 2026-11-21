@@ -2,7 +2,7 @@
 (function(){
 'use strict';
 // Dedicated full-song timing page only. The audio-corrections page has its own navigation.
-if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync\.html$/i.test(location.pathname))return;
+if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
 document.body.classList.add('syncPage');document.title='歌詞同期 | REC NOTE';
