@@ -1,0 +1,46 @@
+name: First Single Browser QA
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'lyrics/index.html'
+      - 'works/index.html'
+      - 'releases/**'
+      - 'assets/releases/first-single-2026-cover.webp'
+      - 'assets/releases/first-single-2026-og.jpg'
+      - 'assets/first-single-home-spotlight.css'
+      - 'tests/first-single-ui.mjs'
+      - '.github/workflows/first-single-ui.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  responsive-and-sharing:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install browsers for Chromium and Safari-engine checks
+        run: |
+          npm install --no-save playwright@1.56.1
+          npx playwright install --with-deps chromium webkit
+      - name: Serve this branch without publishing it
+        run: |
+          python3 -m http.server 8765 --bind 127.0.0.1 > /tmp/first-single-http.log 2>&1 &
+          sleep 3
+      - name: Test width, hidden message, share images, poetry, and release announcement
+        run: node tests/first-single-ui.mjs
+      - name: Upload temporary private review screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: first-single-ui-review
+          path: test-results/first-single
+          if-no-files-found: ignore
+          retention-days: 1
