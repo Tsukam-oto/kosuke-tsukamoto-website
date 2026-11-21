@@ -480,7 +480,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
     // In compact reveal mode the entire eight-character vertical line fits
     // on a phone screen. Move the view to its top only after relayout.
     requestAnimationFrame(()=>{
-      host.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
+      host.scrollIntoView({block:"start",behavior:window.matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
     });
   }
   if(yes&&focusShare)document.getElementById("secret-open").focus({preventScroll:true});
