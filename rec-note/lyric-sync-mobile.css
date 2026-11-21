@@ -114,3 +114,100 @@ body.syncPage #syncStudio{display:block;max-width:750px;margin:0 auto;padding:0 
 #syncStudio .syncConflictBox[hidden]{display:none}
 #syncStudio .syncConflictBox p{font-size:12px;font-weight:700;line-height:1.6;color:#965539;margin:0 0 3px}
 #syncStudio .syncConflictBox button{border:1px solid #ddac94;color:#753e2b;font-size:12px;text-align:left;background:white;min-height:44px}
+
+
+/* v8.0: focus mode. One immediate action, progressive disclosure, no nested scrolling. */
+body.syncPage{background:#f6f5f2;color:#252626}
+body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:calc(122px + env(safe-area-inset-bottom))}
+#syncStudio .syncHeading{padding:21px 0 11px;border-color:#e5e1dc}
+#syncStudio .syncHeading h1{font-size:23px;letter-spacing:-.025em}
+#syncStudio .syncHeading small{font-size:10px;font-weight:600;color:#aaa49d}
+#syncStudio .syncHeading a{font-size:11px;font-weight:500;color:#8e8882;border-bottom:1px solid #bdb6b0}
+#syncStudio .syncSongs{margin:14px 0 13px;gap:8px}
+#syncStudio .syncSongs button{border:1px solid #e6e3df;border-radius:12px;font-size:13px;font-weight:700;min-height:47px;background:#fff}
+#syncStudio .syncSongs button.active{background:#363238;border-color:#363238;color:#fff;box-shadow:0 3px 9px #3e313225}
+#syncStudio #syncAccount{border:0;box-shadow:none;background:none;margin-top:7px}
+#syncStudio #syncAccount summary{font-size:11px;font-weight:500;color:#91877f;padding:6px 1px;justify-content:flex-start;gap:10px;min-height:35px}
+#syncStudio #syncAccount summary b{font-size:11px;color:#4e7769}
+#syncStudio #syncCloudSlot{border:1px solid #e5e0d9;border-radius:12px;padding:12px;background:#fff;margin-top:8px}
+#syncStudio #syncCloudSlot .recCloudHead{display:none}
+#syncStudio #syncCloudSlot .recCloudMedia,#syncStudio #syncCloudSlot .recCloudConnected>.recCloudLine:nth-child(2){display:none!important}
+#syncStudio #syncCloudSlot .recCloudPanel>p.recCloudSub{display:none}
+#syncStudio #syncCloudSlot .recCloudLogin p.recCloudSub{font-size:11px;margin:5px 0}
+#syncStudio #syncCloudSlot .recCloudConnected{padding:0}
+#syncStudio #syncCloudSlot .recCloudStatus{font-size:11px;line-height:1.6}
+#syncStudio .syncIntro{margin:12px 0 14px;padding:19px;background:#fff;border:1px solid #e8e5df;border-radius:16px}
+#syncStudio .syncIntro strong{font-size:17px;line-height:1.4;display:block}
+#syncStudio .syncIntro p{font-size:12px;line-height:1.75;margin:7px 0 0;color:#827b74}
+#syncStudio .syncNotice{font-size:11px;background:none;padding:0 2px;color:#89827a;min-height:0;margin:0 0 7px}
+#syncStudio .syncPlayer{position:sticky;top:0;z-index:19;padding:15px 15px 13px;box-shadow:0 6px 28px #2a252814;border:1px solid #e3dfd8;border-radius:15px;background:#fff}
+#syncStudio .syncSongHead{margin-bottom:1px}
+#syncStudio .syncSongHead strong{font-size:14px}
+#syncStudio .syncSongHead span{font-size:10px}
+#syncStudio .syncTime{gap:5px}
+#syncStudio .syncTime strong{font-size:27px;font-weight:750;letter-spacing:-.02em}
+#syncStudio .syncTime span{font-size:11px}
+#syncStudio #syncSlider{margin:7px 0 10px;height:21px;accent-color:#66595f}
+#syncStudio .syncTransport{grid-template-columns:1fr 1.6fr 1fr auto;gap:7px}
+#syncStudio .syncTransport button{border-color:#e5dfd8;min-height:45px}
+#syncStudio .syncTransport .syncEmphasis{background:#302d32}
+#syncStudio .syncMedia{margin-top:10px;padding-top:10px}
+#syncStudio .syncMedia p{font-size:12px;color:#6f675e;line-height:1.6}
+#syncStudio .syncMedia label{background:#302d32;color:#fff;border-color:#302d32;min-height:45px;font-size:13px}
+#syncStudio .syncMedia[hidden]{display:none!important}
+#syncStudio .syncOverview{padding:14px 3px 10px}
+#syncStudio .syncOverview strong{font-size:13px}
+#syncStudio .syncOverview span{font-size:10px}
+#syncStudio .syncMeter{margin-top:7px;height:4px;background:#e8e5e0}
+#syncStudio .syncMeter i{background:#669585}
+#syncStudio .syncSectionLabel{margin:10px 2px 6px;gap:8px}
+#syncStudio .syncSectionLabel strong{font-size:15px;letter-spacing:-.01em}
+#syncStudio .syncSectionLabel small{font-size:10px;margin-top:1px}
+#syncStudio .syncSectionLabel label{font-size:11px;color:#77716a}
+#syncStudio .syncOneLineHelp{font-size:12px;line-height:1.55;color:#675b54;background:#eeebe7;border-radius:9px;padding:10px 12px;margin:8px 0 9px;font-weight:550}
+#syncStudio .syncLines{max-height:none;overflow:visible;border-color:#e7e3de;border-radius:13px}
+#syncStudio .syncLine{min-height:61px;padding:12px 15px;gap:9px;border-bottom:1px solid #f0eeea;background:#fff}
+#syncStudio .syncLineText{font-size:14px;font-weight:500;line-height:1.7;letter-spacing:.005em}
+#syncStudio .syncLine.selected{background:#f1ede8;box-shadow:inset 4px 0 #75666a}
+#syncStudio .syncLine.confirmed{background:#f6faf7}
+#syncStudio .syncLine.confirmed.selected{background:#edf4ed}
+#syncStudio .syncLineStamp{font-size:10px;color:#8c8580}
+#syncStudio .syncQuickReview{display:flex;gap:7px;flex-wrap:wrap;align-items:center;padding:12px 0 5px}
+#syncStudio .syncQuickReview[hidden]{display:none!important}
+#syncStudio .syncQuickNote{width:100%;font-size:11px;color:#8e847d}
+#syncStudio .syncQuickReview button{flex:1 1 120px;background:#fff;border-color:#ddd7d1;padding:9px 7px;min-height:45px;font-size:12px}
+#syncStudio .syncQuickReview #syncQuickConfirm{background:#e3eee8;color:#376654;border-color:#d3e4d9}
+#syncStudio .syncQuickReview #syncQuickConfirm:disabled{background:#fff;color:#6c6a67}
+#syncStudio .syncFineTune,#syncStudio .syncExtra{margin:11px 0;border:1px solid #e5e0d9;border-radius:11px;background:#fff;overflow:hidden}
+#syncStudio .syncFineTune>summary,#syncStudio .syncExtra>summary{font-size:12px;font-weight:650;color:#68625e;padding:13px 15px;min-height:45px;display:flex;align-items:center;cursor:pointer}
+#syncStudio .syncFineTune>summary::before,#syncStudio .syncExtra>summary::before{content:'+';display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;margin-right:7px;border-radius:6px;background:#f1efec;font-size:17px;font-weight:400}
+#syncStudio .syncFineTune[open]>summary::before,#syncStudio .syncExtra[open]>summary::before{content:'−'}
+#syncStudio .syncFineTune .syncEditor{margin:0;border:0;border-top:1px solid #eee9e2;border-radius:0}
+#syncStudio .syncExtra .syncOffsetLabel,#syncStudio .syncExtra .syncVersion{padding:8px 15px;margin:5px 0;display:flex;flex-wrap:wrap}
+#syncStudio .syncExtra .syncTools{padding:8px 15px;margin:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+#syncStudio .syncExtra .syncTools button{font-size:12px}
+#syncStudio .syncExtra .syncFoot{padding:4px 15px 14px;color:#958c83;font-size:11px;margin:0}
+#syncStudio .syncDock{z-index:50;background:#fffdfbf5;border-top:1px solid #e8e2da;box-shadow:0 -9px 22px #24202714;grid-template-columns:minmax(0,1fr) 50px minmax(154px,auto);padding:11px 16px calc(12px + env(safe-area-inset-bottom))}
+#syncStudio .syncDock strong{font-size:13px;font-weight:750}
+#syncStudio .syncDock small{font-size:11px;color:#948982;margin-top:2px}
+#syncStudio .syncDock button{min-height:53px}
+#syncStudio .syncDock #syncTapNow{font-size:13px;font-weight:750;background:#3e333b;border-color:#3e333b;padding:10px 15px}
+#syncStudio #syncSourceWarning{margin:6px 0 10px;font-size:11px}
+#syncStudio .syncVersion{font-size:11px}
+#syncStudio .syncNeedsLogin .syncSongs,#syncStudio .syncNeedsLogin .syncPlayer,#syncStudio .syncNeedsLogin .syncOverview,#syncStudio .syncNeedsLogin .syncSectionLabel,#syncStudio .syncNeedsLogin .syncOneLineHelp,#syncStudio .syncNeedsLogin #syncSourceWarning,#syncStudio .syncNeedsLogin .syncLines,#syncStudio .syncNeedsLogin .syncQuickReview,#syncStudio .syncNeedsLogin .syncFineTune,#syncStudio .syncNeedsLogin .syncExtra,#syncStudio .syncNeedsLogin .syncDock{display:none!important}
+#syncStudio .syncNeedsAudio .syncOverview,#syncStudio .syncNeedsAudio .syncSectionLabel,#syncStudio .syncNeedsAudio .syncOneLineHelp,#syncStudio .syncNeedsAudio #syncSourceWarning,#syncStudio .syncNeedsAudio .syncLines,#syncStudio .syncNeedsAudio .syncQuickReview,#syncStudio .syncNeedsAudio .syncFineTune,#syncStudio .syncNeedsAudio .syncExtra,#syncStudio .syncNeedsAudio .syncDock{display:none!important}
+#syncStudio.syncReady .syncIntro{display:none}
+#syncStudio.syncReady .syncNotice:not(.error){display:none}
+#syncStudio.syncReady .syncPlayer{margin-bottom:3px}
+@media(max-width:550px){
+ body.syncPage #syncStudio{padding-left:12px;padding-right:12px;padding-bottom:calc(125px + env(safe-area-inset-bottom))}
+ #syncStudio .syncTransport{grid-template-columns:1fr 1.5fr 1fr;gap:6px}
+ #syncStudio .syncTransport label{grid-column:1/-1;justify-content:flex-end;min-height:0}
+ #syncStudio .syncTransport label select{min-height:31px}
+ #syncStudio .syncLine{grid-template-columns:26px minmax(0,1fr);padding:12px 12px;min-height:59px}
+ #syncStudio .syncLineStamp{grid-column:2;justify-self:start}
+ #syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 43px minmax(145px,auto);gap:6px;padding-left:10px;padding-right:10px}
+ #syncStudio .syncDock #syncTapNow{font-size:12px;padding:8px 9px}
+ #syncStudio .syncQuickReview button{flex:1 1 45%}
+ #syncStudio .syncTime strong{font-size:25px}
+}
