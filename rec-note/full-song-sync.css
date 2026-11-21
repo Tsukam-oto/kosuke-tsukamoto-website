@@ -1,0 +1,68 @@
+/* Full-song mobile timestamp editor, v9.0 */
+#syncStudio .fullSongTabs{display:grid;grid-template-columns:1.17fr 1fr;gap:6px;margin:13px 0 12px;padding:4px;background:#e9e6e0;border-radius:12px}
+#syncStudio .fullSongTabs button{border:0;background:transparent;color:#76716d;font-size:12px;font-weight:700;padding:10px 5px;min-height:47px;line-height:1.3}
+#syncStudio .fullSongTabs button[aria-pressed="true"]{background:#fff;color:#302b2e;box-shadow:0 2px 8px #25202912}
+#syncStudio .fullSongSections{position:relative;padding-bottom:85px}
+#syncStudio .fsIntro{margin:5px 0 11px}
+#syncStudio .fsIntro strong{font-size:17px;line-height:1.4}
+#syncStudio .fsIntro p{font-size:11px;color:#7d746e;margin:4px 0 0;line-height:1.7}
+#syncStudio .fsOverview{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:3px;padding:7px 1px 12px}
+#syncStudio .fsOverview strong{font-size:12px}
+#syncStudio .fsOverview span{font-size:10px;color:#827870}
+#syncStudio .fsList{display:flex;flex-direction:column;gap:7px}
+#syncStudio .fsItem{display:grid;grid-template-columns:minmax(56px,.8fr) minmax(0,2fr) auto;align-items:center;gap:7px;border:1px solid #ded9d2;border-radius:12px;min-height:66px;padding:12px 13px;background:#fff;text-align:left;box-shadow:none}
+#syncStudio .fsItem strong{font-size:13px;font-weight:750}
+#syncStudio .fsItem span{font-size:12px;font-weight:550;color:#655c58;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#syncStudio .fsItem em{font-size:10px;font-style:normal;font-weight:700;color:#9c8880;white-space:nowrap}
+#syncStudio .fsItem.active{background:#eee9e5;border-color:#98857e;box-shadow:inset 3px 0 #89726c}
+#syncStudio .fsItem.done{border-color:#d8e7dc;background:#f2f8f4}
+#syncStudio .fsItem.done em{color:#427c5b}
+#syncStudio .fsItem.done.active{background:#e7f1e9;border-color:#63907b}
+#syncStudio .fsAdd{width:100%;margin:10px 0 11px;min-height:51px;border:1px dashed #bbb3ad;background:#faf9f6;color:#66564e;font-size:12px;font-weight:750}
+#syncStudio .fsEditor{border:1px solid #e2dcd5;border-radius:13px;padding:14px;background:#fff}
+#syncStudio .fsEditor[hidden]{display:none!important}
+#syncStudio .fsEditor>strong{font-size:15px;display:block}
+#syncStudio .fsEditor>span{font-size:12px;color:#6d675f;display:block;margin:4px 0 8px;font-variant-numeric:tabular-nums}
+#syncStudio .fsEditor .fsActions{position:fixed;bottom:0;left:50%;transform:translateX(-50%);z-index:55;width:min(690px,100%);background:#fffdfbf7;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:10px 12px calc(11px + env(safe-area-inset-bottom));border-top:1px solid #e1dad3;box-shadow:0 -7px 20px #24192318}
+#syncStudio .fsEditor .fsActions button{min-height:55px;font-size:14px;font-weight:750;color:#fff;background:#353038;border-color:#353038;border-radius:12px}
+#syncStudio .fsEditor .fsActions button:disabled{opacity:.38}
+#syncStudio .fsEditor .fsActions #fsFinish{background:#766458;border-color:#766458}
+#syncStudio .fsOtherActions{display:flex;gap:8px;margin:8px 0}
+#syncStudio .fsOtherActions button{flex:1 1 50%;min-height:47px;font-size:12px}
+#syncStudio #fsConfirm{background:#e3ede7;border-color:#c9dfce;color:#356b51}
+#syncStudio #fsConfirm:disabled{background:#f4f4f1;color:#817f7c}
+#syncStudio .fsFine{background:#f8f7f4;border:1px solid #e5e0db;border-radius:10px;margin-top:11px;overflow:hidden}
+#syncStudio .fsFine summary{min-height:46px;cursor:pointer;padding:12px;font-size:12px;color:#6b615c;font-weight:700}
+#syncStudio .fsTimeInputs{display:grid;grid-template-columns:1fr 1fr;gap:9px;padding:8px 12px}
+#syncStudio .fsTimeInputs label{font-size:11px;color:#746d67;font-weight:700}
+#syncStudio .fsTimeInputs input{display:block;margin-top:5px;border:1px solid #d9d1ca;border-radius:9px;padding:11px 10px;width:100%;min-height:46px;font-size:16px;font-variant-numeric:tabular-nums;background:#fff}
+#syncStudio .fsNudge{display:grid;grid-template-columns:36px repeat(4,minmax(0,1fr));gap:4px;align-items:center;padding:5px 12px}
+#syncStudio .fsNudge span{font-size:11px;color:#716960}
+#syncStudio .fsNudge button{padding:5px 2px;min-height:40px;font-size:10px;background:#fff}
+#syncStudio .fsSave{display:block;width:calc(100% - 24px);margin:12px;min-height:48px;background:#363238;color:#fff;border-color:#363238}
+#syncStudio .fsDelete{display:block;width:calc(100% - 24px);margin:12px;min-height:45px;color:#965845;border-color:#ecd9d1}
+#syncStudio .fsDelete[hidden]{display:none}
+#syncStudio .fsConflicts{padding:11px;border-radius:9px;margin-top:9px;background:#fff0e9;border:1px solid #eac4b0}
+#syncStudio .fsConflicts[hidden]{display:none}
+#syncStudio .fsConflicts p{font-size:12px;color:#a55236}
+#syncStudio .fsConflicts button{display:block;width:100%;margin-top:7px;white-space:normal;font-size:12px}
+#syncStudio .fsTools{margin-top:14px}
+#syncStudio .fsTools button{width:100%;min-height:49px;background:#fff;color:#5d5752;font-size:12px}
+#syncStudio .fsCaution{font-size:11px;line-height:1.75;color:#8f847d;margin-top:12px}
+#syncStudio.syncStructureView .syncModeBar,#syncStudio.syncStructureView .syncLines,#syncStudio.syncStructureView .syncOverview,
+#syncStudio.syncStructureView .syncOneLineHelp,#syncStudio.syncStructureView .syncSectionLabel,
+#syncStudio.syncStructureView .syncSourceWarning,#syncStudio.syncStructureView .syncFineTune,
+#syncStudio.syncStructureView .syncQuickReview,#syncStudio.syncStructureView .syncExtra,#syncStudio.syncStructureView .syncDock{display:none!important}
+#syncStudio.syncLyricsView #fullSongSections{display:none!important}
+#syncStudio.syncNeedsAudio .fullSongTabs,#syncStudio.syncNeedsAudio .fullSongSections,#syncStudio.syncNeedsLogin .fullSongTabs,#syncStudio.syncNeedsLogin .fullSongSections{display:none!important}
+#syncStudio.syncStructureView.syncReady .syncSaveState{display:inline-flex!important}
+@media(max-width:550px){
+ #syncStudio .fullSongTabs{margin-top:9px}
+ #syncStudio .fullSongTabs button{font-size:11px;padding:10px 3px}
+ #syncStudio .fsItem{grid-template-columns:65px 1fr;min-height:68px}
+ #syncStudio .fsItem em{grid-column:2;justify-self:start}
+ #syncStudio .fsEditor .fsActions button{min-height:58px;font-size:13px}
+ #syncStudio .fsNudge{grid-template-columns:34px repeat(4,minmax(0,1fr))}
+ #syncStudio .fsNudge button{font-size:10px}
+}
+@media(prefers-reduced-motion:reduce){#syncStudio .fsEditor .fsActions{-webkit-backdrop-filter:none;backdrop-filter:none}}
