@@ -493,6 +493,17 @@ async function testEngine(engineType,engine){
    await page.locator(".release-words .secret-char").first().waitFor();
    assert.equal(await page.locator("h2.release-statement-heading").innerText(),"FOR THIS RELEASE");
    assert.equal(await page.locator(".track").count(),6,"the first EP contains six planned tracks");
+   assert.equal(await page.locator('.new-song-lyrics a[href="/lyrics/#korekaramo"]').count(),1,"new song lyrics receive the first visible tracklist CTA");
+   assert.ok((await page.locator(".new-song-lyrics h3").innerText()).includes("これからも"),"the new song is highlighted above the tracklist");
+   assert.equal(await page.locator("#tracks details.track[open]").count(),0,"song details must be collapsed by default");
+   assert.equal(await page.locator("#tracks details.track").count(),3,"three sung tracks retain optional credits and lyrics");
+   const firstTrack=page.locator("#tracks details.track").first();
+   await firstTrack.locator("summary").click();
+   assert.equal(await firstTrack.evaluate(el=>el.open),true,"credits remain accessible on demand");
+   assert.equal(await firstTrack.locator('a[href="/lyrics/#anata-to"]').count(),1,"prior song lyrics remain available");
+   await firstTrack.locator("summary").click();
+   assert.equal(await firstTrack.evaluate(el=>el.open),false,"details can be collapsed again");
+
    assert.equal(await page.locator(".hero h1").innerText(),"配信決定。","announcement is the primary heading");
    assert.ok((await page.locator(".release-work-title").innerText()).replace(/\s/g,"").includes("あなたと、これから、これからも"));
    assert.ok((await page.locator(".hero .summary").innerText()).includes("全6曲の1st EP"));
