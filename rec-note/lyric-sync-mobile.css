@@ -211,3 +211,24 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncQuickReview button{flex:1 1 45%}
  #syncStudio .syncTime strong{font-size:25px}
 }
+
+/* v8 correction drawer: only shown when requested from the dock */
+#syncStudio .syncQuickReview{display:none!important}
+#syncStudio .syncFineTune:not([open]){display:none!important}
+#syncStudio .syncFineTune[open]{
+ position:fixed;left:50%;bottom:0;transform:translateX(-50%);width:min(700px,100%);
+ max-height:min(79dvh,790px);overflow-y:auto;overscroll-behavior:contain;
+ z-index:85;margin:0;background:#fff;border:1px solid #ddd5ca;
+ border-radius:20px 20px 0 0;box-shadow:0 -20px 65px #18131e4d;
+ padding-bottom:env(safe-area-inset-bottom)
+}
+#syncStudio .syncFineTune[open]>summary{position:sticky;top:0;z-index:2;background:#f6f4f1;border-bottom:1px solid #ece6e0;padding:16px;font-size:14px}
+#syncStudio .syncFineTune[open] .syncEditor{padding:16px 18px 26px}
+#syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 45px 51px minmax(135px,auto)}
+#syncStudio .syncDock #syncDockEdit{font-size:11px;background:#f3f0ed;color:#625852;border-color:#e5ded6;min-height:52px;padding:7px 4px}
+@media(max-width:550px){
+ #syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 38px 43px minmax(129px,auto);gap:5px}
+ #syncStudio .syncDock #syncDockEdit{font-size:11px;padding:7px 1px;min-height:49px}
+ #syncStudio .syncDock #syncTapNow{font-size:12px}
+ #syncStudio .syncDock strong{font-size:12px}
+}
