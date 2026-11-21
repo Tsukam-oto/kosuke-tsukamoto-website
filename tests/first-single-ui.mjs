@@ -167,6 +167,48 @@ async function checkTeaser(browser,engine){
  }
 }
 
+async function checkEPFeedback(browser,engine){
+ for(const width of [320,375,768,1440]){
+  const page=await browser.newPage({viewport:{width,height:860},reducedMotion:"reduce"});
+  await page.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
+  const form=page.locator("#ep-feedback-form");
+  assert.equal(await form.count(),1,engine+" one dedicated EP feedback form");
+  assert.equal(await form.getAttribute("method"),"POST");
+  assert.equal(await form.getAttribute("action"),"https://formspree.io/f/xbgjraga");
+  assert.equal(await page.locator('.release-feedback-link[href="#ep-message"]').count(),1,"EP hero links directly to feedback");
+  assert.equal(await form.locator('input[name="email"]').count(),0,"no contact info required from commenters");
+  assert.equal(await form.locator('textarea[name="voice"]').getAttribute("required"),"","EP feedback text required");
+  assert.equal(await form.locator('input[name="publication"]:checked').getAttribute("value"),"掲載しない","default to no public sharing");
+  assert.equal(await form.evaluate(el=>el.checkValidity()),false,"cannot submit blank comment");
+  const dims=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
+  assert.ok(dims[0]<=dims[1]+1.5,engine+" EP form mobile overflow at "+width);
+  await page.close();
+ }
+ const page=await browser.newPage({viewport:{width:390,height:844},reducedMotion:"reduce"});
+ await page.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
+ await page.locator("#ep-feedback-message").fill("ティザーを見ました。配信が楽しみです。");
+ await page.locator("#ep-feedback-name").fill("音楽ファン");
+ await page.locator('#ep-feedback-form input[name="publication"][value="匿名で掲載してよい"]').check();
+ assert.equal(await page.locator("#ep-feedback-form").evaluate(el=>el.checkValidity()),true);
+ let post=null;
+ await page.route("https://formspree.io/f/xbgjraga",async route=>{
+  post={method:route.request().method(),body:route.request().postData()};
+  await route.fulfill({status:200,contentType:"text/html",body:"<p>Mocked. No real message sent.</p>"});
+ });
+ await page.locator("#ep-feedback-form button[type=submit]").click();
+ await page.waitForURL("https://formspree.io/f/xbgjraga");
+ const fields=new URLSearchParams(post?.body||"");
+ assert.equal(post?.method,"POST");
+ assert.equal(fields.get("project"),"first-ep-2026-11-22");
+ assert.equal(fields.get("category"),"1st EP / 感想・メッセージ");
+ assert.equal(fields.get("work"),"あなたと、これから、これからも");
+ assert.equal(fields.get("voice"),"ティザーを見ました。配信が楽しみです。");
+ assert.equal(fields.get("name"),"音楽ファン");
+ assert.equal(fields.get("publication"),"匿名で掲載してよい");
+ await page.close();
+ log(engine+" EP message intake","4 widths; anonymous option; private by default; intercepted Formspree POST");
+}
+
 async function checkArtworkContest(browser,engine){
  const widths=[240,320,375,768,1440];
  for(const width of widths){
@@ -187,7 +229,8 @@ async function checkArtworkContest(browser,engine){
   const bounds=await page.evaluate(()=>[document.documentElement.scrollWidth,document.documentElement.clientWidth]);
   assert.ok(bounds[0]<=bounds[1]+1.5,engine+" contest horizontal overflow "+width);
   assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),false,"empty message must fail");
-  assert.equal(await page.locator("#data-consent").count(),1,"data-handling disclosure must be accepted");
+  assert.equal(await page.locator("#artwork-message").getAttribute("required"),null,"interest form does not demand an elaborate proposal");
+ assert.equal(await page.locator("#data-consent").count(),1,"data-handling disclosure must be accepted");
   assert.ok((await page.locator("#data-policy").innerText()).includes("Formspree"));
   assert.ok((await page.locator("#data-policy").innerText()).includes("削除"));
   if(width===375)await page.screenshot({path:output+"/"+engine+"-artwork-contest-375.png",fullPage:true,animations:"disabled"});
@@ -201,6 +244,9 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
  await page.locator("#graduation-consent").check();
  await page.locator("#data-consent").check();
+ await page.locator("#artwork-message").fill("");
+ assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"artwork interest can be submitted without a full proposal");
+ await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"interest message valid after privacy and graduation checks");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid interest message");
  let post=null;
@@ -452,7 +498,7 @@ async function testEngine(engineType,engine){
    assert.ok((await page.locator(".hero .summary").innerText()).includes("全6曲の1st EP"));
    assert.ok((await page.locator(".hero .summary").innerText()).includes("配信開始日は後日発表"));
    const heroLinks=page.locator(".release-hero-actions a");
-   assert.deepEqual((await heroLinks.allTextContents()).map(s=>s.replace(/\s+/g," ").trim()),["EPについて読む ↓","ティザーを見る ↓","YouTubeチャンネルを見る ↗","TikTokを見る ↗"]);
+   assert.deepEqual((await heroLinks.allTextContents()).map(s=>s.replace(/\s+/g," ").trim()),["EPについて読む ↓","ティザーを見る ↓","ひとことを送る ↓","YouTubeチャンネルを見る ↗","TikTokを見る ↗"]);
    assert.equal(await page.locator("#artwork-project a[href=\"/voice-box/\"]").count(),1,"anonymous feedback is reachable");
    assert.equal(await page.locator("#artwork-project a[href=\"/releases/artwork-project/\"]").count(),1,"artwork participation is distinct");
    const wrongArrows=await page.locator("a[href]").evaluateAll(links=>links.filter(a=>/[↗↓→]/.test(a.textContent)).filter(a=>{const href=a.getAttribute("href");const expected=href.startsWith("#")?"↓":new URL(href,location.href).origin===location.origin||new URL(href,location.href).origin==="https://kosuke-tsukamoto-website.pages.dev"?"→":"↗";return !a.textContent.trim().endsWith(expected);}).map(a=>a.textContent));
@@ -496,6 +542,7 @@ async function testEngine(engineType,engine){
   await checkReleaseMetadata(browser,engine);
   await checkTeaser(browser,engine);
   await checkCoverWhenAvailable(browser,engine);
+  await checkEPFeedback(browser,engine);
   await checkArtworkContest(browser,engine);
   await checkUcnucThanks(browser,engine);
   await checkReleaseInternalLinks(browser,engine);
