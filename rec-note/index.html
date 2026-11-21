@@ -87,6 +87,7 @@ body.recSimplified .headwrap .brand .sub{display:none}
 
 /* v10: Only audio corrections belong on the REC page. Keep archived MV/SHORT
    records and fields in source for compatibility, never show them in this UI. */
+body.recSimplified #lyricsPanel,
 body.recSimplified #productionFields,
 body.recSimplified #shortStoryboard,
 body.recSimplified .modeDock,
@@ -106,7 +107,7 @@ body.recSimplified .top{margin-top:7px}
 <header><div class="headwrap"><div class="brand"><div class="logo">RN</div><div><h1>REC NOTE <span style="font-size:12px;font-weight:500;color:#a6a49c">/ CREATIVE TIMELINE</span></h1><div class="sub">録音の修正依頼と、歌詞のタイミング合わせ</div></div></div><div class="headops"><button id="mailBtn">修正依頼の文章</button><details class="recExtras"><summary>保存・出力</summary><div class="recExtrasMenu"><button id="csvBtn">CSV出力</button><button id="jsonBtn">JSON保存</button><button id="importBtn">JSON取込</button><input id="importFile" type="file" accept="application/json,.json" hidden /></div></details></div></div></header>
 <nav class="recTaskNav" aria-label="作業を選択">
   <a href="./" aria-current="page">録音の修正依頼<small>何分何秒の、どこを直すか</small></a>
-  <a href="./lyric-sync.html">歌詞のタイミング合わせ<small>歌声に合わせて時刻を記録</small></a>
+  <a href="./lyric-sync.html?v=10">歌詞のタイミング合わせ<small>歌声に合わせて時刻を記録</small></a>
 </nav>
 <main class="wrap"><div class="top" id="songTabs"></div>
 <div class="modeDock" role="region" aria-label="制作モード">
@@ -248,7 +249,7 @@ updateAll();
 <script src="./operations.js?v=4.1"></script>
 <script src="./cloud.js?v=6.3"></script>
 <script src="./lyrics.js?v=6.4"></script>
-<script src="./media-persistence.js?v=6.3"></script>
+<script src="./media-persistence.js?v=10"></script>
 
-<script src="./lyric-sync-mobile.js?v=8.2"></script>
+
 </body></html>
