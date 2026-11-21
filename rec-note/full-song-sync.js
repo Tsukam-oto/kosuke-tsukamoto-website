@@ -190,7 +190,7 @@ $('fsExport').addEventListener('click',()=>{
 });
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{restoreSelection();previewEnd=null;render();});
 window.addEventListener('recnote:cloud-synced',render);
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;}else render();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();});
 audio.addEventListener('loadedmetadata',render);
 window.addEventListener('focus',render);
 restoreSelection();switchView('sections');
