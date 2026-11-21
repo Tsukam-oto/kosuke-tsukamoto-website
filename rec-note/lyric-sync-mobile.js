@@ -10,10 +10,10 @@ document.body.classList.add('syncPage');document.title='歌詞同期 | REC NOTE'
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
-'<header class="syncHeading"><div><small>REC NOTE / LYRIC SYNC</small><h1>歌詞の時間を合わせる</h1></div><a href="./">REC NOTEに戻る</a></header>',
-'<details id="syncAccount"><summary>ログイン・同期 <b id="syncAuthState">確認中</b></summary><div id="syncCloudSlot"></div></details>',
+'<header class="syncHeading"><div><small>LYRIC SYNC</small><h1>歌詞合わせ</h1></div><a href="./">REC NOTE</a></header>',
+'<details id="syncAccount"><summary><span id="syncAccountSummary">クラウドにログイン</span><b id="syncAuthState">確認中</b></summary><div id="syncCloudSlot"></div></details>',
 '<nav class="syncSongs" aria-label="楽曲選択"><button data-song="あなたと">あなたと</button><button data-song="これから">これから</button><button data-song="これからも">これからも</button></nav>',
-'<p id="syncNotice" class="syncNotice" role="status">読み込み中…</p>',
+'<p id="syncNotice" class="syncNotice" role="status">準備しています…</p>',
 '<section class="syncPlayer"><div class="syncSongHead"><strong id="syncTitle">—</strong><span id="syncFile">音源を確認しています</span></div>',
 '<div class="syncTime"><strong id="syncClock">0:00.00</strong><span id="syncLength">/ 0:00.00</span></div>',
 '<input id="syncSlider" type="range" min="0" max="100" value="0" step="1" aria-label="再生位置"/>',
@@ -21,7 +21,7 @@ root.innerHTML=[
 '<label class="syncOffsetLabel">WAV基準の時刻補正 <select id="syncOffset"><option value="-0.022">11/19版MP3：−0.022秒</option><option value="0">補正なし：0秒</option></select><small>原本WAVとの実測差。Safariでずれがなければ「補正なし」に変更できます。</small></label>',
 '<div class="syncMedia" id="syncMedia"><p id="syncMediaHelp">MP3はクラウドから復元します。</p><label>MP3を一度だけ登録<input id="syncUpload" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4"/></label><span id="syncUploadState"></span></div></section>',
 '<div class="syncOverview"><strong id="syncCount">0 / 0 行</strong><span id="syncBreakdown">確認待ち</span><div class="syncMeter"><i id="syncMeterFill"></i></div></div>',
-'<div class="syncSectionLabel"><div><strong>歌詞をタップして記録</strong><small>再生中、歌われ始めた行をタップ</small></div><label><input id="syncTapMode" type="checkbox" checked/>連続タップ</label></div>',
+'<div class="syncSectionLabel"><div><strong>歌詞</strong><small>行をタップすると選べます</small></div><label><input id="syncTapMode" type="checkbox" checked/>次の行へ</label></div>',
 '<p id="syncSourceWarning" class="syncWarning" hidden></p>',
 '<label class="syncVersion">歌詞の版 <select id="syncVersion"></select></label>',
 '<div id="syncLines" class="syncLines"></div>',
@@ -34,7 +34,7 @@ root.innerHTML=[
 '<div class="syncEditorActions"><button id="syncReplay">前後を聴く</button><button class="syncEmphasis" id="syncConfirm">確認済みにする</button><button id="syncUnconfirm">確認を解除</button></div><p id="syncEditorHelp"></p></section>',
 '<div class="syncTools"><button id="syncUndo">元に戻す</button><button id="syncFindNext">未確認へ移動</button><button id="syncPush">クラウド同期</button><button id="syncSrt">SRT保存</button><button id="syncJson">JSON保存</button></div>',
 '<p class="syncFoot">原文は変更しません。同期時刻は端末に即時保存し、ログイン中は本人専用クラウドへ同期します。未校正の歌詞は別途原文照合が必要です。動画の高音質音声にはWAV原本を使用します。</p>',
-'<footer class="syncDock"><div><strong id="syncDockLyric">歌詞を選択</strong><small id="syncDockClock">0:00.00</small></div><button id="syncDockPlay">▶</button><button class="syncEmphasis" id="syncTapNow">この歌詞の開始を記録</button></footer>'
+'<footer class="syncDock"><div><strong id="syncDockLyric">歌詞を選択</strong><small id="syncDockClock">0:00.00</small></div><button id="syncDockPlay" aria-label="再生・一時停止">▶</button><button class="syncEmphasis" id="syncTapNow">歌い始めを記録</button></footer>'
 ].join('');
 document.body.append(root);
 const cloudPanel=$('recCloudPanel');if(cloudPanel)$('syncCloudSlot').append(cloudPanel);
@@ -92,7 +92,7 @@ function renderRows(){
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
   const time=document.createElement('span');time.className='syncLineStamp';time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+' / 終了未設定':'未記録';
   b.append(number,content,time);
-  b.addEventListener('click',()=>{if($('syncTapMode').checked&&hasAudio()&&!confirmed(get(x.i)))tap(x.i);else choose(x.i,true,true);});
+  b.addEventListener('click',()=>{choose(x.i,true,true);});
   view.append(b);
  }
  view.scrollTop=position;$('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
@@ -144,8 +144,8 @@ function tap(i){
  }
  if(!saveRecord(i,{start:now,end:Number.isFinite(t?.end)&&t.end>now?t.end:null,status:'draft'}))return;
  lastTap=i;selected=i;clearDraft();renderRows();
- const next=rows().find(x=>x.i>i);choose(next?.i??i,true,false);
- notice(timestamp(now)+' に記録しました。'+(next?'次の歌詞を選択しています。':'最後の行です。'));
+ const next=$('syncTapMode').checked?rows().find(x=>x.i>i):null;choose(next?.i??i,true,false);
+ notice(timestamp(now)+' に記録。'+(next?'次の歌詞へ進みました。':'開始を保存しました。'));
 }
 function editorSave(){
  if(selected<0)return;
