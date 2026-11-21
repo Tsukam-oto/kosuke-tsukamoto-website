@@ -330,6 +330,8 @@ async function checkHomepage(browser,engine){
     assert.equal(await page.locator(".release-announcement-topline .date").innerText(),"ANNOUNCED / 2026.11.22");
     assert.ok((await modal.innerText()).includes("配信開始日は後日発表します"));
     assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
+    assert.ok((await page.locator(".release-announcement-kicker").innerText()).includes("1ST EP"));
+    assert.ok((await page.locator(".release-announcement-description").innerText()).includes("全6曲収録予定"));
     assert.equal(await page.locator(".release-announcement-art-note").isVisible(),false,"do not claim artwork before its image loads");
     const layout=await page.locator(".release-announcement-panel").evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,bg:getComputedStyle(el).backgroundColor}));
     assert.ok(layout.scroll<=layout.client+2,"mobile announcement should not overflow horizontally");
@@ -426,6 +428,11 @@ async function testEngine(engineType,engine){
    await page.goto(BASE+"/releases/2026-11-22/",{waitUntil:"domcontentloaded"});
    await page.locator(".release-words .secret-char").first().waitFor();
    assert.equal(await page.locator("h2.release-statement-heading").innerText(),"FOR THIS RELEASE");
+   assert.equal(await page.locator(".track").count(),6,"the first EP contains six planned tracks");
+   assert.ok((await page.locator(".eyebrow").innerText()).includes("1st EP"),"release is identified as first EP");
+   assert.equal(await page.locator(".track-title").count(),6);
+   assert.equal(await page.locator(".track-title").filter({hasText:"Piano Instrumental"}).count(),3,"three piano-only versions are listed");
+   assert.ok((await page.locator("#listen .credit-line").innerText()).includes("全6曲予定"),"EP planned duration and count are accurate");
    assert.equal(await page.locator("#preview").count(),0,"premature preview removed");
    assert.equal(await page.locator("h2:has-text('まず、音楽から。')").count(),0,"unwanted heading removed");
    assert.equal(await page.locator(".hero + .editorial-note").count(),1,"statement follows jacket directly");
