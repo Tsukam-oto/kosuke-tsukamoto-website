@@ -355,9 +355,28 @@ $('syncUpload').addEventListener('change',async e=>{
 });
 window.addEventListener('recnote:cloud-auth-change',()=>{
  const signed=bridge.isSignedIn();$('syncAuthState').textContent=signed?'接続中':'ログインが必要';
- if(signed){$('syncAccount').open=false;loadLyrics();}else {audio.pause();work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncFineTune').open=false;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;notice('ログインしてください。',true);}focusState();
+ if(signed){$('syncAccount').open=false;saveBadgeStatus('クラウド接続中','pending');loadLyrics();}
+ else {audio.pause();work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncFineTune').open=false;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;saveBadgeStatus('ログインが必要','offline');notice('ログインしてください。',true);}focusState();
 });
-window.addEventListener('recnote:cloud-synced',()=>{$('syncAuthState').textContent='クラウド同期済み';renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();});
+window.addEventListener('recnote:cloud-synced',()=>{
+ $('syncAuthState').textContent='クラウド同期済み';saveBadgeStatus('クラウド同期済み','saved');
+ renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();
+});
 window.addEventListener('focus',clock);
+window.addEventListener('offline',()=>saveBadgeStatus('オフライン · 端末保存','offline'));
+window.addEventListener('online',()=>{saveBadgeStatus('再接続 · 同期待ち','pending');clock();});
+if(typeof MutationObserver==='function'){
+ const status=$('recCloudStatus');
+ if(status){
+  const refresh=()=>{
+   if(!bridge.isSignedIn())return;
+   const level=status.dataset.level;
+   if(level==='bad')saveBadgeStatus('クラウド未同期 · 要確認','error');
+   else if(level==='busy')saveBadgeStatus('クラウド保存中…','pending');
+   else if(level==='good')saveBadgeStatus('クラウド同期済み','saved');
+  };
+  new MutationObserver(refresh).observe(status,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['data-level']});
+ }
+}
 clock();loadLyrics();
 })();
