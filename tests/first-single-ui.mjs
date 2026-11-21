@@ -64,13 +64,15 @@ async function checkTeaser(browser,engine){
  };
  {
   const page=await browser.newPage({viewport:{width:375,height:840}});
-  await page.goto(url,{waitUntil:"networkidle"});
-  assert.equal(await page.locator("#teaser").isVisible(),false,"unpublished teaser must not render");
-  assert.equal(await page.locator("#hero-teaser-link").isVisible(),false,"do not claim an unpublished teaser exists");
+  await page.goto(url,{waitUntil:"domcontentloaded"});
+  await page.locator("#teaser").waitFor({state:"visible"});
+  assert.equal(await page.locator("#hero-teaser-link").isVisible(),true,"actual published Shorts teaser is linked");
+  assert.equal(await page.locator(".release-teaser-item").count(),1,"exactly one verified teaser is published");
+  assert.equal(await page.locator(".release-teaser-item a").first().getAttribute("href"),"https://youtube.com/shorts/9sHQVSQfBnc");
   assert.equal(await page.locator(".release-youtube-channel").isVisible(),true,"YouTube channel link always visible");
   assert.equal(await page.locator(".hero + #for-this-release").count(),1,"release essay keeps priority");
   await page.close();
-  log(engine+" teaser pending","no false promise; channel remains linked");
+  log(engine+" published Shorts teaser","YouTube short 9sHQVSQfBnc is linked, no placeholder videos");
  }
  {
   const page=await browser.newPage({viewport:{width:375,height:840}});
@@ -449,6 +451,12 @@ async function testEngine(engineType,engine){
    assert.equal(await page.locator(".track-title").count(),6);
    assert.equal(await page.locator('a[href="/lyrics/#korekaramo"]').count()>0,true,"EP feature links to the full Korekaramo lyrics");
    assert.equal(await page.locator(".track-title").filter({hasText:"Piano Instrumental"}).count(),3,"three piano-only versions are listed");
+   assert.equal(await page.locator(".track-version").count(),3,"instrumental subtitle remains a secondary text label");
+   assert.equal(await page.locator(".track-instrumental summary,.track-instrumental .plus,.track-instrumental .track-description").count(),0,"instrumentals are compact informational rows");
+   const titleSize=await page.locator(".track-instrumental .track-title").first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+   assert.ok(titleSize<=27,engine+" instrumental title is visually restrained at width "+width);
+   const versionSize=await page.locator(".track-version").first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+   assert.ok(versionSize<titleSize,engine+" Piano Instrumental subtitle must be smaller than the title");
    assert.ok((await page.locator("#listen .credit-line").innerText()).includes("全6曲予定"),"EP planned duration and count are accurate");
    assert.equal(await page.locator("#preview").count(),0,"premature preview removed");
    assert.equal(await page.locator("h2:has-text('まず、音楽から。')").count(),0,"unwanted heading removed");
