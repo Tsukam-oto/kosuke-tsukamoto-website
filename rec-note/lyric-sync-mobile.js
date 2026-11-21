@@ -26,6 +26,7 @@ root.innerHTML=[
 '<label class="syncVersion">歌詞の版 <select id="syncVersion"></select></label>',
 '<div id="syncLines" class="syncLines"></div>',
 '<section id="syncEditor" class="syncEditor" hidden><small id="syncLineNumber">選択中の歌詞</small><h2 id="syncSelected"></h2>',
+'<div id="syncConflictBox" class="syncConflictBox" hidden></div>',
 '<div class="syncFields"><label>開始 <input type="text" inputmode="decimal" id="syncStart" placeholder="1:20.25"/></label><label>終了 <input type="text" inputmode="decimal" id="syncEnd" placeholder="1:24.50"/></label></div>',
 '<div class="syncEditorActions"><button id="syncCaptureStart">現在位置を開始に</button><button id="syncCaptureEnd">現在位置を終了に</button><button id="syncSave">時刻保存</button></div>',
 '<div class="syncNudge"><span>開始の微調整</span><button data-adjust-start="-0.1">−0.10</button><button data-adjust-start="-0.01">−0.01</button><button data-adjust-start="0.01">＋0.01</button><button data-adjust-start="0.1">＋0.10</button></div>',
@@ -56,6 +57,17 @@ function confirmed(t){return complete(t)&&t.status==='confirmed';}
 function draftKey(){return DRAFT_PREFIX+song+':'+(version?.id||'')+':'+selected;}
 function clearDraft(){try{localStorage.removeItem(draftKey());}catch(e){}}
 function saveDraft(){if(selected<0)return;try{localStorage.setItem(draftKey(),JSON.stringify({a:$('syncStart').value,b:$('syncEnd').value}));}catch(e){}}
+function resolveConflict(chosen){
+ if(selected<0||!work||!version)return;
+ const main=id(selected),current=all().find(x=>x.id===main),variants=all().filter(x=>x.syncConflictOf===main);
+ if(!current||!variants.length){notice('この行の競合はありません。');return;}
+ STACK.push(JSON.stringify(all()));if(STACK.length>15)STACK.shift();
+ state.lyricTimings=all().filter(x=>x.syncConflictOf!==main);
+ const at=state.lyricTimings.findIndex(x=>x.id===main);
+ const target=chosen?{...current,start:chosen.start??null,end:chosen.end??null,status:'draft',confirmedAt:null,updatedAt:new Date().toISOString()}:current;
+ if(at>=0)state.lyricTimings[at]=target;
+ persist();renderRows();fillEditor();notice('選択した時刻で競合を解消しました。音声を聴き直して確認してください。');
+}
 function saveRecord(i,patch){
  if(i<0||!version)return false;
  const list=all(),key=id(i),at=list.findIndex(x=>x.id===key);
@@ -105,7 +117,21 @@ function fillEditor(){
  $('syncEnd').value=d?.b??(Number.isFinite(t?.end)?timestamp(t.end):'');
  $('syncConfirm').disabled=!complete(t)||confirmed(t)||conflict(selected);
  $('syncUnconfirm').disabled=!confirmed(t);
- $('syncEditorHelp').textContent=conflict(selected)?'別端末との編集競合が保存されています。確認してください。':confirmed(t)?'開始・終了を照合済みです。':started(t)?'終了位置も記録してから、音声を確認してください。':'歌われ始めた瞬間に記録してください。';
+ $('syncEditorHelp').textContent=conflict(selected)?'別端末の記録と競合しています。下の候補を比較して解消してください。':confirmed(t)?'開始・終了を照合済みです。':started(t)?'終了位置も記録してから、音声を確認してください。':'歌われ始めた瞬間に記録してください。';
+ const box=$('syncConflictBox');box.replaceChildren();
+ const variants=all().filter(x=>x.syncConflictOf===id(selected));
+ box.hidden=!variants.length;
+ if(variants.length){
+  const header=document.createElement('p');header.textContent='別端末との編集競合：採用する時刻を選択してください。';box.append(header);
+  const current=document.createElement('button');current.textContent='現在の時刻 '+(started(t)?timestamp(t.start):'未記録')+' を採用';
+  current.addEventListener('click',()=>resolveConflict(null));box.append(current);
+  for(const entry of variants){
+   const option=document.createElement('button');
+   option.textContent='競合側 '+(started(entry)?timestamp(entry.start):'未記録')+(complete(entry)?'〜'+timestamp(entry.end):'')+' を採用';
+   option.addEventListener('click',()=>resolveConflict(entry));box.append(option);
+  }
+ }
+
 }
 function hasAudio(){return !!(files[song]?.url)&&audio.readyState>=1;}
 function tap(i){
