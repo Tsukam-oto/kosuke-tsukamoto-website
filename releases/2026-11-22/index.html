@@ -236,12 +236,17 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 
 
 .artwork-project-section{border-top:1px solid var(--line);padding-top:clamp(65px,8vw,112px);padding-bottom:clamp(65px,8vw,112px)}
-.artwork-project-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(30px,5vw,70px)}
-.artwork-project-grid h2{font-size:clamp(27px,3.6vw,43px);line-height:1.45}
+.artwork-project-grid{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,.8fr);gap:clamp(24px,3.5vw,50px)}
+.artwork-project-grid h2{font-size:clamp(25px,2.9vw,36px);line-height:1.45;word-break:keep-all;overflow-wrap:normal}.artwork-project-grid h2 span{display:inline;white-space:nowrap}
 .artwork-project-grid p{font-size:clamp(14px,1.35vw,16px);line-height:2;margin:0 0 17px}
 .artwork-project-grid .artwork-project-meta{font-size:12px;color:var(--muted);margin:0 0 21px}
 .artwork-project-action{font-size:14px;font-weight:600;text-underline-offset:5px}
-@media(max-width:750px){.artwork-project-grid{grid-template-columns:1fr;gap:17px}.artwork-project-section{padding-top:59px;padding-bottom:64px}}
+@media(max-width:750px){.artwork-project-grid{grid-template-columns:1fr;gap:17px}.artwork-project-grid h2 span{display:block}.artwork-project-section{padding-top:59px;padding-bottom:64px}}
+
+
+/* Instrumentals have no supporting copy: display them as clean, non-interactive track rows. */
+.track-instrumental .track-row{display:grid;grid-template-columns:38px minmax(0,1fr);align-items:center;gap:20px;min-height:115px;padding:18px 3px}
+@media(max-width:800px){.track-instrumental .track-row{grid-template-columns:26px minmax(0,1fr);gap:9px;min-height:86px;padding:15px 0}}
 
 .ucnuc-credit{margin:26px 0 0;font-size:12px;line-height:1.95;color:var(--muted)}.ucnuc-credit a{color:var(--ink);text-decoration:underline;text-underline-offset:4px}
 </style>
@@ -259,7 +264,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <div class="eyebrow"><b>1st EP</b><span>2026.11.22 発表</span></div>
 <h1><span>あなたと、</span><span>これから、</span><span>これからも</span></h1>
 <p class="artist">束元康介</p>
-<p class="summary">《あなたと》《これから》の新録と、新曲《これからも》。各曲のピアノ・インストゥルメンタルを加えた全6曲を収録予定。</p>
+<p class="summary">《あなたと》《これから》の新録と、新曲《これからも》。歌入り3曲とピアノのみの3曲、全6曲を収録予定。</p>
 <div class="release-hero-actions">
 <a href="#for-this-release" class="main-action">FOR THIS RELEASE <span aria-hidden="true">↓</span></a>
 <a id="hero-teaser-link" class="release-hero-teaser-link" href="#teaser" hidden>ティザーを聴く ↓</a>
@@ -297,16 +302,16 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <div class="track-details"><div><p class="track-description">令和7年度の卒業生とともにつくった合唱曲を、歌とピアノで新たに録音しました。</p><p class="track-source">原曲：令和7年度 卒業記念創作合唱<br>作詞：令和7年度3学年一同・束元康介 ／ 作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekara">歌詞を読む ↗</a></p></div></div></details>
 <details class="track"><summary><span class="number">03</span><span class="track-title">これからも</span><span class="tag">2026年・新曲</span><span class="plus" aria-hidden="true">＋</span></summary>
 <div class="track-details"><div><p class="track-source">作詞・作曲：束元康介</p><p><a class="more-link" href="/lyrics/#korekaramo">歌詞を読む ↗</a></p></div></div></details>
-<details class="track"><summary><span class="number">04</span><span class="track-title">あなたと（Piano Instrumental）</span><span class="tag">ピアノ版・収録予定</span><span class="plus" aria-hidden="true">＋</span></summary><div class="track-details"><p class="track-description">《あなたと》のピアノ・インストゥルメンタル。正式なトラック表記は音源受領後に確定します。</p></div></details>
-<details class="track"><summary><span class="number">05</span><span class="track-title">これから（Piano Instrumental）</span><span class="tag">ピアノ版・収録予定</span><span class="plus" aria-hidden="true">＋</span></summary><div class="track-details"><p class="track-description">《これから》のピアノ・インストゥルメンタル。正式なトラック表記は音源受領後に確定します。</p></div></details>
-<details class="track"><summary><span class="number">06</span><span class="track-title">これからも（Piano Instrumental）</span><span class="tag">ピアノ版・収録予定</span><span class="plus" aria-hidden="true">＋</span></summary><div class="track-details"><p class="track-description">《これからも》のピアノ・インストゥルメンタル。正式なトラック表記は音源受領後に確定します。</p></div></details>
-</div><p class="track-source">※ピアノ版の曲順・正式名称・収録は音源の最終確認後に確定します。</p></section>
+<div class="track track-instrumental"><div class="track-row"><span class="number">04</span><span class="track-title">あなたと（Piano Instrumental）</span></div></div>
+<div class="track track-instrumental"><div class="track-row"><span class="number">05</span><span class="track-title">これから（Piano Instrumental）</span></div></div>
+<div class="track track-instrumental"><div class="track-row"><span class="number">06</span><span class="track-title">これからも（Piano Instrumental）</span></div></div>
+</div></section>
 
 
 
 <section id="artwork-project" class="container artwork-project-section" aria-labelledby="artwork-project-title">
 <div class="artwork-project-grid">
-<div><p class="kicker">ARTWORK PROJECT</p><h2 id="artwork-project-title">ジャケットを募集します。</h2></div>
+<div><p class="kicker">ARTWORK PROJECT</p><h2 id="artwork-project-title"><span>ジャケットを</span><span>募集します。</span></h2></div>
 <div><p>《あなたと》《これから》の単独配信用ジャケットを描いてくださる方を募集します。まずはメッセージでご連絡ください。</p><p class="artwork-project-meta">2026年11月22日 募集開始</p><a href="/releases/artwork-project/" class="artwork-project-action">募集内容・メッセージはこちら ↗</a></div>
 </div>
 </section>
