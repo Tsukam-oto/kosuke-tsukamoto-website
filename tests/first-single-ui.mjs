@@ -332,6 +332,7 @@ async function checkHomepage(browser,engine){
     assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
     assert.ok((await page.locator(".release-announcement-kicker").innerText()).includes("1st ep"));
     assert.ok((await page.locator(".release-announcement-description").innerText()).includes("全6曲収録予定"));
+    assert.equal(await modal.locator('a[href="https://www.tiktok.com/@tsukam.oto.kos"]').count(),1,"official TikTok linked from EP popup");
     const coverLoaded=await page.locator("#first-single-announcement-cover").evaluate(el=>el.complete&&el.naturalWidth>0);
     assert.equal(await page.locator(".release-announcement-art-note").isVisible(),coverLoaded,"artwork caption must match actual cover-load state");
     const layout=await page.locator(".release-announcement-panel").evaluate(el=>({client:el.clientWidth,scroll:el.scrollWidth,bg:getComputedStyle(el).backgroundColor}));
@@ -430,6 +431,7 @@ async function testEngine(engineType,engine){
    await page.locator(".release-words .secret-char").first().waitFor();
    assert.equal(await page.locator("h2.release-statement-heading").innerText(),"FOR THIS RELEASE");
    assert.equal(await page.locator(".track").count(),6,"the first EP contains six planned tracks");
+   assert.equal(await page.locator('.release-hero-actions a[href="https://www.tiktok.com/@tsukam.oto.kos"]').count(),1,"TikTok is accessible from first ep hero");
    assert.ok((await page.locator(".eyebrow").innerText()).includes("1st ep"),"release is identified as first EP");
    assert.equal(await page.locator(".track-title").count(),6);
    assert.equal(await page.locator(".track-title").filter({hasText:"Piano Instrumental"}).count(),3,"three piano-only versions are listed");
