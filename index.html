@@ -1412,10 +1412,51 @@
  .release-announcement-panel{max-height:none}
  .release-announcement-media{min-height:150px;max-height:43dvh}
 }
-</style><link rel="stylesheet" href="/assets/first-single-home-spotlight.css"></head>
+
+<style>
+/* Persistent 1st EP announcement: visible immediately, even if the popup was dismissed. */
+.home-ep-launch{padding:108px 5vw 30px;background:#181817;color:#fff;border-bottom:3px solid #cf694b}
+.home-ep-launch-inner{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:minmax(0,1fr) 190px;grid-template-areas:"intro cover" "desc cover" "links cover";column-gap:38px;row-gap:11px;align-items:center}
+.home-ep-launch-intro{grid-area:intro;min-width:0}
+.home-ep-launch-kicker{margin:0 0 7px;font:700 11px/1.5 var(--sans);letter-spacing:.11em;color:#e8a58f}
+.home-ep-launch h2{margin:0;font:700 clamp(34px,3.6vw,51px)/1.16 var(--sans);letter-spacing:-.045em;color:#fff}
+.home-ep-launch-work{margin:9px 0 0;font:600 clamp(17px,1.9vw,24px)/1.55 var(--sans);letter-spacing:-.02em;overflow-wrap:anywhere}
+.home-ep-launch-cover{grid-area:cover;display:block;width:100%;aspect-ratio:1;object-fit:cover;align-self:center}
+.home-ep-launch-desc{grid-area:desc;margin:0;font:400 13px/1.7 var(--sans);color:#dededb}
+.home-ep-launch-actions{grid-area:links;display:flex;align-items:center;flex-wrap:wrap;gap:12px 22px;margin-top:5px}
+.home-ep-launch-actions a{display:inline-flex;align-items:center;font:700 12px/1.45 var(--sans);text-decoration:none}
+.home-ep-launch-actions a:focus-visible{outline:2px solid white;outline-offset:4px}
+.home-ep-launch-primary{background:#fff;color:#161615!important;padding:11px 17px}
+.home-ep-launch-secondary{color:#fff!important;border-bottom:1px solid #9b9b96;padding:8px 0}
+@media(max-width:640px){
+  .home-ep-launch{padding:94px 5vw 23px}
+  .home-ep-launch-inner{grid-template-columns:minmax(0,1fr) 100px;grid-template-areas:"intro cover" "desc desc" "links links";column-gap:13px;row-gap:11px;align-items:start}
+  .home-ep-launch-kicker{font-size:10px;margin-bottom:8px}
+  .home-ep-launch h2{font-size:clamp(29px,8.8vw,39px)}
+  .home-ep-launch-work{font-size:clamp(15px,4.1vw,18px);line-height:1.5;margin-top:8px}
+  .home-ep-launch-desc{font-size:12px;line-height:1.7}
+  .home-ep-launch-actions{gap:8px 19px;margin-top:4px}
+  .home-ep-launch-actions a{font-size:11px}
+  .home-ep-launch-primary{padding:10px 12px}
+}
+</style></style><link rel="stylesheet" href="/assets/first-single-home-spotlight.css"></head>
 <body>
 <header class="site-header"><a class="site-brand" href="/">束元康介<span>KOSUKE TSUKAMOTO</span></a><details class="site-menu"><summary>MENU <span aria-hidden="true">＋</span></summary><nav aria-label="メインメニュー"><a href="/works/">WORKS</a><a href="/lyrics/">LYRICS</a><a href="/#lyric-box">LYRIC BOX</a><a href="/music-education/">EDUCATION</a><a href="/voice-box/">VOICE BOX</a><a href="/special-thanks/">SPECIAL THANKS</a><a href="/profile/">PROFILE</a><a href="/contact/">CONTACT</a></nav></details></header>
-<main id="top"><section class="hero">
+<main id="top"><section class="home-ep-launch" aria-labelledby="home-ep-launch-title">
+  <div class="home-ep-launch-inner">
+    <div class="home-ep-launch-intro">
+      <p class="home-ep-launch-kicker">1st EP / 2026.11.22 発表</p>
+      <h2 id="home-ep-launch-title">配信決定。</h2>
+      <p class="home-ep-launch-work">『あなたと、これから、これからも』</p>
+    </div>
+    <img class="home-ep-launch-cover" src="/assets/releases/first-single-2026-cover.webp" alt="1st EP『あなたと、これから、これからも』ジャケット" width="190" height="190" decoding="async">
+    <p class="home-ep-launch-desc">歌入り3曲とピアノ版3曲、全6曲。配信開始日は後日発表します。</p>
+    <nav class="home-ep-launch-actions" aria-label="1st EP発表のご案内">
+      <a class="home-ep-launch-primary" href="/releases/2026-11-22/">EP特設ページを見る →</a>
+      <a class="home-ep-launch-secondary" href="https://youtube.com/shorts/9sHQVSQfBnc" target="_blank" rel="noopener noreferrer">EPティザーを見る ↗</a>
+    </nav>
+  </div>
+</section><section class="hero">
 <div class="hero-copy">
 <p class="eyebrow">LYRICIST / COMPOSER / MUSIC EDUCATOR</p>
 <h1><span class="v13-line">思いあふれて<span class="comma">、</span></span><span class="v13-line">音になるまで。</span></h1>
