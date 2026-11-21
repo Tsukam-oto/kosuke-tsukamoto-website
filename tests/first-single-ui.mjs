@@ -22,9 +22,18 @@ async function checkColumn(page, engine, width) {
 }
 
 async function exerciseShare(page,engine) {
+  const sourceLines=await page.locator(".release-words .note-line").allTextContents();
+  assert.equal(sourceLines.length,8,"the original editorial note remains eight complete lines");
   await page.locator(".secret-char").nth(2).click();
   assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),true);
   await page.waitForTimeout(1300);
+  const column=await page.locator(".release-words .secret-char").evaluateAll(els=>els.map(el=>({x:el.getBoundingClientRect().left,y:el.getBoundingClientRect().top,height:el.getBoundingClientRect().height,letter:el.textContent.trim()})));
+  assert.equal(column.map(ch=>ch.letter).join(""),"けっこんしました","the original eight buttons still spell the exact secret");
+  assert.ok(Math.max(...column.map(ch=>ch.x))-Math.min(...column.map(ch=>ch.x))<=1.25,"touch reveal has a straight vertical character column");
+  assert.ok(column.every((ch,i)=>i===0||(ch.y-column[i-1].y>=30&&ch.y-column[i-1].y<=48)),"mobile reveal has compact, regularly spaced rows");
+  assert.ok(column[7].y-column[0].y<=350,"all eight touched characters fit in one mobile viewport");
+  assert.deepEqual(await page.locator(".release-words .note-line").allTextContents(),sourceLines,"all original text stays unchanged after reveal");
+  assert.equal(await page.locator(".release-words .note-line .tail").first().evaluate(el=>getComputedStyle(el).textOverflow),"ellipsis","long prose is visually clipped, not deleted, during reveal");
   await page.locator("#for-this-release").screenshot({path:output+"/"+engine+"-revealed-words.png",animations:"disabled"});
   await page.locator("#secret-open").waitFor({state:"visible"});
   await page.locator("#secret-open").click();
@@ -52,6 +61,8 @@ async function exerciseShare(page,engine) {
   assert.equal(await page.locator("#release-share-modal").isVisible(),false);
   await page.locator("#secret-clear").click();
   assert.equal(await page.locator(".release-words").evaluate(el=>el.classList.contains("secret-active")),false);
+  assert.deepEqual(await page.locator(".release-words .note-line").allTextContents(),sourceLines,"clearing restores original prose");
+  assert.notEqual(await page.locator(".release-words .note-line .tail").first().evaluate(el=>getComputedStyle(el).textOverflow),"ellipsis","full lines are readable again after clear");
   log(engine+" reveal/share/escape/clear");
 }
 
