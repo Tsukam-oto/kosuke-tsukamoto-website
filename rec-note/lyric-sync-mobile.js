@@ -44,6 +44,12 @@ intro.innerHTML='<strong id="syncIntroTitle">ログインして始めます</str
 root.insertBefore(intro,root.querySelector('.syncPlayer'));
 const hint=document.createElement('p');hint.className='syncOneLineHelp';hint.textContent='①再生 → ②歌い始めたら画面下の「記録」を押す';
 root.insertBefore(hint,$('syncLines'));
+const modeBar=document.createElement('nav');modeBar.id='syncModeBar';modeBar.className='syncModeBar';modeBar.setAttribute('aria-label','作業の切り替え');
+modeBar.innerHTML='<button type="button" id="syncRecordMode" class="active" aria-pressed="true">① 時刻を記録</button><button type="button" id="syncReviewMode" aria-pressed="false">② 聴いて確認</button>';
+root.insertBefore(modeBar,$('syncLines'));
+const saveBadge=document.createElement('span');saveBadge.id='syncSaveState';saveBadge.className='syncSaveState';saveBadge.textContent='接続を確認中';
+root.insertBefore(saveBadge,root.querySelector('.syncOverview'));
+
 const review=document.createElement('div');review.className='syncQuickReview';review.id='syncQuickReview';
 review.innerHTML='<span class="syncQuickNote">選択中の行</span><button id="syncQuickListen" type="button">前後を聴く</button><button id="syncQuickEnd" type="button">いま終了</button><button id="syncQuickConfirm" type="button">確認済み</button><button id="syncQuickAdjust" type="button">時刻を直す</button>';
 root.insertBefore(review,$('syncEditor'));
@@ -57,7 +63,15 @@ extra.append(root.querySelector('.syncOffsetLabel'),root.querySelector('.syncVer
 const dockEdit=document.createElement('button');dockEdit.type='button';dockEdit.id='syncDockEdit';dockEdit.textContent='修正';dockEdit.setAttribute('aria-label','選択した歌詞の時刻を修正');root.querySelector('.syncDock').insertBefore(dockEdit,$('syncTapNow'));
 dockEdit.addEventListener('click',()=>{if($('syncEditor').hidden)return;adjust.open=!adjust.open;});
 const cloudPanel=$('recCloudPanel');if(cloudPanel)$('syncCloudSlot').append(cloudPanel);
-const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:',OFFSET_PREFIX='rec_note_sync_offset_v7:';
+const audio=$('audio'),STACK=[],DRAFT_PREFIX='rec_note_sync_edit_draft_v7:',OFFSET_PREFIX='rec_note_sync_offset_v7:',RESUME_PREFIX='rec_note_sync_resume_v81:';
+let syncMode='record';
+function saveBadgeStatus(status,kind='pending'){
+ const el=$('syncSaveState');if(!el)return;el.textContent=status;el.dataset.status=kind;
+}
+function checkpointKey(){return RESUME_PREFIX+song+':'+(version?.id||'');}
+function saveCheckpoint(){if(!version||selected<0)return;try{localStorage.setItem(checkpointKey(),String(selected));}catch(e){}}
+function readCheckpoint(){try{const s=localStorage.getItem(checkpointKey());return s===null?null:Number(s);}catch(e){return null;}}
+
 function audioOffset(){const saved=localStorage.getItem(OFFSET_PREFIX+song);if(saved!==null&&Number.isFinite(Number(saved)))return Number(saved);return /_1119\.mp3$/i.test(files[song]?.name||'')?-0.022:0;}
 function wavPosition(){return Math.max(0,(Number(audio.currentTime)||0)+audioOffset());}
 function refreshOffsetSelector(){$('syncOffset').value=String(audioOffset());}
@@ -111,7 +125,7 @@ function renderRows(){
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
   const time=document.createElement('span');time.className='syncLineStamp';time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+' / 終了未設定':'未記録';
   b.append(number,content,time);
-  b.addEventListener('click',()=>{choose(x.i,true,false);});
+  b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));});
   view.append(b);
  }
  view.scrollTop=position;$('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
@@ -124,7 +138,7 @@ function choose(i,scroll,seekAudio){
  if(seekAudio&&started(t))seek(t.start);
  for(const el of $('syncLines').querySelectorAll('.syncLine'))el.classList.toggle('selected',Number(el.dataset.line)===i);
  const node=$('syncLines').querySelector('[data-line="'+i+'"]');if(scroll)node?.scrollIntoView({block:'nearest',behavior:'smooth'});
- fillEditor();
+ fillEditor();saveCheckpoint();updatePrimary();
 }
 function fillEditor(){
  $('syncEditor').hidden=selected<0;
@@ -242,7 +256,9 @@ function changeVersion(v){
  $('syncVersion').value=version.id;
  $('syncSourceWarning').hidden=version.text_status!=='unverified_pdf_extract';
  $('syncSourceWarning').textContent='この歌詞はPDF抽出による未校正版です。時間合わせと原文校正は別工程です。';
- selected=rows()[0]?.i??-1;renderRows();if(selected>=0)choose(selected,false,false);
+ const saved=readCheckpoint(),unconfirmed=rows().find(x=>!confirmed(x.time));
+ selected=Number.isInteger(saved)&&lines[saved]?.trim()&&!confirmed(get(saved))?saved:(unconfirmed?.i??rows()[0]?.i??-1);
+ renderRows();if(selected>=0)choose(selected,false,false);
 }
 function download(name,content,type){
  const url=URL.createObjectURL(new Blob([content],{type:type||'text/plain;charset=utf-8'}));
@@ -279,7 +295,9 @@ for(const b of root.querySelectorAll('[data-adjust-start]'))b.addEventListener('
 for(const b of root.querySelectorAll('[data-adjust-end]'))b.addEventListener('click',()=>shift('end',Number(b.dataset.adjustEnd)));
 $('syncConfirm').addEventListener('click',confirm);
 $('syncUnconfirm').addEventListener('click',()=>{if(selected>=0&&saveRecord(selected,{status:'draft',confirmedAt:null})){renderRows();fillEditor();}});
-$('syncTapNow').addEventListener('click',()=>tap(selected));
+$('syncTapNow').addEventListener('click',primaryAction);
+$('syncRecordMode').addEventListener('click',()=>switchSyncMode('record'));
+$('syncReviewMode').addEventListener('click',()=>switchSyncMode('review'));
 $('syncUndo').addEventListener('click',()=>{if(!STACK.length){notice('戻せる操作がありません。');return;}state.lyricTimings=JSON.parse(STACK.pop());persist();renderRows();fillEditor();notice('前の状態に戻しました。');});
 $('syncFindNext').addEventListener('click',()=>{const item=rows().find(x=>!confirmed(x.time));if(!item){notice('全行が確認済みです。');return;}$('syncTapMode').checked=false;choose(item.i,true,true);});
 $('syncReplay').addEventListener('click',()=>{const t=get(selected);if(!started(t)){notice('開始位置を記録してください。',true);return;}seek(Math.max(0,t.start-1));replayEnd=Number.isFinite(t.end)?t.end+1:t.start+6;audio.play().catch(e=>notice(e.message,true));});
