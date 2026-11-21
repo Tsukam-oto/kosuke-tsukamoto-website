@@ -194,6 +194,29 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 }
 .release-words .note-line{line-height:inherit;overflow-wrap:anywhere}
 .release-words .secret-char{font-weight:inherit}
+/* Untouched phone view: keep every original sentence readable, but give the
+   eight paragraphs equal-height rows. Their existing eighth character already
+   has the same x-coordinate; equal row heights make a genuinely readable
+   vertical column without revealing, coloring, or adding hints. */
+@media(max-width:700px){
+  .release-words:not(.secret-active){
+    display:grid;
+    grid-template-columns:minmax(0,1fr);
+    grid-auto-rows:1fr;
+    gap:8px;
+    line-height:1.85;
+  }
+  .release-words:not(.secret-active) .note-line{
+    margin:0;
+    min-width:0;
+    line-height:inherit;
+  }
+  .release-words:not(.secret-active) .lead{
+    display:inline-block;
+    width:7em;
+    white-space:nowrap;
+  }
+}
 /* On phones, touching any hidden character condenses the same eight real lines
    into one readable vertical column. All original words remain in the DOM and
    return unchanged when selection is cleared. */
