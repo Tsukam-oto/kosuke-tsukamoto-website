@@ -111,7 +111,7 @@ function saveRecord(i,patch){
  if(Number.isFinite(next.end)&&(!Number.isFinite(next.start)||next.end<=next.start)){notice('終了時刻は開始より後にしてください。',true);return false;}
  STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
  if(at>=0)list[at]=next;else list.push(next);
- persist();$('syncAuthState').textContent=media.isSignedIn()?'クラウド同期待ち':'端末内のみ';notice('端末に保存しました。クラウド同期を実行しています。');return true;
+ persist();$('syncAuthState').textContent=media.isSignedIn()?'クラウド同期待ち':'端末内のみ';saveBadgeStatus(media.isSignedIn()?'端末保存済 · 同期待ち':'端末内のみ保存',media.isSignedIn()?'pending':'offline');notice('端末に保存しました。クラウド同期を実行しています。');return true;
 }
 function renderRows(){
  const view=$('syncLines'),position=view.scrollTop;view.replaceChildren();
@@ -166,6 +166,37 @@ function fillEditor(){
  }
 
 }
+function updatePrimary(){
+ const button=$('syncTapNow');if(!button)return;
+ const t=get(selected),usable=selected>=0&&!!lines[selected]?.trim();
+ if(syncMode==='review'){
+  button.textContent=confirmed(t)?'確認済み ✓':'確認済みにする';
+  button.disabled=!usable||!complete(t)||confirmed(t)||conflict(selected);
+ }else{
+  button.textContent=usable&&started(t)&&!complete(t)?'歌い終わりを記録':'歌い始めを記録';
+  button.disabled=!usable||confirmed(t)||!hasAudio();
+ }
+}
+function switchSyncMode(mode){
+ syncMode=mode==='review'?'review':'record';
+ for(const [id,v] of [['syncRecordMode','record'],['syncReviewMode','review']]){
+  const b=$(id);b.classList.toggle('active',syncMode===v);b.setAttribute('aria-pressed',String(syncMode===v));
+ }
+ hint.textContent=syncMode==='review'?'行を選ぶ → 聴いて確認 → 画面下のボタンで確定':'再生して、歌い始めたら画面下のボタンを押す';
+ if(syncMode==='review'){
+  const next=rows().find(x=>complete(x.time)&&!confirmed(x.time));
+  if(next)choose(next.i,true,true);
+ }
+ updatePrimary();
+}
+function primaryAction(){
+ if(syncMode==='review'){confirm();return;}
+ const t=get(selected);
+ if(started(t)&&!complete(t)){
+  capture('end');updatePrimary();return;
+ }
+ tap(selected);updatePrimary();
+}
 function hasAudio(){return !!(files[song]?.url)&&audio.readyState>=1;}
 function tap(i){
  if(!hasAudio()){choose(i,true,false);notice('先にMP3を読み込んでください。',true);return;}
@@ -184,7 +215,7 @@ function editorSave(){
  if(selected<0)return;
  const a=parse($('syncStart').value),b=$('syncEnd').value.trim()?parse($('syncEnd').value):null;
  if(a===null||($('syncEnd').value.trim()&&b===null)){notice('時刻の形式は 1:20.25 です。',true);return;}
- if(saveRecord(selected,{start:a,end:b,status:'draft'})){clearDraft();renderRows();fillEditor();}
+ if(saveRecord(selected,{start:a,end:b,status:'draft'})){clearDraft();renderRows();fillEditor();updatePrimary();}
 }
 function capture(kind){
  if(selected<0)return;if(!hasAudio()){notice('音源を先に再生してください。',true);return;}
@@ -203,7 +234,14 @@ function shift(kind,amount){
 function confirm(){
  const t=get(selected);if(!complete(t)){notice('開始と終了を設定してから確認してください。',true);return;}
  if(conflict(selected)){notice('この行にはクラウド編集競合があります。',true);return;}
- if(saveRecord(selected,{status:'confirmed',confirmedAt:new Date().toISOString()})){renderRows();fillEditor();notice('この歌詞を確認済みにしました。');}
+ if(saveRecord(selected,{status:'confirmed',confirmedAt:new Date().toISOString()})){
+  renderRows();fillEditor();notice('この歌詞を確認済みにしました。');
+  if(syncMode==='review'){
+   const following=rows().find(x=>complete(x.time)&&!confirmed(x.time));
+   if(following)choose(following.i,true,true);
+  }
+  updatePrimary();
+ }
 }
 function seek(t){if(!hasAudio())return;audio.currentTime=Math.max(0,Math.min(t-audioOffset(),audio.duration||t));clock();}
 function clock(){
@@ -233,7 +271,7 @@ function focusState(){
  $('syncQuickConfirm').disabled=!complete(t)||confirmed(t)||conflict(selected);
  $('syncQuickEnd').disabled=!started(t)||confirmed(t);
  $('syncQuickEnd').hidden=complete(t);
- $('syncDockLyric').title=selected>=0?lines[selected]:'';
+ $('syncDockLyric').title=selected>=0?lines[selected]:'';updatePrimary();
 }
 function toggleAudio(){if(!hasAudio()){notice('先にMP3を選んでください。',true);return;}if(audio.paused)audio.play().catch(e=>notice('再生できません：'+e.message,true));else audio.pause();}
 async function loadLyrics(){
