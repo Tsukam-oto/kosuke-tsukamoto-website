@@ -394,6 +394,20 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
   .release-words.secret-active .note-line .tail{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
   .release-share-toolbar{margin-top:15px}
 }
+
+/* Reserve the actual eighth-character cell on every natural wrap. The prose
+   still uses the first seven character spaces of each continued line. */
+.release-words:not(.secret-active) .note-line.has-tail-skip .tail{display:contents}
+.release-words:not(.secret-active) .tail-first{display:inline;white-space:nowrap}
+.release-words:not(.secret-active) .tail-continuation{
+  display:grid;grid-template-columns:7em 1em minmax(0,1fr);
+  width:100%;min-width:0;line-height:inherit;align-items:baseline;gap:0;
+}
+.release-words:not(.secret-active) .tail-before,
+.release-words:not(.secret-active) .tail-after{
+  display:block;white-space:nowrap;min-width:0;
+}
+.release-words:not(.secret-active) .tail-hole{display:block;width:1em;min-width:1em;height:1em;pointer-events:none}
 </style>
 </head>
 <body>
@@ -512,12 +526,93 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
  const host=document.querySelector(".release-words"),buttons=[...document.querySelectorAll(".secret-char")],toolbar=document.getElementById("secret-toolbar");
  if(!host||buttons.length!==8)return;
  let active=false,lastFocus=null,objectUrl=null,imageBlob=null;
+ // The source text stays untouched in reading order. For narrow viewports,
+ // wrap only what actually exceeds one line, reserving an empty eighth-cell
+ // on each additional visual row (rather than indenting the entire row).
+ const proseLines=[...host.querySelectorAll(".note-line")].map(line=>({
+   line,tail:line.querySelector(".tail"),raw:line.querySelector(".tail")?.textContent||"",
+   secret:line.querySelector(".secret-char")
+ }));
+ const measureCanvas=document.createElement("canvas");
+ const measureContext=measureCanvas.getContext("2d");
+ const resetTailWrap=()=>{
+   for(const {line,tail,raw} of proseLines){
+     if(!line.classList.contains("has-tail-skip"))continue;
+     tail.textContent=raw;
+     line.classList.remove("has-tail-skip");
+   }
+ };
+ const reflowTailWrap=()=>{
+   resetTailWrap();
+   if(active||!measureContext)return;
+   // Run with the actual measured line width: device rotation and font loading
+   // may change how much of an original sentence fits on the first visual row.
+   for(const {line,tail,raw,secret} of proseLines){
+     const box=line.getBoundingClientRect();
+     const secretRect=secret.getBoundingClientRect();
+     const width=box.width, firstCapacity=box.right-secretRect.right-4;
+     if(width<170||firstCapacity<10)continue;
+     const cs=getComputedStyle(line);
+     measureContext.font=cs.font;
+     const letterSpacing=Number.parseFloat(cs.letterSpacing)||0;
+     const characters=Array.from(raw);
+     const measure=text=>measureContext.measureText(text).width+Math.max(0,Array.from(text).length-1)*letterSpacing;
+     if(measure(raw)<=firstCapacity)continue;
+     const take=(start,capacity)=>{
+       let count=0;
+       while(start+count<characters.length){
+         const candidate=characters.slice(start,start+count+1).join("");
+         if(count>0&&measure(candidate)>capacity)break;
+         count++;
+       }
+       return Math.max(1,count);
+     };
+     let position=0;
+     const initialCount=take(0,firstCapacity);
+     const first=document.createElement("span");
+     first.className="tail-first";
+     first.textContent=characters.slice(0,initialCount).join("");
+     position=initialCount;
+     const pieces=[first];
+     const em=Number.parseFloat(cs.fontSize)||16;
+     const leftWidth=7*em-4,rightWidth=Math.max(8,width-8*em-4);
+     while(position<characters.length){
+       const leftCount=take(position,leftWidth);
+       const prefix=characters.slice(position,position+leftCount).join("");
+       position+=leftCount;
+       const rightCount=position<characters.length?take(position,rightWidth):0;
+       const suffix=characters.slice(position,position+rightCount).join("");
+       position+=rightCount;
+       const row=document.createElement("span");
+       row.className="tail-continuation";
+       const left=document.createElement("span");left.className="tail-before";left.textContent=prefix;
+       const hole=document.createElement("span");hole.className="tail-hole";
+       hole.setAttribute("aria-hidden","true");
+       const right=document.createElement("span");right.className="tail-after";right.textContent=suffix;
+       row.append(left,hole,right);
+       pieces.push(row);
+     }
+     tail.replaceChildren(...pieces);
+     line.classList.add("has-tail-skip");
+   }
+ };
+ let reflowQueued=false;
+ const scheduleReflow=()=>{
+   if(reflowQueued)return;
+   reflowQueued=true;
+   requestAnimationFrame(()=>{reflowQueued=false;reflowTailWrap();});
+ };
+ window.addEventListener("resize",scheduleReflow,{passive:true});
+ document.fonts?.ready.then(scheduleReflow);
+ scheduleReflow();
  const setActive=(yes,focusShare=false)=>{
+  resetTailWrap();
   active=yes;
   if(yes){host.classList.remove("secret-active");void host.offsetWidth;}
   host.classList.toggle("secret-active",yes);
   toolbar.classList.toggle("visible",yes);
   buttons.forEach(b=>b.setAttribute("aria-pressed",String(yes)));
+  if(!yes)scheduleReflow();
   if(yes&&window.matchMedia("(max-width:700px), (orientation:landscape) and (max-width:1100px) and (max-height:560px)").matches){
     // In compact reveal mode the entire eight-character vertical line fits
     // on a phone screen. Move the view to its top only after relayout.
