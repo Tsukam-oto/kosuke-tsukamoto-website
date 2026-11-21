@@ -139,6 +139,28 @@ function completeMissingEnds(onlyBeforeIndex=null){
  }
  return updated;
 }
+function closeLyricBeforeInstrument(boundary){
+ if(!work||!version||!bridge.isSignedIn()||!Number.isFinite(boundary))return;
+ const prev=rows().filter(x=>started(x.time)&&x.time.start<boundary).at(-1);
+ if(!prev||complete(prev.time)||confirmed(prev.time)||conflict(prev.i)||Number.isFinite(prev.time.end))return;
+ const end=candidateEnd(prev.i),list=all(),j=list.findIndex(t=>t.id===id(prev.i));
+ if(j<0||!Number.isFinite(end)||end<=prev.time.start)return;
+ STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
+ list[j]={...list[j],end,autoEndSource:'instrument-start',updatedAt:new Date().toISOString()};
+ persist();renderRows();if(selected>=0)fillEditor();
+}
+function closeOpenInterludeAt(start){
+ if(!bridge.isSignedIn()||!Number.isFinite(start))return;
+ const list=all();
+ const candidates=list.filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'&&!x.deleted&&Number.isFinite(x.start)&&x.start<start&&!Number.isFinite(x.end)&&!x.syncConflictOf);
+ candidates.sort((a,b)=>b.start-a.start);
+ const target=candidates.find(x=>!list.some(z=>z.syncConflictOf===x.id));
+ if(!target)return;
+ const j=list.findIndex(x=>x.id===target.id);if(j<0)return;
+ STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
+ list[j]={...target,end:Math.round(start*100)/100,autoEndSource:'following-lyric',updatedAt:new Date().toISOString()};
+ persist();saveBadgeStatus('端末保存済 · クラウド同期待ち','pending');
+}
 function draftKey(){return DRAFT_PREFIX+song+':'+(version?.id||'')+':'+selected;}
 function clearDraft(){try{localStorage.removeItem(draftKey());}catch(e){}}
 function saveDraft(){if(selected<0)return;try{localStorage.setItem(draftKey(),JSON.stringify({a:$('syncStart').value,b:$('syncEnd').value}));}catch(e){}}
@@ -258,7 +280,7 @@ function tap(i){
  const now=Math.round(wavPosition()*100)/100,t=get(i);
  if(started(t)){notice('この歌詞の開始は登録済みです。既存の時刻は変更しません。');return;}
  if(!saveRecord(i,{start:now,end:null,status:'draft'}))return;
- completeMissingEnds(i);
+ completeMissingEnds(i);closeOpenInterludeAt(now);
  lastTap=i;selected=i;clearDraft();renderRows();
  const next=$('syncTapMode').checked?rows().find(x=>x.i>i):null;choose(next?.i??i,true,false);
  notice(timestamp(now)+' に記録。'+(next?'次の歌詞へ進みました。':'開始を保存しました。'));
@@ -267,7 +289,7 @@ function editorSave(){
  if(selected<0)return;
  const a=parse($('syncStart').value),b=$('syncEnd').value.trim()?parse($('syncEnd').value):null;
  if(a===null||($('syncEnd').value.trim()&&b===null)){notice('時刻の形式は 1:20.25 です。',true);return;}
- if(saveRecord(selected,{start:a,end:b,status:'draft'})){clearDraft();renderRows();fillEditor();updatePrimary();}
+ if(saveRecord(selected,{start:a,end:b,status:'draft'})){completeMissingEnds(selected);closeOpenInterludeAt(a);clearDraft();renderRows();fillEditor();updatePrimary();}
 }
 function capture(kind){
  if(selected<0)return;if(!hasAudio()){notice('音源を先に再生してください。',true);return;}
@@ -276,7 +298,7 @@ function capture(kind){
  let b=kind==='end'?now:parse($('syncEnd').value)??t?.end??null;
  if(kind==='start'&&Number.isFinite(b)&&b<=a)b=null;
  if(a===null){notice('先に開始時刻を記録してください。',true);return;}
- if(saveRecord(selected,{start:a,end:b,status:'draft'})){clearDraft();renderRows();fillEditor();}
+ if(saveRecord(selected,{start:a,end:b,status:'draft'})){if(kind==='start'){completeMissingEnds(selected);closeOpenInterludeAt(a);}clearDraft();renderRows();fillEditor();}
 }
 function shift(kind,amount){
  const field=$(kind==='start'?'syncStart':'syncEnd'),current=parse(field.value);
@@ -415,6 +437,7 @@ window.addEventListener('recnote:cloud-auth-change',()=>{
  if(signed){$('syncAccount').open=false;saveBadgeStatus('クラウド接続中','pending');loadLyrics();}
  else {audio.pause();work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncFineTune').open=false;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;saveBadgeStatus('ログインが必要','offline');notice('ログインしてください。',true);}focusState();
 });
+window.addEventListener('recnote:instrument-start',e=>{if(e.detail?.song===song)closeLyricBeforeInstrument(Number(e.detail.start));});
 window.addEventListener('recnote:cloud-synced',()=>{
  $('syncAuthState').textContent='クラウド同期済み';saveBadgeStatus('クラウド同期済み','saved');
  renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();
