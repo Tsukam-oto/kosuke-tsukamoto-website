@@ -19,7 +19,7 @@ root.innerHTML=[
 '<input id="syncSlider" type="range" min="0" max="100" value="0" step="1" aria-label="再生位置"/>',
 '<div class="syncTransport"><button id="syncBack">−3秒</button><button class="syncEmphasis" id="syncPlay">▶ 再生</button><button id="syncNext">＋3秒</button><label>速度 <select id="syncSpeed"><option value="0.65">0.65×</option><option value="0.8">0.8×</option><option value="1" selected>1×</option></select></label></div>',
 '<label class="syncOffsetLabel">WAV基準の時刻補正 <select id="syncOffset"><option value="-0.022">11/19版MP3：−0.022秒</option><option value="0">補正なし：0秒</option></select><small>原本WAVとの実測差。Safariでずれがなければ「補正なし」に変更できます。</small></label>',
-'<div class="syncMedia" id="syncMedia"><p id="syncMediaHelp">MP3はクラウドから復元します。</p><label>MP3を一度だけ登録<input id="syncUpload" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4"/></label><span id="syncUploadState"></span></div></section>',
+'<div class="syncMedia" id="syncMedia"><p id="syncMediaHelp">MP3はクラウドから復元します。</p><label>音源を選ぶ<input id="syncUpload" type="file" accept=".mp3,.m4a,audio/mpeg,audio/mp4"/></label><span id="syncUploadState"></span></div></section>',
 '<div class="syncOverview"><strong id="syncCount">0 / 0 行</strong><span id="syncBreakdown">確認待ち</span><div class="syncMeter"><i id="syncMeterFill"></i></div></div>',
 '<div class="syncSectionLabel"><div><strong>歌詞</strong><small>行をタップすると選べます</small></div><label><input id="syncTapMode" type="checkbox" checked/>次の行へ</label></div>',
 '<p id="syncSourceWarning" class="syncWarning" hidden></p>',
