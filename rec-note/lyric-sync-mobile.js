@@ -109,7 +109,7 @@ function candidateEnd(i){
  return options.length?Math.round(Math.min(...options)*100)/100:null;
 }
 function fillableRows(){
- return rows().filter(x=>started(x.time)&&!Number.isFinite(x.time.end)&&!confirmed(x.time)&&!conflict(x.i)&&Number.isFinite(candidateEnd(x.i)));
+ return rows().filter(x=>started(x.time)&&!Number.isFinite(x.time.end)&&x.time.status!=='confirmed'&&!conflict(x.i)&&Number.isFinite(candidateEnd(x.i)));
 }
 function completeMissingEnds(onlyBeforeIndex=null){
  if(!version||!work||!bridge.isSignedIn())return 0;
@@ -128,7 +128,7 @@ function completeMissingEnds(onlyBeforeIndex=null){
   const index=list.findIndex(t=>t.id===id(x.i));
   if(index<0)continue;
   const current=list[index],end=candidateEnd(x.i);
-  if(!started(current)||Number.isFinite(current.end)||confirmed(current)||conflict(x.i)||!Number.isFinite(end)||end<=current.start)continue;
+  if(!started(current)||Number.isFinite(current.end)||current.status==='confirmed'||conflict(x.i)||!Number.isFinite(end)||end<=current.start)continue;
   list[index]={...current,end,autoEndSource:'next-start-or-section',updatedAt:new Date().toISOString()};
   updated++;
  }
@@ -142,7 +142,7 @@ function completeMissingEnds(onlyBeforeIndex=null){
 function closeLyricBeforeInstrument(boundary){
  if(!work||!version||!bridge.isSignedIn()||!Number.isFinite(boundary))return;
  const prev=rows().filter(x=>started(x.time)&&x.time.start<boundary).at(-1);
- if(!prev||complete(prev.time)||confirmed(prev.time)||conflict(prev.i)||Number.isFinite(prev.time.end))return;
+ if(!prev||complete(prev.time)||prev.time.status==='confirmed'||conflict(prev.i)||Number.isFinite(prev.time.end))return;
  const end=candidateEnd(prev.i),list=all(),j=list.findIndex(t=>t.id===id(prev.i));
  if(j<0||!Number.isFinite(end)||end<=prev.time.start)return;
  STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
@@ -152,7 +152,7 @@ function closeLyricBeforeInstrument(boundary){
 function closeOpenInterludeAt(start){
  if(!bridge.isSignedIn()||!Number.isFinite(start))return;
  const list=all();
- const candidates=list.filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'&&!x.deleted&&Number.isFinite(x.start)&&x.start<start&&!Number.isFinite(x.end)&&!x.syncConflictOf);
+ const candidates=list.filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'&&!x.deleted&&x.status!=='confirmed'&&Number.isFinite(x.start)&&x.start<start&&!Number.isFinite(x.end)&&!x.syncConflictOf);
  candidates.sort((a,b)=>b.start-a.start);
  const target=candidates.find(x=>!list.some(z=>z.syncConflictOf===x.id));
  if(!target)return;
