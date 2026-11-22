@@ -95,29 +95,10 @@
  #syncStudio #fullSongSections{scroll-margin-top:170px}
 }
 
-/* v13: while scrolled through lyrics, mark a new interlude without navigating upward */
-#syncStudio .syncDock{
- grid-template-columns:minmax(0,1fr) 42px 42px minmax(0,1fr)!important;
- grid-template-rows:minmax(35px,auto) minmax(52px,auto)!important;
- grid-template-areas:"cue cue play edit" "interlude interlude record record";
- gap:5px 8px!important;padding:7px 12px calc(10px + env(safe-area-inset-bottom))!important;
-}
-#syncStudio .syncDock>div{grid-area:cue;align-self:center}
-#syncStudio .syncDock #syncDockPlay{grid-area:play;min-height:39px!important;max-height:41px;padding:4px!important}
-#syncStudio .syncDock #syncDockEdit{grid-area:edit;min-height:39px!important;max-height:41px;padding:4px!important}
-#syncStudio .syncDock #syncDockInterlude{
- grid-area:interlude;min-height:53px!important;background:#eee9e3;
- border:1px solid #d8cfc6;color:#524640;font-size:13px;font-weight:750;
- border-radius:11px;padding:9px 8px;
-}
-#syncStudio .syncDock #syncDockInterlude[data-recording="true"]{
- background:#e0d9e9;color:#533e62;border-color:#b5a4c6;
-}
-#syncStudio .syncDock #syncDockInterlude:disabled{opacity:.45}
-#syncStudio .syncDock #syncTapNow{grid-area:record;min-height:53px!important}
+/* v14: section buttons are beside lyrics; restore one-row lyric recording dock. */
+#syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 45px 51px minmax(135px,auto)!important;grid-template-rows:auto!important;grid-template-areas:none!important;gap:6px!important}
+#syncStudio .syncDock>div,#syncStudio .syncDock #syncDockPlay,#syncStudio .syncDock #syncDockEdit,#syncStudio .syncDock #syncTapNow{grid-area:auto!important}
 @media(max-width:550px){
- #syncStudio .syncDock{gap:5px!important;padding:7px 10px calc(9px + env(safe-area-inset-bottom))!important}
- #syncStudio .syncDock #syncDockInterlude{font-size:12px;min-height:53px!important}
- #syncStudio .syncDock #syncTapNow{font-size:12px;min-height:53px!important}
- #syncStudio.syncReady{padding-bottom:calc(150px + env(safe-area-inset-bottom))}
+ #syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 38px 43px minmax(129px,auto)!important;gap:5px!important;padding:9px 10px calc(10px + env(safe-area-inset-bottom))!important}
+ #syncStudio.syncReady{padding-bottom:calc(125px + env(safe-area-inset-bottom))}
 }
