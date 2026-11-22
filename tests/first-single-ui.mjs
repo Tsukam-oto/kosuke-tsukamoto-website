@@ -289,23 +289,73 @@ async function checkEPFeedback(browser,engine){
  await page.locator("#ep-feedback-name").fill("音楽ファン");
  await page.locator('#ep-feedback-form input[name="publication"][value="匿名で掲載してよい"]').check();
  assert.equal(await page.locator("#ep-feedback-form").evaluate(el=>el.checkValidity()),true);
- let post=null;
+
+ let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
-  post={method:route.request().method(),body:route.request().postData()};
-  await route.fulfill({status:200,contentType:"text/html",body:"<p>Mocked. No real message sent.</p>"});
+  posts.push(route.request().postData()||"");
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
  });
  await page.locator("#ep-feedback-form button[type=submit]").click();
- await page.waitForURL("https://formspree.io/f/xbgjraga");
- const fields=new URLSearchParams(post?.body||"");
- assert.equal(post?.method,"POST");
- assert.equal(fields.get("project"),"first-ep-2026-11-22");
- assert.equal(fields.get("category"),"1st EP / 感想・メッセージ");
- assert.equal(fields.get("work"),"あなたと、これから、これからも");
- assert.equal(fields.get("voice"),"ティザーを見ました。配信が楽しみです。");
- assert.equal(fields.get("name"),"音楽ファン");
- assert.equal(fields.get("publication"),"匿名で掲載してよい");
+ await page.locator("#ep-feedback-status[data-state=success]").waitFor();
+ assert.equal(posts.length,1,"EP feedback submitted exactly once");
+ for(const value of ["first-ep-2026-11-22","1st EP / 感想・メッセージ","あなたと、これから、これからも","ティザーを見ました。配信が楽しみです。","音楽ファン","匿名で掲載してよい"]){
+  assert.ok(posts[0].includes(value),"EP FormData contains "+value);
+ }
+ assert.equal(await page.locator("#ep-feedback-form button[type=submit]").isDisabled(),true,"sent form locked to prevent duplicates");
+ assert.ok(page.url().includes("/releases/2026-11-22/"),"success confirmation stays on EP site");
  await page.close();
  log(engine+" EP message intake","4 widths; anonymous option; private by default; intercepted Formspree POST");
+}
+
+
+async function checkFeedbackHandling(browser,engine){
+ const cases=[
+  {url:"/releases/2026-11-22/",selector:"#ep-feedback-form",text:"#ep-feedback-message",status:"#ep-feedback-status",tag:"first-ep-2026-11-22"},
+  {url:"/voice-box/",selector:"#voice-form",text:"#voice-message",status:"#voice-feedback-status",tag:"voice-box"},
+  {url:"/contact/",selector:".contact-form",text:"#contact-message",status:"#contact-feedback-status",tag:"website-contact"}
+ ];
+ for(const item of cases){
+  const page=await browser.newPage({viewport:{width:375,height:844}});
+  await page.goto(BASE+item.url,{waitUntil:"domcontentloaded"});
+  const form=page.locator(item.selector);
+  assert.equal(await form.getAttribute("data-ajax-feedback"),"","shared handler is installed");
+  assert.equal(await page.locator(item.status).getAttribute("role"),"status","accessible submission status");
+  if(item.selector==="#voice-form"){
+   await page.locator("#voice-theme").selectOption({label:"作品の感想"});
+   assert.equal(await form.locator('input[name="publication"]:checked').getAttribute("value"),"掲載しない","privacy by default");
+  }
+  if(item.selector===".contact-form"){
+   await page.locator("#contact-name").fill("テスト依頼者");
+   await page.locator("#contact-email").fill("test@example.com");
+   await page.locator("#contact-category").selectOption({label:"作曲"});
+  }
+  await page.locator(item.text).fill("フォームの入力保持・送信テストです");
+  let requests=0,mode="server",payload="";
+  await page.route("https://formspree.io/f/xbgjraga",async route=>{
+    requests++;
+    payload=route.request().postData()||"";
+    if(mode==="network")return route.abort("internetdisconnected");
+    return route.fulfill({status:mode==="success"?200:503,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
+  });
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="error"]').waitFor();
+  assert.ok(await form.locator('button[type="submit"]').isEnabled(),"retry permitted after server error");
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  assert.ok(payload.includes(item.tag),engine+" category is attached to "+item.selector);
+  mode="network";
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="uncertain"]').waitFor();
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  assert.ok((await page.locator(item.status).innerText()).includes("重複"),"uncertain responses discourage resends");
+  mode="success";
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="success"]').waitFor();
+  assert.equal(requests,3,"three intercepted test submissions; none reaches Formspree");
+  assert.equal(await form.locator('button[type="submit"]').isDisabled(),true,"sent form stays locked");
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  await page.close();
+ }
+ log(engine+" Formspree controls","EP, VOICE BOX and contact: success, errors, uncertainty, privacy");
 }
 
 async function checkArtworkContest(browser,engine){
@@ -348,27 +398,22 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"interest message valid after privacy and graduation checks");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid interest message");
- let post=null;
+
+ let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
-  post={method:route.request().method(),body:route.request().postData()};
-  await route.fulfill({status:200,contentType:"text/html",body:"<p>Test success</p>"});
+  posts.push(route.request().postData()||"");
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
  });
  await page.locator("#artwork-entry-form button[type=submit]").click();
- await page.waitForURL("https://formspree.io/f/xbgjraga");
- assert.equal(post?.method,"POST");
- // Native HTML forms percent-encode values (spaces become '+').
- // Parse as application/x-www-form-urlencoded instead of comparing raw text.
- const fields=new URLSearchParams(post?.body||"");
- assert.equal(fields.get("project"),"first-single-artwork-interest-2026");
- assert.equal(fields.get("_subject"),"ARTWORK PROJECT｜制作希望メッセージ");
- assert.equal(fields.get("name"),"Test Artist");
- assert.equal(fields.get("email"),"sample@example.com");
- assert.equal(fields.get("song"),"両方");
- assert.equal(fields.get("message"),"二曲のジャケットを描いてみたいです。ご連絡ください。");
- assert.equal(fields.get("junior_high_graduated"),"yes");
- assert.equal(fields.get("data_policy_accepted"),"yes");
- assert.equal(fields.has("unpaid_project_confirmed"),false,"no unpaid consent data");
- assert.equal(fields.has("artwork_url"),false,"no artwork link is collected");
+ await page.locator("#artwork-form-status[data-state=success]").waitFor();
+ assert.equal(posts.length,1,"artwork interest is submitted once");
+ for(const value of ["first-single-artwork-interest-2026","ARTWORK PROJECT｜制作希望メッセージ","Test Artist","sample@example.com","両方","二曲のジャケットを描いてみたいです。ご連絡ください。"]){
+  assert.ok(posts[0].includes(value),"artwork FormData contains "+value);
+ }
+ assert.equal(posts[0].includes("unpaid_project_confirmed"),false);
+ assert.equal(posts[0].includes("artwork_url"),false);
+ assert.equal(await page.locator("#artwork-entry-form button[type=submit]").isDisabled(),true,"sent artwork interest cannot be duplicated");
+ assert.ok(page.url().includes("/releases/artwork-project/"),"artwork confirmation remains in-page");
  await page.close();
  const listing=await browser.newPage({viewport:{width:390,height:844}});
  await listing.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
@@ -556,6 +601,13 @@ async function checkReleaseMetadata(browser,engine){
   assert.equal(await page.locator('meta[name="twitter:card"]').getAttribute("content"),"summary_large_image");
   await page.close();
  }
+
+ const home=await browser.newPage();
+ await home.goto(BASE+"/",{waitUntil:"domcontentloaded"});
+ assert.equal(await home.locator('meta[property="og:image"]').getAttribute("content"),expected,"homepage shares EP artwork");
+ assert.ok((await home.locator('meta[property="og:title"]').getAttribute("content")).includes("1st EP"),"homepage preview announces the EP");
+ assert.ok((await home.locator('meta[property="og:description"]').getAttribute("content")).includes("配信開始日は後日"),"social metadata does not claim a release date");
+ await home.close();
  log(engine+" release metadata","1200x630 social artwork configured on three pages");
 }
 
@@ -674,6 +726,7 @@ async function testEngine(engineType,engine){
   await checkCoverWhenAvailable(browser,engine);
   await checkEPFeedback(browser,engine);
   await checkArtworkContest(browser,engine);
+  await checkFeedbackHandling(browser,engine);
   await checkUcnucThanks(browser,engine);
   await checkReleaseInternalLinks(browser,engine);
  }finally{await browser.close();}

@@ -79,7 +79,7 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 @media(max-width:680px){.site-header nav{gap:13px}.container{width:min(100% - 32px,1080px)}.track-list,.rules,.form-grid{grid-template-columns:1fr}.track-list{gap:13px}.track-card{min-height:175px;padding:25px}.hero{padding-top:60px}.section{padding:53px 0}}
 @media(max-width:420px){.site-header{flex-wrap:wrap;gap:7px}.site-header nav{width:100%;justify-content:flex-start;flex-wrap:wrap}.hero h1{overflow-wrap:anywhere}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-</style>
+</style><link rel="stylesheet" href="/assets/form-submit-feedback.css"><script src="/assets/form-submit-feedback.js" defer></script>
 </head>
 <body>
 <header class="site-header"><a href="/" class="brand">束元康介</a><nav aria-label="サイト内の移動"><a href="/releases/2026-11-22/">1st EP</a><a href="/releases/">配信作品</a><a href="/">HOME</a></nav></header>
@@ -124,7 +124,7 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 </dl>
 <p>このサイト独自の下書き保存は行いません。</p>
 </div>
-<form id="artwork-entry-form" action="https://formspree.io/f/xbgjraga" method="POST">
+<form id="artwork-entry-form" data-ajax-feedback action="https://formspree.io/f/xbgjraga" method="POST">
 <input type="hidden" name="_subject" value="ARTWORK PROJECT｜制作希望メッセージ">
 <input type="hidden" name="category" value="ARTWORK PROJECT / 制作希望">
 <input type="hidden" name="project" value="first-single-artwork-interest-2026">
@@ -137,34 +137,13 @@ input[type=checkbox]{width:18px;height:18px;flex:none;accent-color:#222;margin:5
 <div class="form-field"><label for="artwork-message">伝えておきたいこと <span class="optional">（任意）</span></label><textarea id="artwork-message" name="message" maxlength="1500" placeholder="制作イメージなどがあればご記入ください。まだ決まっていなくても応募できます。"></textarea><p class="help">最初はお名前・連絡先・希望曲だけで大丈夫です。作品画像やポートフォリオの提出も不要です。</p></div>
 <div class="checkbox-line"><input id="graduation-consent" type="checkbox" name="junior_high_graduated" value="yes" required><label for="graduation-consent">中学校を卒業しています。18歳未満の場合は保護者の同意を得ています。</label></div>
 <div class="checkbox-line"><input id="data-consent" type="checkbox" name="data_policy_accepted" value="yes" required><label for="data-consent"><a href="#data-policy">メッセージの取り扱い</a>を読み、Formspreeを通じて送信・保存されることを確認しました。</label></div>
-<p class="help">送信後はFormspreeの受付画面に移動します。受付完了の表示をご確認ください。自動返信メールは保証されません。送信状況が不明な場合は、再送前に<a href="/contact/">お問い合わせ</a>ください。</p>
-<p id="artwork-form-status" class="form-status" role="status" aria-live="polite"></p>
+<p class="help">送信後はこのページに受付結果が表示されます。自動返信メールは保証されません。送信状況が不明な場合は、再送前に<a href="/contact/">お問い合わせ</a>ください。</p>
+<p id="artwork-form-status" class="form-status form-feedback-status" data-feedback-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
 <button class="form-submit" type="submit">ジャケット制作に興味があると伝える →</button>
 </form>
 </div>
 </div></section>
 </main>
 <footer class="footer"><span>© 2026 Kosuke Tsukamoto</span><div><a href="/contact/">お問い合わせ</a>　<a href="/releases/2026-11-22/">1st EP</a>　<a href="/">HOME</a></div></footer>
-<script>
-(()=>{
-"use strict";
-const form=document.getElementById("artwork-entry-form");
-const submit=form?.querySelector('button[type="submit"]');
-const status=document.getElementById("artwork-form-status");
-if(!form||!submit||!status)return;
-const original=submit.textContent;
-let submitting=false;
-form.addEventListener("submit",event=>{
-  if(submitting){event.preventDefault();return;}
-  if(!form.reportValidity()){event.preventDefault();return;}
-  submitting=true;
-  submit.disabled=true;
-  submit.textContent="送信しています…";
-  status.textContent="受付画面に移動します。送信完了の表示をご確認ください。";
-});
-window.addEventListener("pageshow",()=>{
-  submitting=false;submit.disabled=false;submit.textContent=original;status.textContent="";
-});
-})();
-</script>
+
 </body></html>
