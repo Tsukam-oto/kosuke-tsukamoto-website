@@ -289,21 +289,20 @@ async function checkEPFeedback(browser,engine){
  await page.locator("#ep-feedback-name").fill("音楽ファン");
  await page.locator('#ep-feedback-form input[name="publication"][value="匿名で掲載してよい"]').check();
  assert.equal(await page.locator("#ep-feedback-form").evaluate(el=>el.checkValidity()),true);
- let post=null;
+
+ let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
-  post={method:route.request().method(),body:route.request().postData()};
-  await route.fulfill({status:200,contentType:"text/html",body:"<p>Mocked. No real message sent.</p>"});
+  posts.push(route.request().postData()||"");
+  await route.fulfill({status:200,contentType:"application/json",body:'{"ok":true}'});
  });
  await page.locator("#ep-feedback-form button[type=submit]").click();
- await page.waitForURL("https://formspree.io/f/xbgjraga");
- const fields=new URLSearchParams(post?.body||"");
- assert.equal(post?.method,"POST");
- assert.equal(fields.get("project"),"first-ep-2026-11-22");
- assert.equal(fields.get("category"),"1st EP / 感想・メッセージ");
- assert.equal(fields.get("work"),"あなたと、これから、これからも");
- assert.equal(fields.get("voice"),"ティザーを見ました。配信が楽しみです。");
- assert.equal(fields.get("name"),"音楽ファン");
- assert.equal(fields.get("publication"),"匿名で掲載してよい");
+ await page.locator("#ep-feedback-status[data-state=success]").waitFor();
+ assert.equal(posts.length,1,"EP feedback submitted exactly once");
+ for(const value of ["first-ep-2026-11-22","1st EP / 感想・メッセージ","あなたと、これから、これからも","ティザーを見ました。配信が楽しみです。","音楽ファン","匿名で掲載してよい"]){
+  assert.ok(posts[0].includes(value),"EP FormData contains "+value);
+ }
+ assert.equal(await page.locator("#ep-feedback-form button[type=submit]").isDisabled(),true,"sent form locked to prevent duplicates");
+ assert.ok(page.url().includes("/releases/2026-11-22/"),"success confirmation stays on EP site");
  await page.close();
  log(engine+" EP message intake","4 widths; anonymous option; private by default; intercepted Formspree POST");
 }
@@ -348,27 +347,22 @@ async function checkArtworkContest(browser,engine){
  await page.locator("#artwork-message").fill("二曲のジャケットを描いてみたいです。ご連絡ください。");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"interest message valid after privacy and graduation checks");
  assert.equal(await page.locator("#artwork-entry-form").evaluate(form=>form.checkValidity()),true,"valid interest message");
- let post=null;
+
+ let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
-  post={method:route.request().method(),body:route.request().postData()};
-  await route.fulfill({status:200,contentType:"text/html",body:"<p>Test success</p>"});
+  posts.push(route.request().postData()||"");
+  await route.fulfill({status:200,contentType:"application/json",body:'{"ok":true}'});
  });
  await page.locator("#artwork-entry-form button[type=submit]").click();
- await page.waitForURL("https://formspree.io/f/xbgjraga");
- assert.equal(post?.method,"POST");
- // Native HTML forms percent-encode values (spaces become '+').
- // Parse as application/x-www-form-urlencoded instead of comparing raw text.
- const fields=new URLSearchParams(post?.body||"");
- assert.equal(fields.get("project"),"first-single-artwork-interest-2026");
- assert.equal(fields.get("_subject"),"ARTWORK PROJECT｜制作希望メッセージ");
- assert.equal(fields.get("name"),"Test Artist");
- assert.equal(fields.get("email"),"sample@example.com");
- assert.equal(fields.get("song"),"両方");
- assert.equal(fields.get("message"),"二曲のジャケットを描いてみたいです。ご連絡ください。");
- assert.equal(fields.get("junior_high_graduated"),"yes");
- assert.equal(fields.get("data_policy_accepted"),"yes");
- assert.equal(fields.has("unpaid_project_confirmed"),false,"no unpaid consent data");
- assert.equal(fields.has("artwork_url"),false,"no artwork link is collected");
+ await page.locator("#artwork-form-status[data-state=success]").waitFor();
+ assert.equal(posts.length,1,"artwork interest is submitted once");
+ for(const value of ["first-single-artwork-interest-2026","ARTWORK PROJECT｜制作希望メッセージ","Test Artist","sample@example.com","両方","二曲のジャケットを描いてみたいです。ご連絡ください。"]){
+  assert.ok(posts[0].includes(value),"artwork FormData contains "+value);
+ }
+ assert.equal(posts[0].includes("unpaid_project_confirmed"),false);
+ assert.equal(posts[0].includes("artwork_url"),false);
+ assert.equal(await page.locator("#artwork-entry-form button[type=submit]").isDisabled(),true,"sent artwork interest cannot be duplicated");
+ assert.ok(page.url().includes("/releases/artwork-project/"),"artwork confirmation remains in-page");
  await page.close();
  const listing=await browser.newPage({viewport:{width:390,height:844}});
  await listing.goto(BASE+"/releases/",{waitUntil:"domcontentloaded"});
