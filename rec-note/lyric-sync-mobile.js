@@ -5,7 +5,7 @@
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
-document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v14';
+document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v15';
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
@@ -201,21 +201,10 @@ function renderRows(){
   const time=document.createElement('span');time.className='syncLineStamp';const suggested=started(t)&&!Number.isFinite(t?.end)?candidateEnd(x.i):null;time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+(Number.isFinite(suggested)?' → '+timestamp(suggested)+'（自動候補）':' / 終了未設定'):'未記録';
   b.append(number,content,time);
   b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));});
-  // Each lyric remains its own button; instrumental timing is a separate column.
-  const row=document.createElement('div');row.className='syncLyricRow';
-  const controls=document.createElement('div');controls.className='syncRowSections';
-  controls.setAttribute('role','group');controls.setAttribute('aria-label','歌詞とは独立した区間記録');
-  for(const [kind,label] of [['interlude','間奏開始'],['outro','後奏開始']]){
-   const action=document.createElement('button');action.type='button';
-   action.className='syncRowSectionButton';action.dataset.syncSectionAction=kind;
-   action.textContent=label;action.setAttribute('aria-label',label+'：現在の再生位置を記録');
-   action.addEventListener('click',()=>window.dispatchEvent(new CustomEvent('recnote:section-row-action',{detail:{song,kind}})));
-   controls.append(action);
-  }
-  row.append(b,controls);view.append(row);
+  view.append(b);
  }
  view.scrollTop=position;
- window.dispatchEvent(new CustomEvent('recnote:section-row-render',{detail:{song}}));
+ window.dispatchEvent(new CustomEvent('recnote:instrument-rail-refresh',{detail:{song}}));
  $('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
  $('syncBreakdown').textContent='開始 '+begin+'・終了 '+end+'・確認済み '+done;
  $('syncMeterFill').style.width=(data.length?100*done/data.length:0)+'%';
@@ -453,7 +442,7 @@ window.addEventListener('recnote:cloud-auth-change',()=>{
 });
 window.addEventListener('recnote:instrument-start',e=>{if(e.detail?.song===song)closeLyricBeforeInstrument(Number(e.detail.start));});
 window.addEventListener('recnote:interlude-started',e=>{
- if(e.detail?.song!==song||e.detail?.source==='row'||!work||!version||syncMode!=='record')return;
+ if(e.detail?.song!==song||e.detail?.source==='rail'||!work||!version||syncMode!=='record')return;
  // Stay in the lyric flow. If the current line was already timed, focus the
  // next untimed lyric without jumping to the top of the page.
  if(selected>=0&&!started(get(selected)))return;
