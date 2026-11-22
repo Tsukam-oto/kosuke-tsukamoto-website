@@ -160,6 +160,7 @@ function closeOpenInterludeAt(start){
  STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
  list[j]={...target,end:Math.round(start*100)/100,autoEndSource:'following-lyric',updatedAt:new Date().toISOString()};
  persist();saveBadgeStatus('端末保存済 · クラウド同期待ち','pending');
+ window.dispatchEvent(new CustomEvent('recnote:timing-updated',{detail:{song}}));
 }
 function draftKey(){return DRAFT_PREFIX+song+':'+(version?.id||'')+':'+selected;}
 function clearDraft(){try{localStorage.removeItem(draftKey());}catch(e){}}
