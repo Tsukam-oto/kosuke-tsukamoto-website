@@ -34,13 +34,7 @@ panel.innerHTML=[
  '<div class="fsTools"><button type="button" id="fsExport">曲全体の時間をJSON保存</button></div>',
  '<p class="fsCaution">動画に使用する原音源はWAVです。スマホでは軽量MP3で時間を指定します。音源の読み込みがまだの場合は上の「MP3を登録」から選んでください。</p>'
 ].join('');
-// Keep an interlude action within thumb reach even when the lyrics are scrolled far down.
-const interludeDockButton=document.createElement('button');
-interludeDockButton.id='syncDockInterlude';
-interludeDockButton.type='button';
-interludeDockButton.textContent='間奏開始';
-interludeDockButton.setAttribute('aria-label','現在の再生位置で間奏を開始');
-$('syncDock')?.insertBefore(interludeDockButton,$('syncTapNow'));
+// Instrumental buttons are rendered in a separate column beside each lyric.
 const lyricsAnchor=$('syncModeBar')||$('syncLines');
 root.insertBefore(tab,lyricsAnchor);
 root.insertBefore(panel,lyricsAnchor);
@@ -70,7 +64,7 @@ const pos=()=>{let offset=0;try{let v=localStorage.getItem('rec_note_sync_offset
 const seek=t=>{if(!(audio.readyState>=1))return;let offset=pos()-(Number(audio.currentTime)||0);audio.currentTime=Math.max(0,Math.min(audio.duration||Infinity,t-offset));};
 function ready(){return cloud.isSignedIn()&&Boolean(files[song]?.url)&&audio.readyState>=1;}
 function alertStatus(message,bad=false){const n=$('syncNotice');if(n){n.textContent=message;n.classList.toggle('error',bad)}$('fsSaveNote').textContent=message;}
-function store(key,patch){
+function store(key,patch,source='editor'){
  if(!cloud.isSignedIn()){alertStatus('ログインしてください。',true);return false;}
  const a=sections(),j=a.findIndex(x=>x.id===id(key));
  const old=j>=0?a[j]:{id:id(key),song,workId:workId(),textVersionId:'full-song-structure-v1',lineIndex:index(key),kind:'song-section',sectionKey:key,sectionType:key.split('-')[0],start:null,end:null,status:'draft',deleted:false};
@@ -81,12 +75,12 @@ function store(key,patch){
  if(j>=0)a[j]=rec;else a.push(rec);
  persist();clearDraft(key);
  if((key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
-  window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start}}));
-  if(key.startsWith('interlude-'))window.dispatchEvent(new CustomEvent('recnote:interlude-started',{detail:{song,start:rec.start}}));
+  window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start,source}}));
+  if(key.startsWith('interlude-'))window.dispatchEvent(new CustomEvent('recnote:interlude-started',{detail:{song,start:rec.start,source}}));
  }
  const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
- render();refreshDockInterlude();return true;
+ render();refreshRowSectionButtons();return true;
 }
 function interludeKeysAll(){
  return sections().filter(x=>x.song===song&&x.kind==='song-section'&&/^interlude-\d+$/.test(x.sectionKey||''))
@@ -99,30 +93,44 @@ function interludeInProgress(){
   &&!disputes(x.sectionKey).length)
   .sort((a,b)=>b.start-a.start)[0]||null;
 }
-function refreshDockInterlude(){
- const active=interludeInProgress(),button=interludeDockButton;
- button.disabled=!ready();
- button.dataset.recording=active?'true':'false';
- button.textContent=active?'間奏終了':'間奏開始';
- button.setAttribute('aria-label',active?'現在位置で間奏を終了':'現在位置で間奏を開始');
+function refreshRowSectionButtons(){
+ const activeInterlude=interludeInProgress(),outro=find('outro');
+ const activeOutro=outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end);
+ for(const button of root.querySelectorAll('[data-sync-section-action]')){
+  const kind=button.dataset.syncSectionAction,active=kind==='interlude'?!!activeInterlude:!!activeOutro;
+  const locked=kind==='outro'&&!!outro&&(verified(outro)||complete(outro));
+  button.disabled=!ready()||locked;
+  button.dataset.recording=active?'true':'false';
+  button.textContent=kind==='interlude'?(active?'間奏終了':'間奏開始'):(locked?'後奏記録済':active?'後奏終了':'後奏開始');
+  button.setAttribute('aria-label',button.textContent+'：現在の再生位置を記録');
+ }
 }
-function toggleDockInterlude(){
- if(!ready()){alertStatus('音源を読み込んでから記録してください。',true);return;}
+function toggleRowSection(kind){
+ if(kind!=='interlude'&&kind!=='outro')return;
+ if(!ready()){alertStatus('ログインし、音源を読み込んでから記録してください。',true);return;}
  const now=Math.round(pos()*100)/100;
- const active=interludeInProgress();
- if(active){
-  if(now<=active.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
-  // Existing start is preserved; only its missing end is filled.
-  if(store(active.sectionKey,{end:now})){
-   selection=active.sectionKey;refreshDockInterlude();
+ if(kind==='interlude'){
+  const active=interludeInProgress();
+  if(active){
+   if(now<=active.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
+   if(store(active.sectionKey,{end:now},'row'))selection=active.sectionKey;
+  }else{
+   const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
+   if(store(key,{start:now,end:null,status:'draft',deleted:false},'row'))selection=key;
   }
   return;
  }
- // Never reuse an existing section ID, including soft-deleted sections.
- const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
- if(store(key,{start:now,end:null,status:'draft',deleted:false})){
-  selection=key;refreshDockInterlude();
+ const outro=find('outro');
+ if(verified(outro)||complete(outro)){
+  alertStatus('後奏は記録済みです。修正する場合は上の「後奏」を開いてください。');return;
  }
+ if(Number.isFinite(outro?.start)){
+  if(now<=outro.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
+  store('outro',{end:now},'row');
+ }else{
+  store('outro',{start:now,end:null,status:'draft',confirmedAt:null},'row');
+ }
+ selection='outro';
 }
 function keys(){
  const k=sections().filter(x=>x.song===song&&x.kind==='song-section'&&!x.deleted&&/^interlude-\d+$/.test(x.sectionKey||'')).map(x=>x.sectionKey);
@@ -247,12 +255,22 @@ $('fsExport').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='FULL_SONG_TIMING_'+song+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();refreshDockInterlude();});
-interludeDockButton.addEventListener('click',toggleDockInterlude);
-window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshDockInterlude();});
-window.addEventListener('recnote:cloud-synced',()=>{render();refreshDockInterlude();});
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();refreshDockInterlude();});
-audio.addEventListener('loadedmetadata',()=>{render();refreshDockInterlude();});
-window.addEventListener('focus',()=>{render();refreshDockInterlude();});
-restoreSelection();closeSection();render();refreshDockInterlude();
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();refreshRowSectionButtons();});
+window.addEventListener('recnote:section-row-action',e=>{
+ if(e.detail?.song===song)toggleRowSection(e.detail.kind);
+});
+window.addEventListener('recnote:section-row-render',e=>{
+ if(e.detail?.song===song)refreshRowSectionButtons();
+});
+audio.addEventListener('ended',()=>{
+ const outro=find('outro'),end=Math.round(pos()*100)/100;
+ if(outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end)&&end>outro.start)
+  store('outro',{end},'audio-ended');
+});
+window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshRowSectionButtons();});
+window.addEventListener('recnote:cloud-synced',()=>{render();refreshRowSectionButtons();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();refreshRowSectionButtons();});
+audio.addEventListener('loadedmetadata',()=>{render();refreshRowSectionButtons();});
+window.addEventListener('focus',()=>{render();refreshRowSectionButtons();});
+restoreSelection();closeSection();render();refreshRowSectionButtons();
 })();
