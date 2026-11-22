@@ -306,13 +306,15 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
 #syncStudio.syncNeedsLogin .syncInstrumentRail,
 #syncStudio.syncNeedsAudio .syncInstrumentRail{display:none!important}
 @media(max-width:1220px){
- /* With no exterior space, show a SINGLE compact group above the lyrics. */
+ /* Keep ONE instrumental control group above the fixed lyric dock. */
  #syncStudio .syncInstrumentRail{
-  position:sticky;top:8px;left:auto;width:100%;z-index:45;
-  flex-direction:row;align-items:center;gap:7px;
-  padding:7px 9px;margin:6px 0 11px;
+  position:fixed;top:auto;bottom:calc(78px + env(safe-area-inset-bottom));
+  left:50%;transform:translateX(-50%);width:min(730px,calc(100% - 18px));
+  z-index:48;flex-direction:row;align-items:center;gap:6px;
+  padding:7px 9px;margin:0;
  }
- #syncStudio .syncInstrumentRail strong{flex:0 0 auto;font-size:11px}
+ #syncStudio .syncInstrumentRail strong{display:none}
  #syncStudio .syncInstrumentRail small{display:none}
- #syncStudio .syncInstrumentRail button{flex:1 1 0;min-width:0;min-height:46px;font-size:12px}
+ #syncStudio .syncInstrumentRail button{flex:1 1 0;min-width:0;min-height:46px;font-size:11px;padding:7px 3px}
+ body.syncPage #syncStudio.syncReady{padding-bottom:calc(185px + env(safe-area-inset-bottom))}
 }
