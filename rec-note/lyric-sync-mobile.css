@@ -283,17 +283,36 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncLineStamp{font-size:10px}
 }
 
-/* v14: instrumental timing is a separate button column beside each lyric. */
-#syncStudio .syncLyricRow{display:grid;grid-template-columns:minmax(0,1fr) 91px;align-items:stretch;border-bottom:1px solid #efede9;background:#fff}
-#syncStudio .syncLyricRow:last-child{border-bottom:0}
-#syncStudio .syncLyricRow>.syncLine{min-width:0;border-bottom:0;border-radius:0}
-#syncStudio .syncRowSections{display:flex;flex-direction:column;justify-content:center;gap:4px;border-left:1px solid #eee8e2;padding:5px 6px 5px 5px}
-#syncStudio .syncRowSections button{display:block;width:100%;min-height:36px;padding:4px 3px;font-size:11px;font-weight:750;line-height:1.2;border-radius:7px;border-color:#d6cfc6;background:#f8f6f3;color:#5b4d46;white-space:nowrap}
-#syncStudio .syncRowSections button[data-recording="true"]{background:#e8dff0;color:#60476f;border-color:#bda8d0}
-#syncStudio .syncRowSections button:disabled{opacity:.42}
-@media(max-width:550px){
- #syncStudio .syncLyricRow{grid-template-columns:minmax(0,1fr) 86px}
- #syncStudio .syncLyricRow>.syncLine{padding:9px 7px;gap:4px}
- #syncStudio .syncRowSections{padding:5px 4px}
- #syncStudio .syncRowSections button{font-size:10.5px;min-height:35px}
+/* v15: one section recording rail in the wide RIGHT GUTTER, not in any lyric row. */
+#syncStudio .syncInstrumentRail{
+ display:none;position:fixed;top:clamp(245px,52dvh,530px);
+ left:calc(50% + 388px);width:157px;z-index:45;
+ flex-direction:column;gap:8px;padding:13px;
+ border:1px solid #ded6ce;border-radius:13px;
+ background:#fffdfbf7;box-shadow:0 8px 30px #22201d13;
+}
+#syncStudio.syncReady .syncInstrumentRail{display:flex}
+#syncStudio .syncInstrumentRail strong{font-size:13px;color:#4b3b40}
+#syncStudio .syncInstrumentRail small{font-size:10px;line-height:1.5;color:#887f79}
+#syncStudio .syncInstrumentRail button{
+ width:100%;min-height:50px;padding:8px 6px;font-size:12px;
+ border-color:#d9cfc8;background:#f6f1ed;color:#4f4149;border-radius:10px;
+}
+#syncStudio .syncInstrumentRail button[data-recording="true"]{
+ background:#e9ddf0;border-color:#b6a0c7;color:#573966
+}
+#syncStudio .syncInstrumentRail button:disabled{opacity:.45}
+#syncStudio.syncInlineSectionActive .syncInstrumentRail,
+#syncStudio.syncNeedsLogin .syncInstrumentRail,
+#syncStudio.syncNeedsAudio .syncInstrumentRail{display:none!important}
+@media(max-width:1220px){
+ /* With no exterior space, show a SINGLE compact group above the lyrics. */
+ #syncStudio .syncInstrumentRail{
+  position:sticky;top:8px;left:auto;width:100%;z-index:45;
+  flex-direction:row;align-items:center;gap:7px;
+  padding:7px 9px;margin:6px 0 11px;
+ }
+ #syncStudio .syncInstrumentRail strong{flex:0 0 auto;font-size:11px}
+ #syncStudio .syncInstrumentRail small{display:none}
+ #syncStudio .syncInstrumentRail button{flex:1 1 0;min-width:0;min-height:46px;font-size:12px}
 }
