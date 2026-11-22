@@ -85,17 +85,16 @@ function store(key,patch){
  }
  const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
- render();return true;
+ render();refreshDockInterlude();return true;
 }
 function interludeKeysAll(){
  return sections().filter(x=>x.song===song&&x.kind==='song-section'&&/^interlude-\d+$/.test(x.sectionKey||''))
   .map(x=>Number(x.sectionKey.split('-')[1])).filter(Number.isFinite);
 }
 function interludeInProgress(){
- const now=pos();
  return sections().filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'
   &&!x.deleted&&x.status!=='confirmed'&&!x.syncConflictOf
-  &&Number.isFinite(x.start)&&x.start<=now+0.15&&!Number.isFinite(x.end)
+  &&Number.isFinite(x.start)&&!Number.isFinite(x.end)
   &&!disputes(x.sectionKey).length)
   .sort((a,b)=>b.start-a.start)[0]||null;
 }
