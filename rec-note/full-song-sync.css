@@ -102,3 +102,7 @@
  #syncStudio .syncDock{grid-template-columns:minmax(0,1fr) 38px 43px minmax(129px,auto)!important;gap:5px!important;padding:9px 10px calc(10px + env(safe-area-inset-bottom))!important}
  #syncStudio.syncReady{padding-bottom:calc(125px + env(safe-area-inset-bottom))}
 }
+
+/* v16: simple section workflow, start only. Manual end remains in details. */
+#syncStudio .fsEditor .fsActions{grid-template-columns:minmax(0,1fr)}
+#syncStudio .fsFine #fsFinish{display:block;width:calc(100% - 24px);margin:10px 12px 5px;min-height:44px;font-size:12px;border-color:#e2d8d0;background:#f8f5f2}
