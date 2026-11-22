@@ -601,6 +601,13 @@ async function checkReleaseMetadata(browser,engine){
   assert.equal(await page.locator('meta[name="twitter:card"]').getAttribute("content"),"summary_large_image");
   await page.close();
  }
+
+ const home=await browser.newPage();
+ await home.goto(BASE+"/",{waitUntil:"domcontentloaded"});
+ assert.equal(await home.locator('meta[property="og:image"]').getAttribute("content"),expected,"homepage shares EP artwork");
+ assert.ok((await home.locator('meta[property="og:title"]').getAttribute("content")).includes("1st EP"),"homepage preview announces the EP");
+ assert.ok((await home.locator('meta[property="og:description"]').getAttribute("content")).includes("配信開始日は後日"),"social metadata does not claim a release date");
+ await home.close();
  log(engine+" release metadata","1200x630 social artwork configured on three pages");
 }
 
