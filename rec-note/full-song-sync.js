@@ -34,6 +34,13 @@ panel.innerHTML=[
  '<div class="fsTools"><button type="button" id="fsExport">曲全体の時間をJSON保存</button></div>',
  '<p class="fsCaution">動画に使用する原音源はWAVです。スマホでは軽量MP3で時間を指定します。音源の読み込みがまだの場合は上の「MP3を登録」から選んでください。</p>'
 ].join('');
+// Keep an interlude action within thumb reach even when the lyrics are scrolled far down.
+const interludeDockButton=document.createElement('button');
+interludeDockButton.id='syncDockInterlude';
+interludeDockButton.type='button';
+interludeDockButton.textContent='間奏開始';
+interludeDockButton.setAttribute('aria-label','現在の再生位置で間奏を開始');
+$('syncDock')?.insertBefore(interludeDockButton,$('syncTapNow'));
 const lyricsAnchor=$('syncModeBar')||$('syncLines');
 root.insertBefore(tab,lyricsAnchor);
 root.insertBefore(panel,lyricsAnchor);
@@ -79,6 +86,43 @@ function store(key,patch){
  const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
  render();return true;
+}
+function interludeKeysAll(){
+ return sections().filter(x=>x.song===song&&x.kind==='song-section'&&/^interlude-\d+$/.test(x.sectionKey||''))
+  .map(x=>Number(x.sectionKey.split('-')[1])).filter(Number.isFinite);
+}
+function interludeInProgress(){
+ const now=pos();
+ return sections().filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'
+  &&!x.deleted&&x.status!=='confirmed'&&!x.syncConflictOf
+  &&Number.isFinite(x.start)&&x.start<=now+0.15&&!Number.isFinite(x.end)
+  &&!disputes(x.sectionKey).length)
+  .sort((a,b)=>b.start-a.start)[0]||null;
+}
+function refreshDockInterlude(){
+ const active=interludeInProgress(),button=interludeDockButton;
+ button.disabled=!ready();
+ button.dataset.recording=active?'true':'false';
+ button.textContent=active?'間奏終了':'間奏開始';
+ button.setAttribute('aria-label',active?'現在位置で間奏を終了':'現在位置で間奏を開始');
+}
+function toggleDockInterlude(){
+ if(!ready()){alertStatus('音源を読み込んでから記録してください。',true);return;}
+ const now=Math.round(pos()*100)/100;
+ const active=interludeInProgress();
+ if(active){
+  if(now<=active.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
+  // Existing start is preserved; only its missing end is filled.
+  if(store(active.sectionKey,{end:now})){
+   selection=active.sectionKey;refreshDockInterlude();
+  }
+  return;
+ }
+ // Never reuse an existing section ID, including soft-deleted sections.
+ const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
+ if(store(key,{start:now,end:null,status:'draft',deleted:false})){
+  selection=key;refreshDockInterlude();
+ }
 }
 function keys(){
  const k=sections().filter(x=>x.song===song&&x.kind==='song-section'&&!x.deleted&&/^interlude-\d+$/.test(x.sectionKey||'')).map(x=>x.sectionKey);
@@ -203,10 +247,12 @@ $('fsExport').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='FULL_SONG_TIMING_'+song+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();});
-window.addEventListener('recnote:cloud-synced',render);
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();});
-audio.addEventListener('loadedmetadata',render);
-window.addEventListener('focus',render);
-restoreSelection();closeSection();render();
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();refreshDockInterlude();});
+interludeDockButton.addEventListener('click',toggleDockInterlude);
+window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshDockInterlude();});
+window.addEventListener('recnote:cloud-synced',()=>{render();refreshDockInterlude();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();refreshDockInterlude();});
+audio.addEventListener('loadedmetadata',()=>{render();refreshDockInterlude();});
+window.addEventListener('focus',()=>{render();refreshDockInterlude();});
+restoreSelection();closeSection();render();refreshDockInterlude();
 })();
