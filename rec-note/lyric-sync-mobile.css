@@ -282,3 +282,18 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncFillMissing{font-size:12px;min-height:44px}
  #syncStudio .syncLineStamp{font-size:10px}
 }
+
+/* v14: instrumental timing is a separate button column beside each lyric. */
+#syncStudio .syncLyricRow{display:grid;grid-template-columns:minmax(0,1fr) 91px;align-items:stretch;border-bottom:1px solid #efede9;background:#fff}
+#syncStudio .syncLyricRow:last-child{border-bottom:0}
+#syncStudio .syncLyricRow>.syncLine{min-width:0;border-bottom:0;border-radius:0}
+#syncStudio .syncRowSections{display:flex;flex-direction:column;justify-content:center;gap:4px;border-left:1px solid #eee8e2;padding:5px 6px 5px 5px}
+#syncStudio .syncRowSections button{display:block;width:100%;min-height:36px;padding:4px 3px;font-size:11px;font-weight:750;line-height:1.2;border-radius:7px;border-color:#d6cfc6;background:#f8f6f3;color:#5b4d46;white-space:nowrap}
+#syncStudio .syncRowSections button[data-recording="true"]{background:#e8dff0;color:#60476f;border-color:#bda8d0}
+#syncStudio .syncRowSections button:disabled{opacity:.42}
+@media(max-width:550px){
+ #syncStudio .syncLyricRow{grid-template-columns:minmax(0,1fr) 86px}
+ #syncStudio .syncLyricRow>.syncLine{padding:9px 7px;gap:4px}
+ #syncStudio .syncRowSections{padding:5px 4px}
+ #syncStudio .syncRowSections button{font-size:10.5px;min-height:35px}
+}
