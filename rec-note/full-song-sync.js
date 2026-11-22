@@ -20,9 +20,9 @@ panel.innerHTML=[
  '<button type="button" id="fsAddInterlude" class="fsAdd">＋ 間奏を追加する</button>',
  '<div class="fsEditor" id="fsEditor" hidden>',
   '<strong id="fsTitle">区間を選択</strong><span id="fsRecorded">時間未登録</span>',
-  '<div class="fsActions"><button id="fsBegin" type="button">開始を記録</button><button id="fsFinish" type="button">終了を記録</button></div>',
+  '<div class="fsActions"><button id="fsBegin" type="button">開始を記録</button></div>',
   '<div class="fsOtherActions"><button id="fsListen" type="button">この区間を聴く</button><button id="fsConfirm" type="button">確認済みにする</button></div>',
-  '<details id="fsFine" class="fsFine"><summary>時間を細かく修正する</summary>',
+  '<details id="fsFine" class="fsFine"><summary>時間を細かく修正する</summary><button id="fsFinish" type="button">終了時刻を手動で記録（修正用）</button>',
    '<div class="fsTimeInputs"><label>開始 <input id="fsStartInput" inputmode="decimal" type="text" placeholder="0:00.00" /></label><label>終了 <input id="fsEndInput" inputmode="decimal" type="text" placeholder="0:15.00" /></label></div>',
    '<div class="fsNudge"><span>開始</span><button data-fs-adjust="start:-0.1" type="button">−0.1秒</button><button data-fs-adjust="start:-0.01" type="button">−0.01秒</button><button data-fs-adjust="start:0.01" type="button">＋0.01秒</button><button data-fs-adjust="start:0.1" type="button">＋0.1秒</button></div>',
    '<div class="fsNudge"><span>終了</span><button data-fs-adjust="end:-0.1" type="button">−0.1秒</button><button data-fs-adjust="end:-0.01" type="button">−0.01秒</button><button data-fs-adjust="end:0.01" type="button">＋0.01秒</button><button data-fs-adjust="end:0.1" type="button">＋0.1秒</button></div>',
@@ -38,7 +38,7 @@ panel.innerHTML=[
 const rail=document.createElement('aside');
 rail.id='syncInstrumentRail';rail.className='syncInstrumentRail';
 rail.setAttribute('aria-label','歌詞と独立した区間の記録');
-rail.innerHTML='<strong>区間を記録</strong><button type="button" data-sync-section-action="interlude">間奏開始</button><button type="button" data-sync-section-action="outro">後奏開始</button><small>再生中の時刻を記録</small>';
+rail.innerHTML='<strong>区間の開始</strong><button type="button" data-sync-section-action="intro">前奏開始</button><button type="button" data-sync-section-action="interlude">間奏開始</button><button type="button" data-sync-section-action="outro">後奏開始</button><small>次の開始で自動終了</small>';
 root.insertBefore(rail,$('syncLines'));
 for(const button of rail.querySelectorAll('[data-sync-section-action]')){
  button.addEventListener('click',()=>toggleRailSection(button.dataset.syncSectionAction));
@@ -81,8 +81,26 @@ function store(key,patch,source='editor'){
  if(rec.end!==null&&(!Number.isFinite(rec.end)||rec.end<0)){alertStatus('終了時刻が不正です。',true);return false}
  if(Number.isFinite(rec.end)&&(!Number.isFinite(rec.start)||rec.end<=rec.start)){alertStatus('終了は開始より後にしてください。',true);return false}
  if(j>=0)a[j]=rec;else a.push(rec);
+ // Section starts finalize earlier unfinished sections without changing recorded ends.
+ if(source==='rail'&&Number.isFinite(patch.start)){
+  for(let z=0;z<a.length;z++){
+   const prev=a[z];
+   if(prev.id===rec.id||prev.song!==song||prev.kind!=='song-section'||prev.deleted||
+      !['intro','interlude'].includes(prev.sectionType)||prev.status==='confirmed'||
+      !Number.isFinite(prev.start)||Number.isFinite(prev.end)||prev.start>=rec.start||
+      prev.syncConflictOf||a.some(other=>other.syncConflictOf===prev.id))continue;
+   const candidates=[rec.start];
+   for(const other of a){
+    if(other===prev||other.song!==song||other.deleted||!Number.isFinite(other.start)||
+       other.start<=prev.start||other.start>rec.start)continue;
+    if(other.kind==='song-section'||(Number.isInteger(other.lineIndex)&&other.lineIndex>=0))candidates.push(other.start);
+   }
+   const end=Math.round(Math.min(...candidates)*100)/100;
+   if(end>prev.start)a[z]={...prev,end,autoEndSource:'next-start',updatedAt:new Date().toISOString()};
+  }
+ }
  persist();clearDraft(key);
- if(source!=='rail'&&(key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
+ if((key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
   window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start,source}}));
   if(key.startsWith('interlude-'))window.dispatchEvent(new CustomEvent('recnote:interlude-started',{detail:{song,start:rec.start,source}}));
  }
@@ -102,43 +120,39 @@ function interludeInProgress(){
   .sort((a,b)=>b.start-a.start)[0]||null;
 }
 function refreshRailSectionButtons(){
- const activeInterlude=interludeInProgress(),outro=find('outro');
- const activeOutro=outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end);
- for(const button of root.querySelectorAll('[data-sync-section-action]')){
-  const kind=button.dataset.syncSectionAction,active=kind==='interlude'?!!activeInterlude:!!activeOutro;
-  const locked=kind==='outro'&&!!outro&&(verified(outro)||complete(outro));
-  button.disabled=!ready()||locked;
-  button.dataset.recording=active?'true':'false';
-  button.textContent=kind==='interlude'?(active?'間奏終了':'間奏開始'):(locked?'後奏記録済':active?'後奏終了':'後奏開始');
-  button.setAttribute('aria-label',button.textContent+'：現在の再生位置を記録');
+ const intro=find('intro'),interlude=interludeInProgress(),outro=find('outro');
+ for(const button of rail.querySelectorAll('[data-sync-section-action]')){
+  const kind=button.dataset.syncSectionAction;
+  const current=kind==='intro'?intro:kind==='outro'?outro:interlude;
+  const started=Number.isFinite(current?.start),finished=complete(current);
+  button.disabled=!ready()||(kind==='interlude'?!!interlude:started);
+  button.dataset.recording=started&&!finished?'true':'false';
+  button.textContent=kind==='intro'?(started?'前奏開始済':'前奏開始'):
+                     kind==='outro'?(started?'後奏開始済':'後奏開始'):
+                     interlude?'間奏開始済':'間奏開始';
+  button.setAttribute('aria-label',button.textContent+'：現在位置を記録し、前の区間は自動終了');
  }
 }
 function toggleRailSection(kind){
- if(kind!=='interlude'&&kind!=='outro')return;
+ if(!['intro','interlude','outro'].includes(kind))return;
  if(!ready()){alertStatus('ログインし、音源を読み込んでから記録してください。',true);return;}
  const now=Math.round(pos()*100)/100;
  if(kind==='interlude'){
-  const active=interludeInProgress();
-  if(active){
-   if(now<=active.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
-   if(store(active.sectionKey,{end:now},'rail'))selection=active.sectionKey;
-  }else{
-   const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
-   if(store(key,{start:now,end:null,status:'draft',deleted:false},'rail'))selection=key;
-  }
+  if(interludeInProgress()){alertStatus('間奏は開始済みです。次の歌詞または後奏の開始を記録してください。');return;}
+  // Never recycle a deleted or historical section ID.
+  const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
+  if(store(key,{start:now,end:null,status:'draft',deleted:false},'rail'))selection=key;
   return;
  }
- const outro=find('outro');
- if(verified(outro)||complete(outro)){
-  alertStatus('後奏は記録済みです。修正する場合は上の「後奏」を開いてください。');return;
+ if(Number.isFinite(find(kind)?.start)){
+  alertStatus(name(kind)+'の開始は記録済みです。既存時刻は変更しません。');return;
  }
- if(Number.isFinite(outro?.start)){
-  if(now<=outro.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
-  store('outro',{end:now},'rail');
- }else{
-  store('outro',{start:now,end:null,status:'draft',confirmedAt:null},'rail');
+ if(kind==='intro'){
+  const earlier=sections().some(x=>x.song===song&&!x.deleted&&x.id!==id('intro')&&
+   Number.isFinite(x.start)&&x.start<=now);
+  if(earlier){alertStatus('前奏は曲の先頭で記録してください。既存時刻は変更しません。',true);return;}
  }
- selection='outro';
+ if(store(kind,{start:now,end:null,status:'draft',confirmedAt:null},'rail'))selection=kind;
 }
 function keys(){
  const k=sections().filter(x=>x.song===song&&x.kind==='song-section'&&!x.deleted&&/^interlude-\d+$/.test(x.sectionKey||'')).map(x=>x.sectionKey);
@@ -169,7 +183,8 @@ function render(){
   $('fsStartInput').value=draft?.start??(Number.isFinite(r?.start)?display(r.start):'');
   $('fsEndInput').value=draft?.end??(Number.isFinite(r?.end)?display(r.end):'');
  }
- $('fsBegin').disabled=!ready()||verified(r);
+ $('fsBegin').disabled=!ready()||Number.isFinite(r?.start);
+ $('fsBegin').textContent=Number.isFinite(r?.start)?'開始記録済み':'開始を記録';
  $('fsFinish').disabled=!ready()||!Number.isFinite(r?.start)||verified(r);
  $('fsListen').disabled=!ready()||!Number.isFinite(r?.start);
  $('fsConfirm').disabled=!complete(r)||verified(r)||issue;
@@ -198,7 +213,7 @@ function capture(which){
  if(!ready()){alertStatus('ログインして、MP3を読み込んでください。',true);return;}
  if(verified(r)){alertStatus('確認済みです。時間を変える場合は「時間を細かく修正する」を開いてください。',true);return;}
  const t=Math.round(pos()*100)/100;
- if(which==='start')store(key,{start:t,end:Number.isFinite(r?.end)&&r.end>t?r.end:null,status:'draft',confirmedAt:null});
+ if(which==='start'){if(Number.isFinite(r?.start)){alertStatus('開始は記録済みです。修正は詳細設定で行ってください。');return;}store(key,{start:t,end:null,status:'draft',confirmedAt:null},'rail');}
  else {if(!Number.isFinite(r?.start)){alertStatus('先に開始を記録してください。',true);return;}store(key,{end:t,status:'draft',confirmedAt:null});}
 }
 function saveEdit(){
@@ -270,7 +285,7 @@ window.addEventListener('recnote:instrument-rail-refresh',e=>{
 audio.addEventListener('ended',()=>{
  const outro=find('outro'),end=Math.round(pos()*100)/100;
  if(outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end)&&end>outro.start)
-  store('outro',{end},'audio-ended');
+  store('outro',{end,autoEndSource:'audio-ended'},'audio-ended');
 });
 window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshRailSectionButtons();});
 window.addEventListener('recnote:cloud-synced',()=>{render();refreshRailSectionButtons();});
