@@ -439,6 +439,15 @@ window.addEventListener('recnote:cloud-auth-change',()=>{
  else {audio.pause();work=null;version=null;versions=[];lines=[];selected=-1;lastTap=-1;renderRows();$('syncEditor').hidden=true;$('syncFineTune').open=false;$('syncDockLyric').textContent='歌詞を選択';$('syncAccount').open=true;saveBadgeStatus('ログインが必要','offline');notice('ログインしてください。',true);}focusState();
 });
 window.addEventListener('recnote:instrument-start',e=>{if(e.detail?.song===song)closeLyricBeforeInstrument(Number(e.detail.start));});
+window.addEventListener('recnote:interlude-started',e=>{
+ if(e.detail?.song!==song||!work||!version)return;
+ // Stay in the lyric flow. If the current line was already timed, focus the
+ // next untimed lyric without jumping to the top of the page.
+ if(selected>=0&&!started(get(selected)))return;
+ const following=rows().find(x=>x.i>selected&&!started(x.time));
+ if(following)choose(following.i,true,false);
+});
+
 window.addEventListener('recnote:cloud-synced',()=>{
  $('syncAuthState').textContent='クラウド同期済み';saveBadgeStatus('クラウド同期済み','saved');
  renderRows();if(!document.activeElement?.closest('.syncEditor'))fillEditor();clock();
