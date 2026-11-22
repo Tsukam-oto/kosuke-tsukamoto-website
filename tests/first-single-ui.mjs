@@ -293,7 +293,7 @@ async function checkEPFeedback(browser,engine){
  let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
   posts.push(route.request().postData()||"");
-  await route.fulfill({status:200,contentType:"application/json",body:'{"ok":true}'});
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
  });
  await page.locator("#ep-feedback-form button[type=submit]").click();
  await page.locator("#ep-feedback-status[data-state=success]").waitFor();
@@ -335,7 +335,7 @@ async function checkFeedbackHandling(browser,engine){
     requests++;
     payload=route.request().postData()||"";
     if(mode==="network")return route.abort("internetdisconnected");
-    return route.fulfill({status:mode==="success"?200:503,contentType:"application/json",body:'{"ok":true}'});
+    return route.fulfill({status:mode==="success"?200:503,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
   });
   await form.locator('button[type="submit"]').click();
   await page.locator(item.status+'[data-state="error"]').waitFor();
@@ -402,7 +402,7 @@ async function checkArtworkContest(browser,engine){
  let posts=[];
  await page.route("https://formspree.io/f/xbgjraga",async route=>{
   posts.push(route.request().postData()||"");
-  await route.fulfill({status:200,contentType:"application/json",body:'{"ok":true}'});
+  await route.fulfill({status:200,contentType:"application/json",headers:{"access-control-allow-origin":"*"},body:'{"ok":true}'});
  });
  await page.locator("#artwork-entry-form button[type=submit]").click();
  await page.locator("#artwork-form-status[data-state=success]").waitFor();
