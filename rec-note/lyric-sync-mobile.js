@@ -440,7 +440,7 @@ window.addEventListener('recnote:cloud-auth-change',()=>{
 });
 window.addEventListener('recnote:instrument-start',e=>{if(e.detail?.song===song)closeLyricBeforeInstrument(Number(e.detail.start));});
 window.addEventListener('recnote:interlude-started',e=>{
- if(e.detail?.song!==song||!work||!version)return;
+ if(e.detail?.song!==song||!work||!version||syncMode!=='record')return;
  // Stay in the lyric flow. If the current line was already timed, focus the
  // next untimed lyric without jumping to the top of the page.
  if(selected>=0&&!started(get(selected)))return;
