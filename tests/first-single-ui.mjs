@@ -307,6 +307,57 @@ async function checkEPFeedback(browser,engine){
  log(engine+" EP message intake","4 widths; anonymous option; private by default; intercepted Formspree POST");
 }
 
+
+async function checkFeedbackHandling(browser,engine){
+ const cases=[
+  {url:"/releases/2026-11-22/",selector:"#ep-feedback-form",text:"#ep-feedback-message",status:"#ep-feedback-status",tag:"first-ep-2026-11-22"},
+  {url:"/voice-box/",selector:"#voice-form",text:"#voice-message",status:"#voice-feedback-status",tag:"voice-box"},
+  {url:"/contact/",selector:".contact-form",text:"#contact-message",status:"#contact-feedback-status",tag:"website-contact"}
+ ];
+ for(const item of cases){
+  const page=await browser.newPage({viewport:{width:375,height:844}});
+  await page.goto(BASE+item.url,{waitUntil:"domcontentloaded"});
+  const form=page.locator(item.selector);
+  assert.equal(await form.getAttribute("data-ajax-feedback"),"","shared handler is installed");
+  assert.equal(await page.locator(item.status).getAttribute("role"),"status","accessible submission status");
+  if(item.selector==="#voice-form"){
+   await page.locator("#voice-theme").selectOption({label:"作品の感想"});
+   assert.equal(await form.locator('input[name="publication"]:checked').getAttribute("value"),"掲載しない","privacy by default");
+  }
+  if(item.selector===".contact-form"){
+   await page.locator("#contact-name").fill("テスト依頼者");
+   await page.locator("#contact-email").fill("test@example.com");
+   await page.locator("#contact-category").selectOption({label:"作曲"});
+  }
+  await page.locator(item.text).fill("フォームの入力保持・送信テストです");
+  let requests=0,mode="server",payload="";
+  await page.route("https://formspree.io/f/xbgjraga",async route=>{
+    requests++;
+    payload=route.request().postData()||"";
+    if(mode==="network")return route.abort("internetdisconnected");
+    return route.fulfill({status:mode==="success"?200:503,contentType:"application/json",body:'{"ok":true}'});
+  });
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="error"]').waitFor();
+  assert.ok(await form.locator('button[type="submit"]').isEnabled(),"retry permitted after server error");
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  assert.ok(payload.includes(item.tag),engine+" category is attached to "+item.selector);
+  mode="network";
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="uncertain"]').waitFor();
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  assert.ok((await page.locator(item.status).innerText()).includes("重複"),"uncertain responses discourage resends");
+  mode="success";
+  await form.locator('button[type="submit"]').click();
+  await page.locator(item.status+'[data-state="success"]').waitFor();
+  assert.equal(requests,3,"three intercepted test submissions; none reaches Formspree");
+  assert.equal(await form.locator('button[type="submit"]').isDisabled(),true,"sent form stays locked");
+  assert.equal(await page.locator(item.text).inputValue(),"フォームの入力保持・送信テストです");
+  await page.close();
+ }
+ log(engine+" Formspree controls","EP, VOICE BOX and contact: success, errors, uncertainty, privacy");
+}
+
 async function checkArtworkContest(browser,engine){
  const widths=[240,320,375,768,1440];
  for(const width of widths){
@@ -668,6 +719,7 @@ async function testEngine(engineType,engine){
   await checkCoverWhenAvailable(browser,engine);
   await checkEPFeedback(browser,engine);
   await checkArtworkContest(browser,engine);
+  await checkFeedbackHandling(browser,engine);
   await checkUcnucThanks(browser,engine);
   await checkReleaseInternalLinks(browser,engine);
  }finally{await browser.close();}
