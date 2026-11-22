@@ -82,6 +82,7 @@ function store(key,patch){
  persist();clearDraft(key);
  if((key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
   window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start}}));
+  if(key.startsWith('interlude-'))window.dispatchEvent(new CustomEvent('recnote:interlude-started',{detail:{song,start:rec.start}}));
  }
  const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
