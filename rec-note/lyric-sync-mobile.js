@@ -5,7 +5,7 @@
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
-document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v15';
+document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v16';
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
@@ -150,15 +150,33 @@ function closeLyricBeforeInstrument(boundary){
  persist();renderRows();if(selected>=0)fillEditor();
 }
 function closeOpenInterludeAt(start){
+ // A first lyric closes the intro; the next lyric closes an open interlude.
+ // Never overwrite recorded ends, confirmed cues or conflict candidates.
  if(!bridge.isSignedIn()||!Number.isFinite(start))return;
- const list=all();
- const candidates=list.filter(x=>x.song===song&&x.kind==='song-section'&&x.sectionType==='interlude'&&!x.deleted&&x.status!=='confirmed'&&Number.isFinite(x.start)&&x.start<start&&!Number.isFinite(x.end)&&!x.syncConflictOf);
- candidates.sort((a,b)=>b.start-a.start);
- const target=candidates.find(x=>!list.some(z=>z.syncConflictOf===x.id));
- if(!target)return;
- const j=list.findIndex(x=>x.id===target.id);if(j<0)return;
+ const list=all(),cues=rows().filter(x=>started(x.time)).map(x=>x.time.start);
+ const candidates=list.filter(x=>x.song===song&&x.kind==='song-section'&&
+  ['intro','interlude'].includes(x.sectionType)&&!x.deleted&&x.status!=='confirmed'&&
+  Number.isFinite(x.start)&&x.start<start&&!Number.isFinite(x.end)&&!x.syncConflictOf&&
+  !list.some(z=>z.syncConflictOf===x.id));
+ if(!candidates.length)return;
+ const changes=[];
+ for(const target of candidates){
+  const boundaries=[start];
+  for(const t of cues)if(t>target.start&&t<=start)boundaries.push(t);
+  for(const other of list){
+   if(other===target||other.song!==song||other.kind!=='song-section'||other.deleted||
+      !Number.isFinite(other.start)||other.start<=target.start||other.start>start)continue;
+   boundaries.push(other.start);
+  }
+  const ending=Math.round(Math.min(...boundaries)*100)/100;
+  if(ending>target.start)changes.push({id:target.id,end:ending});
+ }
+ if(!changes.length)return;
  STACK.push(JSON.stringify(list));if(STACK.length>15)STACK.shift();
- list[j]={...target,end:Math.round(start*100)/100,autoEndSource:'following-lyric',updatedAt:new Date().toISOString()};
+ for(const change of changes){
+  const j=list.findIndex(x=>x.id===change.id);
+  if(j>=0)list[j]={...list[j],end:change.end,autoEndSource:'following-start',updatedAt:new Date().toISOString()};
+ }
  persist();saveBadgeStatus('端末保存済 · クラウド同期待ち','pending');
  window.dispatchEvent(new CustomEvent('recnote:timing-updated',{detail:{song}}));
 }
@@ -251,8 +269,9 @@ function updatePrimary(){
   button.textContent=confirmed(t)?'確認済み ✓':'確認済みにする';
   button.disabled=!usable||!complete(t)||confirmed(t)||conflict(selected);
  }else{
-  button.textContent=confirmed(t)?'確認済み ✓':complete(t)?'時刻は記録済み':started(t)?'歌い終わりを記録':'歌い始めを記録';
-  button.disabled=!usable||complete(t)||!hasAudio();
+  const next=usable&&started(t)?rows().find(x=>x.i>selected&&!started(x.time)):null;
+  button.textContent=started(t)?(next?'次の歌詞の開始を記録':'歌詞の開始は記録済み'):'歌い始めを記録';
+  button.disabled=!usable||!hasAudio()||(started(t)&&!next);
  }
 }
 function switchSyncMode(mode){
@@ -260,7 +279,7 @@ function switchSyncMode(mode){
  for(const [id,v] of [['syncRecordMode','record'],['syncReviewMode','review']]){
   const b=$(id);b.classList.toggle('active',syncMode===v);b.setAttribute('aria-pressed',String(syncMode===v));
  }
- hint.textContent=syncMode==='review'?'行を選ぶ → 聴いて確認 → 画面下のボタンで確定':'再生して、歌い始めたら画面下のボタンを押す';
+ hint.textContent=syncMode==='review'?'行を選ぶ → 聴いて確認 → 画面下のボタンで確定':'開始を順番に記録。前奏・間奏・後奏は右側のボタンから開始し、次の開始で前の区間が自動終了します。';
  if(syncMode==='review'){
   const next=rows().find(x=>complete(x.time)&&!confirmed(x.time));
   if(next)choose(next.i,true,true);
@@ -270,9 +289,11 @@ function switchSyncMode(mode){
 function primaryAction(){
  if(syncMode==='review'){confirm();return;}
  const t=get(selected);
- if(complete(t)){notice('時刻は記録済みです。修正するか「聴いて確認」に切り替えてください。');return;}
- if(started(t)&&!complete(t)){
-  capture('end');updatePrimary();return;
+ // Never require (or write) an end timestamp on the primary button.
+ if(started(t)){
+  const next=rows().find(x=>x.i>selected&&!started(x.time));
+  if(!next){notice('歌詞の開始はすべて記録済みです。後奏があれば右側の「後奏開始」を押してください。');updatePrimary();return;}
+  tap(next.i);updatePrimary();return;
  }
  tap(selected);updatePrimary();
 }
@@ -285,7 +306,7 @@ function tap(i){
  if(!saveRecord(i,{start:now,end:null,status:'draft'}))return;
  completeMissingEnds(i);closeOpenInterludeAt(now);
  lastTap=i;selected=i;clearDraft();renderRows();
- const next=$('syncTapMode').checked?rows().find(x=>x.i>i):null;choose(next?.i??i,true,false);
+ const next=$('syncTapMode').checked?rows().find(x=>x.i>i&&!started(x.time)):null;choose(next?.i??i,true,false);
  notice(timestamp(now)+' に記録。'+(next?'次の歌詞へ進みました。':'開始を保存しました。'));
 }
 function editorSave(){
