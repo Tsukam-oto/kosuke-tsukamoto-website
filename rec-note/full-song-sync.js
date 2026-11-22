@@ -34,7 +34,15 @@ panel.innerHTML=[
  '<div class="fsTools"><button type="button" id="fsExport">曲全体の時間をJSON保存</button></div>',
  '<p class="fsCaution">動画に使用する原音源はWAVです。スマホでは軽量MP3で時間を指定します。音源の読み込みがまだの場合は上の「MP3を登録」から選んでください。</p>'
 ].join('');
-// Instrumental buttons are rendered in a separate column beside each lyric.
+// One set of controls in the EMPTY GUTTER beside the entire lyric list.
+const rail=document.createElement('aside');
+rail.id='syncInstrumentRail';rail.className='syncInstrumentRail';
+rail.setAttribute('aria-label','歌詞と独立した区間の記録');
+rail.innerHTML='<strong>区間を記録</strong><button type="button" data-sync-section-action="interlude">間奏開始</button><button type="button" data-sync-section-action="outro">後奏開始</button><small>再生中の時刻を記録</small>';
+root.insertBefore(rail,$('syncLines'));
+for(const button of rail.querySelectorAll('[data-sync-section-action]')){
+ button.addEventListener('click',()=>toggleRailSection(button.dataset.syncSectionAction));
+}
 const lyricsAnchor=$('syncModeBar')||$('syncLines');
 root.insertBefore(tab,lyricsAnchor);
 root.insertBefore(panel,lyricsAnchor);
@@ -74,13 +82,13 @@ function store(key,patch,source='editor'){
  if(Number.isFinite(rec.end)&&(!Number.isFinite(rec.start)||rec.end<=rec.start)){alertStatus('終了は開始より後にしてください。',true);return false}
  if(j>=0)a[j]=rec;else a.push(rec);
  persist();clearDraft(key);
- if((key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
+ if(source!=='rail'&&(key==='outro'||key.startsWith('interlude-'))&&Number.isFinite(patch.start)){
   window.dispatchEvent(new CustomEvent('recnote:instrument-start',{detail:{song,start:rec.start,source}}));
   if(key.startsWith('interlude-'))window.dispatchEvent(new CustomEvent('recnote:interlude-started',{detail:{song,start:rec.start,source}}));
  }
  const badge=$('syncSaveState');if(badge){badge.textContent='端末保存済 · クラウド同期待ち';badge.dataset.status='pending'}
  alertStatus('端末に保存しました。クラウドに同期しています。');
- render();refreshRowSectionButtons();return true;
+ render();refreshRailSectionButtons();return true;
 }
 function interludeKeysAll(){
  return sections().filter(x=>x.song===song&&x.kind==='song-section'&&/^interlude-\d+$/.test(x.sectionKey||''))
@@ -93,7 +101,7 @@ function interludeInProgress(){
   &&!disputes(x.sectionKey).length)
   .sort((a,b)=>b.start-a.start)[0]||null;
 }
-function refreshRowSectionButtons(){
+function refreshRailSectionButtons(){
  const activeInterlude=interludeInProgress(),outro=find('outro');
  const activeOutro=outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end);
  for(const button of root.querySelectorAll('[data-sync-section-action]')){
@@ -105,7 +113,7 @@ function refreshRowSectionButtons(){
   button.setAttribute('aria-label',button.textContent+'：現在の再生位置を記録');
  }
 }
-function toggleRowSection(kind){
+function toggleRailSection(kind){
  if(kind!=='interlude'&&kind!=='outro')return;
  if(!ready()){alertStatus('ログインし、音源を読み込んでから記録してください。',true);return;}
  const now=Math.round(pos()*100)/100;
@@ -113,10 +121,10 @@ function toggleRowSection(kind){
   const active=interludeInProgress();
   if(active){
    if(now<=active.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
-   if(store(active.sectionKey,{end:now},'row'))selection=active.sectionKey;
+   if(store(active.sectionKey,{end:now},'rail'))selection=active.sectionKey;
   }else{
    const key='interlude-'+(Math.max(0,...interludeKeysAll())+1);
-   if(store(key,{start:now,end:null,status:'draft',deleted:false},'row'))selection=key;
+   if(store(key,{start:now,end:null,status:'draft',deleted:false},'rail'))selection=key;
   }
   return;
  }
@@ -126,9 +134,9 @@ function toggleRowSection(kind){
  }
  if(Number.isFinite(outro?.start)){
   if(now<=outro.start){alertStatus('終了は開始時刻より後にしてください。',true);return;}
-  store('outro',{end:now},'row');
+  store('outro',{end:now},'rail');
  }else{
-  store('outro',{start:now,end:null,status:'draft',confirmedAt:null},'row');
+  store('outro',{start:now,end:null,status:'draft',confirmedAt:null},'rail');
  }
  selection='outro';
 }
@@ -255,22 +263,19 @@ $('fsExport').addEventListener('click',()=>{
  const url=URL.createObjectURL(new Blob([JSON.stringify(exported,null,2)],{type:'application/json'}));
  const a=document.createElement('a');a.href=url;a.download='FULL_SONG_TIMING_'+song+'.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);
 });
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();refreshRowSectionButtons();});
-window.addEventListener('recnote:section-row-action',e=>{
- if(e.detail?.song===song)toggleRowSection(e.detail.kind);
-});
-window.addEventListener('recnote:section-row-render',e=>{
- if(e.detail?.song===song)refreshRowSectionButtons();
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{closeSection();restoreSelection();render();refreshRailSectionButtons();});
+window.addEventListener('recnote:instrument-rail-refresh',e=>{
+ if(e.detail?.song===song)refreshRailSectionButtons();
 });
 audio.addEventListener('ended',()=>{
  const outro=find('outro'),end=Math.round(pos()*100)/100;
  if(outro&&!verified(outro)&&Number.isFinite(outro.start)&&!Number.isFinite(outro.end)&&end>outro.start)
   store('outro',{end},'audio-ended');
 });
-window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshRowSectionButtons();});
-window.addEventListener('recnote:cloud-synced',()=>{render();refreshRowSectionButtons();});
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();refreshRowSectionButtons();});
-audio.addEventListener('loadedmetadata',()=>{render();refreshRowSectionButtons();});
-window.addEventListener('focus',()=>{render();refreshRowSectionButtons();});
-restoreSelection();closeSection();render();refreshRowSectionButtons();
+window.addEventListener('recnote:timing-updated',e=>{if(e.detail?.song===song)refreshRailSectionButtons();});
+window.addEventListener('recnote:cloud-synced',()=>{render();refreshRailSectionButtons();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(!cloud.isSignedIn()){previewEnd=null;panel.hidden=true;$('fsList').replaceChildren();$('fsRecorded').textContent='';$('fsTitle').textContent='ログインしてください';}else render();refreshRailSectionButtons();});
+audio.addEventListener('loadedmetadata',()=>{render();refreshRailSectionButtons();});
+window.addEventListener('focus',()=>{render();refreshRailSectionButtons();});
+restoreSelection();closeSection();render();refreshRailSectionButtons();
 })();
