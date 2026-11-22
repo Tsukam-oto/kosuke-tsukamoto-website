@@ -383,7 +383,7 @@ async function loadLyrics(){
   const res=await bridge.read(target);if(request!==seq||song!==target)return;
   if(!res?.versions?.length){notice('この曲の歌詞原文が見つかりません。',true);return;}
   work=res.work;versions=res.versions;
-  for(const v of versions){const o=document.createElement('option');o.value=v.id;o.textContent='第'+v.version_no+'版 '+(v.text_status==='unverified_pdf_extract'?'PDF未照合':v.text_status==='author_original'?'原文':'登録版');$('syncVersion').append(o);}
+  for(const v of versions){const o=document.createElement('option');o.value=v.id;o.textContent='第'+v.version_no+'版 '+(v.text_status==='unverified_pdf_extract'?'PDF未照合':v.text_status==='author_original'?'原文':v.text_status==='author_revision'?'作者修正版':'登録版');$('syncVersion').append(o);}
   changeVersion(versions[0].id);notice('歌詞を読み込みました。');
  }catch(e){if(request===seq)notice('歌詞取得に失敗：'+e.message,true);}
 }
