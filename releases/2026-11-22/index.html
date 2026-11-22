@@ -408,7 +408,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
   display:block;white-space:nowrap;min-width:0;
 }
 .release-words:not(.secret-active) .tail-hole{display:block;width:1em;min-width:1em;height:1em;pointer-events:none}
-</style>
+</style><link rel="stylesheet" href="/assets/form-submit-feedback.css"><script src="/assets/form-submit-feedback.js" defer></script>
 </head>
 <body>
 <a class="skip" href="#main">本文へ移動</a>
@@ -482,7 +482,7 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <p class="kicker">COMMENT / MESSAGE</p>
 <h3 id="ep-message-title">EPへのひとこと</h3>
 <p>ティザーや歌詞を見た感想、応援のひとことなど。匿名で、ここから直接送れます。</p>
-<form id="ep-feedback-form" class="ep-feedback-form" action="https://formspree.io/f/xbgjraga" method="POST">
+<form id="ep-feedback-form" class="ep-feedback-form" data-ajax-feedback action="https://formspree.io/f/xbgjraga" method="POST">
 <input type="hidden" name="_subject" value="1st EP｜あなたと、これから、これからも｜感想">
 <input type="hidden" name="category" value="1st EP / 感想・メッセージ">
 <input type="hidden" name="project" value="first-ep-2026-11-22">
@@ -496,8 +496,8 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
 <label><input type="radio" name="publication" value="掲載しない" checked> 紹介しない</label>
 <label><input type="radio" name="publication" value="匿名で掲載してよい"> 内容を確認したうえで匿名で紹介してよい</label>
 </fieldset>
-<p class="ep-feedback-notice">送信内容は自動公開されません。<a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree ↗</a>を通じて受け付けます。個人情報や第三者を特定できる内容は書かないでください。送信後は受付画面で完了をご確認ください。</p>
-<button type="submit" class="ep-feedback-send">ひとことを送る →</button>
+<p class="ep-feedback-notice">送信内容は自動公開されません。<a href="https://formspree.io/legal/privacy-policy/" target="_blank" rel="noopener noreferrer">Formspree ↗</a>を通じて受け付けます。個人情報や第三者を特定できる内容は書かないでください。送信後はこのページに受付結果が表示されます。</p>
+<button type="submit" class="ep-feedback-send">ひとことを送る →</button><p class="form-feedback-status" id="ep-feedback-status" data-feedback-status role="status" aria-live="polite" aria-atomic="true" tabindex="-1"></p>
 </form>
 <a class="ep-message-other" href="/voice-box/">ほかの作品へのメッセージはVOICE BOXへ →</a>
 </article>
@@ -721,13 +721,13 @@ h2{font-size:clamp(28px,3vw,42px);font-weight:700;line-height:1.4;letter-spacing
    const media=document.createElement("div");media.className="release-teaser-player";
    if(vid){
       if(vid.shorts)media.classList.add("shorts");
-      const link=document.createElement("a");link.href=vid.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="YouTubeで見る ↗";content.append(link);
+      const link=document.createElement("a");link.href=vid.url;link.target="_blank";link.rel="noopener noreferrer";link.textContent="YouTubeで直接見る ↗";content.append(link);
       const play=document.createElement("button");play.type="button";play.textContent="▶ ティザーを再生";
       play.setAttribute("aria-label",title.textContent+"のティザーを再生");
       play.addEventListener("click",()=>{
         const frame=document.createElement("iframe");
         frame.src="https://www.youtube-nocookie.com/embed/"+vid.id+"?autoplay=1&rel=0";
-        frame.title=title.textContent+" / YouTube";frame.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share";frame.allowFullscreen=true;
+        frame.title=title.textContent+" / YouTube";frame.loading="lazy";frame.allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture; web-share";frame.allowFullscreen=true;
         media.replaceChildren(frame);
       });
       media.append(play);
