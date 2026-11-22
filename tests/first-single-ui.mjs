@@ -542,6 +542,8 @@ async function checkHomepage(browser,engine){
     assert.ok((await page.content()).includes('"これからも": "korekaramo"'),"Korekaramo LYRIC BOX link maps to published poem");
     assert.equal(await page.locator('#korekaramo').count(),0,"the song lyrics are linked from the separate lyrics page");
     assert.equal(await page.locator("#artwork-contest-topic").isVisible(),false,"no public contest announcement before November 22");
+    assert.equal(await page.locator("#news .topics-history").evaluate(el=>el.open),true,"older topics are visible if release topics are not published yet");
+    assert.ok((await page.locator("#news .topics-history").innerText()).includes("2026.10.29"),"historical news remains available");
     await context.close();
     log(engine+" homepage pre-release", "no spoiler popup");
   }
@@ -551,6 +553,12 @@ async function checkHomepage(browser,engine){
     await modal.waitFor({state:"visible"});
     assert.equal(await page.locator("#first-single-topic").isVisible(),true);
     assert.equal(await page.locator("#artwork-contest-topic").isVisible(),true,"artwork contest public on November 22");
+    assert.equal(await page.locator("#news .topics-history").evaluate(el=>el.open),false,"older news is collapsed after EP announcement");
+    assert.deepEqual(await page.locator("#news > .wrap > .news-list > .news-item").evaluateAll(els=>els.map(el=>el.id)),["first-single-topic","special-thanks-ep-topic","artwork-contest-topic"],"top-level topics show only three current announcements");
+    assert.ok((await page.locator("#news .topics-history").textContent()).includes("2026.10.29"),"October archive is retained");
+    await page.locator("#news .topics-history summary").click();
+    assert.equal(await page.locator("#news .topics-history").evaluate(el=>el.open),true,"archive is accessible by click or keyboard");
+    await page.locator("#news .topics-history summary").click();
     assert.equal(await page.locator(".release-announcement-topline .date").innerText(),"ANNOUNCED / 2026.11.22");
     assert.ok((await modal.innerText()).includes("配信開始日は後日発表します"));
     assert.equal(await page.locator(".release-announcement-content h2").innerText(),"配信決定。");
