@@ -597,6 +597,27 @@ async function checkHomepage(browser,engine){
     await compact.context.close();
     log(engine+" homepage announcement", "first visit only; permanent CTA; 320px keyboard and compact viewport; mobile + desktop screenshots");
   }
+  {
+    // From November 23 onwards the EP hero stays visible, without a repeated
+    // countdown announcement or an automatic full-screen launch modal.
+    for(const width of [320,390,1440]){
+      const {context,page}=await freshWithDate("2026-11-23T12:00:00+09:00",width);
+      assert.equal(await page.locator(".home-ep-launch").isVisible(),true,"EP spotlight remains the single launch announcement");
+      assert.equal(await page.locator("#countdown").isVisible(),false,"post-launch countdown duplicate stays hidden");
+      assert.equal(await page.locator("#first-single-announcement").isVisible(),false,"no automatic launch popup after the announcement day");
+      assert.equal(await page.locator("#first-single-topic").isVisible(),true,"November 22 news remains accessible in TOPICS");
+      assert.equal(await page.locator(".home-ep-launch-primary").isVisible(),true,"permanent EP detail link is visible");
+      const bounds=await page.evaluate(()=>({scroll:document.documentElement.scrollWidth,client:document.documentElement.clientWidth}));
+      assert.ok(bounds.scroll<=bounds.client+1.5,"home must not scroll horizontally at "+width+"px");
+      if(width<=390){
+        const buttons=await page.locator(".home-ep-launch-actions a").evaluateAll(els=>els.map(el=>({height:el.getBoundingClientRect().height,width:el.getBoundingClientRect().width})));
+        assert.ok(buttons.every(box=>box.height>=44),"mobile release actions must be 44px or taller at "+width+"px");
+      }
+      if(width===390)await page.screenshot({path:output+"/"+engine+"-homepage-post-launch-390.png",animations:"disabled"});
+      await context.close();
+    }
+    log(engine+" homepage after launch", "one EP spotlight; no repeat modal/countdown; 320/390/1440 responsive");
+  }
 }
 
 async function checkReleaseMetadata(browser,engine){
