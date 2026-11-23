@@ -1,0 +1,52 @@
+{
+  "id": "first-single-2026-11-22",
+  "display": {
+    "eyebrow": "KOSUKE TSUKAMOTO / 1ST SINGLE",
+    "headline": "配信決定。",
+    "title": "あなたと、これから、これからも",
+    "artist": "束元康介",
+    "primaryCta": "特設ページを見る",
+    "teaserLabel": "TEASER",
+    "teaserPending": "イントロ映像は公開準備中"
+  },
+  "schedule": {
+    "announcementDateTokyo": "2026-11-22",
+    "autoPopupUntilTokyo": "2026-11-29",
+    "showOncePerVisitor": true
+  },
+  "links": {
+    "specialPagePath": "/releases/2026-11-22/",
+    "youtubeChannel": "https://www.youtube.com/channel/UC3mLzMQottVyAoX3goOAouA",
+    "teaserVideoUrl": null,
+    "streamingUrls": []
+  },
+  "artwork": {
+    "originalArtworkPlanned": true,
+    "artworkPath": null,
+    "reuseForSoloKorekaramoDesired": true,
+    "distributionReuseApprovalPending": true
+  },
+  "publish": {
+    "ready": false,
+    "announcementApproved": false,
+    "artworkApproved": false,
+    "masterPreviewApproved": false,
+    "specialPageExists": false,
+    "teaserPublished": false
+  },
+  "singleCuts": [
+    {
+      "title": "あなたと",
+      "artwork": "public-call-planned"
+    },
+    {
+      "title": "これから",
+      "artwork": "public-call-planned"
+    },
+    {
+      "title": "これからも",
+      "artwork": "reuse-original-artwork-requested-check-distributor"
+    }
+  ],
+  "notes": "11月22日は配信決定の発表日であり配信開始日ではない。ポップアップでは説明過多な注釈を置かず、詳細は特設ページに記載する。すべてreadyになるまで本番有効化しない。"
+}
