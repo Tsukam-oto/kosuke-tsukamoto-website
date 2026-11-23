@@ -472,3 +472,118 @@ body.syncPage #syncStudio #syncContextEditor>.syncFineTune[open]>summary{
 body.syncPage #syncStudio #syncContextEditor>.syncFineTune[open] #syncCloseEdit{
  position:static!important;top:auto!important;float:none!important;margin:8px 10px!important;
 }
+
+
+/* REC NOTE v18.3: SINGLE reading order; selected row expands in place.
+   Previous two-column / fixed-footer rules intentionally overridden. */
+body.syncPage #syncStudio{
+ display:block!important;max-width:900px!important;width:100%!important;
+ grid-template-columns:none!important;column-gap:0!important;
+ padding:0 15px 80px!important;min-height:100dvh!important;
+}
+body.syncPage #syncStudio #syncLines{
+ display:block!important;grid-column:auto!important;grid-row:auto!important;
+ max-height:none!important;min-height:0!important;height:auto!important;
+ overflow:visible!important;overscroll-behavior:auto!important;
+ padding:0!important;margin:10px 0 12px!important;
+}
+body.syncPage #syncStudio #syncLines>.syncLine{
+ scroll-margin-top:150px!important;position:relative!important;z-index:0;
+}
+body.syncPage #syncStudio #syncLines>.syncLine.selected{
+ background:#e9f0f6!important;border-left:3px solid #4b7b9a!important;
+ border-bottom-left-radius:0!important;border-bottom-right-radius:0!important;
+}
+body.syncPage #syncStudio #syncLines>#syncContextEditor{
+ display:block;grid-column:auto!important;grid-row:auto!important;
+ position:static!important;top:auto!important;bottom:auto!important;
+ left:auto!important;right:auto!important;transform:none!important;
+ width:100%!important;max-width:none!important;min-width:0!important;
+ max-height:none!important;height:auto!important;overflow:visible!important;
+ overscroll-behavior:auto!important;z-index:auto!important;
+ padding:13px 15px 17px!important;margin:0 0 16px!important;
+ border:1px solid #bbd0df!important;border-top:0!important;
+ border-radius:0 0 14px 14px!important;background:#f8fafc!important;
+ box-shadow:0 6px 24px rgba(33,69,92,.07)!important;
+ scroll-margin-top:110px!important;
+}
+body.syncPage #syncStudio #syncLines>#syncContextEditor[hidden]{display:none!important}
+#syncStudio .syncContextNavigation{
+ display:flex;align-items:center;justify-content:space-between;gap:8px;
+ flex-wrap:wrap;margin:0 0 12px;min-height:38px;
+}
+#syncStudio .syncContextNavigation strong{color:#385b72;font-size:13px}
+#syncStudio .syncContextNavigation>div{display:flex;flex-wrap:wrap;gap:6px}
+#syncStudio .syncContextNavigation button{
+ min-height:35px!important;font-size:12px!important;padding:7px 10px!important;
+ background:#fff!important;border-color:#c9d5e0!important;
+}
+body.syncPage #syncStudio #syncLines>#syncContextEditor>.syncDock{
+ display:grid!important;position:static!important;top:auto!important;bottom:auto!important;
+ left:auto!important;right:auto!important;transform:none!important;z-index:auto!important;
+ width:100%!important;margin:0 0 12px!important;padding:9px 8px!important;
+ grid-template-columns:minmax(0,1fr) 40px 45px minmax(135px,1fr)!important;
+ gap:6px!important;
+}
+body.syncPage #syncStudio #syncLines>#syncContextEditor>.syncFineTune[open]{
+ position:static!important;top:auto!important;bottom:auto!important;left:auto!important;
+ transform:none!important;width:100%!important;max-height:none!important;
+ overflow:visible!important;box-shadow:none!important;border-radius:11px!important;
+}
+body.syncPage #syncStudio #syncInstrumentRail:not([hidden]){
+ display:grid!important;position:static!important;
+ top:auto!important;bottom:auto!important;left:auto!important;right:auto!important;
+ transform:none!important;width:100%!important;height:auto!important;
+ z-index:auto!important;max-width:none!important;
+ grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:7px!important;padding:12px!important;margin:9px 0 16px!important;
+ box-shadow:none!important;background:#fdfcfb!important;
+}
+body.syncPage #syncStudio #syncInstrumentRail strong,
+body.syncPage #syncStudio #syncInstrumentRail small{
+ display:block!important;grid-column:1 / -1!important;margin:0!important;
+}
+body.syncPage #syncStudio #syncInstrumentRail button{
+ width:100%!important;min-width:0!important;min-height:40px!important;
+ padding:8px 6px!important;font-size:12px!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer{
+ padding:7px 12px 8px!important;border-radius:0 0 11px 11px!important;
+ box-shadow:0 3px 12px rgba(23,28,34,.1)!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer .syncSongHead{display:none!important}
+body.syncPage #syncStudio.syncScrolled .syncPlayer .syncTime strong{
+ font-size:18px!important;line-height:1.15!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer .syncTime{
+ margin:0 0 2px!important;padding:0!important;min-height:0!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer .syncTransport{
+ margin:3px 0 0!important;gap:6px!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer .syncTransport button{
+ min-height:34px!important;padding:5px 9px!important;font-size:12px!important;
+}
+body.syncPage #syncStudio.syncScrolled .syncPlayer #syncSlider{margin:3px 0!important}
+@media(max-width:600px){
+ body.syncPage #syncStudio{padding:0 9px 80px!important}
+ body.syncPage #syncStudio #syncLines>#syncContextEditor{padding:10px 9px 14px!important}
+ body.syncPage #syncStudio #syncLines>#syncContextEditor>.syncDock{
+  grid-template-columns:minmax(0,1fr) 35px 40px minmax(102px,1fr)!important;
+  gap:4px!important;padding:7px 5px!important;
+ }
+ #syncStudio .syncContextNavigation button{min-height:32px!important;padding:6px 7px!important}
+}
+
+
+/* Existing disabled/loading states still take priority over the static rail. */
+body.syncPage #syncStudio:not(.syncReady) #syncInstrumentRail,
+body.syncPage #syncStudio.syncNeedsLogin #syncInstrumentRail,
+body.syncPage #syncStudio.syncNeedsAudio #syncInstrumentRail,
+body.syncPage #syncStudio.syncInlineSectionActive #syncInstrumentRail{
+ display:none!important;
+}
+body.syncPage #syncStudio.syncNeedsLogin #syncContextEditor,
+body.syncPage #syncStudio.syncNeedsAudio #syncContextEditor{
+ display:none!important;
+}

@@ -5,7 +5,7 @@
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
-document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v18.2';
+document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v18.3';
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
@@ -96,9 +96,19 @@ function refreshInline(){
  $('syncInlineNote').textContent=text!==(lines[selected]??'')?'この行には修正案があります。正式版への反映はまだです。':'表示上の分割・改行は、すぐ下で調整できます。';
 }
 function mountInline(){
- if(!work||!version||selected<0)return;
+ // One edit surface directly BELOW the selected lyric. Never leave stale editing
+ // controls in a distant sidebar; moving this node keeps all input events intact.
+ if(!work||!version||selected<0){contextHost.hidden=true;return;}
  const node=$('syncLines').querySelector('[data-line="'+selected+'"]');
- if(node){if(inlinePanel.parentNode!==contextHost)contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
+ if(!node){contextHost.hidden=true;return;}
+ if(node.nextElementSibling!==contextHost)node.after(contextHost);
+ contextHost.hidden=false;
+ const visibleRows=rows();
+ const offset=visibleRows.findIndex(row=>row.i===selected);
+ $('syncContextPosition').textContent='編集する歌詞 '+(offset+1)+' / '+visibleRows.length;
+ $('syncContextPrev').disabled=offset<=0;
+ $('syncContextNext').disabled=offset>=visibleRows.length-1;
+ refreshInline();
 }
 function saveInline(announce){
  const c=window.RECNOTE_LYRIC_WORKBENCH;if(!c||selected<0||!version)return false;
@@ -132,8 +142,23 @@ $('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);in
 
 const contextHost=document.createElement('aside');contextHost.id='syncContextEditor';contextHost.className='syncContextEditor';contextHost.setAttribute('aria-label','選択した歌詞の編集');
 root.insertBefore(contextHost,$('syncLines').nextSibling);
-// Move the recording footer inside the editing workspace; it must not hide final lyrics.
-contextHost.append(root.querySelector('.syncDock'),inlinePanel,displayEdit,quickEdit,review,adjust);
+contextHost.hidden=true;
+// Reuse the existing timing, text and display editors as ONE selected-row card.
+const contextNavigation=document.createElement('nav');contextNavigation.className='syncContextNavigation';
+contextNavigation.setAttribute('aria-label','選択中の歌詞を移動');
+contextNavigation.innerHTML='<strong id="syncContextPosition">編集する歌詞</strong><div><button type="button" id="syncContextPrev">前の行</button><button type="button" id="syncContextNext">次の行</button><button type="button" id="syncContextClose">閉じる</button></div>';
+contextHost.append(contextNavigation,root.querySelector('.syncDock'),inlinePanel,displayEdit,quickEdit,review,adjust);
+for(const [name,direction] of [['syncContextPrev',-1],['syncContextNext',1]]){
+ $(name).addEventListener('click',()=>{
+  const list=rows(),position=list.findIndex(row=>row.i===selected);
+  const next=list[position+direction];
+  if(next){choose(next.i,false,false);requestAnimationFrame(()=>contextHost.scrollIntoView({block:'nearest',behavior:'smooth'}));}
+ });
+}
+$('syncContextClose').addEventListener('click',()=>{
+ if(inlineDirty){clearTimeout(inlineTimer);saveInline(false);}
+ contextHost.hidden=true;
+});
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
@@ -283,7 +308,12 @@ function saveRecord(i,patch){
 function renderRows(){
  if(inlineDirty&&selected>=0){clearTimeout(inlineTimer);saveInline(false);}
  dispRender();
- const view=$('syncLines'),position=view.scrollTop;view.replaceChildren();
+ // Rebuilding status rows must not discard a textarea's cursor or keyboard focus.
+ const focusNode=document.activeElement;
+ const focusInEditor=!!focusNode&&contextHost.contains(focusNode);
+ let caret=null;
+ if(focusInEditor){try{caret=[focusNode.selectionStart,focusNode.selectionEnd];}catch(_e){}}
+ const view=$('syncLines');view.replaceChildren();
  let begin=0,end=0,done=0;const data=rows();
  for(let n=0;n<data.length;n++){
   const x=data[n],t=x.time;
@@ -294,11 +324,18 @@ function renderRows(){
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
   const time=document.createElement('span');time.className='syncLineStamp';const suggested=started(t)&&!Number.isFinite(t?.end)?candidateEnd(x.i):null;time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+(Number.isFinite(suggested)?' → '+timestamp(suggested)+'（自動候補）':' / 終了未設定'):'未記録';
   b.append(number,content,time);
-  b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));if(window.innerWidth<=850)contextHost.scrollIntoView({block:'start',behavior:'smooth'});});
+  b.addEventListener('click',()=>{
+   choose(x.i,false,false);
+   if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));
+   requestAnimationFrame(()=>contextHost.scrollIntoView({block:'nearest',behavior:'smooth'}));
+  });
   view.append(b);
  }
  mountInline();
- view.scrollTop=position;
+ if(focusInEditor&&focusNode?.isConnected&&typeof focusNode.focus==='function'){
+  focusNode.focus({preventScroll:true});
+  if(caret&&Number.isInteger(caret[0]))try{focusNode.setSelectionRange(caret[0],caret[1]);}catch(_e){}
+ }
  window.dispatchEvent(new CustomEvent('recnote:instrument-rail-refresh',{detail:{song}}));
  $('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
  $('syncBreakdown').textContent='開始 '+begin+'・終了 '+end+'・確認済み '+done;
@@ -702,5 +739,10 @@ if(typeof MutationObserver==='function'){
 }
 const incomingSong=new URLSearchParams(location.search).get('song');if(incomingSong&&typeof SONGS!=='undefined'&&SONGS.includes(incomingSong)&&incomingSong!==song)setSong(incomingSong);
 window.addEventListener('pagehide',()=>{if(inlineDirty)saveInline(false);});
+// Keep the playback transport available without occupying half the screen
+// while scrolling through 40+ lyric lines.
+function updateCompactPlayer(){root.classList.toggle('syncScrolled',window.scrollY>260);}
+window.addEventListener('scroll',updateCompactPlayer,{passive:true});
+updateCompactPlayer();
 clock();loadLyrics();
 })();
