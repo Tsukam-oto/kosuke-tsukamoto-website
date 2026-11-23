@@ -69,6 +69,15 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'song-structure-studio.js'),'u
  assert.equal($('ssName').value,'Aメロ1候補');
  assert.ok($('ssDerivedTime').textContent.includes('自動取得：'));
  assert.ok($('ssFirstLyric').value!==''&&$('ssLastLyric').value!=='');
+ const lyricStart=+$('ssFirstLyric').value;
+ const endBefore=+$('ssLastLyric').value;
+ $('ssLastLyric').value=String(endBefore+1);
+ for(const listener of $('ssLastLyric').listeners.change||[])listener();
+ assert.ok($('ssDerivedTime').textContent.includes('自動取得：'),'Changing a lyric must recalculate time');
+ $('ssSave').click();
+ const savedRegion=payload.lyricTimings.find(x=>x.kind==='music-structure'&&x.label==='Aメロ1候補');
+ assert.equal(savedRegion.startLyricIndex,lyricStart);
+ assert.equal(savedRegion.endLyricIndex,endBefore+1);
  $('ssApprove').click();
  assert.equal(payload.lyricTimings.filter(x=>x.kind==='music-structure'&&x.status==='confirmed').length,1);
  $('ssMakeShort').click();
