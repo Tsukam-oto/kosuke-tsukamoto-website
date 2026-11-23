@@ -75,7 +75,10 @@ function saveDraft(state,work,version,text){
  const key=draftKey(work.id,version.id);
  if(Object.keys(state.drafts||{}).some(k=>k.startsWith(key+'__local_')))throw Error('クラウド同期の競合があります。別端末の変更を確認してください。');
  state.drafts=state.drafts&&typeof state.drafts==='object'?state.drafts:{};
- const v={schema:1,sourceVersionId:version.id,baseText:version.literal_text,text:normalize(text),updatedAt:new Date().toISOString()};
+ const previous=state.drafts[key];
+ const v={schema:1,sourceVersionId:version.id,baseText:version.literal_text,text:normalize(text),
+  displayBreaks:previous?.sourceVersionId===version.id&&previous?.baseText===version.literal_text&&previous.displayBreaks&&typeof previous.displayBreaks==='object'?JSON.parse(JSON.stringify(previous.displayBreaks)):{},
+  updatedAt:new Date().toISOString()};
  state.drafts[key]=v;return v;
 }
 global.RECNOTE_LYRIC_WORKBENCH=Object.freeze({normalize,lines,mapping,validation,transfer,previewMigration,draftKey,displayKey,fetchDraft,saveDraft});
