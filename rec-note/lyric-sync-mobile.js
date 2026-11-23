@@ -5,7 +5,7 @@
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
-document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v17';
+document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v18.2';
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
@@ -132,7 +132,8 @@ $('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);in
 
 const contextHost=document.createElement('aside');contextHost.id='syncContextEditor';contextHost.className='syncContextEditor';contextHost.setAttribute('aria-label','選択した歌詞の編集');
 root.insertBefore(contextHost,$('syncLines').nextSibling);
-contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);
+// Move the recording footer inside the editing workspace; it must not hide final lyrics.
+contextHost.append(root.querySelector('.syncDock'),inlinePanel,displayEdit,quickEdit,review,adjust);
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
@@ -491,9 +492,13 @@ const dispUndo=[];let dispLast=-100;
 function dispKey(i){return 'lyric-display-v1:'+work.id+':'+version.id+':'+i;}
 function dispConflict(i){const p=dispKey(i)+'__local_';return Object.keys(state.drafts||{}).some(k=>k.startsWith(p));}
 function dispPlan(i){
- const x=state.drafts?.[dispKey(i)];
- if(!x||x.source!==lines[i]||!Array.isArray(x.splits)||!Array.isArray(x.breaks))return {splits:[],breaks:[],join:false};
- return {splits:x.splits.map(a=>({pos:a.pos,time:Number.isFinite(a.time)?a.time:null})),breaks:x.breaks.slice(),join:!!x.join};
+ const x=state.drafts?.[dispKey(i)],src=lines[i]||'',layout=window.RECNOTE_LYRIC_LAYOUT;
+ const approved=layout?.suggestions(song,src)||[];
+ if(!x||x.source!==src||!Array.isArray(x.splits)||!Array.isArray(x.breaks))
+  return {splits:[],breaks:approved,join:false,mode:approved.length?'v04':'single'};
+ const choice=layout?.resolve(song,src,x);
+ return {splits:x.splits.map(a=>({pos:a.pos,time:Number.isFinite(a.time)?a.time:null})),
+  breaks:choice?.breaks||x.breaks.slice(),join:!!x.join,mode:choice?.source||'manual'};
 }
 function dispMessage(text,bad=false){$('syncDisplayStatus').textContent=text;$('syncDisplayStatus').dataset.error=bad?'yes':'no';if(bad)notice(text,true);}
 function dispSave(i,x){
@@ -506,7 +511,7 @@ function dispSave(i,x){
  for(const v of sorted){if(v.time!==null&&(!Number.isFinite(v.time)||v.time<0||(previous!==null&&v.time<=previous)||(Number.isFinite(time?.end)&&v.time>=time.end))){dispMessage('分割の開始時刻が前後の時刻と矛盾しています。',true);return false;}if(v.time!==null)previous=v.time;}
  const key=dispKey(i);dispUndo.push({key,old:state.drafts?.[key]??null});if(dispUndo.length>30)dispUndo.shift();
  if(!state.drafts||typeof state.drafts!=='object')state.drafts={};
- state.drafts[key]={schema:1,source:lines[i],splits:sorted,breaks:x.breaks.slice().sort((a,b)=>a-b),join:!!x.join,updatedAt:new Date().toISOString()};
+ state.drafts[key]={schema:1,source:lines[i],splits:sorted,breaks:x.breaks.slice().sort((a,b)=>a-b),join:!!x.join,mode:x.mode==='single'?'single':'manual',updatedAt:new Date().toISOString()};
  persist();saveBadgeStatus('表示を端末保存 · 同期待ち','pending');dispRender();
  window.dispatchEvent(new CustomEvent('recnote:display-updated',{detail:{song}}));return true;
 }
@@ -572,7 +577,9 @@ function dispRender(){
    head.append(inp,save,now,remove);
   }
   const preview=document.createElement('div');preview.className='vertical';
-  for(const col of u.columns){const span=document.createElement('span');span.textContent=col;preview.append(span);}
+  const layout=window.RECNOTE_LYRIC_LAYOUT;
+  if(layout){let p=0;const cuts=[];for(const col of u.columns.slice(0,-1)){p+=col.length;cuts.push(p);}layout.render(preview,u.text,cuts);}
+  else for(const col of u.columns){const span=document.createElement('span');span.textContent=col;preview.append(span);}
   box.append(head,preview);container.append(box);
  }
  if(dispConflict(i))dispMessage('別端末の表示データに競合があります。編集前に確認してください。',true);

@@ -386,3 +386,89 @@ body.syncPage #syncStudio{display:grid!important;grid-template-columns:minmax(0,
  #syncStudio #syncContextEditor{grid-column:1;position:static;max-height:none;overflow:visible;
   padding:9px;margin:12px 0 18px;scroll-margin-top:12px}
 }
+
+/* v18.1: identical vertical column logic in timing editor. */
+#syncStudio #syncDisplayResults .vertical{
+ writing-mode:horizontal-tb!important;display:flex!important;flex-direction:row!important;
+ direction:rtl!important;align-items:flex-start!important;justify-content:center!important;
+ gap:10px!important;width:min(100%,265px)!important;aspect-ratio:9 / 16!important;
+ min-height:0!important;height:auto!important;max-height:none!important;
+ margin:11px auto!important;padding:41px 14px!important;box-sizing:border-box!important;
+ overflow:visible!important;font-size:var(--lyric-font-size,21px)!important;
+ line-height:1.38!important;text-align:start!important;
+}
+#syncStudio #syncDisplayResults .vertical>.lyricVerticalColumn{
+ display:block!important;flex:0 0 auto!important;writing-mode:vertical-rl!important;
+ white-space:pre!important;word-break:keep-all!important;overflow-wrap:normal!important;
+ height:max-content!important;max-height:none!important;align-self:flex-start!important;
+ direction:ltr!important;line-height:1.38!important;letter-spacing:.035em!important;
+}
+@media(max-width:500px){#syncStudio #syncDisplayResults .vertical{width:min(100%,245px)!important}}
+
+
+/* v18.2 usability: no bottom overlay, no clipped final lyric.
+   The recording button stays in the right editing workspace. */
+body.syncPage #syncStudio #syncContextEditor>.syncDock{
+ position:sticky!important;top:0!important;bottom:auto!important;left:auto!important;
+ right:auto!important;transform:none!important;z-index:8!important;box-sizing:border-box!important;
+ width:100%!important;margin:0 0 14px!important;padding:9px 8px!important;
+ background:#fffdfb!important;border:1px solid #d7e0e7!important;border-radius:10px!important;
+ box-shadow:0 4px 14px rgba(27,48,66,.08)!important;
+ grid-template-columns:minmax(0,1fr) 38px 41px minmax(112px,1fr)!important;gap:5px!important;
+}
+body.syncPage #syncStudio #syncContextEditor>.syncDock button{
+ min-height:43px!important;font-size:12px!important;padding:7px 5px!important;
+}
+body.syncPage #syncStudio #syncContextEditor>.syncDock #syncDockEdit{
+ min-height:43px!important;font-size:11px!important;
+}
+body.syncPage #syncStudio #syncContextEditor>.syncDock strong{font-size:12px!important}
+body.syncPage #syncStudio #syncContextEditor>.syncDock small{font-size:10px!important}
+@media(min-width:901px){
+ /* One document scrollbar for lyric rows; all 38+ rows reachable. */
+ body.syncPage #syncStudio #syncLines{
+  max-height:none!important;min-height:0!important;height:auto!important;
+  overflow:visible!important;overscroll-behavior:auto!important;
+  padding-bottom:28px!important;scroll-margin-bottom:28px!important;
+ }
+ body.syncPage #syncStudio #syncContextEditor{
+  position:sticky!important;top:10px!important;
+  max-height:calc(100dvh - 20px)!important;overflow-y:auto!important;
+ }
+}
+@media(max-width:900px){
+ /* Smaller devices: list scrolls independently with a safe tail. */
+ body.syncPage #syncStudio #syncLines{
+  max-height:min(54dvh,490px)!important;overflow-y:auto!important;overflow-x:hidden!important;
+  padding-bottom:110px!important;scroll-padding-bottom:110px!important;
+  overscroll-behavior-y:contain!important;scrollbar-gutter:stable;
+ }
+ body.syncPage #syncStudio #syncContextEditor{
+  max-height:none!important;overflow:visible!important;
+ }
+ body.syncPage #syncStudio #syncContextEditor>.syncDock{
+  position:static!important;top:auto!important;
+ }
+}
+@media(max-width:480px){
+ body.syncPage #syncStudio #syncContextEditor>.syncDock{
+  grid-template-columns:minmax(0,1fr) 34px 37px minmax(92px,1fr)!important;
+  padding:7px 6px!important;
+ }
+}
+
+/* v18.2: the old timing correction bottom sheet must also stay in the editor.
+   Otherwise it can cover the last lyric even after moving the record toolbar. */
+body.syncPage #syncStudio #syncContextEditor>.syncFineTune[open]{
+ position:static!important;left:auto!important;right:auto!important;top:auto!important;
+ bottom:auto!important;transform:none!important;width:100%!important;
+ max-height:none!important;height:auto!important;overflow:visible!important;
+ z-index:auto!important;box-shadow:none!important;border-radius:11px!important;
+ padding:0 0 10px!important;margin:10px 0!important;
+}
+body.syncPage #syncStudio #syncContextEditor>.syncFineTune[open]>summary{
+ position:static!important;top:auto!important;
+}
+body.syncPage #syncStudio #syncContextEditor>.syncFineTune[open] #syncCloseEdit{
+ position:static!important;top:auto!important;float:none!important;margin:8px 10px!important;
+}

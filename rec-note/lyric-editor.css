@@ -77,3 +77,24 @@ body.lyricEditorPage > :not(#lyricEditorApp){display:none!important}
 
 /* Real vertical-rl columns must advance right-to-left and share the same top. */
 #lyricEditorApp .leVertical{flex-direction:column;align-items:flex-start;justify-content:center}
+
+/* v18.1 semantic preview: portrait canvas, columns only at explicit Japanese phrase breaks.
+   Do not allow browser's auto column overflow to cut kana or words. */
+#lyricEditorApp .leVertical{
+ writing-mode:horizontal-tb!important;display:flex!important;flex-direction:row!important;
+ direction:rtl!important;align-items:flex-start!important;justify-content:center!important;
+ gap:12px!important;width:min(100%,300px)!important;aspect-ratio:9 / 16!important;
+ height:auto!important;max-height:none!important;min-height:0!important;
+ margin:15px auto!important;padding:52px 17px!important;box-sizing:border-box!important;
+ overflow:visible!important;font-size:var(--lyric-font-size,22px)!important;
+ line-height:1.38!important;text-align:start!important;
+ border:1px solid rgba(255,255,255,.10);box-shadow:0 9px 29px #261a2030;
+}
+#lyricEditorApp .leVertical>.lyricVerticalColumn{
+ display:block!important;flex:0 0 auto!important;writing-mode:vertical-rl!important;
+ text-orientation:mixed!important;white-space:pre!important;word-break:keep-all!important;
+ overflow-wrap:normal!important;height:max-content!important;min-height:0!important;
+ max-height:none!important;align-self:flex-start!important;direction:ltr!important;
+ line-height:1.38!important;letter-spacing:.035em!important;
+}
+@media(max-width:500px){#lyricEditorApp .leVertical{width:min(100%,260px)!important;padding:38px 14px!important;gap:10px!important}}
