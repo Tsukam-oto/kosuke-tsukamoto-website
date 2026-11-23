@@ -128,6 +128,7 @@ function buildLyricContext(song,read,records,duration){
 }
 function rangeFromLyrics(ctx,first,last){
  if(!ctx?.cues?.length)return {start:null,end:null,issue:'歌詞タイミングを取得できていません。'};
+ if(!Number.isInteger(first)||!Number.isInteger(last))return {start:null,end:null,issue:'開始する歌詞と最後の歌詞を選択してください。'};
  const a=ctx.cues.find(x=>x.index===Number(first)),b=ctx.cues.find(x=>x.index===Number(last));
  if(!a||!b||a.index>b.index)return {start:null,end:null,issue:'開始・最後の歌詞を正しく選択してください。'};
  if(a.conflict||b.conflict)return {start:null,end:null,issue:'歌詞のタイミングにクラウド競合があります。'};
@@ -161,8 +162,12 @@ function linkInterval(record,ctx){
 function anchorFromApproximation(ctx,start,end){
  const available=ctx?.cues?.filter(x=>Number.isFinite(x.start))||[];
  if(!available.length||!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return null;
- const first=available.find(x=>x.start>=start-.2)||available.at(-1);
+ const first=available.find(x=>x.start>=start-.2);
+ // A proposal outside the available lyric timing coverage must not be silently linked
+ // to the last verse or to unrelated material.
+ if(!first||Math.abs(first.start-start)>12)return null;
  const last=available.filter(x=>x.index>=first.index&&x.start<end-.01).at(-1)||first;
+ if(last.start>end+0.05)return null;
  const range=rangeFromLyrics(ctx,first.index,last.index);
  if(range.issue)return null;
  return {startLyricIndex:first.index,endLyricIndex:last.index,lyricVersionId:ctx.versionId,
