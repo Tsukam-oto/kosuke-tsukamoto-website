@@ -70,6 +70,66 @@ displayEdit.innerHTML='<summary>歌詞の分割・結合・改行</summary><p>�
 root.insertBefore(displayEdit,$('syncFineTune'));
 const extraStyle=document.createElement('style');extraStyle.textContent='.syncTimingPanel{background:#fff;border:1px solid #dce3eb;padding:10px 12px;border-radius:12px;margin:12px 0}.syncTimingPanel summary{font-weight:700;color:#15538b;padding:7px;cursor:pointer}.syncTimingPanel p{font-size:12px;color:#566476}.syncDisplayFields,.syncDisplayActions,#syncTimingButtons>div{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:9px 0}.syncDisplayFields label{font-size:12px;flex:1;min-width:128px}.syncDisplayFields input,.syncDisplayFields select{display:block;padding:7px;border:1px solid #cfd6e1;border-radius:7px;width:100%}.syncDisplayActions button,#syncTimingButtons button,#syncDisplayResults button{font-size:12px;min-height:32px;padding:5px 8px}#syncDisplaySource{white-space:pre-wrap;background:#f4f6f8;padding:10px;border-radius:8px}#syncDisplayResults>article{background:#f6f8fa;border:1px solid #e3e7eb;padding:9px;border-radius:9px;margin:9px 0}#syncDisplayResults .vertical{writing-mode:vertical-rl;text-orientation:mixed;display:flex;gap:14px;background:#292832;color:#f5f1ea;max-height:240px;min-height:90px;padding:15px;margin-top:7px;overflow:auto;line-height:1.9}#syncDisplayResults .vertical span{display:block}#syncDisplayResults input{max-width:115px;padding:6px;margin:5px;border:1px solid #d0d7e2;border-radius:7px}#syncDisplayStatus[data-error="yes"]{color:#b72b2b}';document.head.append(extraStyle);
 
+
+// v18 inline editing, mounted immediately after selected lyric row.
+const inlinePanel=document.createElement('section');inlinePanel.id='syncInlineEdit';inlinePanel.className='syncInlineEdit';
+inlinePanel.innerHTML='<div class="syncInlineHeading"><strong>選択中の歌詞を整える</strong><a id="syncInlineFull" href="./lyric-editor">専用ページで編集</a></div><label>歌詞の誤字・言葉を修正<textarea id="syncInlineSource" rows="2" spellcheck="false"></textarea></label><div class="syncInlineActions"><button id="syncInlineSave" type="button">修正案を保存</button><button id="syncInlineCommit" type="button">正式歌詞へ反映</button><button id="syncInlineOriginal" type="button">この行を元に戻す</button></div><p id="syncInlineNote">ここで編集した文字は、正式保存まで原文を変更しません。</p>';
+root.insertBefore(inlinePanel,$('syncLines').nextSibling);
+const navToEditor=document.createElement('a');navToEditor.className='syncEditorNav';navToEditor.id='syncEditorNav';navToEditor.textContent='歌詞の編集・改行';navToEditor.href='./lyric-editor';
+root.querySelector('.syncHeading').append(navToEditor);
+let inlineTimer=0;
+function inlineProposed(){
+ const c=window.RECNOTE_LYRIC_WORKBENCH;
+ const d=work&&version?c?.fetchDraft(state,work,version):null;
+ return d?c.lines(d.text):lines.slice();
+}
+function refreshInline(){
+ if(!work||!version||selected<0){inlinePanel.hidden=true;return;}
+ inlinePanel.hidden=false;
+ const text=inlineProposed()[selected]??lines[selected]??'',input=$('syncInlineSource');
+ if(document.activeElement!==input)input.value=text;
+ const params=new URLSearchParams({song,line:String(selected)});
+ $('syncInlineFull').href='./lyric-editor?'+params.toString();
+ navToEditor.href='./lyric-editor?'+new URLSearchParams({song}).toString();
+ $('syncInlineCommit').disabled=version.id!==versions[0]?.id||inlineProposed().join('\n')===version.literal_text;
+ $('syncInlineOriginal').disabled=text===(lines[selected]??'');
+ $('syncInlineNote').textContent=text!==(lines[selected]??'')?'この行には修正案があります。正式版への反映はまだです。':'表示上の分割・改行は、すぐ下で調整できます。';
+}
+function mountInline(){
+ if(!work||!version||selected<0)return;
+ const node=$('syncLines').querySelector('[data-line="'+selected+'"]');
+ if(node){node.after(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
+}
+function saveInline(announce){
+ const c=window.RECNOTE_LYRIC_WORKBENCH;if(!c||selected<0||!version)return false;
+ const draft=inlineProposed();
+ if(draft.length!==lines.length){notice('行数が変わった下書きは専用ページで続けて編集してください。',true);return false;}
+ draft[selected]=$('syncInlineSource').value;
+ try{c.saveDraft(state,work,version,draft.join('\n'));persist();saveBadgeStatus('歌詞修正案を保存 · クラウド同期待ち','pending');refreshInline();if(announce)notice('歌詞の修正案を保存しました。');return true;}
+ catch(e){notice(e.message,true);return false;}
+}
+async function publishInline(){
+ const c=window.RECNOTE_LYRIC_WORKBENCH;
+ if(!bridge.writeRevision||!c||!saveInline(false))return;
+ const d=c.fetchDraft(state,work,version);if(!d||d.text===version.literal_text)return;
+ if(!confirm('修正した歌詞を新しい正式版として保存しますか？ 古い歌詞と時刻は残ります。変更行の時刻は確認待ちになります。'))return;
+ const from=version,w=work,oldSong=song,idx=selected;
+ $('syncInlineCommit').disabled=true;notice('正式歌詞を保存中…');
+ try{
+  const to=await bridge.writeRevision({workId:w.id,baseVersionId:from.id,literalText:d.text});
+  const report=c.transfer(state,w.id,oldSong,from,to);
+  const draft=state.drafts[c.draftKey(w.id,from.id)];if(draft)draft.publishedAs=to.id;
+  persist();await loadLyrics();
+  if(lines[idx]?.trim())choose(idx,true,false);
+  notice('第'+to.version_no+'版を保存しました。'+report.copied+'行の時刻を引き継ぎました。');
+ }catch(e){notice('正式保存に失敗しました：'+e.message,true);}
+ finally{refreshInline();}
+}
+$('syncInlineSave').addEventListener('click',()=>saveInline(true));
+$('syncInlineCommit').addEventListener('click',publishInline);
+$('syncInlineOriginal').addEventListener('click',()=>{$('syncInlineSource').value=lines[selected]??'';saveInline(true);});
+$('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);$('syncInlineNote').textContent='編集中…';inlineTimer=setTimeout(()=>saveInline(false),850);});
+
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
@@ -232,6 +292,7 @@ function renderRows(){
   b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));});
   view.append(b);
  }
+ mountInline();
  view.scrollTop=position;
  window.dispatchEvent(new CustomEvent('recnote:instrument-rail-refresh',{detail:{song}}));
  $('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
@@ -245,7 +306,7 @@ function choose(i,scroll,seekAudio){
  if(seekAudio&&started(t))seek(t.start);
  for(const el of $('syncLines').querySelectorAll('.syncLine'))el.classList.toggle('selected',Number(el.dataset.line)===i);
  const node=$('syncLines').querySelector('[data-line="'+i+'"]');if(scroll)node?.scrollIntoView({block:'nearest',behavior:'smooth'});
- fillEditor();saveCheckpoint();updatePrimary();
+ mountInline();fillEditor();saveCheckpoint();updatePrimary();
 }
 function fillEditor(){
  dispRender();
