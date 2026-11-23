@@ -413,27 +413,19 @@ $('ssApprove').onclick=()=>{
 $('ssDelete').onclick=remove;
 $('ssImport').onclick=importDraftMap;
 $('ssMakeShort').onclick=addFromSection;
-$('ssCaptureStart').onclick=()=>capture('start');
-$('ssCaptureEnd').onclick=()=>capture('end');
 $('ssPreview').onclick=listen;
 $('ssExport').onclick=download;
 for(const id of inputIds){$(id).addEventListener('input',onEdit);$(id).addEventListener('change',onEdit);}
-for(const b of panel.querySelectorAll('[data-ss-nudge]')){
- b.onclick=()=>{
-  const [side,offset]=b.dataset.ssNudge.split(':'),input=$(side==='start'?'ssStart':'ssEnd'),value=core.parseTime(input.value);
-  if(value===null||!Number.isFinite(value)){status('先に開始・終了時刻を入力してください。',true);return;}
-  input.value=core.formatTime(Math.max(0,value+Number(offset)));onEdit();
- };
-}
+for(const id of ['ssFirstLyric','ssLastLyric'])$(id).addEventListener('change',onEdit);
 audio.addEventListener('timeupdate',()=>{
  if(previewStop!==null&&nowTime()>=previewStop){audio.pause();previewStop=null;}
 });
-window.addEventListener('recnote:cloud-synced',()=>{if(!panel.hidden)render();});
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!panel.hidden)render();});
-audio.addEventListener('loadedmetadata',()=>{if(!panel.hidden)render();});
+window.addEventListener('recnote:cloud-synced',()=>{if(lyricRead)updateLyricContext();if(!panel.hidden)render();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(bridge?.isSignedIn())loadLyricCues();else{lyricRead=null;lyricCtx=null;lyricIssue='ログインが必要です。';if(!panel.hidden)render();}});
+audio.addEventListener('loadedmetadata',()=>{if(lyricRead)updateLyricContext();if(!panel.hidden)render();});
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',changeSong);
 for(const id of ['fsOpenIntro','fsOpenInterlude','fsOpenOutro'])$(id)?.addEventListener('click',()=>{if(!panel.hidden)closePanel();});
 window.addEventListener('pagehide',flushDraft);
 restoreForm(state.drafts?.[formKey()]||{type:'verse'});
-window.RECNOTE_STRUCTURE_STUDIO=Object.freeze({open:openPanel,close:closePanel});
+window.RECNOTE_STRUCTURE_STUDIO=Object.freeze({open:openPanel,close:closePanel,refresh:loadLyricCues});
 })();
