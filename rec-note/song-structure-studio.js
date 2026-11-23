@@ -67,16 +67,69 @@ const seekOriginal=t=>{
 };
 function status(msg,error=false){$('ssStatus').textContent=msg;$('ssStatus').dataset.error=error?'true':'false';}
 function formKey(id=selectedId,what=mode){return 'recnote-structure-form-v1:'+song+':'+what+':'+(id||'new');}
+function updateLyricContext(){
+ lyricCtx=lyricRead?.work?.id?core.buildLyricContext(song,lyricRead,records(),audio.readyState>=1?audio.duration:null):null;
+}
+async function loadLyricCues(){
+ const requestedSong=song,request=++lyricSeq;
+ if(!bridge?.isSignedIn()){
+  lyricRead=null;lyricCtx=null;lyricIssue='歌詞を取得するにはREC NOTEへログインしてください。';
+  fillLyricSelectors();if(!panel.hidden)render();return;
+ }
+ lyricIssue='登録済みの歌詞と時刻を読み込んでいます…';
+ if(!panel.hidden)status(lyricIssue);
+ try{
+  const data=await bridge.read(requestedSong);
+  if(request!==lyricSeq||requestedSong!==song)return;
+  lyricRead=data;updateLyricContext();
+  lyricIssue=lyricCtx?'':'最新版の歌詞が見つかりません。';
+  if(!formChanged){
+   const saved=state.drafts?.[formKey()]||current()||{};
+   restoreForm(saved);
+  }else fillLyricSelectors();
+  if(!panel.hidden)render();
+ }catch(e){
+  if(request!==lyricSeq)return;
+  lyricRead=null;lyricCtx=null;lyricIssue='歌詞の読み込みに失敗：'+e.message;
+  fillLyricSelectors();if(!panel.hidden)render();
+ }
+}
+function fillLyricSelectors(){
+ for(const [id,selectedValue] of [['ssFirstLyric',selectedFirst],['ssLastLyric',selectedLast]]){
+  const select=$(id);select.replaceChildren();
+  const placeholder=document.createElement('option');placeholder.value='';
+  placeholder.textContent=lyricCtx?.cues?.length?'歌詞を選択してください':(lyricIssue||'歌詞のタイミングを読み込み中…');
+  select.append(placeholder);
+  for(const cue of lyricCtx?.cues||[]){
+   const option=document.createElement('option');option.value=String(cue.index);
+   option.textContent=String(cue.index+1).padStart(2,'0')+' '+core.formatTime(cue.start)+'｜'+cue.text.replace(/\s+/g,' ').slice(0,48);
+   select.append(option);
+  }
+  select.value=Number.isInteger(selectedValue)?String(selectedValue):'';
+  if(select.value!==String(selectedValue))select.value='';
+ }
+}
+function currentRange(){
+ return core.rangeFromLyrics(lyricCtx,selectedFirst,selectedLast);
+}
 function formValues(){
- return {type:mode==='music-structure'?$('ssType').value:null,label:$('ssName').value,start:$('ssStart').value,end:$('ssEnd').value,note:$('ssNote').value,sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
+ return {type:mode==='music-structure'?$('ssType').value:null,
+  label:$('ssName').value,startLyricIndex:selectedFirst,endLyricIndex:selectedLast,
+  lyricVersionId:lyricCtx?.versionId||null,note:$('ssNote').value,
+  sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
 }
 function restoreForm(data){
  shortSourceRegionId=mode==='short-cut'?(data?.sourceRegionId||null):null;
  $('ssType').value=core.ALLOWED.has(data?.type)?data.type:'verse';
  $('ssName').value=data?.label||'';
- $('ssStart').value=Number.isFinite(data?.start)?core.formatTime(data.start):data?.start||'';
- $('ssEnd').value=Number.isFinite(data?.end)?core.formatTime(data.end):data?.end||'';
  $('ssNote').value=data?.note||'';
+ let first=Number.isInteger(data?.startLyricIndex)?data.startLyricIndex:null;
+ let last=Number.isInteger(data?.endLyricIndex)?data.endLyricIndex:null;
+ if((first===null||last===null)&&Number.isFinite(data?.start)&&Number.isFinite(data?.end)){
+  const inferred=core.anchorFromApproximation(lyricCtx,data.start,data.end);
+  if(inferred){first=inferred.startLyricIndex;last=inferred.endLyricIndex;}
+ }
+ selectedFirst=first;selectedLast=last;fillLyricSelectors();
  formChanged=false;initialForm=JSON.stringify(formValues());
 }
 function saveFormDraft(){
