@@ -308,6 +308,11 @@ function saveRecord(i,patch){
 function renderRows(){
  if(inlineDirty&&selected>=0){clearTimeout(inlineTimer);saveInline(false);}
  dispRender();
+ // Rebuilding status rows must not discard a textarea's cursor or keyboard focus.
+ const focusNode=document.activeElement;
+ const focusInEditor=!!focusNode&&contextHost.contains(focusNode);
+ let caret=null;
+ if(focusInEditor){try{caret=[focusNode.selectionStart,focusNode.selectionEnd];}catch(_e){}}
  const view=$('syncLines');view.replaceChildren();
  let begin=0,end=0,done=0;const data=rows();
  for(let n=0;n<data.length;n++){
@@ -327,6 +332,10 @@ function renderRows(){
   view.append(b);
  }
  mountInline();
+ if(focusInEditor&&focusNode?.isConnected&&typeof focusNode.focus==='function'){
+  focusNode.focus({preventScroll:true});
+  if(caret&&Number.isInteger(caret[0]))try{focusNode.setSelectionRange(caret[0],caret[1]);}catch(_e){}
+ }
  window.dispatchEvent(new CustomEvent('recnote:instrument-rail-refresh',{detail:{song}}));
  $('syncCount').textContent=done+' / '+data.length+' 行 確認済み';
  $('syncBreakdown').textContent='開始 '+begin+'・終了 '+end+'・確認済み '+done;
