@@ -300,45 +300,64 @@ function remove(){
 }
 function importDraftMap(){
  if(!loggedIn()){status('先にログインしてください。',true);return;}
+ if(!lyricCtx){status('先に歌詞と時刻を読み込んでください。',true);return;}
  const source=core.seedFor(song,mode);if(!source.length){status('この曲の仮マップはありません。',true);return;}
- // Stable seed keys prevent re-adding a proposal after its time was refined or it was deleted.
  const existing=records().filter(x=>x.song===song&&x.kind===mode&&!x.syncConflictOf);
  const pending=source.filter(x=>!existing.some(y=>
   (x.sourceSeedKey&&y.sourceSeedKey===x.sourceSeedKey)||
   (!y.deleted&&Number.isFinite(y.start)&&Number.isFinite(y.end)&&Math.abs(y.start-x.start)<.03&&Math.abs(y.end-x.end)<.03)));
  if(!pending.length){status('仮マップの候補はすでに登録されています。');return;}
- if(!confirm('この曲の'+pending.length+'件を「仮・確認待ち」で追加しますか？ 既存データは上書きしません。'))return;
+ const linked=pending.map(item=>{
+  const anchor=core.anchorFromApproximation(lyricCtx,item.start,item.end);
+  return anchor?{...item,...anchor}:null;
+ }).filter(Boolean);
+ const skipped=pending.length-linked.length;
+ if(!linked.length){status('この候補は歌詞の時刻に紐づきませんでした。歌詞タイミングを確認してください。',true);return;}
+ if(!confirm('歌詞から計算した'+linked.length+'区間を「仮・確認待ち」で登録しますか？'+
+  (skipped?'　時刻が揃わない'+skipped+'件は追加しません。':'')+' 以前の歌詞・時刻には触れません。'))return;
  const all=records();
- for(const v of pending){
+ for(const v of linked){
   all.push({...v,id:core.recordId(song,mode,uid()),kind:mode,song,
    workId:'recnote-arrangement:'+song,textVersionId:core.VER,
    lineIndex:mode==='music-structure'?-10000:-20000,
    confirmedAt:null,deleted:false,updatedAt:new Date().toISOString()});
  }
- persist();render();status(pending.length+'件の仮候補を追加しました。音源を聴いて確認してください。');
+ persist();render();
+ status(linked.length+'件を歌詞タイミングと連動して登録しました。'+
+  (skipped?skipped+'件は未登録のままです。':'')+' あとは各区間がAメロ・サビ等か音で確認してください。');
 }
 function addFromSection(){
- const r=current(),preset=core.clipFromSection(r);
- if(!preset){status('開始・終了が登録されている区間から作成してください。',true);return;}
- flushDraft();mode='short-cut';selectedId=null;restoreForm(preset);
- formChanged=true;saveFormDraft();render();status('ショート候補の下書きを作成しました。時刻と内容を確認して保存してください。');
-}
-function capture(field){
- if(!ready()){status('再生可能な音源とログインが必要です。',true);return;}
- $(field==='start'?'ssStart':'ssEnd').value=core.formatTime(nowTime());onEdit();
+ const r=current(),linked=r?core.linkInterval(r,lyricCtx):null;
+ if(!r||!linked||linked.issue){status(linked?.issue||'歌詞と連動する区間を選択してください。',true);return;}
+ // Prefer a self-contained 15-30 second group of actual lyric cues; no arbitrary 25s trim.
+ let last=r.endLyricIndex,best=Infinity;
+ for(const c of lyricCtx.cues){
+  if(c.index<r.startLyricIndex||c.index>r.endLyricIndex)continue;
+  const part=core.rangeFromLyrics(lyricCtx,r.startLyricIndex,c.index);
+  if(part.issue)continue;
+  const dur=part.end-part.start;
+  if(dur>=15&&dur<=30&&Math.abs(dur-24)<best){best=Math.abs(dur-24);last=c.index;}
+ }
+ const part=core.rangeFromLyrics(lyricCtx,r.startLyricIndex,last);
+ flushDraft();mode='short-cut';selectedId=null;
+ restoreForm({label:'ショート候補｜'+(r.label||core.typeLabel(r.type)),
+  startLyricIndex:r.startLyricIndex,endLyricIndex:last,lyricVersionId:lyricCtx.versionId,
+  start:part.start,end:part.end,
+  note:'元区間：'+(r.label||core.typeLabel(r.type))+'。前後の歌詞を選んで長さを調整してください。',
+  sourceRegionId:r.id});
+ formChanged=true;saveFormDraft();render();
+ status('ショート候補を歌詞の時刻から作成しました。最後の歌詞を選ぶだけで長さを変更できます。');
 }
 function listen(){
  if(!ready()){status('音源を読み込んでください。',true);return;}
- try{
-  const x=formTyped(true);
-  if(x.start===null)throw Error('開始時刻を設定してください。');
-  seekOriginal(Math.max(0,x.start-.25));
-  previewStop=Number.isFinite(x.end)?x.end+.5:x.start+15;
-  audio.play().catch(e=>status('再生できません：'+e.message,true));
- }catch(e){status(e.message,true);}
+ const range=currentRange();
+ if(range.issue){status(range.issue,true);return;}
+ seekOriginal(Math.max(0,range.start-.25));
+ previewStop=range.end+.5;
+ audio.play().catch(e=>status('再生できません：'+e.message,true));
 }
 function download(){
- const info=core.exportPlan(song,records(),new Date());
+ const info=core.exportPlan(song,records(),new Date(),lyricCtx);
  const blob=new Blob([JSON.stringify(info,null,2)],{type:'application/json'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='楽曲構成とショート候補_'+song+'.json';
@@ -346,22 +365,35 @@ function download(){
  status('区間一覧・ショート候補・既存の前奏／間奏／後奏のJSONを書き出しました。');
 }
 function onEdit(){
+ selectedFirst=$('ssFirstLyric').value!==''?Number($('ssFirstLyric').value):null;
+ selectedLast=$('ssLastLyric').value!==''?Number($('ssLastLyric').value):null;
  formChanged=JSON.stringify(formValues())!==initialForm;
  $('ssEditorStatus').textContent=formChanged?'編集中・自動下書き保存':'変更なし';
- const typed=formTyped(false),overlap=core.overlapWarnings(records(),{...typed,song,id:selectedId});
+ const range=currentRange(),ok=!range.issue;
+ $('ssDerivedTime').dataset.error=ok?'false':'true';
+ $('ssDerivedTime').textContent=ok
+  ?'自動取得：'+core.formatTime(range.start)+' ～ '+core.formatTime(range.end)+
+   '（'+(range.end-range.start).toFixed(2)+'秒）｜'+range.endSource
+  :range.issue;
+ $('ssPreview').disabled=!ready()||!ok;
+ const typed=formTyped(false),live=records().filter(x=>core.isArrangement(x,song)).map(x=>{
+  const d=core.linkInterval(x,lyricCtx);return {...x,start:d.issue?null:d.start,end:d.issue?null:d.end};
+ });
+ const overlap=core.overlapWarnings(live,{...typed,song,id:selectedId});
  $('ssOverlap').textContent=overlap.length?'他の構成区間と重なります：'+overlap.join('／'):'';
  clearTimeout(draftTimer);
  if(formChanged)draftTimer=setTimeout(saveFormDraft,650);
 }
 function changeSong(){
- flushDraft();selectedId=null;restoreForm(state.drafts?.[formKey()]||{type:'verse'});
- if(!panel.hidden)render();
+ flushDraft();++lyricSeq;lyricRead=null;lyricCtx=null;lyricIssue='歌詞の読み込み中…';
+ selectedId=null;restoreForm(state.drafts?.[formKey()]||{type:'verse'});
+ if(!panel.hidden){render();loadLyricCues();}
 }
 function openPanel(){
  if(!$('fullSongSections')?.hidden)$('fsClose')?.click();
  panel.hidden=false;root.classList.add('syncArrangementActive');open.setAttribute('aria-expanded','true');
  if(!initialForm)restoreForm(state.drafts?.[formKey()]||{type:'verse'});
- render();panel.scrollIntoView({block:'start',behavior:'smooth'});
+ render();if(!lyricCtx)loadLyricCues();panel.scrollIntoView({block:'start',behavior:'smooth'});
 }
 function closePanel(){
  flushDraft();panel.hidden=true;root.classList.remove('syncArrangementActive');
