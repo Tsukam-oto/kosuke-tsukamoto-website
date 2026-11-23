@@ -39,8 +39,12 @@ function ensureEdit(){
 function displayChoice(i){
  const src=editing[i]||'',layout=window.RECNOTE_LYRIC_LAYOUT;
  if(!layout)return {breaks:[],source:'single'};
- if(Object.prototype.hasOwnProperty.call(displayBreaks,i))return {breaks:displayBreaks[i]||[],source:'manual'};
  const saved=state.drafts?.[core.displayKey(work.id,version.id,i)];
+ if(Object.prototype.hasOwnProperty.call(displayBreaks,i)){
+  const local=displayBreaks[i]||[];
+  // v18's stored empty array was an accidental no-op, not an explicit one-column choice.
+  if(local.length||saved?.mode==='single')return {breaks:local,source:local.length?'manual':'single'};
+ }
  return layout.resolve(song,src,saved?.source===src?saved:null);
 }
 function renderDisplayText(){
@@ -145,9 +149,9 @@ function applyBreaks(){
  if(raw.replace(/\n/g,'')!==src){$('leBreakStatus').textContent='歌詞の文字が変わっています。改行以外は上の歌詞欄で修正してください。';$('leBreakStatus').dataset.error='true';return;}
  const cols=raw.split('\n'),breaks=[],total=src.length;let n=0;
  for(const col of cols.slice(0,-1)){n+=col.length;if(n<=0||n>=total||breaks.includes(n)){message('空の列や重複する改行は使えません。',true);return;}breaks.push(n);}
- displayBreaks[selected]=breaks;
  const key=core.displayKey(work.id,version.id,selected),d=state.drafts?.[key];
  if(d?.source===src&&d.splits?.some(x=>breaks.includes(x.pos))){message('独立表示の分割点と重なる場所は調整が必要です。',true);return;}
+ displayBreaks[selected]=breaks;
  // The existing display format is kept; only its line-break offsets change.
  state.drafts=state.drafts||{};
  state.drafts[key]={schema:1,source:src,splits:d?.source===src&&Array.isArray(d.splits)?d.splits:[],
