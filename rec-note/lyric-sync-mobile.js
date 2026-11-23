@@ -468,7 +468,8 @@ function changeVersion(v){
  $('syncSourceWarning').hidden=version.text_status!=='unverified_pdf_extract';
  $('syncSourceWarning').textContent='この歌詞はPDF抽出による未校正版です。時間合わせと原文校正は別工程です。';
  const saved=readCheckpoint(),unconfirmed=rows().find(x=>!confirmed(x.time));
- selected=Number.isInteger(saved)&&lines[saved]?.trim()&&!confirmed(get(saved))?saved:(unconfirmed?.i??rows()[0]?.i??-1);
+ const fromEditor=Number(new URLSearchParams(location.search).get('line'));
+ selected=Number.isInteger(fromEditor)&&fromEditor>=0&&lines[fromEditor]?.trim()?fromEditor: Number.isInteger(saved)&&lines[saved]?.trim()&&!confirmed(get(saved))?saved:(unconfirmed?.i??rows()[0]?.i??-1);
  renderRows();if(selected>=0)choose(selected,true,false);
 }
 function download(name,content,type){
@@ -612,7 +613,7 @@ $('syncQuickListen').addEventListener('click',()=>$('syncReplay').click());
 $('syncQuickEnd').addEventListener('click',()=>$('syncCaptureEnd').click());
 $('syncQuickConfirm').addEventListener('click',()=>$('syncConfirm').click());
 $('syncQuickAdjust').addEventListener('click',()=>{const item=$('syncFineTune');item.open=true;item.scrollIntoView({behavior:'smooth',block:'start'});});
-for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{if(song!==b.dataset.song){setSong(b.dataset.song);loadLyrics();}});
+for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',()=>{if(song!==b.dataset.song){if(inlineDirty){clearTimeout(inlineTimer);saveInline(false);}setSong(b.dataset.song);loadLyrics();}});
 $('syncVersion').addEventListener('change',e=>changeVersion(e.target.value));
 $('syncPlay').addEventListener('click',toggleAudio);$('syncDockPlay').addEventListener('click',toggleAudio);
 $('syncBack').addEventListener('click',()=>seek(wavPosition()-3));
@@ -689,5 +690,7 @@ if(typeof MutationObserver==='function'){
   new MutationObserver(refresh).observe(status,{childList:true,characterData:true,subtree:true,attributes:true,attributeFilter:['data-level']});
  }
 }
+const incomingSong=new URLSearchParams(location.search).get('song');if(incomingSong&&typeof SONGS!=='undefined'&&SONGS.includes(incomingSong)&&incomingSong!==song)setSong(incomingSong);
+window.addEventListener('pagehide',()=>{if(inlineDirty)saveInline(false);});
 clock();loadLyrics();
 })();
