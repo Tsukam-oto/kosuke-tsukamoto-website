@@ -56,7 +56,7 @@ vm.runInNewContext(fs.readFileSync(path.join(root,'song-structure-studio.js'),'u
  assert.equal($('ssFirstLyric').children.length,61);
  assert.ok($('ssDerivedTime').textContent.includes('選択してください'),
   'Without selecting lyrics, there must be NO fabricated interval');
- assert.equal($('ssStart'),undefined,'obsolete numeric time input must not exist');
+ assert.ok(!nodes.has('ssStart')&&!nodes.has('ssEnd'), 'time-entry widgets must not be mounted');
  // A proposal can be selected without first manually typing a single time.
  assert.ok($('ssList').children.some(x=>x.className?.includes('ssProposal')));
  $('ssImport').click();
