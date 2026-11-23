@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#16312e">
+<meta name="description" content="合唱・演奏会 審査集計ライトの体験版。架空データで得点入力、入力不備の確認、同点順位を試せます。">
+<title>合唱・演奏会 審査集計ライト｜体験版</title>
+<style>
+:root{--ink:#17312e;--muted:#596963;--paper:#f6f7f4;--line:#dce4de;--accent:#1d7567;--pale:#eaf3f0;--warn:#fff3df;--good:#127153;--bad:#9c4128;--white:#fff;--radius:16px}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Zen Kaku Gothic New","Hiragino Kaku Gothic ProN","Noto Sans JP",system-ui,sans-serif;line-height:1.7}
+a{color:inherit}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #81b8ad;outline-offset:2px}
+.wrap{width:min(1050px,calc(100% - 36px));margin:auto}.top{padding:22px 0;border-bottom:1px solid var(--line);background:#fff}.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px}.brand{font-weight:800;font-size:14px;letter-spacing:.09em;text-decoration:none}.back{font-size:12px;color:var(--muted);text-decoration:none}.back:hover{text-decoration:underline}
+.hero{padding:60px 0 34px}.eyebrow{display:inline-block;border:1px solid #a8c8be;color:#1c6a57;background:#f0f7f4;border-radius:30px;padding:5px 14px;font-size:12px;font-weight:800;letter-spacing:.06em}.hero h1{font-size:clamp(30px,5vw,48px);line-height:1.42;margin:20px 0 12px;letter-spacing:.02em}.lede{color:var(--muted);font-size:15px;max-width:740px;margin:0 0 22px}.facts{display:flex;gap:8px;flex-wrap:wrap}.facts span{font-size:12px;background:#fff;border:1px solid var(--line);border-radius:30px;padding:6px 12px}
+.section{padding:22px 0}.section h2{font-size:24px;margin:0 0 8px;letter-spacing:.03em}.section-desc{margin:0 0 22px;color:var(--muted);font-size:14px}.paper{background:white;border-radius:var(--radius);border:1px solid var(--line);box-shadow:0 12px 32px rgba(13,51,43,.045);padding:24px}
+.toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:17px}.buttons{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--ink);border-radius:10px;padding:10px 16px;background:var(--ink);color:white;font-size:13px;font-weight:800}.btn-secondary{background:white;color:var(--ink);border-color:var(--line)}.btn:hover{filter:brightness(.95)}.btn:disabled{opacity:.48;cursor:not-allowed;filter:none}.key{font-size:12px;color:var(--muted)}.key strong{display:inline-block;width:14px;height:14px;background:var(--warn);border:1px solid #e4d5b7;vertical-align:middle;border-radius:3px;margin-right:4px}
+.table-scroll{overflow-x:auto}.score-table{width:100%;border-collapse:separate;border-spacing:0;text-align:left;white-space:nowrap;font-size:13px}.score-table th{padding:11px;background:var(--pale);border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-size:12px}.score-table td{padding:9px 11px;border-bottom:1px solid #edf0eb}.score-table th:first-child{border-radius:8px 0 0 0}.score-table th:last-child{border-radius:0 8px 0 0}.score-table input{width:84px;background:var(--warn);border:1px solid #e5d3b4;border-radius:8px;padding:9px;text-align:center;color:var(--ink)}.score-table input[aria-invalid="true"]{border:2px solid var(--bad);background:#ffebe4}.score-table .sum{font-weight:800;font-variant-numeric:tabular-nums}.score-table .muted{color:var(--muted)}
+.notice{margin-top:18px;padding:15px 17px;border-radius:10px;border:1px solid var(--line);font-size:13px}.notice.good{background:#edf7f1;color:#235e46;border-color:#b5dec6}.notice.alert{background:#fff2eb;color:#803920;border-color:#e8c7b7}.notice ul{margin:7px 0 0;padding-left:18px}.notice p{margin:0}
+.results{display:grid;grid-template-columns:1.25fr .75fr;gap:16px;margin-top:17px}.resultbox{border:1px solid var(--line);border-radius:12px;padding:20px;background:#fff}.resultbox h3{margin:0 0 13px;font-size:15px}.ranking{display:grid;gap:10px}.rankline{display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:11px 13px;border:1px solid var(--line);border-radius:10px}.rank{background:var(--pale);border-radius:7px;font-weight:900;text-align:center;padding:5px}.score{font-size:19px;font-weight:900;font-variant-numeric:tabular-nums}.metric{font-weight:900;font-size:36px;line-height:1.3}.metric-note{font-size:12px;color:var(--muted);margin:6px 0 0}.disclaimer{font-size:13px;color:var(--muted)}.foot{border-top:1px solid var(--line);margin-top:54px;padding:26px 0 40px;font-size:12px;color:var(--muted)}.foot p{margin:4px 0}
+@media(max-width:720px){
+.hero{padding:42px 0 21px}.results{grid-template-columns:1fr}.paper{padding:14px}.section h2{font-size:21px}.toolbar{align-items:flex-start}.back{font-size:11px}
+.table-scroll{overflow:visible}.score-table,.score-table tbody{display:block;width:100%;min-width:0;white-space:normal}
+.score-table thead{display:none}.score-table tr{display:grid;grid-template-columns:1fr 1fr;gap:10px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;margin:0 0 12px}
+.score-table td{padding:0;border:0;min-width:0}.score-table td:nth-child(1){grid-column:1;font-weight:800}.score-table td:nth-child(2){grid-column:2;text-align:right;font-weight:800}
+.score-table td:nth-child(3),.score-table td:nth-child(4){display:flex;flex-direction:column;gap:4px}
+.score-table td:nth-child(3)::before{content:'音楽表現 / 10'}.score-table td:nth-child(4)::before{content:'アンサンブル / 10'}
+.score-table td:nth-child(3)::before,.score-table td:nth-child(4)::before{font-size:12px;font-weight:700;color:var(--muted)}
+.score-table td:nth-child(5){grid-column:1/-1;border-top:1px dashed var(--line);padding-top:7px;text-align:right}
+.score-table td:nth-child(5)::before{content:'合計  ';font-size:12px;font-weight:700;color:var(--muted)}
+.score-table input{width:100%;min-width:0;min-height:44px;font-size:16px}
+}
+@media print{body{background:white}.top,.buttons,.back,.toolbar .key,.foot{display:none!important}.wrap{width:100%}.hero{padding:8px 0}.hero h1{font-size:27px}.section{padding:10px 0}.paper{border:none;box-shadow:none;padding:0}.score-table{min-width:0;font-size:11px}.score-table th,.score-table td{padding:4px}.score-table input{border:0;background:transparent;padding:0;width:40px}.results{grid-template-columns:1.3fr .7fr}.notice{break-inside:avoid}.rankline{break-inside:avoid}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap"><a class="brand" href="/">束元康介｜教育と創作</a><a class="back" href="/">公式サイトへ戻る</a></div></header>
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow">販売準備中 · 架空データによる無料体験版</span>
+    <h1>採点を、集計まで。<br>合唱・演奏会 審査集計ライト</h1>
+    <p class="lede">審査員ごとの得点を入力すると、全団体の得点を集計します。未入力や入力ミスがあるときは順位を出さず、同点は同順位で扱う設計を、ここで試せます。</p>
+    <div class="facts"><span>Google スプレッドシート版を開発中</span><span>得点チェック</span><span>同点順位に対応</span><span>この画面のデータは保存・送信されません</span></div>
+  </section>
+  <section class="section" aria-labelledby="trial-heading">
+    <h2 id="trial-heading">まず、架空の審査を試す</h2>
+    <p class="section-desc">3団体・2審査員・2観点の例です。黄色の得点欄を変更すると順位が更新されます。最初は青組と赤組が同点1位です。</p>
+    <div class="paper">
+      <div class="toolbar"><div class="buttons"><button class="btn" type="button" id="reset">同点の例に戻す</button><button class="btn btn-secondary" type="button" id="separate">順位が分かれる例</button><button class="btn btn-secondary" type="button" id="missing">未入力の例を試す</button><button class="btn btn-secondary" type="button" id="print">印刷プレビュー</button></div><div class="key"><strong></strong>黄色の欄を編集（0～10点・0.5点刻み）</div></div>
+      <div class="table-scroll"><table class="score-table"><thead><tr><th scope="col">審査員</th><th scope="col">団体</th><th scope="col">音楽表現 /10</th><th scope="col">アンサンブル /10</th><th scope="col">合計</th></tr></thead><tbody id="entries"></tbody></table></div>
+      <div id="notice" class="notice good" role="status" aria-live="polite"></div>
+      <div class="results">
+        <div class="resultbox"><h3>集計結果・順位</h3><div id="ranking" class="ranking" aria-live="polite"></div></div>
+        <div class="resultbox"><h3>入力の進捗</h3><div id="progress" class="metric">12 / 12</div><p class="metric-note">入力済みの採点数 / 必要な採点数</p><p class="disclaimer">1つでも未入力・不正な点数がある場合、結果は非表示です。実際の賞の決定には審査規程と人による検算が必要です。</p></div>
+      </div>
+    </div>
+  </section>
+  <section class="section" aria-labelledby="product-heading">
+    <h2 id="product-heading">販売予定の商品について</h2>
+    <p class="section-desc">このページは仕組みを試すための簡易体験版です。有料版ではGoogleスプレッドシート上で団体・審査員・評価観点を設定し、採点票の生成と集計、印刷を行う構想です。現在は実機検証および提供条件の確認中のため、購入・注文は受け付けていません。</p>
+  </section>
+</main>
+<footer class="foot"><div class="wrap"><p>本体験版は架空データのみを使用し、入力内容をネットワーク送信・保存しません。</p><p>© 束元康介｜教育と創作</p></div></footer>
+<script>
+'use strict';
+const sample = Object.freeze([
+  Object.freeze({judge:'審査員A',group:'青組',a:'8',b:'9'}),
+  Object.freeze({judge:'審査員A',group:'赤組',a:'9',b:'8'}),
+  Object.freeze({judge:'審査員A',group:'緑組',a:'7',b:'8'}),
+  Object.freeze({judge:'審査員B',group:'青組',a:'9',b:'8'}),
+  Object.freeze({judge:'審査員B',group:'赤組',a:'8',b:'9'}),
+  Object.freeze({judge:'審査員B',group:'緑組',a:'8',b:'7'})
+]);
+let rows = sample.map(r=>({...r}));
+const groups=['青組','赤組','緑組'];
+const byId=id=>document.getElementById(id);
+function parsePoint(v) {
+  if(typeof v!=='string' || !/^\d+(?:\.\d+)?$/.test(v.trim()))return null;
+  const n=Number(v);
+  return Number.isFinite(n)&&n>=0&&n<=10&&Number.isInteger(n*2)?n:null;
+}
+function evaluate(input) {
+  const problems=[];let filled=0;
+  const totals=Object.fromEntries(groups.map(g=>[g,0]));
+  for(const r of input){
+    for(const k of ['a','b']){
+      const p=parsePoint(r[k]);
+      if(p===null){problems.push(`${r.judge}・${r.group}：「${k==='a'?'音楽表現':'アンサンブル'}」の点数を確認してください。`);}
+      else{filled++;totals[r.group]+=p;}
+    }
+  }
+  if(problems.length)return {complete:false,filled,required:input.length*2,problems,ranks:[]};
+  const ranked=Object.entries(totals).map(([group,total])=>({group,total})).sort((x,y)=>y.total-x.total||x.group.localeCompare(y.group,'ja'));
+  let previous=null,rank=0;
+  ranked.forEach((r,i)=>{if(previous===null||r.total!==previous)rank=i+1;r.rank=rank;previous=r.total;});
+  return {complete:true,filled,required:input.length*2,problems:[],ranks:ranked};
+}
+function element(tag,className,textValue){const e=document.createElement(tag);if(className)e.className=className;if(textValue!==undefined)e.textContent=String(textValue);return e;}
+function render(){
+ const tbody=byId('entries');tbody.replaceChildren();
+ rows.forEach((row,i)=>{
+   const tr=element('tr');tr.append(element('td','',row.judge),element('td','',row.group));
+   for(const k of ['a','b']){
+     const td=element('td');const input=element('input');input.type='text';input.inputMode='decimal';input.autocomplete='off';input.value=row[k];input.setAttribute('aria-label',`${row.judge} ${row.group} ${k==='a'?'音楽表現':'アンサンブル'}の点数`);input.setAttribute('aria-invalid',parsePoint(row[k])===null?'true':'false');
+     input.addEventListener('input',()=>{row[k]=input.value;input.setAttribute('aria-invalid',parsePoint(row[k])===null?'true':'false');updateSummary();});
+     td.append(input);tr.append(td);
+   }
+   const sum=element('td','sum');const a=parsePoint(row.a),b=parsePoint(row.b);sum.textContent=a===null||b===null?'—':String(a+b);tr.append(sum);tbody.append(tr);
+ });updateSummary();
+}
+function updateSummary(){
+ const result=evaluate(rows);byId('progress').textContent=`${result.filled} / ${result.required}`;
+ const printButton=byId('print');printButton.disabled=!result.complete;
+ printButton.title=result.complete?'集計結果を印刷する':'得点をすべて修正すると印刷できます';
+ const notice=byId('notice');notice.replaceChildren();notice.className='notice '+(result.complete?'good':'alert');
+ const ranking=byId('ranking');ranking.replaceChildren();
+ if(result.complete){
+   notice.append(element('p','',`すべての得点が有効です。同点は同順位で集計しています。`));
+   result.ranks.forEach(r=>{const line=element('div','rankline');line.append(element('div','rank',`${r.rank}位`),element('strong','',r.group),element('div','score',`${r.total}点`));ranking.append(line);});
+ }else{
+   notice.append(element('p','',`${result.problems.length}件の未入力・不備があります。順位は表示しません。`));
+   const list=element('ul');result.problems.slice(0,6).forEach(t=>list.append(element('li','',t)));if(result.problems.length>6)list.append(element('li','',`ほか ${result.problems.length-6}件`));notice.append(list);
+   ranking.append(element('p','disclaimer','入力をすべて修正すると順位が表示されます。'));
+ }
+ document.querySelectorAll('#entries tr').forEach((tr,i)=>{const t=tr.lastElementChild;const a=parsePoint(rows[i].a),b=parsePoint(rows[i].b);t.textContent=a===null||b===null?'—':String(a+b);});
+}
+byId('reset').addEventListener('click',()=>{rows=sample.map(r=>({...r}));render();});
+byId('separate').addEventListener('click',()=>{rows=sample.map(r=>({...r}));rows[1].a='7';render();});
+byId('missing').addEventListener('click',()=>{rows=sample.map(r=>({...r}));rows[0].a='';render();});
+byId('print').addEventListener('click',()=>{if(evaluate(rows).complete)window.print();});
+render();
+</script>
+</body></html>
