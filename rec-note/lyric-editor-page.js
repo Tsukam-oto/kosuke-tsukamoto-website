@@ -6,7 +6,7 @@ if(!/\/lyric-editor(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,core=window.RECNOTE_LYRIC_WORKBENCH;
 if(!bridge||!core||typeof persist!=='function')return;
 const $=id=>document.getElementById(id);
-document.title='歌詞を整える | REC NOTE v18';
+document.title='歌詞を整える | REC NOTE v18.2';
 document.body.classList.add('lyricEditorPage');
 const app=document.createElement('div');app.id='lyricEditorApp';
 app.innerHTML=[
