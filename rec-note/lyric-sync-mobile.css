@@ -587,3 +587,24 @@ body.syncPage #syncStudio.syncNeedsLogin #syncContextEditor,
 body.syncPage #syncStudio.syncNeedsAudio #syncContextEditor{
  display:none!important;
 }
+
+
+/* v18.4: author text and display typography edit ONLY on dedicated lyric-editor.
+   This view shows timing controls, plus one direct link for text changes. */
+#syncStudio #syncContextEditor .syncContextLyricLink{
+ display:flex;flex:1 1 100%;align-items:center;justify-content:center;
+ margin:4px 0 0;padding:9px 12px;min-height:40px;
+ background:#eef5fa;border:1px solid #c5d9e8;border-radius:9px;
+ color:#235779;text-decoration:none;font-size:12px;font-weight:800;
+}
+#syncStudio #syncContextEditor .syncContextLyricLink:hover{background:#e1eff8}
+#syncStudio #syncTimingPanel{background:#fff;border:1px solid #d3e2ec;border-radius:10px;padding:10px 12px;margin:9px 0}
+#syncStudio #syncTimingPanel>summary{font-size:13px;font-weight:800;color:#315a74;cursor:pointer;min-height:32px}
+#syncStudio #syncTimingPanel>p{font-size:12px;color:#667786;line-height:1.6;margin:7px 0}
+#syncStudio #syncTimingButtons>div{display:flex;gap:6px;flex-wrap:wrap;align-items:center;padding:8px 0;border-bottom:1px solid #edf1f5}
+#syncStudio #syncTimingButtons>div strong{flex:1 1 100px;font-size:12px}
+#syncStudio #syncTimingButtons button,#syncStudio #syncTimingUndo{min-height:35px;font-size:12px;padding:6px 9px}
+@media(max-width:500px){
+ #syncStudio #syncTimingButtons>div strong{flex-basis:100%}
+ #syncStudio #syncTimingButtons>div button{flex:1 1 25%}
+}
