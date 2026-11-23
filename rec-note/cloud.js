@@ -169,8 +169,28 @@
     const versions=await api('/rest/v1/lyric_master_text_versions?select=id,version_no,literal_text,text_status,created_at&work_id=eq.'+encodeURIComponent(work.id)+'&order=version_no.desc&limit=20');
     return {work,versions:Array.isArray(versions)?versions:[]};
   }
+  // Append-only author revision. Prior lyric versions and REC NOTE timing rows are never updated.
+  async function writeLyricRevision({workId,baseVersionId,literalText}) {
+    if(!session||!owner)throw Error('歌詞の保存にはログインが必要です');
+    if(typeof workId!=='string'||!workId||typeof baseVersionId!=='string'||!baseVersionId)throw Error('歌詞の元の版を確認してください');
+    const text=String(literalText||'').replace(/\r\n?/g,'\n');
+    if(!text.trim()||text.length>40000||text.split('\n').length>500)throw Error('歌詞の文字数・行数を確認してください');
+    const q='/rest/v1/lyric_master_text_versions?select=id,version_no,literal_text&work_id=eq.'+encodeURIComponent(workId)+'&order=version_no.desc&limit=1';
+    const rows=await api(q,{cache:'no-store'});
+    const latest=rows?.[0];
+    if(!latest||latest.id!==baseVersionId)throw Error('別の端末で新しい歌詞版が保存されています。再読み込みして変更内容を照合してください');
+    if(latest.literal_text===text)throw Error('歌詞に変更がありません。');
+    const body={id:randomId(),user_id:owner.id,work_id:workId,
+      version_no:latest.version_no+1,literal_text:text,text_status:'author_revision',
+      source_ref:'REC_NOTE_LYRIC_WORKBENCH_v18'};
+    const saved=await api('/rest/v1/lyric_master_text_versions?select=id,version_no,literal_text,text_status,created_at',
+      {method:'POST',headers:{'content-type':'application/json','Prefer':'return=representation'},body:JSON.stringify(body)});
+    if(!Array.isArray(saved)||saved.length!==1||saved[0].id!==body.id)throw Error('歌詞版の保存結果を確認できませんでした。画面を更新し、重複登録しないでください');
+    return saved[0];
+  }
   window.RECNOTE_LYRIC_BRIDGE=Object.freeze({
     read:readLyricWork,
+    writeRevision:writeLyricRevision,
     isSignedIn:()=>Boolean(session&&owner)
   });
 
