@@ -414,7 +414,7 @@ body.syncPage #syncStudio #syncContextEditor>.syncDock{
  width:100%!important;margin:0 0 14px!important;padding:9px 8px!important;
  background:#fffdfb!important;border:1px solid #d7e0e7!important;border-radius:10px!important;
  box-shadow:0 4px 14px rgba(27,48,66,.08)!important;
- grid-template-columns:minmax(0,1fr) 42px minmax(114px,1fr)!important;gap:6px!important;
+ grid-template-columns:minmax(0,1fr) 38px 41px minmax(112px,1fr)!important;gap:5px!important;
 }
 body.syncPage #syncStudio #syncContextEditor>.syncDock button{
  min-height:43px!important;font-size:12px!important;padding:7px 5px!important;
@@ -452,7 +452,7 @@ body.syncPage #syncStudio #syncContextEditor>.syncDock small{font-size:10px!impo
 }
 @media(max-width:480px){
  body.syncPage #syncStudio #syncContextEditor>.syncDock{
-  grid-template-columns:minmax(0,1fr) 36px minmax(102px,1fr)!important;
+  grid-template-columns:minmax(0,1fr) 34px 37px minmax(92px,1fr)!important;
   padding:7px 6px!important;
  }
 }
