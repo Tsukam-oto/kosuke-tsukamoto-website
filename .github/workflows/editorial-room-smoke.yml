@@ -1,0 +1,36 @@
+name: Private editorial room regression
+on:
+  pull_request:
+    paths:
+      - 'chi-no-toshokan/editor-room.*'
+      - 'chi-no-toshokan/editor-magazines.js'
+      - 'chi-no-toshokan/editor-note-package.js'
+      - 'chi-no-toshokan/editorial-policy.json'
+      - '.github/workflows/editorial-room-smoke.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'chi-no-toshokan/editor-room.*'
+      - 'chi-no-toshokan/editor-magazines.js'
+      - 'chi-no-toshokan/editor-note-package.js'
+      - 'chi-no-toshokan/editorial-policy.json'
+      - '.github/workflows/editorial-room-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  editorial-smoke:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Syntax check
+        run: |
+          node --check chi-no-toshokan/editor-room.js
+          node --check chi-no-toshokan/editor-magazines.js
+          node --check chi-no-toshokan/editor-note-package.js
+      - name: No-credentials editorial regression
+        run: node chi-no-toshokan/editor-room.test.cjs

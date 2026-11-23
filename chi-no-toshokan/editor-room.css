@@ -104,3 +104,12 @@
 .editor-rulebook a:hover{background:#dfebe0}
 .editor-rulebook .rulebook-status{grid-column:1/-1;padding:9px 12px;background:#fafbf7;border-left:3px solid #a9bdae;border-radius:4px;font-size:11px;margin:1px 0 0}
 @media(max-width:780px){.editor-rulebook{grid-template-columns:1fr;padding:14px 13px;gap:9px}.editor-rulebook>div:nth-child(2){display:grid;grid-template-columns:1fr 1fr;gap:7px}.editor-rulebook a{text-align:center;white-space:normal;font-size:11px}.editor-rulebook .rulebook-status{grid-column:auto}}
+
+/* Current editorial step. Read-only guidance, never publication approval. */
+.next-panel{background:#fffefa;border:1px solid #cbded2;border-left:4px solid #4a785c;border-radius:14px;margin:0 0 20px;padding:17px 21px}
+.next-panel .panel-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px 14px;margin:0 0 5px}
+.next-panel h2{font-size:18px;margin:0}
+.next-panel .small-note{font-size:11px;color:#5d7566}
+.next-panel p{margin:4px 0 6px;font-size:14px;line-height:1.8;color:#254b39}
+.next-panel small{font-size:11px;display:block;color:#677b6c}
+@media(max-width:690px){.next-panel{padding:15px 14px;margin-bottom:15px}.next-panel p{font-size:13.5px}}
