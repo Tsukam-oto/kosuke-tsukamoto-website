@@ -98,7 +98,7 @@ function refreshInline(){
 function mountInline(){
  if(!work||!version||selected<0)return;
  const node=$('syncLines').querySelector('[data-line="'+selected+'"]');
- if(node){contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
+ if(node){if(inlinePanel.parentNode!==contextHost)contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
 }
 function saveInline(announce){
  const c=window.RECNOTE_LYRIC_WORKBENCH;if(!c||selected<0||!version)return false;
