@@ -72,18 +72,29 @@ function clipFromSection(region){
   note:'元区間：'+(region.label||typeLabel(region.type))+'。音声を確認して始点・終点を確定してください。',
   sourceRegionId:region.id,source:'selected-music-section',status:'draft'};
 }
-function exportPlan(song,data,now){
+function exportPlan(song,data,now,ctx){
  const all=Array.isArray(data)?data:[];
  const structure=all.filter(x=>isArrangement(x,song)).sort((a,b)=>(a.start??Infinity)-(b.start??Infinity));
  const clips=all.filter(x=>isShort(x,song)).sort((a,b)=>(a.start??Infinity)-(b.start??Infinity));
  const traditional=all.filter(x=>x.kind==='song-section'&&x.song===song&&!x.deleted&&!x.syncConflictOf)
   .map(x=>({label:x.sectionType==='intro'?'前奏':x.sectionType==='outro'?'後奏':x.sectionType==='interlude'?'間奏':'その他',
     sectionKey:x.sectionKey,start:x.start??null,end:x.end??null,status:x.status}));
- const clean=(v)=>({id:v.id,label:v.label||'',type:v.type||null,start:v.start??null,end:v.end??null,
-    duration:Number.isFinite(v.start)&&Number.isFinite(v.end)?+(v.end-v.start).toFixed(3):null,
-    note:v.note||'',status:v.status,source:v.source||'manual',sourceSeedKey:v.sourceSeedKey||null,sourceRegionId:v.sourceRegionId||null});
- return {schemaVersion:1,source:'REC_NOTE_ARRANGEMENT_SHORT_PLAN',song,exportedAt:(now||new Date()).toISOString(),
-  caveat:'編集・確認用の区間マップです。動画MP4ではありません。draftは正式な楽曲構成確定ではありません。',
+ const clean=v=>{
+  const mapped=ctx?linkInterval(v,ctx):{start:v.start??null,end:v.end??null,issue:'歌詞タイミング未照合',linked:false};
+  const valid=!!mapped.linked&&!mapped.issue;
+  const changed=valid&&(Math.abs((v.start??0)-mapped.start)>.02||Math.abs((v.end??0)-mapped.end)>.02);
+  return {id:v.id,label:v.label||'',type:v.type||null,start:valid?mapped.start:null,end:valid?mapped.end:null,
+   duration:valid?+(mapped.end-mapped.start).toFixed(3):null,
+   startLyricIndex:Number.isInteger(v.startLyricIndex)?v.startLyricIndex:null,
+   endLyricIndex:Number.isInteger(v.endLyricIndex)?v.endLyricIndex:null,
+   lyricVersionId:v.lyricVersionId||null,
+   linkage:valid?(changed?'lyrics-updated-recheck':'lyrics-linked'):(mapped.issue||'unlinked'),
+   note:v.note||'',status:changed&&v.status==='confirmed'?'needs-reconfirmation':v.status,
+   source:v.source||'manual',sourceSeedKey:v.sourceSeedKey||null,sourceRegionId:v.sourceRegionId||null};
+ };
+ return {schemaVersion:2,source:'REC_NOTE_ARRANGEMENT_SHORT_PLAN',song,exportedAt:(now||new Date()).toISOString(),
+  lyricVersionId:ctx?.versionId||null,
+  caveat:'歌詞との連動が確認できた区間のみ時刻を出力。未連動・異なる歌詞版・開始終了時刻未登録はnullで警告します。',
   sections:structure.map(clean),shortCandidates:clips.map(clean),existingInstrumentalSections:traditional};
 }
 function overlapWarnings(list,record){
