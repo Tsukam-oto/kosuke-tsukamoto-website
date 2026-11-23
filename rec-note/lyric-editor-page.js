@@ -16,7 +16,7 @@ app.innerHTML=[
 '<div class="leWorkspace"><section class="leSongList"><div class="leCardTitle"><strong id="leSongName">歌詞一覧</strong><label>歌詞の版 <select id="leVersion"></select></label></div><p class="leSmall">行を選ぶと右側で直接編集できます。</p><div id="leLineList" class="leLineList"></div></section>',
 '<section class="leMain"><div class="leCardTitle"><strong>歌詞の編集</strong><div class="leModeBar"><button type="button" id="leLineMode" class="active">行ごと</button><button type="button" id="leFullMode">全文</button></div></div>',
 '<div id="leLineEdit"><div class="leLineHead"><strong id="leSelectedNo">行を選択</strong><span id="leLineTime"></span></div><label class="leField">歌詞（文字や誤字の修正）<textarea id="leLineText" rows="3" spellcheck="false"></textarea></label><div class="leActions"><button type="button" id="leSplitLine">カーソル位置で行を分割</button><button type="button" id="leJoinPrev">前の行と結合</button><button type="button" id="leAddLine">次に行を追加</button><button type="button" id="leUndo">歌詞の変更を元に戻す</button></div>',
-'<section class="leDisplayEditor"><h2>動画での表示・改行</h2><p>ここで入れる改行は歌詞原本を増減させません。縦書きは右の列から左へ、上端を揃えます。</p><label class="leField">表示上の改行（文章は変えず改行だけ入力）<textarea id="leDisplayText" rows="3" spellcheck="false"></textarea></label><div class="leActions"><button type="button" id="leApplyBreaks">この表示改行を保存</button><button type="button" id="leClearBreaks">表示改行を解除</button></div><div id="leVerticalPreview" class="leVertical" aria-label="縦書き表示のプレビュー"></div><span id="leBreakStatus" role="status"></span></section></div>',
+'<section class="leDisplayEditor"><h2>動画での表示・改行</h2><p>ここで入れる改行は歌詞原本を増減させません。縦書きは右の列から左へ、上端を揃えます。</p><label class="leField">表示上の改行（文章は変えず改行だけ入力）<textarea id="leDisplayText" rows="3" spellcheck="false"></textarea></label><div class="leActions"><button type="button" id="leApplyBreaks">この表示改行を保存</button><button type="button" id="leClearBreaks">1列表示にする</button><button type="button" id="leUseV04">v04の自然な改行を使う</button></div><div id="leVerticalPreview" class="leVertical" aria-label="縦書き表示のプレビュー"></div><span id="leBreakStatus" role="status"></span></section></div>',
 '<div id="leFullEdit" hidden><label class="leField">歌詞全文（改行は原文の行区切り）<textarea id="leFullText" rows="24" spellcheck="false"></textarea></label><p class="leSmall">全文の改行を増減した場合、既存時刻は一致する行にのみ安全に引き継ぎます。</p></div>',
 '<div class="leSaveArea"><div id="leMigration" class="leMigration">正式な歌詞はまだ変更していません。</div><div class="leActions"><button type="button" id="leSaveDraft">下書きを保存</button><button type="button" id="lePublish" class="lePrimary">正式な歌詞として保存（新しい版）</button></div><p class="leSmall">新しい版を作り、以前の歌詞とタイミングは残します。時刻が不明な箇所は確認待ちになります。</p></div></section></div></div>'
 ].join('');
@@ -36,21 +36,31 @@ function ensureEdit(){
  if(version.id!==versions[0]?.id)throw Error('過去の版は編集できません。最新の版を選択してください。');
  if(!bridge.isSignedIn())throw Error('先にログインしてください。');
 }
-function getBreaks(i){
- const fromSession=displayBreaks[i];if(Array.isArray(fromSession))return fromSession;
+function displayChoice(i){
+ const src=editing[i]||'',layout=window.RECNOTE_LYRIC_LAYOUT;
+ if(!layout)return {breaks:[],source:'single'};
+ if(Object.prototype.hasOwnProperty.call(displayBreaks,i))return {breaks:displayBreaks[i]||[],source:'manual'};
  const saved=state.drafts?.[core.displayKey(work.id,version.id,i)];
- if(saved?.source===editing[i]&&Array.isArray(saved.breaks))return saved.breaks;
- return [];
+ return layout.resolve(song,src,saved?.source===src?saved:null);
 }
 function renderDisplayText(){
- const src=editing[selected]||'',breaks=getBreaks(selected).filter(x=>Number.isInteger(x)&&x>0&&x<src.length).sort((a,b)=>a-b);
+ const src=editing[selected]||'',choice=displayChoice(selected);
+ const breaks=choice.breaks.filter(x=>Number.isInteger(x)&&x>0&&x<src.length).sort((a,b)=>a-b);
  let prev=0,output='';for(const n of [...breaks,src.length]){output+=(output?'\n':'')+src.slice(prev,n);prev=n;}
  $('leDisplayText').value=output;
  showVertical(output);
+ $('leUseV04').disabled=!window.RECNOTE_LYRIC_LAYOUT?.suggestions(song,src).length;
+ $('leBreakStatus').dataset.error='false';
+ $('leBreakStatus').textContent=choice.source==='v04'?
+  '前回のMV v04で確認した自然な改行を表示しています。変更する場合はここで編集してください。':
+  choice.source==='manual'?'保存済みの改行設定を表示しています。':'1列表示です。必要なら自然な文節で改行できます。';
 }
 function showVertical(text){
- const el=$('leVerticalPreview');el.replaceChildren();
- for(const part of text.split('\n')){const span=document.createElement('span');span.textContent=part;el.append(span);}
+ const str=String(text||'').replace(/\r\n?/g,'\n'),parts=str.split('\n'),positions=[];
+ let n=0;for(const part of parts.slice(0,-1)){n+=part.length;positions.push(n);}
+ const el=$('leVerticalPreview');
+ if(window.RECNOTE_LYRIC_LAYOUT)window.RECNOTE_LYRIC_LAYOUT.render(el,parts.join(''),positions);
+ else {el.replaceChildren();for(const part of parts){const node=document.createElement('span');node.textContent=part;el.append(node);}}
 }
 function currentCueInfo(i){
  const t=state.lyricTimings?.find(x=>x.workId===work.id&&x.textVersionId===version.id&&x.lineIndex===i&&!x.syncConflictOf);
@@ -141,7 +151,7 @@ function applyBreaks(){
  // The existing display format is kept; only its line-break offsets change.
  state.drafts=state.drafts||{};
  state.drafts[key]={schema:1,source:src,splits:d?.source===src&&Array.isArray(d.splits)?d.splits:[],
-  join:d?.source===src?!!d.join:false,breaks,updatedAt:new Date().toISOString()};
+  join:d?.source===src?!!d.join:false,breaks,mode:breaks.length?'manual':'single',updatedAt:new Date().toISOString()};
  persist();persistDraft();$('leBreakStatus').dataset.error='false';$('leBreakStatus').textContent='表示上の改行を保存しました。';
  showVertical(raw);
 }
@@ -216,6 +226,7 @@ $('leSplitLine').onclick=splitAtCursor;$('leJoinPrev').onclick=joinPrevious;$('l
 $('leLineMode').onclick=()=>changeMode('line');$('leFullMode').onclick=()=>changeMode('full');
 $('leApplyBreaks').onclick=applyBreaks;
 $('leClearBreaks').onclick=()=>{$('leDisplayText').value=editing[selected]||'';applyBreaks();};
+$('leUseV04').onclick=()=>{const src=editing[selected]||'',layout=window.RECNOTE_LYRIC_LAYOUT;const breaks=layout?.suggestions(song,src)||[];if(!breaks.length){message('この行にはv04の指定改行がありません。');return;}$('leDisplayText').value=layout.columns(src,breaks).join('\n');applyBreaks();};
 $('leDisplayText').addEventListener('input',e=>{showVertical(e.target.value);$('leBreakStatus').textContent=e.target.value.replace(/\r\n?/g,'\n').replace(/\n/g,'')===editing[selected]?'':'歌詞の文字は変更せず、改行だけ調整してください。';});
 $('leSaveDraft').onclick=()=>{if(mode==='line')syncLineTextarea();persistDraft();message('下書きを端末に保存し、クラウド同期を要求しました。');};
 $('lePublish').onclick=publish;
