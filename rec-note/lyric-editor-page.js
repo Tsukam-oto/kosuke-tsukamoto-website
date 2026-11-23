@@ -185,6 +185,7 @@ async function publish(){
  finally{saving=false;renderMigration();}
 }
 async function loadSong(name,preferId){
+ if(version&&pendingChanges)persistDraft();
  const id=++loading;clearTimeout(autoTimer);song=name;work=null;version=null;editing=[];selected=0;displayBreaks={};
  const tabs=$('leSongs');tabs.replaceChildren();
  const choices=[...new Set(['あなたと','これから','これからも',...(typeof SONGS!=='undefined'?SONGS:[])] )];
