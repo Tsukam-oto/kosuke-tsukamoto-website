@@ -17,7 +17,7 @@ nav.append(open);
 const panel=document.createElement('section');panel.id='ssPanel';panel.className='ssPanel';
 panel.hidden=true;
 panel.innerHTML=[
- '<header class="ssHeader"><div><small>SONG MAP / SHORT CUTS</small><h2>楽曲構成・ショート候補</h2><p>歌詞は変更せず、Aメロ・Bメロ・サビなどを時間で管理します。</p></div><button type="button" id="ssClose">歌詞に戻る ×</button></header>',
+ '<header class="ssHeader"><div><small>SONG MAP / SHORT CUTS</small><h2>楽曲構成・ショート候補</h2><p>歌詞の最初と最後を選ぶだけで、登録済みの歌詞タイミングから自動で区間が決まります。</p></div><button type="button" id="ssClose">歌詞に戻る ×</button></header>',
  '<div id="ssStatus" class="ssStatus" role="status">区間データを読み込んでいます。</div>',
  '<nav class="ssTabs" aria-label="楽曲構成とショート候補"><button id="ssTabSection" type="button">楽曲構成</button><button id="ssTabShort" type="button">ショート候補</button></nav>',
  '<div class="ssLayout"><section class="ssListArea"><div class="ssSubHead"><strong id="ssListTitle">登録済み区間</strong><button type="button" id="ssAdd">＋ 区間を追加</button></div>',
@@ -26,13 +26,14 @@ panel.innerHTML=[
  '<details class="ssOld" id="ssOld"><summary>登録済みの前奏・間奏・後奏を見る（読み取り専用）</summary><div id="ssOldList"></div></details></section>',
  '<section class="ssEditArea" id="ssEditArea"><div class="ssSubHead"><strong id="ssFormTitle">区間を追加</strong><span id="ssEditorStatus">未登録</span></div>',
  '<div class="ssRow"><label id="ssTypeWrap">構成の種類<select id="ssType"></select></label><label>表示名<input id="ssName" type="text" maxlength="80" placeholder="例：Aメロ1／ラスサビ"></label></div>',
- '<div class="ssRow ssTimeRow"><label>開始時刻<input id="ssStart" type="text" inputmode="decimal" placeholder="1:20.00"></label><label>終了時刻<input id="ssEnd" type="text" inputmode="decimal" placeholder="1:45.00"></label></div>',
- '<div class="ssRow ssCapture"><button id="ssCaptureStart" type="button">再生位置を開始に設定</button><button id="ssCaptureEnd" type="button">再生位置を終了に設定</button><button id="ssPreview" type="button">この区間を再生</button></div>',
- '<div class="ssNudges"><button type="button" data-ss-nudge="start:-0.1">開始 −0.1秒</button><button type="button" data-ss-nudge="start:0.1">開始 ＋0.1秒</button><button type="button" data-ss-nudge="end:-0.1">終了 −0.1秒</button><button type="button" data-ss-nudge="end:0.1">終了 ＋0.1秒</button></div>',
+ '<div class="ssLyricSelect"><label>開始する歌詞<select id="ssFirstLyric"><option value="">歌詞を読み込み中…</option></select></label>',
+ '<label>最後の歌詞（この行まで含む）<select id="ssLastLyric"><option value="">歌詞を読み込み中…</option></select></label></div>',
+ '<div class="ssDerivedTime" id="ssDerivedTime" role="status">登録済みの歌詞タイミングから区間を自動取得します。</div>',
+ '<div class="ssRow ssCapture"><button id="ssPreview" type="button">選んだ歌詞の範囲を試聴</button></div>',
  '<label class="ssNote">制作メモ<textarea id="ssNote" rows="2" placeholder="盛り上がり、ショート向きの理由など"></textarea></label>',
  '<p id="ssOverlap" class="ssHint"></p>',
  '<div class="ssActions"><button id="ssSave" class="ssMain" type="button">下書き保存</button><button id="ssApprove" type="button">音源で確認済みにする</button><button id="ssMakeShort" type="button">この区間からショート候補</button><button id="ssDelete" type="button">削除</button></div>',
- '<p class="ssFootnote">確認前の区間は「仮」。音源を聴いて開始・終了を決めてから確定してください。歌詞の編集は専用ページのみです。</p></section></div>',
+ '<p class="ssFootnote">区間の時刻は歌詞のタイミングに連動します。時刻を修正する場合は従来の歌詞タイミング画面から行ってください。歌詞の文面は専用ページで編集します。</p></section></div>',
  '<div class="ssBottom"><button id="ssExport" type="button">構成＋ショート候補をJSON保存</button><a href="./lyric-editor" id="ssLyricsLink">歌詞の編集専用ページ</a></div>'
 ].join('');
 root.insertBefore(panel,$('fullSongSections')?.nextSibling||$('syncModeBar'));
@@ -40,10 +41,12 @@ for(const [type,label] of core.TYPES){
  const option=document.createElement('option');option.value=type;option.textContent=label;$('ssType').append(option);
 }
 let mode='music-structure',selectedId=null,previewStop=null,initialForm=null,formChanged=false,draftTimer=null,shortSourceRegionId=null;
-const inputIds=['ssType','ssName','ssStart','ssEnd','ssNote'];
+let lyricRead=null,lyricCtx=null,lyricSeq=0,selectedFirst=null,selectedLast=null,lyricIssue='';
+const bridge=window.RECNOTE_LYRIC_BRIDGE;
+const inputIds=['ssType','ssName','ssNote'];
 const records=()=>Array.isArray(state.lyricTimings)?state.lyricTimings:(state.lyricTimings=[]);
 const targetList=()=>records().filter(x=>mode==='music-structure'?core.isArrangement(x,song):core.isShort(x,song))
- .sort((a,b)=>(a.start??Infinity)-(b.start??Infinity)||(a.label||'').localeCompare(b.label||''));
+ .sort((a,b)=>((core.linkInterval(a,lyricCtx).start??Infinity)-(core.linkInterval(b,lyricCtx).start??Infinity))||(a.label||'').localeCompare(b.label||''));
 const current=()=>selectedId?records().find(x=>x.id===selectedId&&!x.deleted&&!x.syncConflictOf):null;
 const conflicts=id=>records().filter(x=>x.syncConflictOf===id);
 const loggedIn=()=>cloud.isSignedIn();
