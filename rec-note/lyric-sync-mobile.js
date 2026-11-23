@@ -98,7 +98,7 @@ function refreshInline(){
 function mountInline(){
  if(!work||!version||selected<0)return;
  const node=$('syncLines').querySelector('[data-line="'+selected+'"]');
- if(node){node.after(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
+ if(node){contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);refreshInline();}
 }
 function saveInline(announce){
  const c=window.RECNOTE_LYRIC_WORKBENCH;if(!c||selected<0||!version)return false;
@@ -130,6 +130,9 @@ $('syncInlineCommit').addEventListener('click',publishInline);
 $('syncInlineOriginal').addEventListener('click',()=>{$('syncInlineSource').value=lines[selected]??'';saveInline(true);});
 $('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);inlineDirty=true;$('syncInlineNote').textContent='編集中…';inlineTimer=setTimeout(()=>{if(inlineDirty)saveInline(false);},850);});
 
+const contextHost=document.createElement('aside');contextHost.id='syncContextEditor';contextHost.className='syncContextEditor';contextHost.setAttribute('aria-label','選択した歌詞の編集');
+root.insertBefore(contextHost,$('syncLines').nextSibling);
+contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
@@ -290,7 +293,7 @@ function renderRows(){
   const content=document.createElement('span');content.className='syncLineText';content.textContent=x.text;
   const time=document.createElement('span');time.className='syncLineStamp';const suggested=started(t)&&!Number.isFinite(t?.end)?candidateEnd(x.i):null;time.textContent=confirmed(t)?'✓ '+timestamp(t.start):complete(t)?timestamp(t.start)+'–'+timestamp(t.end):started(t)?timestamp(t.start)+(Number.isFinite(suggested)?' → '+timestamp(suggested)+'（自動候補）':' / 終了未設定'):'未記録';
   b.append(number,content,time);
-  b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));});
+  b.addEventListener('click',()=>{choose(x.i,true,false);if(syncMode==='review'&&started(get(x.i)))seek(Math.max(0,get(x.i).start-0.8));if(window.innerWidth<=850)contextHost.scrollIntoView({block:'start',behavior:'smooth'});});
   view.append(b);
  }
  mountInline();
