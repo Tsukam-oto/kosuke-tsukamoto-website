@@ -318,3 +318,71 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncInstrumentRail button{flex:1 1 0;min-width:0;min-height:46px;font-size:11px;padding:7px 3px}
  body.syncPage #syncStudio.syncReady{padding-bottom:calc(185px + env(safe-area-inset-bottom))}
 }
+
+
+/* v18: lyric editing belongs directly to the selected row. */
+#syncStudio .syncHeading a.syncEditorNav{display:inline-flex!important;align-items:center;justify-content:center;
+ text-align:center;font-size:12px;font-weight:800;color:#fff;background:#2c4e67;border:1px solid #2c4e67;
+ border-radius:10px;min-height:40px;padding:8px 13px;text-decoration:none;white-space:normal}
+#syncStudio .syncInlineEdit{display:block;min-width:0;width:100%;padding:15px 15px 13px;margin:1px 0 8px;
+ border:1px solid #aec6d9;border-top:4px solid #3d739b;border-radius:0 0 13px 13px;background:#f6f9fc;
+ box-shadow:0 8px 18px rgba(34,72,100,.06)}
+#syncStudio .syncInlineEdit[hidden]{display:none!important}
+#syncStudio .syncInlineHeading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+#syncStudio .syncInlineHeading strong{font-size:15px}
+#syncStudio .syncInlineHeading a{display:inline-flex;color:#215d84;background:#fff;text-decoration:none;
+ font-size:12px;font-weight:800;border:1px solid #cadce9;border-radius:9px;padding:8px 11px}
+#syncStudio .syncInlineEdit label{font-size:12px;font-weight:800;display:block;line-height:1.5}
+#syncStudio .syncInlineEdit textarea{font:inherit;display:block;resize:vertical;min-height:68px;width:100%;
+ margin:6px 0 10px;padding:11px;border:1px solid #b8cedd;border-radius:9px;background:#fff;color:#252b2e;
+ font-size:15px;line-height:1.7}
+#syncStudio .syncInlineEdit textarea:focus{outline:2px solid #92b9d2;outline-offset:1px}
+#syncStudio .syncInlineActions{display:flex;flex-wrap:wrap;gap:7px}
+#syncStudio .syncInlineActions button{min-height:40px;font-size:12px}
+#syncStudio #syncInlineSave{background:#e7f0f8;border-color:#b4ccdf;color:#265c84}
+#syncStudio #syncInlineCommit{background:#2c536e;border-color:#2c536e;color:#fff}
+#syncStudio .syncInlineStatus,#syncStudio #syncInlineNote{font-size:11px;margin:10px 0 0;color:#556b7b;line-height:1.7}
+#syncStudio .syncLine.selected{border-bottom-left-radius:0;border-bottom-right-radius:0}
+#syncStudio .syncTimingPanel{margin:5px 0 10px;border:1px solid #d9e4eb;background:#fff;border-radius:12px;padding:10px 12px}
+#syncStudio #syncDisplayPanel>summary,#syncStudio #syncTimingPanel>summary{font-weight:800;font-size:13px;color:#2c5e86}
+#syncStudio .syncFineTune{margin:6px 0 12px}
+#syncStudio .syncQuickReview{margin:5px 0}
+#syncStudio .syncLine{scroll-margin-top:120px}
+@media(max-width:550px){
+ #syncStudio .syncHeading{gap:8px;flex-wrap:wrap}
+ #syncStudio .syncHeading a.syncEditorNav{width:100%;margin-top:5px}
+ #syncStudio .syncInlineEdit{padding:11px 10px}
+ #syncStudio .syncInlineActions button{flex:1 1 45%;min-width:0}
+}
+
+/* Vertical preview: columns proceed right-to-left, tops aligned. */
+#syncStudio #syncDisplayResults .vertical{flex-direction:column;align-items:flex-start;justify-content:center}
+
+
+/* v18: keep the scrollable lyric list and editor visible side-by-side on Mac.
+   The list is still a DIRECT child of #syncStudio for the legacy instrument rail. */
+body.syncPage #syncStudio{display:grid!important;grid-template-columns:minmax(0,1.04fr) minmax(340px,.96fr);
+ column-gap:18px;max-width:1160px!important}
+#syncStudio > :not(#syncLines):not(#syncContextEditor){grid-column:1 / -1}
+#syncStudio #syncLines{grid-column:1;grid-row:auto;max-height:min(72dvh,720px);min-height:300px}
+#syncStudio #syncContextEditor{grid-column:2;grid-row:auto;align-self:start;position:sticky;top:14px;
+ min-width:0;max-height:min(82dvh,810px);overflow-y:auto;overscroll-behavior:contain;
+ background:#fff;border:1px solid #d9e1e8;border-radius:14px;padding:11px;
+ box-shadow:0 5px 22px rgba(38,61,80,.045)}
+#syncStudio .syncContextEditor .syncTimingPanel{margin:8px 0}
+#syncStudio .syncContextEditor .syncInlineEdit{margin:0 0 12px;border-radius:11px}
+#syncStudio .syncContextEditor .syncQuickReview{margin:5px 0}
+@media(min-width:1531px){#syncStudio .syncInstrumentRail{left:calc(50% + 588px)}}
+@media(max-width:1530px) and (min-width:1221px){
+ #syncStudio .syncInstrumentRail{position:fixed;top:auto;bottom:17px;left:50%;transform:translateX(-50%);
+  width:min(1120px,calc(100% - 22px));z-index:48;flex-direction:row;align-items:center;gap:7px;padding:8px}
+ #syncStudio .syncInstrumentRail strong,#syncStudio .syncInstrumentRail small{display:none}
+ #syncStudio .syncInstrumentRail button{flex:1;min-width:0;min-height:44px}
+ body.syncPage #syncStudio{padding-bottom:155px}
+}
+@media(max-width:900px){
+ body.syncPage #syncStudio{grid-template-columns:minmax(0,1fr);max-width:750px!important;column-gap:0}
+ #syncStudio #syncLines{grid-column:1;max-height:min(53dvh,520px);min-height:190px}
+ #syncStudio #syncContextEditor{grid-column:1;position:static;max-height:none;overflow:visible;
+  padding:9px;margin:12px 0 18px;scroll-margin-top:12px}
+}

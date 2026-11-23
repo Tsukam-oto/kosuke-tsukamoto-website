@@ -1,0 +1,79 @@
+/* REC NOTE v18 full lyrics editor - no decorative controls. */
+body.lyricEditorPage{margin:0!important;background:#f4f5f6!important;color:#21282f!important;min-height:100vh!important;overflow:auto!important;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif!important}
+body.lyricEditorPage > :not(#lyricEditorApp){display:none!important}
+#lyricEditorApp,#lyricEditorApp *{box-sizing:border-box}
+#lyricEditorApp{display:block;max-width:1320px;margin:0 auto;padding:22px 24px 90px;color:#20262e;font-size:15px;line-height:1.65}
+#lyricEditorApp .leHeader{padding:18px 0 22px;border-bottom:1px solid #d8dde3;margin-bottom:20px}
+#lyricEditorApp .leEyebrow{font-size:11px;font-weight:800;color:#6f8193;letter-spacing:0.15em}
+#lyricEditorApp .leHeadRow{display:flex;gap:15px;justify-content:space-between;align-items:center;flex-wrap:wrap}
+#lyricEditorApp h1{font-size:31px;letter-spacing:-.025em;margin:4px 0;color:#22282e}
+#lyricEditorApp .leHeader p{font-size:13px;color:#67717b;margin:1px 0}
+#lyricEditorApp .leHeader nav{display:flex;gap:10px;flex-wrap:wrap}
+#lyricEditorApp .leHeader nav a{font-size:13px;text-decoration:none;padding:9px 14px;border:1px solid #d7dce1;border-radius:9px;background:#fff;color:#2b485e;font-weight:700}
+#lyricEditorApp .leFrame{background:#fff;border:1px solid #e0e4e8;border-radius:17px;box-shadow:0 12px 38px rgba(25,36,48,.045);overflow:hidden}
+#lyricEditorApp button,#lyricEditorApp select,#lyricEditorApp input,#lyricEditorApp textarea{font-family:inherit}
+#lyricEditorApp button{cursor:pointer;color:#2b3744;background:#fff;border:1px solid #ced7e0;padding:8px 11px;border-radius:8px;font-weight:650;line-height:1.35}
+#lyricEditorApp button:disabled{opacity:.45;cursor:not-allowed}
+#lyricEditorApp button:hover:not(:disabled){background:#ecf3f9}
+#lyricEditorApp .leSongTabs{display:flex;gap:8px;padding:18px 21px 10px;flex-wrap:wrap}
+#lyricEditorApp .leSongTabs button{padding:10px 19px;background:#f6f8fa;font-size:14px}
+#lyricEditorApp .leSongTabs button.active{background:#193c54;border-color:#193c54;color:#fff}
+#lyricEditorApp .leStatusBar{display:flex;justify-content:space-between;gap:16px;align-items:center;margin:0 20px;padding:10px 12px;background:#f4f7fa;color:#39536a;border-radius:10px;font-size:12px}
+#lyricEditorApp #leStatus[data-error=true]{color:#a32727;font-weight:700}
+#lyricEditorApp #leSaveStatus{white-space:nowrap;font-weight:700;color:#5e6a75}
+#lyricEditorApp .leAuth{margin:10px 20px 0;border:1px solid #e2e6eb;border-radius:8px;font-size:12px}
+#lyricEditorApp .leAuth summary{cursor:pointer;padding:8px 12px;font-weight:700;color:#345670}
+#lyricEditorApp #leCloudHere{padding:12px}
+#lyricEditorApp .leWorkspace{display:grid;grid-template-columns:minmax(280px,0.8fr) minmax(360px,1.55fr);gap:0;margin-top:17px}
+#lyricEditorApp .leWorkspace>section{padding:18px 20px 30px}
+#lyricEditorApp .leSongList{border-right:1px solid #e3e7ec;min-width:0}
+#lyricEditorApp .leMain{min-width:0}
+#lyricEditorApp .leCardTitle{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:9px}
+#lyricEditorApp .leCardTitle strong{font-size:17px}
+#lyricEditorApp .leCardTitle label{font-size:12px;color:#64717e;font-weight:700}
+#lyricEditorApp .leCardTitle select{display:block;width:100%;max-width:185px;padding:7px;border-radius:8px;border:1px solid #ccd5de;font-size:12px;background:#fff}
+#lyricEditorApp .leSmall{font-size:12px;color:#65727f;margin:4px 0 13px}
+#lyricEditorApp .leLineList{display:flex;flex-direction:column;gap:6px;max-height:68vh;min-height:230px;overflow:auto;padding:3px}
+#lyricEditorApp .leLyricRow{display:grid;grid-template-columns:32px minmax(0,1fr);gap:3px 10px;align-items:center;text-align:left!important;min-height:54px;padding:10px 10px!important;border:1px solid #e4e8ed!important;border-radius:9px!important;background:#fff!important}
+#lyricEditorApp .leLyricRow strong{font-size:12px;color:#6f7d89;align-self:start}
+#lyricEditorApp .leLyricRow span{font-size:14px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+#lyricEditorApp .leLyricRow small{font-size:11px;color:#758494;grid-column:2}
+#lyricEditorApp .leLyricRow.selected{border-color:#557a99!important;background:#e9f2f8!important;box-shadow:inset 3px 0 #396d91}
+#lyricEditorApp .leModeBar{display:flex;gap:5px}
+#lyricEditorApp .leModeBar button{font-size:12px;padding:6px 11px}
+#lyricEditorApp .leModeBar button.active{background:#34495f;color:#fff;border-color:#34495f}
+#lyricEditorApp .leLineHead{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0 5px}
+#lyricEditorApp #leLineTime{font-size:12px;color:#5d7489}
+#lyricEditorApp .leField{display:block;font-size:12px;font-weight:800;color:#3a4e62;margin-top:8px}
+#lyricEditorApp textarea,#lyricEditorApp input,#lyricEditorApp select{color:#29333b}
+#lyricEditorApp textarea{display:block;width:100%;resize:vertical;background:#fff;border:1px solid #bacbd9;border-radius:10px;padding:13px;font-size:16px;line-height:1.7;margin:5px 0 8px}
+#lyricEditorApp textarea:focus{outline:2px solid #95c5e3;outline-offset:1px}
+#lyricEditorApp .leActions{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+#lyricEditorApp .leActions button{font-size:12px}
+#lyricEditorApp .leDisplayEditor{margin-top:23px;border-top:1px solid #e4e9ef;padding-top:15px}
+#lyricEditorApp .leDisplayEditor h2{font-size:17px;margin:0 0 5px}
+#lyricEditorApp .leDisplayEditor p{font-size:12px;color:#627485;margin:0 0 12px}
+#lyricEditorApp .leVertical{display:flex;flex-direction:row;justify-content:center;align-items:flex-start;writing-mode:vertical-rl;text-orientation:mixed;gap:22px;line-height:1.8;background:linear-gradient(130deg,#251d25,#35222b,#181e23);color:#f4e9dd;border-radius:11px;padding:24px 20px;min-height:140px;max-height:300px;overflow:auto;font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:21px;margin:12px 0}
+#lyricEditorApp .leVertical span{white-space:pre-wrap;display:block}
+#lyricEditorApp #leBreakStatus[data-error=true]{color:#ac2626}
+#lyricEditorApp #leBreakStatus{font-size:12px;display:block}
+#lyricEditorApp .leSaveArea{margin:26px 0 0;padding:17px;border:1px solid #dce3e9;border-radius:12px;background:#f6f8fa}
+#lyricEditorApp .leMigration{font-size:13px;font-weight:700;color:#4d5d6b}
+#lyricEditorApp button.lePrimary{background:#173e56;color:#fff;border-color:#173e56;padding:10px 17px}
+#lyricEditorApp button.lePrimary:hover:not(:disabled){background:#235b80}
+#lyricEditorApp #leFullText{font-size:14px;line-height:1.8;min-height:570px}
+@media(max-width:760px){
+ #lyricEditorApp{padding:10px 9px 65px}
+ #lyricEditorApp h1{font-size:25px}
+ #lyricEditorApp .leHeader{padding:12px 6px}
+ #lyricEditorApp .leFrame{border-radius:12px}
+ #lyricEditorApp .leWorkspace{grid-template-columns:minmax(0,1fr)}
+ #lyricEditorApp .leWorkspace>section{padding:13px 14px 20px}
+ #lyricEditorApp .leSongList{border-right:0;border-bottom:1px solid #e3e7ec}
+ #lyricEditorApp .leLineList{max-height:300px;min-height:130px}
+ #lyricEditorApp .leStatusBar{margin:0 12px}
+ #lyricEditorApp .leVertical{font-size:19px}
+}
+
+/* Real vertical-rl columns must advance right-to-left and share the same top. */
+#lyricEditorApp .leVertical{flex-direction:column;align-items:flex-start;justify-content:center}
