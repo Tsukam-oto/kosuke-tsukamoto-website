@@ -1,11 +1,11 @@
-/* REC NOTE 7.0: mobile cloud lyric timing; existing record schema and authentication. */
+/* REC NOTE v17: cloud lyric timing and non-destructive display plans. */
 (function(){
 'use strict';
 // Dedicated full-song timing page only. The audio-corrections page has its own navigation.
 if(new URLSearchParams(location.search).get('sync')!=='1'&&!/\/lyric-sync(?:\.html)?\/?$/i.test(location.pathname))return;
 const bridge=window.RECNOTE_LYRIC_BRIDGE,media=window.RECNOTE_CLOUD_MEDIA;
 if(!bridge||!media||typeof persist!=='function')return;
-document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v16';
+document.body.classList.add('syncPage');document.title='曲のタイミング合わせ | REC NOTE v17';
 const $=id=>document.getElementById(id);
 const root=document.createElement('div');root.id='syncStudio';
 root.innerHTML=[
