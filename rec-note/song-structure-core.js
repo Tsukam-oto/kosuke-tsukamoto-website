@@ -62,8 +62,8 @@ function typeLabel(type){return TYPES.find(x=>x[0]===type)?.[1]||'その他';}
 function seedFor(song,kind){
  const arr=kind==='short-cut'?seedShorts[song]:seedSections[song];
  return (arr||[]).map((entry,n)=>kind==='short-cut'?
-  {label:entry[0],start:entry[1],end:entry[2],note:entry[3],source:'ep-draft-map-v01',status:'draft'}:
-  {type:entry[0],label:entry[1],start:entry[2],end:entry[3],note:'以前の仮マップから。音源で確認して確定してください。',source:'ep-draft-map-v01',status:'draft'});
+  {label:entry[0],start:entry[1],end:entry[2],note:entry[3],source:'ep-draft-map-v01',sourceSeedKey:'ep-v01:'+kind+':'+n,status:'draft'}:
+  {type:entry[0],label:entry[1],start:entry[2],end:entry[3],note:'以前の仮マップから。音源で確認して確定してください。',source:'ep-draft-map-v01',sourceSeedKey:'ep-v01:'+kind+':'+n,status:'draft'});
 }
 function clipFromSection(region){
  if(!Number.isFinite(region?.start)||!Number.isFinite(region?.end)||region.end<=region.start)return null;
@@ -81,7 +81,7 @@ function exportPlan(song,data,now){
     sectionKey:x.sectionKey,start:x.start??null,end:x.end??null,status:x.status}));
  const clean=(v)=>({id:v.id,label:v.label||'',type:v.type||null,start:v.start??null,end:v.end??null,
     duration:Number.isFinite(v.start)&&Number.isFinite(v.end)?+(v.end-v.start).toFixed(3):null,
-    note:v.note||'',status:v.status,source:v.source||'manual',sourceRegionId:v.sourceRegionId||null});
+    note:v.note||'',status:v.status,source:v.source||'manual',sourceSeedKey:v.sourceSeedKey||null,sourceRegionId:v.sourceRegionId||null});
  return {schemaVersion:1,source:'REC_NOTE_ARRANGEMENT_SHORT_PLAN',song,exportedAt:(now||new Date()).toISOString(),
   caveat:'編集・確認用の区間マップです。動画MP4ではありません。draftは正式な楽曲構成確定ではありません。',
   sections:structure.map(clean),shortCandidates:clips.map(clean),existingInstrumentalSections:traditional};
