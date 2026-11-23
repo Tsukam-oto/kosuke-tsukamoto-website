@@ -374,7 +374,7 @@ body.syncPage #syncStudio{display:grid!important;grid-template-columns:minmax(0,
 #syncStudio .syncContextEditor .syncQuickReview{margin:5px 0}
 @media(min-width:1531px){#syncStudio .syncInstrumentRail{left:calc(50% + 588px)}}
 @media(max-width:1530px) and (min-width:1221px){
- #syncStudio .syncInstrumentRail{position:fixed;top:auto;bottom:17px;left:50%;transform:translateX(-50%);
+ #syncStudio .syncInstrumentRail{position:fixed;top:auto;bottom:calc(80px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);
   width:min(1120px,calc(100% - 22px));z-index:48;flex-direction:row;align-items:center;gap:7px;padding:8px}
  #syncStudio .syncInstrumentRail strong,#syncStudio .syncInstrumentRail small{display:none}
  #syncStudio .syncInstrumentRail button{flex:1;min-width:0;min-height:44px}
