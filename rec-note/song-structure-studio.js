@@ -151,7 +151,8 @@ function render(){
   const item=document.createElement('button');item.type='button';item.className='ssItem'+(x.id===selectedId?' selected':'');
   const head=document.createElement('strong');head.textContent=x.label||core.typeLabel(x.type);
   const detail=document.createElement('small');detail.textContent=
-   (mode==='music-structure'?core.typeLabel(x.type)+' ・ ':'')+core.formatTime(x.start)+' – '+core.formatTime(x.end);
+   (mode==='music-structure'?core.typeLabel(x.type)+' ・ ':'')+core.formatTime(x.start)+' – '+core.formatTime(x.end)+
+   (mode==='short-cut'&&Number.isFinite(x.start)&&Number.isFinite(x.end)?'（'+(x.end-x.start).toFixed(1)+'秒）':'');
   const tag=document.createElement('span');tag.className='ssTag';tag.textContent=x.status==='confirmed'?'確認済み':'仮';
   item.append(head,detail,tag);
   item.onclick=()=>selectRecord(x.id);
