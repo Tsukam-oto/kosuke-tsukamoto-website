@@ -219,6 +219,7 @@ $('leClearBreaks').onclick=()=>{$('leDisplayText').value=editing[selected]||'';a
 $('leDisplayText').addEventListener('input',e=>{showVertical(e.target.value);$('leBreakStatus').textContent=e.target.value.replace(/\r\n?/g,'\n').replace(/\n/g,'')===editing[selected]?'':'歌詞の文字は変更せず、改行だけ調整してください。';});
 $('leSaveDraft').onclick=()=>{if(mode==='line')syncLineTextarea();persistDraft();message('下書きを端末に保存し、クラウド同期を要求しました。');};
 $('lePublish').onclick=publish;
+const back=app.querySelector('a[href="./lyric-sync"]');if(back)back.addEventListener('click',()=>{if(version&&pendingChanges)persistDraft();back.href='./lyric-sync?'+new URLSearchParams({song,line:String(selected)}).toString();});
 window.addEventListener('recnote:cloud-auth-change',e=>{if(e.detail?.signedIn){$('leAuth').open=false;loadSong(song);}else{$('leAuth').open=true;message('編集にはクラウドログインが必要です。',true);}});
 window.addEventListener('recnote:cloud-synced',()=>saveLabel('クラウド同期済み'));
 window.addEventListener('beforeunload',()=>{if(version&&pendingChanges)persistDraft();});
