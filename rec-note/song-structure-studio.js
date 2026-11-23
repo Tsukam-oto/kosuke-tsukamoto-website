@@ -39,7 +39,7 @@ root.insertBefore(panel,$('fullSongSections')?.nextSibling||$('syncModeBar'));
 for(const [type,label] of core.TYPES){
  const option=document.createElement('option');option.value=type;option.textContent=label;$('ssType').append(option);
 }
-let mode='music-structure',selectedId=null,previewStop=null,initialForm=null,formChanged=false,draftTimer=null;
+let mode='music-structure',selectedId=null,previewStop=null,initialForm=null,formChanged=false,draftTimer=null,shortSourceRegionId=null;
 const inputIds=['ssType','ssName','ssStart','ssEnd','ssNote'];
 const records=()=>Array.isArray(state.lyricTimings)?state.lyricTimings:(state.lyricTimings=[]);
 const targetList=()=>records().filter(x=>mode==='music-structure'?core.isArrangement(x,song):core.isShort(x,song))
@@ -65,9 +65,10 @@ const seekOriginal=t=>{
 function status(msg,error=false){$('ssStatus').textContent=msg;$('ssStatus').dataset.error=error?'true':'false';}
 function formKey(id=selectedId,what=mode){return 'recnote-structure-form-v1:'+song+':'+what+':'+(id||'new');}
 function formValues(){
- return {type:$('ssType').value,label:$('ssName').value,start:$('ssStart').value,end:$('ssEnd').value,note:$('ssNote').value};
+ return {type:mode==='music-structure'?$('ssType').value:null,label:$('ssName').value,start:$('ssStart').value,end:$('ssEnd').value,note:$('ssNote').value,sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
 }
 function restoreForm(data){
+ shortSourceRegionId=mode==='short-cut'?(data?.sourceRegionId||null):null;
  $('ssType').value=core.ALLOWED.has(data?.type)?data.type:'verse';
  $('ssName').value=data?.label||'';
  $('ssStart').value=Number.isFinite(data?.start)?core.formatTime(data.start):data?.start||'';
@@ -135,6 +136,7 @@ function render(){
  $('ssImport').disabled=locked;
  $('ssMakeShort').disabled=locked||!r||!Number.isFinite(r?.start)||!Number.isFinite(r?.end);
  $('ssEditorStatus').textContent=conflict?'クラウド競合：編集不可':r?.status==='confirmed'?'確認済み':r?'登録済み・確認待ち':'未登録';
+ if(mode==='short-cut'&&shortSourceRegionId&&r?.sourceRegionId) $('ssOverlap').textContent='元になった楽曲構成から作成した候補です。';
  $('ssLyricsLink').href='./lyric-editor?'+new URLSearchParams({song}).toString();
  $('ssCaptureStart').disabled=!ready();$('ssCaptureEnd').disabled=!ready();
  $('ssPreview').disabled=!ready();
@@ -164,7 +166,7 @@ function render(){
 }
 function formTyped(strict=true){
  const a=core.parseTime($('ssStart').value),b=core.parseTime($('ssEnd').value);
- const v={type:$('ssType').value,label:$('ssName').value.trim(),start:a,end:b,note:$('ssNote').value.trim().slice(0,1000)};
+ const v={type:mode==='music-structure'?$('ssType').value:null,label:$('ssName').value.trim(),start:a,end:b,note:$('ssNote').value.trim().slice(0,1000),sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
  if(strict){
   if(!v.label||v.label.length>80)throw Error('区間名を1～80文字で入力してください。');
   if(mode==='music-structure'&&!core.ALLOWED.has(v.type))throw Error('構成の種類を選択してください。');
@@ -309,6 +311,7 @@ window.addEventListener('recnote:cloud-synced',()=>{if(!panel.hidden)render();})
 window.addEventListener('recnote:cloud-auth-change',()=>{if(!panel.hidden)render();});
 audio.addEventListener('loadedmetadata',()=>{if(!panel.hidden)render();});
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',changeSong);
+for(const id of ['fsOpenIntro','fsOpenInterlude','fsOpenOutro'])$(id)?.addEventListener('click',()=>{if(!panel.hidden)closePanel();});
 window.addEventListener('pagehide',flushDraft);
 restoreForm(state.drafts?.[formKey()]||{type:'verse'});
 window.RECNOTE_STRUCTURE_STUDIO=Object.freeze({open:openPanel,close:closePanel});
