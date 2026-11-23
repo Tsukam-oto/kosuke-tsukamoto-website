@@ -125,8 +125,10 @@ function restoreForm(data){
  $('ssNote').value=data?.note||'';
  let first=Number.isInteger(data?.startLyricIndex)?data.startLyricIndex:null;
  let last=Number.isInteger(data?.endLyricIndex)?data.endLyricIndex:null;
- if((first===null||last===null)&&Number.isFinite(data?.start)&&Number.isFinite(data?.end)){
-  const inferred=core.anchorFromApproximation(lyricCtx,data.start,data.end);
+ const oldStart=Number.isFinite(data?.start)?data.start:core.parseTime(data?.start);
+ const oldEnd=Number.isFinite(data?.end)?data.end:core.parseTime(data?.end);
+ if((first===null||last===null)&&Number.isFinite(oldStart)&&Number.isFinite(oldEnd)){
+  const inferred=core.anchorFromApproximation(lyricCtx,oldStart,oldEnd);
   if(inferred){first=inferred.startLyricIndex;last=inferred.endLyricIndex;}
  }
  selectedFirst=first;selectedLast=last;fillLyricSelectors();
