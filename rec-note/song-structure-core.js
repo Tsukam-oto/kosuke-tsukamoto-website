@@ -166,7 +166,9 @@ function anchorFromApproximation(ctx,start,end){
  // A proposal outside the available lyric timing coverage must not be silently linked
  // to the last verse or to unrelated material.
  if(!first||Math.abs(first.start-start)>12)return null;
- const last=available.filter(x=>x.index>=first.index&&x.start<end-.01).at(-1)||first;
+ // Boundaries from an estimated map can differ from the registered lyric by a fraction of a second.
+ // Treat a cue within 0.25s of the proposed section end as the NEXT section's opening.
+ const last=available.filter(x=>x.index>=first.index&&x.start<end-.25).at(-1)||first;
  if(last.start>end+0.05)return null;
  const range=rangeFromLyrics(ctx,first.index,last.index);
  if(range.issue)return null;
