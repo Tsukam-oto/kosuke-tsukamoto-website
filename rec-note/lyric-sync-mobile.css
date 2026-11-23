@@ -354,3 +354,6 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncInlineEdit{padding:11px 10px}
  #syncStudio .syncInlineActions button{flex:1 1 45%;min-width:0}
 }
+
+/* Vertical preview: columns proceed right-to-left, tops aligned. */
+#syncStudio #syncDisplayResults .vertical{flex-direction:column;align-items:flex-start;justify-content:center}
