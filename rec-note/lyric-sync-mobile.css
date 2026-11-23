@@ -318,3 +318,39 @@ body.syncPage #syncStudio{max-width:690px;background:transparent;padding-bottom:
  #syncStudio .syncInstrumentRail button{flex:1 1 0;min-width:0;min-height:46px;font-size:11px;padding:7px 3px}
  body.syncPage #syncStudio.syncReady{padding-bottom:calc(185px + env(safe-area-inset-bottom))}
 }
+
+
+/* v18: lyric editing belongs directly to the selected row. */
+#syncStudio .syncHeading a.syncEditorNav{display:inline-flex!important;align-items:center;justify-content:center;
+ text-align:center;font-size:12px;font-weight:800;color:#fff;background:#2c4e67;border:1px solid #2c4e67;
+ border-radius:10px;min-height:40px;padding:8px 13px;text-decoration:none;white-space:normal}
+#syncStudio .syncInlineEdit{display:block;min-width:0;width:100%;padding:15px 15px 13px;margin:1px 0 8px;
+ border:1px solid #aec6d9;border-top:4px solid #3d739b;border-radius:0 0 13px 13px;background:#f6f9fc;
+ box-shadow:0 8px 18px rgba(34,72,100,.06)}
+#syncStudio .syncInlineEdit[hidden]{display:none!important}
+#syncStudio .syncInlineHeading{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-bottom:12px}
+#syncStudio .syncInlineHeading strong{font-size:15px}
+#syncStudio .syncInlineHeading a{display:inline-flex;color:#215d84;background:#fff;text-decoration:none;
+ font-size:12px;font-weight:800;border:1px solid #cadce9;border-radius:9px;padding:8px 11px}
+#syncStudio .syncInlineEdit label{font-size:12px;font-weight:800;display:block;line-height:1.5}
+#syncStudio .syncInlineEdit textarea{font:inherit;display:block;resize:vertical;min-height:68px;width:100%;
+ margin:6px 0 10px;padding:11px;border:1px solid #b8cedd;border-radius:9px;background:#fff;color:#252b2e;
+ font-size:15px;line-height:1.7}
+#syncStudio .syncInlineEdit textarea:focus{outline:2px solid #92b9d2;outline-offset:1px}
+#syncStudio .syncInlineActions{display:flex;flex-wrap:wrap;gap:7px}
+#syncStudio .syncInlineActions button{min-height:40px;font-size:12px}
+#syncStudio #syncInlineSave{background:#e7f0f8;border-color:#b4ccdf;color:#265c84}
+#syncStudio #syncInlineCommit{background:#2c536e;border-color:#2c536e;color:#fff}
+#syncStudio .syncInlineStatus,#syncStudio #syncInlineNote{font-size:11px;margin:10px 0 0;color:#556b7b;line-height:1.7}
+#syncStudio .syncLine.selected{border-bottom-left-radius:0;border-bottom-right-radius:0}
+#syncStudio .syncTimingPanel{margin:5px 0 10px;border:1px solid #d9e4eb;background:#fff;border-radius:12px;padding:10px 12px}
+#syncStudio #syncDisplayPanel>summary,#syncStudio #syncTimingPanel>summary{font-weight:800;font-size:13px;color:#2c5e86}
+#syncStudio .syncFineTune{margin:6px 0 12px}
+#syncStudio .syncQuickReview{margin:5px 0}
+#syncStudio .syncLine{scroll-margin-top:120px}
+@media(max-width:550px){
+ #syncStudio .syncHeading{gap:8px;flex-wrap:wrap}
+ #syncStudio .syncHeading a.syncEditorNav{width:100%;margin-top:5px}
+ #syncStudio .syncInlineEdit{padding:11px 10px}
+ #syncStudio .syncInlineActions button{flex:1 1 45%;min-width:0}
+}
