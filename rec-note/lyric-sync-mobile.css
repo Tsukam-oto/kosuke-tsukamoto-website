@@ -386,3 +386,21 @@ body.syncPage #syncStudio{display:grid!important;grid-template-columns:minmax(0,
  #syncStudio #syncContextEditor{grid-column:1;position:static;max-height:none;overflow:visible;
   padding:9px;margin:12px 0 18px;scroll-margin-top:12px}
 }
+
+/* v18.1: identical vertical column logic in timing editor. */
+#syncStudio #syncDisplayResults .vertical{
+ writing-mode:horizontal-tb!important;display:flex!important;flex-direction:row!important;
+ direction:rtl!important;align-items:flex-start!important;justify-content:center!important;
+ gap:10px!important;width:min(100%,265px)!important;aspect-ratio:9 / 16!important;
+ min-height:0!important;height:auto!important;max-height:none!important;
+ margin:11px auto!important;padding:41px 14px!important;box-sizing:border-box!important;
+ overflow:visible!important;font-size:var(--lyric-font-size,21px)!important;
+ line-height:1.38!important;text-align:start!important;
+}
+#syncStudio #syncDisplayResults .vertical>.lyricVerticalColumn{
+ display:block!important;flex:0 0 auto!important;writing-mode:vertical-rl!important;
+ white-space:pre!important;word-break:keep-all!important;overflow-wrap:normal!important;
+ height:max-content!important;max-height:none!important;align-self:flex-start!important;
+ direction:ltr!important;line-height:1.38!important;letter-spacing:.035em!important;
+}
+@media(max-width:500px){#syncStudio #syncDisplayResults .vertical{width:min(100%,245px)!important}}
