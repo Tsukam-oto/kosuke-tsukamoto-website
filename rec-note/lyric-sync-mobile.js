@@ -77,7 +77,7 @@ inlinePanel.innerHTML='<div class="syncInlineHeading"><strong>選択中の歌詞
 root.insertBefore(inlinePanel,$('syncLines').nextSibling);
 const navToEditor=document.createElement('a');navToEditor.className='syncEditorNav';navToEditor.id='syncEditorNav';navToEditor.textContent='歌詞の編集・改行';navToEditor.href='./lyric-editor';
 root.querySelector('.syncHeading').append(navToEditor);
-let inlineTimer=0;
+let inlineTimer=0,inlineDirty=false;
 function inlineProposed(){
  const c=window.RECNOTE_LYRIC_WORKBENCH;
  const d=work&&version?c?.fetchDraft(state,work,version):null;
@@ -105,7 +105,7 @@ function saveInline(announce){
  const draft=inlineProposed();
  if(draft.length!==lines.length){notice('行数が変わった下書きは専用ページで続けて編集してください。',true);return false;}
  draft[selected]=$('syncInlineSource').value;
- try{c.saveDraft(state,work,version,draft.join('\n'));persist();saveBadgeStatus('歌詞修正案を保存 · クラウド同期待ち','pending');refreshInline();if(announce)notice('歌詞の修正案を保存しました。');return true;}
+ try{c.saveDraft(state,work,version,draft.join('\n'));inlineDirty=false;persist();saveBadgeStatus('歌詞修正案を保存 · クラウド同期待ち','pending');refreshInline();if(announce)notice('歌詞の修正案を保存しました。');return true;}
  catch(e){notice(e.message,true);return false;}
 }
 async function publishInline(){
@@ -128,7 +128,7 @@ async function publishInline(){
 $('syncInlineSave').addEventListener('click',()=>saveInline(true));
 $('syncInlineCommit').addEventListener('click',publishInline);
 $('syncInlineOriginal').addEventListener('click',()=>{$('syncInlineSource').value=lines[selected]??'';saveInline(true);});
-$('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);$('syncInlineNote').textContent='編集中…';inlineTimer=setTimeout(()=>saveInline(false),850);});
+$('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);inlineDirty=true;$('syncInlineNote').textContent='編集中…';inlineTimer=setTimeout(()=>{if(inlineDirty)saveInline(false);},850);});
 
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
@@ -277,6 +277,7 @@ function saveRecord(i,patch){
  persist();$('syncAuthState').textContent=media.isSignedIn()?'クラウド同期待ち':'端末内のみ';saveBadgeStatus(media.isSignedIn()?'端末保存済 · 同期待ち':'端末内のみ保存',media.isSignedIn()?'pending':'offline');notice('端末に保存しました。クラウド同期を実行しています。');return true;
 }
 function renderRows(){
+ if(inlineDirty&&selected>=0){clearTimeout(inlineTimer);saveInline(false);}
  dispRender();
  const view=$('syncLines'),position=view.scrollTop;view.replaceChildren();
  let begin=0,end=0,done=0;const data=rows();
@@ -302,6 +303,7 @@ function renderRows(){
 }
 function choose(i,scroll,seekAudio){
  if(!lines[i]?.trim())return;
+ if(inlineDirty&&selected>=0&&i!==selected){clearTimeout(inlineTimer);saveInline(false);}
  selected=i;const t=get(i);
  if(seekAudio&&started(t))seek(t.start);
  for(const el of $('syncLines').querySelectorAll('.syncLine'))el.classList.toggle('selected',Number(el.dataset.line)===i);
