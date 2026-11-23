@@ -216,6 +216,26 @@ function render(){
    ?'まだ構成区間がありません。「仮マップを利用する」で登録済み歌詞から候補を作れます。'
    :'まだショート候補がありません。構成区間から歌詞範囲を選んで作成できます。';
   list.append(empty);
+  if(ctxReady){
+   // Show the old map as click-to-select suggestions without silently writing records.
+   for(const proposal of core.seedFor(song,mode)){
+    const anchor=core.anchorFromApproximation(lyricCtx,proposal.start,proposal.end);
+    if(!anchor)continue;
+    const preview=document.createElement('button');preview.type='button';
+    preview.className='ssItem ssProposal';
+    const title=document.createElement('strong');title.textContent=proposal.label;
+    const clock=document.createElement('small');
+    clock.textContent='歌詞から自動取得｜'+core.formatTime(anchor.start)+' – '+core.formatTime(anchor.end);
+    const badge=document.createElement('span');badge.className='ssTag';badge.textContent='未登録の仮候補';
+    preview.append(title,clock,badge);
+    preview.onclick=()=>{
+     flushDraft();selectedId=null;restoreForm({...proposal,...anchor});
+     render();status('仮候補を選びました。歌詞範囲を確認して「下書き保存」を押してください。');
+     $('ssEditArea').scrollIntoView({block:'nearest',behavior:'smooth'});
+    };
+    list.append(preview);
+   }
+  }
  }
  for(const x of rows){
   const derived=core.linkInterval(x,lyricCtx),valid=derived.linked&&!derived.issue;
