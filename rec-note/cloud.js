@@ -162,10 +162,14 @@
     if (!session || !owner) throw Error('歌詞の閲覧にはクラウドへのログインが必要です');
     const title=String(requestedSong||'').trim();
     if(!title)throw Error('曲名が未設定です');
-    const works=await api('/rest/v1/lyric_master_works?select=id,title,verification_status&sky=eq.choir&form=eq.song&title=eq.'+encodeURIComponent(title)+'&limit=3');
+    const works=await api('/rest/v1/lyric_master_works?select=id,title,verification_status,sky,form&title=eq.'+encodeURIComponent(title)+'&limit=30');
     if(!Array.isArray(works)||!works.length)return null;
-    if(works.length!==1)throw Error('同名作品が複数あります。歌詞原本を確認してください');
-    const work=works[0];
+    let work=works[0];
+    if(works.length>1){
+      const choir=works.filter(x=>x.sky==='choir'&&x.form==='song');
+      if(choir.length===1)work=choir[0];
+      else throw Error('同じ曲名の作品が複数あります。作品を区別して登録してください');
+    }
     const versions=await api('/rest/v1/lyric_master_text_versions?select=id,version_no,literal_text,text_status,created_at&work_id=eq.'+encodeURIComponent(work.id)+'&order=version_no.desc&limit=20');
     return {work,versions:Array.isArray(versions)?versions:[]};
   }
