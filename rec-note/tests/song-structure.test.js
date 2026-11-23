@@ -63,7 +63,8 @@ assert.equal(result.shortCandidates[0].sourceRegionId,region.id);
 assert.equal(result.shortCandidates[0].startLyricIndex,0);
 assert.equal(JSON.stringify(data),frozen);
 assert.equal(JSON.stringify(sourceTimings),original);
-const changedTimings=sourceTimings.map(x=>({...x,end:x.lineIndex===1?26:x.end}));
+const changedTimings=sourceTimings.map(x=>({...x,
+ end:x.lineIndex===1?26:x.end,start:x.lineIndex===2?26:x.start}));
 const updated=c.buildLyricContext(song,read,[...changedTimings,instrumental],60);
 const shifted=c.exportPlan(song,[region],new Date('2026-11-23T00:00:00Z'),updated);
 assert.equal(shifted.sections[0].end,26);
