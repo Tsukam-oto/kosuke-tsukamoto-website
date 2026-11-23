@@ -17,7 +17,7 @@ nav.append(open);
 const panel=document.createElement('section');panel.id='ssPanel';panel.className='ssPanel';
 panel.hidden=true;
 panel.innerHTML=[
- '<header class="ssHeader"><div><small>SONG MAP / SHORT CUTS</small><h2>楽曲構成・ショート候補</h2><p>歌詞は変更せず、Aメロ・Bメロ・サビなどを時間で管理します。</p></div><button type="button" id="ssClose">歌詞に戻る ×</button></header>',
+ '<header class="ssHeader"><div><small>SONG MAP / SHORT CUTS</small><h2>楽曲構成・ショート候補</h2><p>歌詞の最初と最後を選ぶだけで、登録済みの歌詞タイミングから自動で区間が決まります。</p></div><button type="button" id="ssClose">歌詞に戻る ×</button></header>',
  '<div id="ssStatus" class="ssStatus" role="status">区間データを読み込んでいます。</div>',
  '<nav class="ssTabs" aria-label="楽曲構成とショート候補"><button id="ssTabSection" type="button">楽曲構成</button><button id="ssTabShort" type="button">ショート候補</button></nav>',
  '<div class="ssLayout"><section class="ssListArea"><div class="ssSubHead"><strong id="ssListTitle">登録済み区間</strong><button type="button" id="ssAdd">＋ 区間を追加</button></div>',
@@ -26,13 +26,14 @@ panel.innerHTML=[
  '<details class="ssOld" id="ssOld"><summary>登録済みの前奏・間奏・後奏を見る（読み取り専用）</summary><div id="ssOldList"></div></details></section>',
  '<section class="ssEditArea" id="ssEditArea"><div class="ssSubHead"><strong id="ssFormTitle">区間を追加</strong><span id="ssEditorStatus">未登録</span></div>',
  '<div class="ssRow"><label id="ssTypeWrap">構成の種類<select id="ssType"></select></label><label>表示名<input id="ssName" type="text" maxlength="80" placeholder="例：Aメロ1／ラスサビ"></label></div>',
- '<div class="ssRow ssTimeRow"><label>開始時刻<input id="ssStart" type="text" inputmode="decimal" placeholder="1:20.00"></label><label>終了時刻<input id="ssEnd" type="text" inputmode="decimal" placeholder="1:45.00"></label></div>',
- '<div class="ssRow ssCapture"><button id="ssCaptureStart" type="button">再生位置を開始に設定</button><button id="ssCaptureEnd" type="button">再生位置を終了に設定</button><button id="ssPreview" type="button">この区間を再生</button></div>',
- '<div class="ssNudges"><button type="button" data-ss-nudge="start:-0.1">開始 −0.1秒</button><button type="button" data-ss-nudge="start:0.1">開始 ＋0.1秒</button><button type="button" data-ss-nudge="end:-0.1">終了 −0.1秒</button><button type="button" data-ss-nudge="end:0.1">終了 ＋0.1秒</button></div>',
+ '<div class="ssLyricSelect"><label>開始する歌詞<select id="ssFirstLyric"><option value="">歌詞を読み込み中…</option></select></label>',
+ '<label>最後の歌詞（この行まで含む）<select id="ssLastLyric"><option value="">歌詞を読み込み中…</option></select></label></div>',
+ '<div class="ssDerivedTime" id="ssDerivedTime" role="status">登録済みの歌詞タイミングから区間を自動取得します。</div>',
+ '<div class="ssRow ssCapture"><button id="ssPreview" type="button">選んだ歌詞の範囲を試聴</button></div>',
  '<label class="ssNote">制作メモ<textarea id="ssNote" rows="2" placeholder="盛り上がり、ショート向きの理由など"></textarea></label>',
  '<p id="ssOverlap" class="ssHint"></p>',
  '<div class="ssActions"><button id="ssSave" class="ssMain" type="button">下書き保存</button><button id="ssApprove" type="button">音源で確認済みにする</button><button id="ssMakeShort" type="button">この区間からショート候補</button><button id="ssDelete" type="button">削除</button></div>',
- '<p class="ssFootnote">確認前の区間は「仮」。音源を聴いて開始・終了を決めてから確定してください。歌詞の編集は専用ページのみです。</p></section></div>',
+ '<p class="ssFootnote">区間の時刻は歌詞のタイミングに連動します。時刻を修正する場合は従来の歌詞タイミング画面から行ってください。歌詞の文面は専用ページで編集します。</p></section></div>',
  '<div class="ssBottom"><button id="ssExport" type="button">構成＋ショート候補をJSON保存</button><a href="./lyric-editor" id="ssLyricsLink">歌詞の編集専用ページ</a></div>'
 ].join('');
 root.insertBefore(panel,$('fullSongSections')?.nextSibling||$('syncModeBar'));
@@ -40,10 +41,12 @@ for(const [type,label] of core.TYPES){
  const option=document.createElement('option');option.value=type;option.textContent=label;$('ssType').append(option);
 }
 let mode='music-structure',selectedId=null,previewStop=null,initialForm=null,formChanged=false,draftTimer=null,shortSourceRegionId=null;
-const inputIds=['ssType','ssName','ssStart','ssEnd','ssNote'];
+let lyricRead=null,lyricCtx=null,lyricSeq=0,selectedFirst=null,selectedLast=null,lyricIssue='';
+const bridge=window.RECNOTE_LYRIC_BRIDGE;
+const inputIds=['ssType','ssName','ssNote'];
 const records=()=>Array.isArray(state.lyricTimings)?state.lyricTimings:(state.lyricTimings=[]);
 const targetList=()=>records().filter(x=>mode==='music-structure'?core.isArrangement(x,song):core.isShort(x,song))
- .sort((a,b)=>(a.start??Infinity)-(b.start??Infinity)||(a.label||'').localeCompare(b.label||''));
+ .sort((a,b)=>((core.linkInterval(a,lyricCtx).start??Infinity)-(core.linkInterval(b,lyricCtx).start??Infinity))||(a.label||'').localeCompare(b.label||''));
 const current=()=>selectedId?records().find(x=>x.id===selectedId&&!x.deleted&&!x.syncConflictOf):null;
 const conflicts=id=>records().filter(x=>x.syncConflictOf===id);
 const loggedIn=()=>cloud.isSignedIn();
@@ -64,16 +67,71 @@ const seekOriginal=t=>{
 };
 function status(msg,error=false){$('ssStatus').textContent=msg;$('ssStatus').dataset.error=error?'true':'false';}
 function formKey(id=selectedId,what=mode){return 'recnote-structure-form-v1:'+song+':'+what+':'+(id||'new');}
+function updateLyricContext(){
+ lyricCtx=lyricRead?.work?.id?core.buildLyricContext(song,lyricRead,records(),audio.readyState>=1?audio.duration:null):null;
+}
+async function loadLyricCues(){
+ const requestedSong=song,request=++lyricSeq;
+ if(!bridge?.isSignedIn()){
+  lyricRead=null;lyricCtx=null;lyricIssue='歌詞を取得するにはREC NOTEへログインしてください。';
+  fillLyricSelectors();if(!panel.hidden)render();return;
+ }
+ lyricIssue='登録済みの歌詞と時刻を読み込んでいます…';
+ if(!panel.hidden)status(lyricIssue);
+ try{
+  const data=await bridge.read(requestedSong);
+  if(request!==lyricSeq||requestedSong!==song)return;
+  lyricRead=data;updateLyricContext();
+  lyricIssue=lyricCtx?'':'最新版の歌詞が見つかりません。';
+  if(!formChanged){
+   const saved=state.drafts?.[formKey()]||current()||{};
+   restoreForm(saved);
+  }else fillLyricSelectors();
+  if(!panel.hidden)render();
+ }catch(e){
+  if(request!==lyricSeq)return;
+  lyricRead=null;lyricCtx=null;lyricIssue='歌詞の読み込みに失敗：'+e.message;
+  fillLyricSelectors();if(!panel.hidden)render();
+ }
+}
+function fillLyricSelectors(){
+ for(const [id,selectedValue] of [['ssFirstLyric',selectedFirst],['ssLastLyric',selectedLast]]){
+  const select=$(id);select.replaceChildren();
+  const placeholder=document.createElement('option');placeholder.value='';
+  placeholder.textContent=lyricCtx?.cues?.length?'歌詞を選択してください':(lyricIssue||'歌詞のタイミングを読み込み中…');
+  select.append(placeholder);
+  for(const cue of lyricCtx?.cues||[]){
+   const option=document.createElement('option');option.value=String(cue.index);
+   option.textContent=String(cue.index+1).padStart(2,'0')+' '+core.formatTime(cue.start)+'｜'+cue.text.replace(/\s+/g,' ').slice(0,48);
+   select.append(option);
+  }
+  select.value=Number.isInteger(selectedValue)?String(selectedValue):'';
+  if(select.value!==String(selectedValue))select.value='';
+ }
+}
+function currentRange(){
+ return core.rangeFromLyrics(lyricCtx,selectedFirst,selectedLast);
+}
 function formValues(){
- return {type:mode==='music-structure'?$('ssType').value:null,label:$('ssName').value,start:$('ssStart').value,end:$('ssEnd').value,note:$('ssNote').value,sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
+ return {type:mode==='music-structure'?$('ssType').value:null,
+  label:$('ssName').value,startLyricIndex:selectedFirst,endLyricIndex:selectedLast,
+  lyricVersionId:lyricCtx?.versionId||null,note:$('ssNote').value,
+  sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
 }
 function restoreForm(data){
  shortSourceRegionId=mode==='short-cut'?(data?.sourceRegionId||null):null;
  $('ssType').value=core.ALLOWED.has(data?.type)?data.type:'verse';
  $('ssName').value=data?.label||'';
- $('ssStart').value=Number.isFinite(data?.start)?core.formatTime(data.start):data?.start||'';
- $('ssEnd').value=Number.isFinite(data?.end)?core.formatTime(data.end):data?.end||'';
  $('ssNote').value=data?.note||'';
+ let first=Number.isInteger(data?.startLyricIndex)?data.startLyricIndex:null;
+ let last=Number.isInteger(data?.endLyricIndex)?data.endLyricIndex:null;
+ const oldStart=Number.isFinite(data?.start)?data.start:core.parseTime(data?.start);
+ const oldEnd=Number.isFinite(data?.end)?data.end:core.parseTime(data?.end);
+ if((first===null||last===null)&&Number.isFinite(oldStart)&&Number.isFinite(oldEnd)){
+  const inferred=core.anchorFromApproximation(lyricCtx,oldStart,oldEnd);
+  if(inferred){first=inferred.startLyricIndex;last=inferred.endLyricIndex;}
+ }
+ selectedFirst=first;selectedLast=last;fillLyricSelectors();
  formChanged=false;initialForm=JSON.stringify(formValues());
 }
 function saveFormDraft(){
@@ -119,59 +177,108 @@ function renderOld(){
 }
 function render(){
  if(panel.hidden)return;
- const locked=!loggedIn();
+ const locked=!loggedIn(),ctxReady=!!lyricCtx?.cues?.length;
  $('ssTabSection').classList.toggle('active',mode==='music-structure');
  $('ssTabShort').classList.toggle('active',mode==='short-cut');
  $('ssTypeWrap').hidden=mode==='short-cut';
- $('ssListTitle').textContent=mode==='music-structure'?'曲の区間':'切り出し候補';
  $('ssAdd').textContent=mode==='music-structure'?'＋ 区間を追加':'＋ ショート候補';
  $('ssSeed').querySelector('summary').textContent=mode==='music-structure'?'前回の構成仮マップを利用する':'前回のショート候補を利用する';
  $('ssImport').textContent=mode==='music-structure'?'この曲の構成候補を取り込む':'この曲のショート候補を取り込む';
  $('ssMakeShort').hidden=mode==='short-cut';
  $('ssFormTitle').textContent=(selectedId?'編集：':'新規：')+(mode==='music-structure'?'楽曲構成':'ショート候補');
- const r=current(),conflict=r&&conflicts(r.id).length;
- $('ssDelete').hidden=!r;
- $('ssApprove').disabled=locked||!r||!!conflict||r?.status==='confirmed';
- $('ssSave').disabled=locked||!!conflict;
- $('ssImport').disabled=locked;
- $('ssMakeShort').disabled=locked||!r||!Number.isFinite(r?.start)||!Number.isFinite(r?.end);
- $('ssEditorStatus').textContent=conflict?'クラウド競合：編集不可':r?.status==='confirmed'?'確認済み':r?'登録済み・確認待ち':'未登録';
- if(mode==='short-cut'&&shortSourceRegionId&&r?.sourceRegionId) $('ssOverlap').textContent='元になった楽曲構成から作成した候補です。';
+ const currentRecord=current(),conflict=currentRecord&&conflicts(currentRecord.id).length;
+ const range=currentRange(),rangeComplete=!range.issue&&Number.isFinite(range.start)&&Number.isFinite(range.end);
+ const savedRange=currentRecord?core.linkInterval(currentRecord,lyricCtx):null;
+ const changed=!!savedRange?.linked&&!savedRange.issue&&
+  (Math.abs((currentRecord?.start??0)-savedRange.start)>.02||Math.abs((currentRecord?.end??0)-savedRange.end)>.02);
+ $('ssDelete').hidden=!currentRecord;
+ $('ssApprove').disabled=locked||!ctxReady||!currentRecord||!!conflict||
+  (currentRecord.status==='confirmed'&&!changed);
+ $('ssSave').disabled=locked||!ctxReady||!!conflict;
+ $('ssImport').disabled=locked||!ctxReady;
+ $('ssMakeShort').disabled=locked||!currentRecord||!!conflict||!!savedRange?.issue;
+ $('ssEditorStatus').textContent=conflict?'クラウド競合：編集不可':
+  currentRecord?.status==='confirmed'&&!changed?'確認済み':
+  currentRecord?.status==='confirmed'&&changed?'歌詞時刻が変化・要再確認':
+  currentRecord?'登録済み・確認待ち':'新規・未登録';
  $('ssLyricsLink').href='./lyric-editor?'+new URLSearchParams({song}).toString();
- $('ssCaptureStart').disabled=!ready();$('ssCaptureEnd').disabled=!ready();
- $('ssPreview').disabled=!ready();
+ $('ssPreview').disabled=!ready()||!rangeComplete;
+ $('ssFirstLyric').disabled=!ctxReady;$('ssLastLyric').disabled=!ctxReady;
+ const linked=$('ssDerivedTime');
+ linked.dataset.error=range.issue?'true':'false';
+ linked.textContent=range.issue
+  ?(lyricIssue||range.issue)
+  :('自動取得：'+core.formatTime(range.start)+' ～ '+core.formatTime(range.end)+
+     '（'+(range.end-range.start).toFixed(2)+'秒）　｜終了境界：'+range.endSource);
  const list=$('ssList');list.replaceChildren();
  const rows=targetList(),confirmed=rows.filter(x=>x.status==='confirmed').length;
  if(!rows.length){
   const empty=document.createElement('p');empty.className='ssEmpty';
-  empty.textContent=mode==='music-structure'?'まだ構成区間がありません。＋追加、または仮マップを取り込んでください。':'まだショート候補がありません。曲の区間から作成できます。';
+  empty.textContent=mode==='music-structure'
+   ?'まだ構成区間がありません。「仮マップを利用する」で登録済み歌詞から候補を作れます。'
+   :'まだショート候補がありません。構成区間から歌詞範囲を選んで作成できます。';
   list.append(empty);
+  if(ctxReady){
+   // Show the old map as click-to-select suggestions without silently writing records.
+   for(const proposal of core.seedFor(song,mode)){
+    const anchor=core.anchorFromApproximation(lyricCtx,proposal.start,proposal.end);
+    if(!anchor)continue;
+    const preview=document.createElement('button');preview.type='button';
+    preview.className='ssItem ssProposal';
+    const title=document.createElement('strong');title.textContent=proposal.label;
+    const clock=document.createElement('small');
+    clock.textContent='歌詞から自動取得｜'+core.formatTime(anchor.start)+' – '+core.formatTime(anchor.end);
+    const badge=document.createElement('span');badge.className='ssTag';badge.textContent='未登録の仮候補';
+    preview.append(title,clock,badge);
+    preview.onclick=()=>{
+     flushDraft();selectedId=null;restoreForm({...proposal,...anchor});
+     render();status('仮候補を選びました。歌詞範囲を確認して「下書き保存」を押してください。');
+     $('ssEditArea').scrollIntoView({block:'nearest',behavior:'smooth'});
+    };
+    list.append(preview);
+   }
+  }
  }
  for(const x of rows){
+  const derived=core.linkInterval(x,lyricCtx),valid=derived.linked&&!derived.issue;
+  const shifted=valid&&(Math.abs((x.start??0)-derived.start)>.02||Math.abs((x.end??0)-derived.end)>.02);
   const item=document.createElement('button');item.type='button';item.className='ssItem'+(x.id===selectedId?' selected':'');
   const head=document.createElement('strong');head.textContent=x.label||core.typeLabel(x.type);
-  const detail=document.createElement('small');detail.textContent=
-   (mode==='music-structure'?core.typeLabel(x.type)+' ・ ':'')+core.formatTime(x.start)+' – '+core.formatTime(x.end)+
-   (mode==='short-cut'&&Number.isFinite(x.start)&&Number.isFinite(x.end)?'（'+(x.end-x.start).toFixed(1)+'秒）':'');
-  const tag=document.createElement('span');tag.className='ssTag';tag.textContent=x.status==='confirmed'?'確認済み':'仮';
+  const detail=document.createElement('small');
+  detail.textContent=valid
+   ?(mode==='music-structure'?core.typeLabel(x.type)+' ・ ':'')+
+    core.formatTime(derived.start)+' – '+core.formatTime(derived.end)+
+    (mode==='short-cut'?'（'+(derived.end-derived.start).toFixed(1)+'秒）':'')
+   :(derived.issue||'歌詞の連動が未設定です。');
+  const tag=document.createElement('span');tag.className='ssTag';
+  tag.textContent=derived.issue?'要連動':shifted?'要再確認':x.status==='confirmed'?'確認済み':'仮';
   item.append(head,detail,tag);
   item.onclick=()=>selectRecord(x.id);
   list.append(item);
  }
  $('ssListTitle').textContent=(mode==='music-structure'?'曲の区間':'切り出し候補')+'　'+rows.length+'件（確認済み '+confirmed+'件）';
  renderOld();
- if(locked)status('ログインすると区間を保存できます。保存済みの歌詞・時刻には影響しません。');
- else if(!formChanged)status('クラウド同期対象として区間を管理します。歌詞や録音の時刻とは別のデータです。');
- const overlap=core.overlapWarnings(records(),{...formTyped(false),id:selectedId,song});
- $('ssOverlap').textContent=overlap.length?'他の楽曲構成と時間が重なります：'+overlap.join('／'):'';
+ if(locked)status('ログインすると既存の歌詞時刻と連動できます。');
+ else if(!ctxReady)status(lyricIssue||'歌詞を読み込み中…',!!lyricIssue&&!lyricIssue.includes('読み込んでいます'));
+ else if(!formChanged)status('歌詞の開始行と最後の行を選ぶだけです。時間を計り直す必要はありません。');
+ const live=records().filter(x=>core.isArrangement(x,song)).map(x=>{
+  const d=core.linkInterval(x,lyricCtx);return {...x,start:d.issue?null:d.start,end:d.issue?null:d.end};
+ });
+ const overlap=core.overlapWarnings(live,{...formTyped(false),id:selectedId,song});
+ $('ssOverlap').textContent=overlap.length?'他の構成区間と重なります：'+overlap.join('／'):'';
 }
 function formTyped(strict=true){
- const a=core.parseTime($('ssStart').value),b=core.parseTime($('ssEnd').value);
- const v={type:mode==='music-structure'?$('ssType').value:null,label:$('ssName').value.trim(),start:a,end:b,note:$('ssNote').value.trim().slice(0,1000),sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
+ const selectedRange=currentRange();
+ const v={type:mode==='music-structure'?$('ssType').value:null,
+  label:$('ssName').value.trim(),start:selectedRange.start??null,end:selectedRange.end??null,
+  startLyricIndex:selectedFirst,endLyricIndex:selectedLast,lyricVersionId:lyricCtx?.versionId||null,
+  note:$('ssNote').value.trim().slice(0,1000),
+  sourceRegionId:mode==='short-cut'?shortSourceRegionId:null};
  if(strict){
   if(!v.label||v.label.length>80)throw Error('区間名を1～80文字で入力してください。');
   if(mode==='music-structure'&&!core.ALLOWED.has(v.type))throw Error('構成の種類を選択してください。');
-  const error=core.validInterval(v.start,v.end,audio.readyState>=1?audio.duration:null);
+  if(selectedRange.issue)throw Error(selectedRange.issue);
+  const error=core.validInterval(v.start,v.end,audio.readyState>=1?audio.duration:null,true);
   if(error)throw Error(error);
  }
  return v;
@@ -215,45 +322,64 @@ function remove(){
 }
 function importDraftMap(){
  if(!loggedIn()){status('先にログインしてください。',true);return;}
+ if(!lyricCtx){status('先に歌詞と時刻を読み込んでください。',true);return;}
  const source=core.seedFor(song,mode);if(!source.length){status('この曲の仮マップはありません。',true);return;}
- // Stable seed keys prevent re-adding a proposal after its time was refined or it was deleted.
  const existing=records().filter(x=>x.song===song&&x.kind===mode&&!x.syncConflictOf);
  const pending=source.filter(x=>!existing.some(y=>
   (x.sourceSeedKey&&y.sourceSeedKey===x.sourceSeedKey)||
   (!y.deleted&&Number.isFinite(y.start)&&Number.isFinite(y.end)&&Math.abs(y.start-x.start)<.03&&Math.abs(y.end-x.end)<.03)));
  if(!pending.length){status('仮マップの候補はすでに登録されています。');return;}
- if(!confirm('この曲の'+pending.length+'件を「仮・確認待ち」で追加しますか？ 既存データは上書きしません。'))return;
+ const linked=pending.map(item=>{
+  const anchor=core.anchorFromApproximation(lyricCtx,item.start,item.end);
+  return anchor?{...item,...anchor}:null;
+ }).filter(Boolean);
+ const skipped=pending.length-linked.length;
+ if(!linked.length){status('この候補は歌詞の時刻に紐づきませんでした。歌詞タイミングを確認してください。',true);return;}
+ if(!confirm('歌詞から計算した'+linked.length+'区間を「仮・確認待ち」で登録しますか？'+
+  (skipped?'　時刻が揃わない'+skipped+'件は追加しません。':'')+' 以前の歌詞・時刻には触れません。'))return;
  const all=records();
- for(const v of pending){
+ for(const v of linked){
   all.push({...v,id:core.recordId(song,mode,uid()),kind:mode,song,
    workId:'recnote-arrangement:'+song,textVersionId:core.VER,
    lineIndex:mode==='music-structure'?-10000:-20000,
    confirmedAt:null,deleted:false,updatedAt:new Date().toISOString()});
  }
- persist();render();status(pending.length+'件の仮候補を追加しました。音源を聴いて確認してください。');
+ persist();render();
+ status(linked.length+'件を歌詞タイミングと連動して登録しました。'+
+  (skipped?skipped+'件は未登録のままです。':'')+' あとは各区間がAメロ・サビ等か音で確認してください。');
 }
 function addFromSection(){
- const r=current(),preset=core.clipFromSection(r);
- if(!preset){status('開始・終了が登録されている区間から作成してください。',true);return;}
- flushDraft();mode='short-cut';selectedId=null;restoreForm(preset);
- formChanged=true;saveFormDraft();render();status('ショート候補の下書きを作成しました。時刻と内容を確認して保存してください。');
-}
-function capture(field){
- if(!ready()){status('再生可能な音源とログインが必要です。',true);return;}
- $(field==='start'?'ssStart':'ssEnd').value=core.formatTime(nowTime());onEdit();
+ const r=current(),linked=r?core.linkInterval(r,lyricCtx):null;
+ if(!r||!linked||linked.issue){status(linked?.issue||'歌詞と連動する区間を選択してください。',true);return;}
+ // Prefer a self-contained 15-30 second group of actual lyric cues; no arbitrary 25s trim.
+ let last=r.endLyricIndex,best=Infinity;
+ for(const c of lyricCtx.cues){
+  if(c.index<r.startLyricIndex||c.index>r.endLyricIndex)continue;
+  const part=core.rangeFromLyrics(lyricCtx,r.startLyricIndex,c.index);
+  if(part.issue)continue;
+  const dur=part.end-part.start;
+  if(dur>=15&&dur<=30&&Math.abs(dur-24)<best){best=Math.abs(dur-24);last=c.index;}
+ }
+ const part=core.rangeFromLyrics(lyricCtx,r.startLyricIndex,last);
+ flushDraft();mode='short-cut';selectedId=null;
+ restoreForm({label:'ショート候補｜'+(r.label||core.typeLabel(r.type)),
+  startLyricIndex:r.startLyricIndex,endLyricIndex:last,lyricVersionId:lyricCtx.versionId,
+  start:part.start,end:part.end,
+  note:'元区間：'+(r.label||core.typeLabel(r.type))+'。前後の歌詞を選んで長さを調整してください。',
+  sourceRegionId:r.id});
+ formChanged=true;saveFormDraft();render();
+ status('ショート候補を歌詞の時刻から作成しました。最後の歌詞を選ぶだけで長さを変更できます。');
 }
 function listen(){
  if(!ready()){status('音源を読み込んでください。',true);return;}
- try{
-  const x=formTyped(true);
-  if(x.start===null)throw Error('開始時刻を設定してください。');
-  seekOriginal(Math.max(0,x.start-.25));
-  previewStop=Number.isFinite(x.end)?x.end+.5:x.start+15;
-  audio.play().catch(e=>status('再生できません：'+e.message,true));
- }catch(e){status(e.message,true);}
+ const range=currentRange();
+ if(range.issue){status(range.issue,true);return;}
+ seekOriginal(Math.max(0,range.start-.25));
+ previewStop=range.end+.5;
+ audio.play().catch(e=>status('再生できません：'+e.message,true));
 }
 function download(){
- const info=core.exportPlan(song,records(),new Date());
+ const info=core.exportPlan(song,records(),new Date(),lyricCtx);
  const blob=new Blob([JSON.stringify(info,null,2)],{type:'application/json'});
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='楽曲構成とショート候補_'+song+'.json';
@@ -261,22 +387,35 @@ function download(){
  status('区間一覧・ショート候補・既存の前奏／間奏／後奏のJSONを書き出しました。');
 }
 function onEdit(){
+ selectedFirst=$('ssFirstLyric').value!==''?Number($('ssFirstLyric').value):null;
+ selectedLast=$('ssLastLyric').value!==''?Number($('ssLastLyric').value):null;
  formChanged=JSON.stringify(formValues())!==initialForm;
  $('ssEditorStatus').textContent=formChanged?'編集中・自動下書き保存':'変更なし';
- const typed=formTyped(false),overlap=core.overlapWarnings(records(),{...typed,song,id:selectedId});
+ const range=currentRange(),ok=!range.issue;
+ $('ssDerivedTime').dataset.error=ok?'false':'true';
+ $('ssDerivedTime').textContent=ok
+  ?'自動取得：'+core.formatTime(range.start)+' ～ '+core.formatTime(range.end)+
+   '（'+(range.end-range.start).toFixed(2)+'秒）｜'+range.endSource
+  :range.issue;
+ $('ssPreview').disabled=!ready()||!ok;
+ const typed=formTyped(false),live=records().filter(x=>core.isArrangement(x,song)).map(x=>{
+  const d=core.linkInterval(x,lyricCtx);return {...x,start:d.issue?null:d.start,end:d.issue?null:d.end};
+ });
+ const overlap=core.overlapWarnings(live,{...typed,song,id:selectedId});
  $('ssOverlap').textContent=overlap.length?'他の構成区間と重なります：'+overlap.join('／'):'';
  clearTimeout(draftTimer);
  if(formChanged)draftTimer=setTimeout(saveFormDraft,650);
 }
 function changeSong(){
- flushDraft();selectedId=null;restoreForm(state.drafts?.[formKey()]||{type:'verse'});
- if(!panel.hidden)render();
+ flushDraft();++lyricSeq;lyricRead=null;lyricCtx=null;lyricIssue='歌詞の読み込み中…';
+ selectedId=null;restoreForm(state.drafts?.[formKey()]||{type:'verse'});
+ if(!panel.hidden){render();loadLyricCues();}
 }
 function openPanel(){
  if(!$('fullSongSections')?.hidden)$('fsClose')?.click();
  panel.hidden=false;root.classList.add('syncArrangementActive');open.setAttribute('aria-expanded','true');
  if(!initialForm)restoreForm(state.drafts?.[formKey()]||{type:'verse'});
- render();panel.scrollIntoView({block:'start',behavior:'smooth'});
+ render();if(!lyricCtx)loadLyricCues();panel.scrollIntoView({block:'start',behavior:'smooth'});
 }
 function closePanel(){
  flushDraft();panel.hidden=true;root.classList.remove('syncArrangementActive');
@@ -296,27 +435,19 @@ $('ssApprove').onclick=()=>{
 $('ssDelete').onclick=remove;
 $('ssImport').onclick=importDraftMap;
 $('ssMakeShort').onclick=addFromSection;
-$('ssCaptureStart').onclick=()=>capture('start');
-$('ssCaptureEnd').onclick=()=>capture('end');
 $('ssPreview').onclick=listen;
 $('ssExport').onclick=download;
 for(const id of inputIds){$(id).addEventListener('input',onEdit);$(id).addEventListener('change',onEdit);}
-for(const b of panel.querySelectorAll('[data-ss-nudge]')){
- b.onclick=()=>{
-  const [side,offset]=b.dataset.ssNudge.split(':'),input=$(side==='start'?'ssStart':'ssEnd'),value=core.parseTime(input.value);
-  if(value===null||!Number.isFinite(value)){status('先に開始・終了時刻を入力してください。',true);return;}
-  input.value=core.formatTime(Math.max(0,value+Number(offset)));onEdit();
- };
-}
+for(const id of ['ssFirstLyric','ssLastLyric'])$(id).addEventListener('change',onEdit);
 audio.addEventListener('timeupdate',()=>{
  if(previewStop!==null&&nowTime()>=previewStop){audio.pause();previewStop=null;}
 });
-window.addEventListener('recnote:cloud-synced',()=>{if(!panel.hidden)render();});
-window.addEventListener('recnote:cloud-auth-change',()=>{if(!panel.hidden)render();});
-audio.addEventListener('loadedmetadata',()=>{if(!panel.hidden)render();});
+window.addEventListener('recnote:cloud-synced',()=>{if(lyricRead)updateLyricContext();if(!panel.hidden)render();});
+window.addEventListener('recnote:cloud-auth-change',()=>{if(bridge?.isSignedIn())loadLyricCues();else{lyricRead=null;lyricCtx=null;lyricIssue='ログインが必要です。';if(!panel.hidden)render();}});
+audio.addEventListener('loadedmetadata',()=>{if(lyricRead)updateLyricContext();if(!panel.hidden)render();});
 for(const b of root.querySelectorAll('[data-song]'))b.addEventListener('click',changeSong);
 for(const id of ['fsOpenIntro','fsOpenInterlude','fsOpenOutro'])$(id)?.addEventListener('click',()=>{if(!panel.hidden)closePanel();});
 window.addEventListener('pagehide',flushDraft);
 restoreForm(state.drafts?.[formKey()]||{type:'verse'});
-window.RECNOTE_STRUCTURE_STUDIO=Object.freeze({open:openPanel,close:closePanel});
+window.RECNOTE_STRUCTURE_STUDIO=Object.freeze({open:openPanel,close:closePanel,refresh:loadLyricCues});
 })();

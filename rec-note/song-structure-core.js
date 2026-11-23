@@ -72,18 +72,29 @@ function clipFromSection(region){
   note:'元区間：'+(region.label||typeLabel(region.type))+'。音声を確認して始点・終点を確定してください。',
   sourceRegionId:region.id,source:'selected-music-section',status:'draft'};
 }
-function exportPlan(song,data,now){
+function exportPlan(song,data,now,ctx){
  const all=Array.isArray(data)?data:[];
  const structure=all.filter(x=>isArrangement(x,song)).sort((a,b)=>(a.start??Infinity)-(b.start??Infinity));
  const clips=all.filter(x=>isShort(x,song)).sort((a,b)=>(a.start??Infinity)-(b.start??Infinity));
  const traditional=all.filter(x=>x.kind==='song-section'&&x.song===song&&!x.deleted&&!x.syncConflictOf)
   .map(x=>({label:x.sectionType==='intro'?'前奏':x.sectionType==='outro'?'後奏':x.sectionType==='interlude'?'間奏':'その他',
     sectionKey:x.sectionKey,start:x.start??null,end:x.end??null,status:x.status}));
- const clean=(v)=>({id:v.id,label:v.label||'',type:v.type||null,start:v.start??null,end:v.end??null,
-    duration:Number.isFinite(v.start)&&Number.isFinite(v.end)?+(v.end-v.start).toFixed(3):null,
-    note:v.note||'',status:v.status,source:v.source||'manual',sourceSeedKey:v.sourceSeedKey||null,sourceRegionId:v.sourceRegionId||null});
- return {schemaVersion:1,source:'REC_NOTE_ARRANGEMENT_SHORT_PLAN',song,exportedAt:(now||new Date()).toISOString(),
-  caveat:'編集・確認用の区間マップです。動画MP4ではありません。draftは正式な楽曲構成確定ではありません。',
+ const clean=v=>{
+  const mapped=ctx?linkInterval(v,ctx):{start:v.start??null,end:v.end??null,issue:'歌詞タイミング未照合',linked:false};
+  const valid=!!mapped.linked&&!mapped.issue;
+  const changed=valid&&(Math.abs((v.start??0)-mapped.start)>.02||Math.abs((v.end??0)-mapped.end)>.02);
+  return {id:v.id,label:v.label||'',type:v.type||null,start:valid?mapped.start:null,end:valid?mapped.end:null,
+   duration:valid?+(mapped.end-mapped.start).toFixed(3):null,
+   startLyricIndex:Number.isInteger(v.startLyricIndex)?v.startLyricIndex:null,
+   endLyricIndex:Number.isInteger(v.endLyricIndex)?v.endLyricIndex:null,
+   lyricVersionId:v.lyricVersionId||null,
+   linkage:valid?(changed?'lyrics-updated-recheck':'lyrics-linked'):(mapped.issue||'unlinked'),
+   note:v.note||'',status:changed&&v.status==='confirmed'?'needs-reconfirmation':v.status,
+   source:v.source||'manual',sourceSeedKey:v.sourceSeedKey||null,sourceRegionId:v.sourceRegionId||null};
+ };
+ return {schemaVersion:2,source:'REC_NOTE_ARRANGEMENT_SHORT_PLAN',song,exportedAt:(now||new Date()).toISOString(),
+  lyricVersionId:ctx?.versionId||null,
+  caveat:'歌詞との連動が確認できた区間のみ時刻を出力。未連動・異なる歌詞版・開始終了時刻未登録はnullで警告します。',
   sections:structure.map(clean),shortCandidates:clips.map(clean),existingInstrumentalSections:traditional};
 }
 function overlapWarnings(list,record){
@@ -93,6 +104,79 @@ function overlapWarnings(list,record){
   &&Math.min(x.end,record.end)-Math.max(x.start,record.start)>.15)
   .map(x=>x.label||typeLabel(x.type));
 }
+
+/* v19.1: lyric-index anchors are the ONLY authority for section boundaries.
+   Never invent timings: pick registered start from first lyric, ending from final
+   lyric's registered end or next lyric/instrument start. */
+function buildLyricContext(song,read,records,duration){
+ const latest=read?.versions?.[0];
+ if(!read?.work?.id||!latest?.id||typeof latest.literal_text!=='string')return null;
+ const raw=latest.literal_text.split(/\r?\n/),all=Array.isArray(records)?records:[];
+ const cues=raw.map((text,index)=>{
+  if(!text.trim())return null;
+  const id='lyric-line:'+read.work.id+':'+latest.id+':'+index;
+  const row=all.find(x=>x.id===id&&!x.deleted&&!x.syncConflictOf);
+  const conflict=all.some(x=>x.syncConflictOf===id);
+  return {index,text,start:Number.isFinite(row?.start)?row.start:null,
+   end:Number.isFinite(row?.end)?row.end:null,status:row?.status||'unregistered',conflict};
+ }).filter(Boolean);
+ const instrumental=all.filter(x=>x.song===song&&x.kind==='song-section'&&!x.deleted&&!x.syncConflictOf
+  &&['interlude','outro'].includes(x.sectionType)&&Number.isFinite(x.start))
+  .map(x=>({start:x.start,type:x.sectionType}));
+ return {song,workId:read.work.id,versionId:latest.id,versionNo:latest.version_no,cues,
+  instrumental,duration:Number.isFinite(duration)&&duration>0?duration:null};
+}
+function rangeFromLyrics(ctx,first,last){
+ if(!ctx?.cues?.length)return {start:null,end:null,issue:'歌詞タイミングを取得できていません。'};
+ if(!Number.isInteger(first)||!Number.isInteger(last))return {start:null,end:null,issue:'開始する歌詞と最後の歌詞を選択してください。'};
+ const a=ctx.cues.find(x=>x.index===Number(first)),b=ctx.cues.find(x=>x.index===Number(last));
+ if(!a||!b||a.index>b.index)return {start:null,end:null,issue:'開始・最後の歌詞を正しく選択してください。'};
+ if(a.conflict||b.conflict)return {start:null,end:null,issue:'歌詞のタイミングにクラウド競合があります。'};
+ if(!Number.isFinite(a.start))return {start:null,end:null,issue:'開始する歌詞に時刻が登録されていません。'};
+ if(!Number.isFinite(b.start))return {start:a.start,end:null,issue:'最後の歌詞に開始時刻がありません。'};
+ if(b.start<a.start)return {start:a.start,end:null,issue:'歌詞の時刻が逆転しています。'};
+ const next=ctx.cues.find(x=>x.index>b.index&&Number.isFinite(x.start)&&x.start>b.start);
+ const candidates=[];
+ if(Number.isFinite(b.end)&&b.end>b.start)candidates.push({value:b.end,source:'最後の歌詞の終了'});
+ if(next)candidates.push({value:next.start,source:'次の歌詞の開始'});
+ for(const item of ctx.instrumental||[]){
+  if(item.start>b.start)candidates.push({value:item.start,source:'間奏・後奏の開始'});
+ }
+ // Audio duration is valid only when the selected lyric is the very last lyric.
+ if(b.index===ctx.cues.at(-1)?.index&&Number.isFinite(ctx.duration)&&ctx.duration>b.start)
+  candidates.push({value:ctx.duration,source:'音源の終わり'});
+ candidates.sort((x,y)=>x.value-y.value);
+ const chosen=candidates[0],end=chosen?.value??null;
+ if(!Number.isFinite(end)||end<=a.start)return {start:a.start,end:null,issue:'最後の歌詞の終了境界がありません。歌詞の時刻を確認してください。'};
+ return {start:a.start,end:+end.toFixed(2),issue:'',endSource:chosen.source,
+  firstLyric:a.text,lastLyric:b.text,lyricVersionId:ctx.versionId,
+  startLyricIndex:a.index,endLyricIndex:b.index};
+}
+function linkInterval(record,ctx){
+ if(!Number.isInteger(record?.startLyricIndex)||!Number.isInteger(record?.endLyricIndex))
+  return {start:record?.start??null,end:record?.end??null,issue:'歌詞との連動が未設定です。歌詞を選んで保存してください。',linked:false};
+ if(!ctx?.versionId)return {start:null,end:null,issue:'現在の歌詞版を読み込めません。',linked:false};
+ if(record.lyricVersionId!==ctx.versionId)return {start:null,end:null,issue:'歌詞の版が更新されています。歌詞の範囲を選び直してください。',linked:false};
+ return {...rangeFromLyrics(ctx,record.startLyricIndex,record.endLyricIndex),linked:true};
+}
+function anchorFromApproximation(ctx,start,end){
+ const available=ctx?.cues?.filter(x=>Number.isFinite(x.start))||[];
+ if(!available.length||!Number.isFinite(start)||!Number.isFinite(end)||end<=start)return null;
+ const first=available.find(x=>x.start>=start-.2);
+ // A proposal outside the available lyric timing coverage must not be silently linked
+ // to the last verse or to unrelated material.
+ if(!first||Math.abs(first.start-start)>12)return null;
+ // Boundaries from an estimated map can differ from the registered lyric by a fraction of a second.
+ // Treat a cue within 0.25s of the proposed section end as the NEXT section's opening.
+ const last=available.filter(x=>x.index>=first.index&&x.start<end-.25).at(-1)||first;
+ if(last.start>end+0.05)return null;
+ const range=rangeFromLyrics(ctx,first.index,last.index);
+ if(range.issue)return null;
+ return {startLyricIndex:first.index,endLyricIndex:last.index,lyricVersionId:ctx.versionId,
+  start:range.start,end:range.end};
+}
+
 global.RECNOTE_STRUCTURE_CORE=Object.freeze({TYPES,ALLOWED,VER,parseTime,formatTime,validInterval,recordId,
- isArrangement,isShort,typeLabel,seedFor,clipFromSection,exportPlan,overlapWarnings});
+ isArrangement,isShort,typeLabel,seedFor,clipFromSection,exportPlan,overlapWarnings,
+ buildLyricContext,rangeFromLyrics,linkInterval,anchorFromApproximation});
 })(window);

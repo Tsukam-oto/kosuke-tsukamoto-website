@@ -77,3 +77,35 @@
  #syncStudio #ssPanel .ssTabs button{flex:1}
  #syncStudio #ssPanel .ssList{max-height:300px}
 }
+
+
+/* v19.1: selection of registered lyric lines replaces duplicate time recording. */
+#syncStudio #ssPanel .ssLyricSelect{
+ display:grid;grid-template-columns:minmax(0,1fr);gap:12px;
+ margin:14px 0 11px;padding:13px 12px;
+ background:#eff5fa;border:1px solid #d1e2ed;border-radius:11px;
+}
+#syncStudio #ssPanel .ssLyricSelect label{
+ display:block;font-size:12px;font-weight:800;color:#365f78;
+ line-height:1.7;max-width:100%;
+}
+#syncStudio #ssPanel .ssLyricSelect select{
+ display:block;width:100%;font-size:14px;font-weight:600;min-height:48px;
+ margin:5px 0 0;padding:10px 12px;white-space:normal;
+ background:#fff;border:1px solid #b6cad9;
+}
+#syncStudio #ssPanel #ssDerivedTime{
+ font-size:13px;font-weight:700;line-height:1.65;
+ padding:12px 13px;margin:9px 0 12px;border-radius:9px;
+ color:#265e47;background:#eaf5ef;border:1px solid #d1e6d8;
+ overflow-wrap:anywhere;
+}
+#syncStudio #ssPanel #ssDerivedTime[data-error="true"]{
+ color:#8a4d32;background:#fff7ec;border-color:#f1e4cb;
+}
+#syncStudio #ssPanel .ssCapture{margin:8px 0 14px;}
+#syncStudio #ssPanel .ssCapture button{min-height:44px;width:100%}
+#syncStudio #ssPanel .ssList{max-height:none!important;overflow:visible!important}
+@media(max-width:850px){
+ #syncStudio #ssPanel .ssList{max-height:none!important;overflow:visible!important}
+}
