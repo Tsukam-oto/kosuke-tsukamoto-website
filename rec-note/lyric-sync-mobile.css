@@ -574,3 +574,16 @@ body.syncPage #syncStudio.syncScrolled .syncPlayer #syncSlider{margin:3px 0!impo
  }
  #syncStudio .syncContextNavigation button{min-height:32px!important;padding:6px 7px!important}
 }
+
+
+/* Existing disabled/loading states still take priority over the static rail. */
+body.syncPage #syncStudio:not(.syncReady) #syncInstrumentRail,
+body.syncPage #syncStudio.syncNeedsLogin #syncInstrumentRail,
+body.syncPage #syncStudio.syncNeedsAudio #syncInstrumentRail,
+body.syncPage #syncStudio.syncInlineSectionActive #syncInstrumentRail{
+ display:none!important;
+}
+body.syncPage #syncStudio.syncNeedsLogin #syncContextEditor,
+body.syncPage #syncStudio.syncNeedsAudio #syncContextEditor{
+ display:none!important;
+}
