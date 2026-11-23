@@ -216,8 +216,11 @@ function remove(){
 function importDraftMap(){
  if(!loggedIn()){status('先にログインしてください。',true);return;}
  const source=core.seedFor(song,mode);if(!source.length){status('この曲の仮マップはありません。',true);return;}
- const existing=targetList();
- const pending=source.filter(x=>!existing.some(y=>Math.abs(y.start-x.start)<.03&&Math.abs(y.end-x.end)<.03));
+ // Stable seed keys prevent re-adding a proposal after its time was refined or it was deleted.
+ const existing=records().filter(x=>x.song===song&&x.kind===mode&&!x.syncConflictOf);
+ const pending=source.filter(x=>!existing.some(y=>
+  (x.sourceSeedKey&&y.sourceSeedKey===x.sourceSeedKey)||
+  (!y.deleted&&Number.isFinite(y.start)&&Number.isFinite(y.end)&&Math.abs(y.start-x.start)<.03&&Math.abs(y.end-x.end)<.03)));
  if(!pending.length){status('仮マップの候補はすでに登録されています。');return;}
  if(!confirm('この曲の'+pending.length+'件を「仮・確認待ち」で追加しますか？ 既存データは上書きしません。'))return;
  const all=records();
