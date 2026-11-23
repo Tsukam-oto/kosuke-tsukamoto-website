@@ -132,7 +132,8 @@ $('syncInlineSource').addEventListener('input',()=>{clearTimeout(inlineTimer);in
 
 const contextHost=document.createElement('aside');contextHost.id='syncContextEditor';contextHost.className='syncContextEditor';contextHost.setAttribute('aria-label','選択した歌詞の編集');
 root.insertBefore(contextHost,$('syncLines').nextSibling);
-contextHost.append(inlinePanel,displayEdit,quickEdit,review,adjust);
+// Move the recording footer inside the editing workspace; it must not hide final lyrics.
+contextHost.append(root.querySelector('.syncDock'),inlinePanel,displayEdit,quickEdit,review,adjust);
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
