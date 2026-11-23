@@ -61,6 +61,15 @@ root.insertBefore(review,$('syncEditor'));
 const adjust=document.createElement('details');adjust.id='syncFineTune';adjust.className='syncFineTune';
 adjust.innerHTML='<summary>時刻を細かく調整する</summary>';
 root.insertBefore(adjust,$('syncEditor'));adjust.append($('syncEditor'));
+
+const quickEdit=document.createElement('details');quickEdit.className='syncTimingPanel';quickEdit.id='syncTimingPanel';
+quickEdit.innerHTML='<summary>登録済み時刻をすぐ直す</summary><p>再生位置で上書き、または0.1秒ずつ調整できます。変更はその場で保存します。</p><div id="syncTimingButtons"></div><button id="syncTimingUndo" type="button">直前の時刻修正を戻す</button>';
+root.insertBefore(quickEdit,$('syncFineTune'));
+const displayEdit=document.createElement('details');displayEdit.className='syncTimingPanel';displayEdit.id='syncDisplayPanel';
+displayEdit.innerHTML='<summary>歌詞の分割・結合・改行</summary><p>歌詞原本は変更せず、動画に表示する単位だけ編集します。</p><p id="syncDisplaySource"></p><div class="syncDisplayFields"><label>切る位置の言葉<input id="syncDisplayPhrase" type="text" placeholder="例：でも、どうか"/></label><label>言葉の<select id="syncDisplaySide"><option value="before">前で切る</option><option value="after">後で切る</option></select></label></div><div class="syncDisplayActions"><button id="syncDisplaySplitNow" type="button">別画面に分割・いまの時刻</button><button id="syncDisplaySplitDraft" type="button">別画面に分割・時刻は後で</button><button id="syncDisplayBreak" type="button">同じ画面内で改行</button><button id="syncDisplayJoin" type="button">前の歌詞と同じ画面</button></div><div id="syncDisplayResults"></div><div class="syncDisplayActions"><button id="syncDisplayUndo" type="button">表示変更を元に戻す</button><button id="syncDisplayReset" type="button">この行の表示設定を初期化</button><button id="syncDisplayExport" type="button">動画用JSON保存</button></div><p id="syncDisplayStatus" role="status"></p>';
+root.insertBefore(displayEdit,$('syncFineTune'));
+const extraStyle=document.createElement('style');extraStyle.textContent='.syncTimingPanel{background:#fff;border:1px solid #dce3eb;padding:10px 12px;border-radius:12px;margin:12px 0}.syncTimingPanel summary{font-weight:700;color:#15538b;padding:7px;cursor:pointer}.syncTimingPanel p{font-size:12px;color:#566476}.syncDisplayFields,.syncDisplayActions,#syncTimingButtons>div{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:9px 0}.syncDisplayFields label{font-size:12px;flex:1;min-width:128px}.syncDisplayFields input,.syncDisplayFields select{display:block;padding:7px;border:1px solid #cfd6e1;border-radius:7px;width:100%}.syncDisplayActions button,#syncTimingButtons button,#syncDisplayResults button{font-size:12px;min-height:32px;padding:5px 8px}#syncDisplaySource{white-space:pre-wrap;background:#f4f6f8;padding:10px;border-radius:8px}#syncDisplayResults>article{background:#f6f8fa;border:1px solid #e3e7eb;padding:9px;border-radius:9px;margin:9px 0}#syncDisplayResults .vertical{writing-mode:vertical-rl;text-orientation:mixed;display:flex;gap:14px;background:#292832;color:#f5f1ea;max-height:240px;min-height:90px;padding:15px;margin-top:7px;overflow:auto;line-height:1.9}#syncDisplayResults .vertical span{display:block}#syncDisplayResults input{max-width:115px;padding:6px;margin:5px;border:1px solid #d0d7e2;border-radius:7px}#syncDisplayStatus[data-error="yes"]{color:#b72b2b}';document.head.append(extraStyle);
+
 const extra=document.createElement('details');extra.id='syncExtra';extra.className='syncExtra';
 extra.innerHTML='<summary>その他の設定・書き出し</summary>';
 root.insertBefore(extra,$('syncTools'));
@@ -196,6 +205,7 @@ function resolveConflict(chosen){
 }
 function saveRecord(i,patch){
  if(i<0||!version)return false;
+ if(conflict(i)){notice('別端末との時刻競合を先に解消してください。',true);return false;}
  const list=all(),key=id(i),at=list.findIndex(x=>x.id===key);
  const previous=at>=0?list[at]:{id:key,song,workId:work.id,textVersionId:version.id,lineIndex:i,start:null,end:null,status:'draft'};
  const next={...previous,...patch,id:key,song,workId:work.id,textVersionId:version.id,lineIndex:i,updatedAt:new Date().toISOString()};
@@ -207,6 +217,7 @@ function saveRecord(i,patch){
  persist();$('syncAuthState').textContent=media.isSignedIn()?'クラウド同期待ち':'端末内のみ';saveBadgeStatus(media.isSignedIn()?'端末保存済 · 同期待ち':'端末内のみ保存',media.isSignedIn()?'pending':'offline');notice('端末に保存しました。クラウド同期を実行しています。');return true;
 }
 function renderRows(){
+ dispRender();
  const view=$('syncLines'),position=view.scrollTop;view.replaceChildren();
  let begin=0,end=0,done=0;const data=rows();
  for(let n=0;n<data.length;n++){
@@ -237,6 +248,7 @@ function choose(i,scroll,seekAudio){
  fillEditor();saveCheckpoint();updatePrimary();
 }
 function fillEditor(){
+ dispRender();
  $('syncEditor').hidden=selected<0;
  if(selected<0)return;
  const t=get(selected);$('syncLineNumber').textContent='行 '+(rows().findIndex(x=>x.i===selected)+1)+' / '+rows().length;
@@ -406,6 +418,129 @@ function srt(){
  const stamp=t=>{const ms=Math.round(t*1000);return String(Math.floor(ms/3600000)).padStart(2,'0')+':'+String(Math.floor(ms%3600000/60000)).padStart(2,'0')+':'+String(Math.floor(ms%60000/1000)).padStart(2,'0')+','+String(ms%1000).padStart(3,'0');};
  download('LYRIC_SYNC_'+song+'_確認済み.srt',arr.map((x,i)=>(i+1)+'\n'+stamp(x.time.start)+' --> '+stamp(x.time.end)+'\n'+x.text+'\n').join('\n'));
 }
+
+// v17 display-only cue structure stored in the already cloud-synced state.drafts.
+const dispUndo=[];let dispLast=-100;
+function dispKey(i){return 'lyric-display-v1:'+work.id+':'+version.id+':'+i;}
+function dispConflict(i){const p=dispKey(i)+'__local_';return Object.keys(state.drafts||{}).some(k=>k.startsWith(p));}
+function dispPlan(i){
+ const x=state.drafts?.[dispKey(i)];
+ if(!x||x.source!==lines[i]||!Array.isArray(x.splits)||!Array.isArray(x.breaks))return {splits:[],breaks:[],join:false};
+ return {splits:x.splits.map(a=>({pos:a.pos,time:Number.isFinite(a.time)?a.time:null})),breaks:x.breaks.slice(),join:!!x.join};
+}
+function dispMessage(text,bad=false){$('syncDisplayStatus').textContent=text;$('syncDisplayStatus').dataset.error=bad?'yes':'no';if(bad)notice(text,true);}
+function dispSave(i,x){
+ if(dispConflict(i)){dispMessage('別端末の表示設定と競合しています。クラウドのバックアップを確認してください。',true);return false;}
+ const len=lines[i].length,valid=n=>Number.isInteger(n)&&n>0&&n<len;
+ const allPositions=[...x.splits.map(a=>a.pos),...x.breaks];
+ if(allPositions.some(n=>!valid(n))||new Set(x.splits.map(a=>a.pos)).size!==x.splits.length||new Set(x.breaks).size!==x.breaks.length){dispMessage('分割位置が不正です。',true);return false;}
+ const time=get(i),sorted=x.splits.slice().sort((a,b)=>a.pos-b.pos);
+ let previous=Number.isFinite(time?.start)?time.start:null;
+ for(const v of sorted){if(v.time!==null&&(!Number.isFinite(v.time)||v.time<0||(previous!==null&&v.time<=previous)||(Number.isFinite(time?.end)&&v.time>=time.end))){dispMessage('分割の開始時刻が前後の時刻と矛盾しています。',true);return false;}if(v.time!==null)previous=v.time;}
+ const key=dispKey(i);dispUndo.push({key,old:state.drafts?.[key]??null});if(dispUndo.length>30)dispUndo.shift();
+ if(!state.drafts||typeof state.drafts!=='object')state.drafts={};
+ state.drafts[key]={schema:1,source:lines[i],splits:sorted,breaks:x.breaks.slice().sort((a,b)=>a-b),join:!!x.join,updatedAt:new Date().toISOString()};
+ persist();saveBadgeStatus('表示を端末保存 · 同期待ち','pending');dispRender();
+ window.dispatchEvent(new CustomEvent('recnote:display-updated',{detail:{song}}));return true;
+}
+function dispUnits(i){
+ const p=dispPlan(i),txt=lines[i],points=[0,...p.splits.map(x=>x.pos).sort((a,b)=>a-b),txt.length],out=[];
+ for(let j=0;j<points.length-1;j++){
+  const from=points[j],to=points[j+1],breaks=p.breaks.filter(x=>x>from&&x<to).sort((a,b)=>a-b);
+  let at=from;const cols=[];for(const b of [...breaks,to]){cols.push(txt.slice(at,b));at=b;}
+  out.push({lineIndex:i,from,to,text:txt.slice(from,to),columns:cols,start:j===0?get(i)?.start??null:p.splits.find(x=>x.pos===from)?.time??null,end:j===points.length-2?get(i)?.end??null:p.splits.find(x=>x.pos===to)?.time??null});
+ }
+ return out;
+}
+function dispCues(){
+ const allCues=[];
+ for(const row of rows()){
+  const p=dispPlan(row.i);
+  for(const [n,u] of dispUnits(row.i).entries()){
+   const cue={text:u.text,columns:u.columns,start:u.start,end:u.end,source:[{lineIndex:u.lineIndex,from:u.from,to:u.to}],confirmed:false};
+   if(n===0&&p.join&&allCues.length){
+    const previous=allCues[allCues.length-1];previous.text+='\n'+cue.text;previous.columns.push(...cue.columns);previous.end=cue.end;previous.source.push(...cue.source);
+   }else allCues.push(cue);
+  }
+ }
+ return allCues;
+}
+function dispAt(){
+ if(selected<0){dispMessage('歌詞を選んでください。',true);return null;}
+ const q=$('syncDisplayPhrase').value,txt=lines[selected];if(!q){dispMessage('区切りたい言葉を入力してください。',true);return null;}
+ const first=txt.indexOf(q);if(first<0||txt.indexOf(q,first+1)>=0){dispMessage('言葉が見つからないか複数あります。もう少し長く入力してください。',true);return null;}
+ const p=first+($('syncDisplaySide').value==='after'?q.length:0);
+ if(p<=0||p>=txt.length){dispMessage('行の先頭・末尾では区切れません。',true);return null;}return p;
+}
+function dispRender(){
+ const active=!!work&&!!version&&selected>=0&&!!lines[selected]?.trim();
+ displayEdit.hidden=!active;quickEdit.hidden=!active;if(!active)return;
+ if(dispLast!==selected){$('syncDisplayPhrase').value='';dispLast=selected;}
+ const i=selected,p=dispPlan(i),t=get(i);$('syncDisplaySource').textContent=lines[i];
+ $('syncDisplayJoin').textContent=p.join?'前の歌詞との結合を解除':'前の歌詞と同じ画面';
+ $('syncDisplayJoin').disabled=!rows().some(x=>x.i<i)||dispConflict(i);
+ $('syncDisplayUndo').disabled=!dispUndo.length;$('syncTimingUndo').disabled=!STACK.length;
+ const timeUI=$('syncTimingButtons');timeUI.replaceChildren();
+ for(const kind of ['start','end']){
+  const group=document.createElement('div'),label=document.createElement('strong');
+  label.textContent=(kind==='start'?'開始':'終了')+' '+(Number.isFinite(t?.[kind])?timestamp(t[kind]):'未登録');group.append(label);
+  for(const [value,text] of [['now','再生位置で上書き'],[-0.1,'−0.1秒'],[0.1,'＋0.1秒']]){
+   const btn=document.createElement('button');btn.type='button';btn.textContent=text;
+   btn.disabled=!!conflict(i)||(value==='now'?!hasAudio():!Number.isFinite(t?.[kind]));
+   btn.addEventListener('click',()=>dispQuick(kind,value));group.append(btn);
+  }timeUI.append(group);
+ }
+ const container=$('syncDisplayResults');container.replaceChildren();
+ for(const [n,u] of dispUnits(i).entries()){
+  const box=document.createElement('article'),head=document.createElement('div');
+  const title=document.createElement('strong');title.textContent='画面'+(n+1)+'（'+(Number.isFinite(u.start)?timestamp(u.start):'開始未登録')+'〜'+(Number.isFinite(u.end)?timestamp(u.end):'終了未登録')+'）';head.append(title);
+  if(n>0){
+   const inp=document.createElement('input');inp.value=Number.isFinite(u.start)?timestamp(u.start):'';inp.placeholder='1:20.25';inp.setAttribute('aria-label','分割後の開始時刻');
+   const save=document.createElement('button');save.textContent='時刻保存';
+   save.addEventListener('click',()=>{const plan=dispPlan(i),v=plan.splits.find(x=>x.pos===u.from),value=inp.value.trim()?parse(inp.value):null;if(inp.value.trim()&&value===null){dispMessage('時刻形式は1:20.25です。',true);return;}v.time=value;if(dispSave(i,plan))dispMessage('分割の時刻を保存しました。');});
+   const now=document.createElement('button');now.textContent='いまの時刻';now.disabled=!hasAudio();
+   now.addEventListener('click',()=>{const plan=dispPlan(i),v=plan.splits.find(x=>x.pos===u.from);v.time=Math.round(wavPosition()*100)/100;if(dispSave(i,plan))dispMessage('再生位置で時刻を更新しました。');});
+   const remove=document.createElement('button');remove.textContent='分割を解除';
+   remove.addEventListener('click',()=>{const plan=dispPlan(i);plan.splits=plan.splits.filter(x=>x.pos!==u.from);if(dispSave(i,plan))dispMessage('分割を解除しました。');});
+   head.append(inp,save,now,remove);
+  }
+  const preview=document.createElement('div');preview.className='vertical';
+  for(const col of u.columns){const span=document.createElement('span');span.textContent=col;preview.append(span);}
+  box.append(head,preview);container.append(box);
+ }
+ if(dispConflict(i))dispMessage('別端末の表示データに競合があります。編集前に確認してください。',true);
+ else $('syncDisplayStatus').textContent='表示設定は原文と独立して保存され、クラウドと同期されます。';
+}
+function dispQuick(kind,change){
+ if(selected<0||conflict(selected)){notice('この歌詞の時刻競合を確認してください。',true);return;}
+ const t=get(selected)||{},v=change==='now'?(hasAudio()?wavPosition():NaN):Number(t[kind])+change;
+ if(!Number.isFinite(v)){notice('登録時刻または音源を確認してください。',true);return;}
+ const v2=Math.round(v*100)/100,start=kind==='start'?v2:(Number.isFinite(t.start)?t.start:null),end=kind==='end'?v2:(Number.isFinite(t.end)?t.end:null);
+ if(start===null||start<0||(end!==null&&end<=start)){notice('時刻が前後します。既存データは変更しません。',true);return;}
+ if(start===t.start&&end===t.end)return;
+ if(saveRecord(selected,{start,end,status:'draft',confirmedAt:null})){clearDraft();renderRows();fillEditor();updatePrimary();notice('時刻を変更して保存しました。確認済みの場合は再確認待ちになります。');}
+}
+function dispSplit(withTime){
+ const at=dispAt();if(at===null)return;if(withTime&&!hasAudio()){dispMessage('再生する音源が必要です。',true);return;}
+ const p=dispPlan(selected);if(p.splits.some(x=>x.pos===at)){dispMessage('この位置は分割済みです。',true);return;}
+ p.splits.push({pos:at,time:withTime?Math.round(wavPosition()*100)/100:null});
+ if(dispSave(selected,p))dispMessage('歌詞の表示を分割しました。');
+}
+function dispExport(){
+ if(!work||!version)return;
+ const cues=dispCues(),payload={schema_version:1,source:'REC_NOTE_DISPLAY_V17',song,workId:work.id,textVersionId:version.id,generatedAt:new Date().toISOString(),
+  sourceLines:rows().map(x=>({lineIndex:x.i,text:x.text})),displayCues:cues,needsTimingReview:cues.some(x=>!Number.isFinite(x.start)||!Number.isFinite(x.end)||x.end<=x.start)};
+ download('歌詞表示_'+song+'_動画制作.json',JSON.stringify(payload,null,2),'application/json');
+}
+for(const [id,handler] of [
+ ['syncDisplaySplitNow',()=>dispSplit(true)],['syncDisplaySplitDraft',()=>dispSplit(false)],
+ ['syncDisplayBreak',()=>{const at=dispAt();if(at===null)return;const p=dispPlan(selected);p.breaks=p.breaks.includes(at)?p.breaks.filter(x=>x!==at):[...p.breaks,at];if(dispSave(selected,p))dispMessage('同じ画面内の改行を更新しました。');}],
+ ['syncDisplayJoin',()=>{const p=dispPlan(selected);p.join=!p.join;if(dispSave(selected,p))dispMessage('前の歌詞との結合設定を更新しました。');}],
+ ['syncDisplayUndo',()=>{const last=dispUndo.pop();if(!last)return;if(!state.drafts||typeof state.drafts!=='object')state.drafts={};if(last.old===null)delete state.drafts[last.key];else state.drafts[last.key]=last.old;persist();dispRender();dispMessage('表示変更を元に戻しました。');}],
+ ['syncDisplayReset',()=>{if(selected<0||!confirm('この行の表示設定を初期化しますか？ 歌詞原本と時刻は残ります。'))return;if(dispSave(selected,{splits:[],breaks:[],join:false}))dispMessage('この行の表示を初期化しました。');}],
+ ['syncDisplayExport',dispExport],['syncTimingUndo',()=>$('syncUndo').click()]
+])$(id).addEventListener('click',handler);
+
 function json(){
  if(!version)return;
  download('LYRIC_SYNC_'+song+'_同期.json',JSON.stringify({schema_version:3,source:'REC_NOTE_CLOUD_LYRIC_SYNC',song,workId:work.id,textVersionId:version.id,textStatus:version.text_status,exportedAt:new Date().toISOString(),cues:rows().map(x=>({lineIndex:x.i,text:x.text,start:x.time?.start??null,end:x.time?.end??null,status:x.time?.status||'unassigned'}))},null,2),'application/json');
@@ -439,7 +574,7 @@ fillMissing.addEventListener('click',()=>{
 });
 $('syncRecordMode').addEventListener('click',()=>switchSyncMode('record'));
 $('syncReviewMode').addEventListener('click',()=>switchSyncMode('review'));
-$('syncUndo').addEventListener('click',()=>{if(!STACK.length){notice('戻せる操作がありません。');return;}state.lyricTimings=JSON.parse(STACK.pop());persist();renderRows();fillEditor();notice('前の状態に戻しました。');});
+$('syncUndo').addEventListener('click',()=>{if(!STACK.length){notice('戻せる操作がありません。');return;}state.lyricTimings=JSON.parse(STACK.pop());persist();renderRows();fillEditor();updatePrimary();notice('前の状態に戻しました。');});
 $('syncFindNext').addEventListener('click',()=>{const item=rows().find(x=>!confirmed(x.time));if(!item){notice('全行が確認済みです。');return;}$('syncTapMode').checked=false;choose(item.i,true,true);});
 $('syncReplay').addEventListener('click',()=>{const t=get(selected);if(!started(t)){notice('開始位置を記録してください。',true);return;}seek(Math.max(0,t.start-1));replayEnd=Number.isFinite(t.end)?t.end+1:t.start+6;audio.play().catch(e=>notice(e.message,true));});
 $('syncPush').addEventListener('click',()=>{if(!media.isSignedIn()){$('syncAccount').open=true;notice('ログインしてください。',true);return;}$('recCloudSync')?.click();notice('同期を要求しました。完了表示をご確認ください。');});
