@@ -121,7 +121,7 @@ function fillEditor(){
  $('asgSelected').textContent=(view().findIndex(x=>x.key===selected)+1).toString().padStart(2,'0')+'　'+s.label;
  $('asgStatus').textContent=s.disabled?'使用しない':s.issue&&s.issue!=='開始未登録'?'要確認':s.status==='confirmed'&&s.usable?'確認済み':s.usable?'下書き':'未登録';
  $('asgStart').value=Number.isFinite(s.start)?fmt(s.start):'';
- $('asgEnd').value=s.manualEnd?fmt(s.end):'';
+ $('asgEnd').value=s.manualEnd?fmt(s.explicitEnd):'';
  $('asgMark').disabled=!cloud.isSignedIn()||audio.readyState<1||s.disabled;
  $('asgListen').disabled=!s.usable||audio.readyState<1;
  $('asgConfirm').disabled=!s.usable||s.status==='confirmed'||!cloud.isSignedIn();
@@ -151,7 +151,11 @@ function render(){
 $('asgMark').addEventListener('click',()=>{
  const t=Math.round(position()*100)/100;
  if(audio.readyState<1){note('音源を読み込んでから記録してください。',true);return;}
- saveOne(selected,{start:t,end:null,status:'draft',confirmedAt:null});
+ const selectedKey=selected,oldOrder=view().findIndex(x=>x.key===selectedKey);
+ if(saveOne(selectedKey,{start:t,end:null,status:'draft',confirmedAt:null})){
+  const next=view().slice(oldOrder+1).find(x=>!x.disabled&&!Number.isFinite(x.start));
+  if(next){selected=next.key;render();}
+ }
 });
 $('asgSave').addEventListener('click',()=>{
  const inputStart=$('asgStart').value.trim(),inputEnd=$('asgEnd').value.trim();
