@@ -135,6 +135,11 @@ function id(i){return 'lyric-line:'+work.id+':'+version.id+':'+i;}
 function get(i){return work&&version?all().find(x=>x.id===id(i)):null;}
 function conflict(i){return all().some(x=>x.syncConflictOf===id(i));}
 function rows(){return lines.map((text,i)=>({text,i,time:get(i)})).filter(x=>x.text.trim());}
+// Read-only snapshot for clip selection. The clip panel must never persist records.
+window.RECNOTE_READONLY_SYNC=()=>({song,versionId:version?.id||null,
+ rows:rows().map(r=>({i:r.i,text:r.text,start:Number.isFinite(r.time?.start)?r.time.start:null,end:Number.isFinite(r.time?.end)?r.time.end:null,conflict:conflict(r.i)})),
+ sections:all().filter(x=>x.song===song&&x.kind==='song-section'&&!x.deleted&&!x.syncConflictOf).map(x=>({type:x.sectionType,start:x.start,end:x.end})),
+ offset:audioOffset(),audioReady:hasAudio()});
 function started(t){return Number.isFinite(t?.start);}
 function complete(t){return started(t)&&Number.isFinite(t?.end)&&t.end>t.start;}
 function confirmed(t){return complete(t)&&t.status==='confirmed';}
@@ -283,6 +288,7 @@ function renderRows(){
  $('syncBreakdown').textContent='開始 '+begin+'・終了 '+end+'・確認済み '+done;
  $('syncMeterFill').style.width=(data.length?100*done/data.length:0)+'%';
  const missing=fillableRows().length;fillMissing.hidden=missing===0;fillMissing.textContent=missing+'行の終了未設定を自動補完';
+  window.dispatchEvent(new CustomEvent('recnote:lyric-snapshot',{detail:{song}}));
 }
 function choose(i,scroll,seekAudio){
  if(!lines[i]?.trim())return;

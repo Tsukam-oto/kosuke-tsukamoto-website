@@ -1,0 +1,17 @@
+/* Read-only, no-registration short video cue picker */
+#recnoteShortPicker{margin:16px 0;border:1px solid #d4dfe8;border-radius:13px;background:#fff;overflow:hidden}
+#recnoteShortPicker>summary{cursor:pointer;padding:15px 18px;font-size:15px;font-weight:750;color:#244763}
+#recnoteShortPicker>summary small{display:block;font-size:11px;font-weight:450;color:#697784}
+#recnoteShortPicker .scpBody{padding:1px 17px 18px}
+#recnoteShortPicker .scpBody>p{font-size:12px;color:#5a6d7c;line-height:1.6}
+#recnoteShortPicker .scpCandidates{display:flex;flex-wrap:wrap;gap:7px;padding:8px 0 14px}
+#recnoteShortPicker button{min-height:38px;border-radius:8px;border:1px solid #ccd7df;padding:8px 11px;background:#f8fafc;color:#31536b;font-weight:650;cursor:pointer}
+#recnoteShortPicker button.active{color:#fff;background:#285878;border-color:#285878}
+#recnoteShortPicker button:disabled{opacity:.36;cursor:not-allowed}
+#recnoteShortPicker .scpSelects{display:grid;grid-template-columns:1fr 1fr 150px;gap:9px}
+#recnoteShortPicker .scpSelects label{font-size:12px;font-weight:700;color:#526777}
+#recnoteShortPicker select{display:block;width:100%;min-width:0;padding:8px 6px;border:1px solid #cbd7e0;border-radius:8px;margin-top:5px;background:#fff;color:#263d50;font-size:13px}
+#recnoteShortPicker .scpPreview{white-space:pre-wrap;overflow-wrap:anywhere;margin:12px 0;padding:12px;background:#f5f8fa;border-radius:9px;font-size:13px;line-height:1.7}
+#recnoteShortPicker .scpActions{display:flex;flex-wrap:wrap;gap:8px}
+#recnoteShortPicker .scpActions button:last-child{background:#275e85;color:white;border-color:#275e85}
+@media(max-width:680px){#recnoteShortPicker .scpSelects{grid-template-columns:1fr 1fr}#recnoteShortPicker .scpSelects label:last-child{grid-column:1/-1}}
