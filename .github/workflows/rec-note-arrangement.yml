@@ -1,0 +1,31 @@
+name: REC NOTE arrangement checks
+on:
+  pull_request:
+    paths:
+      - 'rec-note/arrangement-*.js'
+      - 'rec-note/arrangement-*.css'
+      - 'rec-note/tests/arrangement-core.test.cjs'
+      - 'rec-note/lyric-sync.html'
+      - 'rec-note/index.html'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check rec-note/arrangement-core.js
+          node --check rec-note/arrangement-studio.js
+      - name: Regression tests
+        run: node --test rec-note/tests/arrangement-core.test.cjs
+      - name: Ensure required assets are included
+        run: |
+          grep -q 'arrangement-core.js' rec-note/lyric-sync.html
+          grep -q 'arrangement-studio.js' rec-note/lyric-sync.html
+          grep -q 'arrangement-studio.css' rec-note/lyric-sync.html

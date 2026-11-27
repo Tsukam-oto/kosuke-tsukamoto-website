@@ -1,0 +1,36 @@
+/* REC NOTE arrangement: compact, mobile-first, no sticky overlays. */
+#arrangementStudio{margin:12px 0 16px;background:#fff;border:1px solid #d9e1e8;border-radius:12px;color:#293b4e;overflow:hidden}
+#arrangementStudio>summary{cursor:pointer;padding:15px 17px;font-size:15px;font-weight:750;display:flex;flex-wrap:wrap;align-items:baseline;gap:5px 12px;list-style-position:inside}
+#arrangementStudio>summary small{font-size:11px;color:#697887;font-weight:450}
+#arrangementStudio .asgBody{padding:0 16px 18px}
+#arrangementStudio .asgHelp{font-size:12px;color:#5c7183;line-height:1.7;margin:0 0 12px}
+#arrangementStudio .asgMeta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;align-items:baseline;padding-bottom:11px;font-size:12px;color:#4a6276}
+#arrangementStudio .asgMeta strong{font-size:13px}
+#arrangementStudio .asgList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+#arrangementStudio .asgRow{min-height:68px;text-align:left;border:1px solid #dfe6ec;background:#fff;border-radius:9px;padding:9px 11px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;color:#2e4355;cursor:pointer;font-size:13px}
+#arrangementStudio .asgRow strong{font-size:13px;font-weight:700}
+#arrangementStudio .asgRow span{font-variant-numeric:tabular-nums;color:#2d658f;font-size:12px}
+#arrangementStudio .asgRow small{font-size:10px;color:#6b7c88;line-height:1.3;overflow-wrap:anywhere}
+#arrangementStudio .asgRow.selected{background:#edf5fc;border-color:#5892bf;box-shadow:inset 3px 0 #437ba8}
+#arrangementStudio .asgRow.disabled{opacity:.55}
+#arrangementStudio button:focus-visible,#arrangementStudio select:focus-visible,#arrangementStudio input:focus-visible,#arrangementStudio summary:focus-visible{outline:3px solid #8ab8de;outline-offset:2px}
+#arrangementStudio button:disabled{opacity:.4;cursor:default}
+#arrangementStudio .asgEditor{margin-top:13px;border:1px solid #d7e1ea;border-radius:11px;padding:13px;background:#f8fafc}
+#arrangementStudio .asgEditorHead{display:flex;gap:6px 12px;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:11px}
+#arrangementStudio .asgEditorHead strong{font-size:16px}
+#arrangementStudio .asgEditorHead span{font-size:11px;color:#607385}
+#arrangementStudio .asgMainActions{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}
+#arrangementStudio button{min-height:40px;border:1px solid #cbd8e2;border-radius:8px;background:#fff;color:#28506d;padding:8px 11px;font-weight:650;cursor:pointer;font-size:12px}
+#arrangementStudio button.asgPrimary{background:#235d85;border-color:#235d85;color:#fff;font-size:14px;padding:10px 15px}
+#arrangementStudio .asgFields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+#arrangementStudio .asgFields label,#arrangementStudio .asgAdd label{font-size:12px;color:#50687e;font-weight:650}
+#arrangementStudio input,#arrangementStudio select{display:block;width:100%;min-height:39px;border:1px solid #cbd7e0;border-radius:7px;padding:8px 9px;margin-top:5px;color:#24394a;background:#fff;font-size:13px;min-width:0}
+#arrangementStudio .asgAdvanced{margin-top:10px;border-top:1px solid #dae4ec;padding-top:10px}
+#arrangementStudio .asgAdvanced>summary{cursor:pointer;color:#55738b;font-size:12px}
+#arrangementStudio .asgAdvancedHelp{font-size:11px;color:#687c8c}
+#arrangementStudio .asgAdd{display:flex;gap:9px;align-items:end;flex-wrap:wrap;margin-top:13px;padding:12px 0;border-top:1px solid #e6eaee}
+#arrangementStudio .asgAdd label{flex:1;min-width:170px}
+#arrangementStudio .asgFooter{margin-top:7px}
+#arrangementStudio .asgFooter p{color:#526d81;font-size:12px;margin:10px 0 0;line-height:1.55}
+#arrangementStudio .asgFooter p[data-error="true"]{color:#a53838}
+@media(max-width:560px){#arrangementStudio .asgBody{padding:0 11px 14px}#arrangementStudio .asgList{grid-template-columns:1fr 1fr;gap:5px}#arrangementStudio .asgRow{padding:9px;min-height:70px}#arrangementStudio .asgRow strong{font-size:12px}#arrangementStudio .asgFields{grid-template-columns:1fr 1fr}}
