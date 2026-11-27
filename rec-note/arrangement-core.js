@@ -59,7 +59,7 @@ function arrangement(records,song,duration){
   const previous=here>0?active[here-1]:null;
   if(!issue&&Number.isFinite(previous?.start)&&previous.start>=start)issue='前の区間より開始が早くなっています。';
   return {key:s.key,id,label:s.label,type:s.type,order:s.order,start,end,endSource,issue,
-    status:s.status==='confirmed'?'confirmed':'draft',disabled:!!s.disabled,manualEnd:manual!==null,
+    status:s.status==='confirmed'?'confirmed':'draft',disabled:!!s.disabled,manualEnd:manual!==null,explicitEnd:manual,
     usable:!issue&&Number.isFinite(start)&&Number.isFinite(end)&&end>start,
     isPreset:PRESET.some(p=>p.key===s.key)};
  });
