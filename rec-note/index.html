@@ -70,9 +70,10 @@
   <link rel="stylesheet" href="./lyric-sync-mobile.css?v=8.2" />
 <style>
 /* REC NOTE two-task entry, other production modes retained in code */
-.recTaskNav{display:grid;grid-template-columns:1fr 1fr;gap:8px;max-width:1240px;margin:12px auto 4px;padding:0 18px}
+.recTaskNav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:1240px;margin:12px auto 4px;padding:0 18px}
 .recTaskNav a{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:62px;gap:3px;padding:11px 8px;text-align:center;background:#fff;color:#425066;text-decoration:none;border:1px solid #dce1e7;border-radius:13px;font-size:15px;font-weight:750;line-height:1.4}
 .recTaskNav a small{font-size:11px;font-weight:450;opacity:.78}
+@media(max-width:600px){.recTaskNav a[href$="#arrangementStudio"]{grid-column:1/-1;min-height:46px}}
 .recTaskNav a[aria-current="page"]{background:#24384d;color:#fff;border-color:#24384d}
 .recTaskNav a:focus-visible{outline:3px solid #7aa6d4;outline-offset:3px}
 body.recSimplified .modeDock{display:none!important}
@@ -83,7 +84,7 @@ body.recSimplified .headwrap .brand .sub{display:none}
 .recExtrasMenu{position:absolute;z-index:55;right:0;top:calc(100% + 6px);display:flex;gap:6px;flex-direction:column;min-width:135px;padding:9px;background:#fff;border:1px solid #dce1e7;border-radius:10px;box-shadow:0 8px 22px #273f5718}
 .recExtrasMenu button{width:100%;text-align:left}
 
-@media(max-width:600px){.recTaskNav{padding:0 12px;gap:7px;margin:9px auto 5px}.recTaskNav a{font-size:13px;min-height:58px}.recTaskNav a small{font-size:10px}}
+@media(max-width:600px){.recTaskNav{grid-template-columns:repeat(2,minmax(0,1fr));padding:0 12px;gap:7px;margin:9px auto 5px}.recTaskNav a{font-size:13px;min-height:58px}.recTaskNav a small{font-size:10px}}
 
 /* v10: Only audio corrections belong on the REC page. Keep archived MV/SHORT
    records and fields in source for compatibility, never show them in this UI. */
